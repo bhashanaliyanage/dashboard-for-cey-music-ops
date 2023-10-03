@@ -70,7 +70,7 @@ public class Main extends Application {
                 "Original file name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line;
+        String line; // Test
 
         while ((line = reader.readLine()) != null) {
             String[] columnNames = line.split(",");
