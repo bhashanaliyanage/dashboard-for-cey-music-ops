@@ -10,7 +10,7 @@ public class Database {
     public static Connection getConn() throws ClassNotFoundException, SQLException {
         if (conn == null) {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:data.sqlite");
+            conn = DriverManager.getConnection("jdbc:sqlite:songs.db");
         }
         return conn;
     }

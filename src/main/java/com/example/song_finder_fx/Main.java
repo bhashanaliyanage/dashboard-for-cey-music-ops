@@ -55,38 +55,43 @@ public class Main extends Application {
         Scanner sc = new Scanner(new File(file.getAbsolutePath()));
         sc.useDelimiter(",");
 
-        PreparedStatement ps = db.prepareStatement("INSERT INTO 'Database New 02' (ISRC," +
-                "Album title," +
+        PreparedStatement ps = db.prepareStatement("INSERT INTO 'songData' (ISRC," +
+                "ALBUM_TITLE," +
                 "UPC," +
-                "Catalog number," +
-                "Primary artists," +
-                "Album format," +
-                "Track title," +
-                "Track version," +
-                "Singer," +
-                "Featuring artists," +
-                "Composers," +
-                "Lyricists," +
-                "Original file name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "CAT_NO," +
+                "PRODUCT_PRIMARY," +
+                "ALBUM_FORMAT," +
+                "TRACK_TITLE," +
+                "TRACK_VERSION," +
+                "SINGER," +
+                "FEATURING," +
+                "COMPOSER," +
+                "LYRICIST," +
+                "FILE_NAME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String line; // Test
 
         while ((line = reader.readLine()) != null) {
             String[] columnNames = line.split(",");
-            if (columnNames.length > 0) {
-                ps.setString(1, columnNames[0]);
-                ps.setString(2, columnNames[1]);
-                ps.setString(3, columnNames[2]);
-                ps.setString(4, columnNames[3]);
-                ps.setString(5, columnNames[4]);
-                ps.setString(6, columnNames[5]);
-                ps.setString(7, columnNames[6]);
-                ps.setString(8, columnNames[7]);
-                ps.setString(9, columnNames[8]);
-                ps.setString(10, columnNames[9]);
-                ps.setString(11, columnNames[10]);
-                ps.setString(12, columnNames[11]);
+
+            try {
+                if (columnNames.length > 0) {
+                    ps.setString(1, columnNames[0]);
+                    ps.setString(2, columnNames[1]);
+                    ps.setString(3, columnNames[2]);
+                    ps.setString(4, columnNames[3]);
+                    ps.setString(5, columnNames[4]);
+                    ps.setString(6, columnNames[5]);
+                    ps.setString(7, columnNames[6]);
+                    ps.setString(8, columnNames[7]);
+                    ps.setString(9, columnNames[8]);
+                    ps.setString(10, columnNames[9]);
+                    ps.setString(11, columnNames[10]);
+                    ps.setString(12, columnNames[11]);
+                }
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("Empty Column skipped!");
             }
         }
 

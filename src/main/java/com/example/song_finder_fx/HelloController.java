@@ -25,7 +25,7 @@ public class HelloController {
         // progressBar.setProgress(100.0);
 
         // Creating Database
-        // main.CreateBase();
+        main.CreateBase();
     }
 
     public void onProceedButtonClick(ActionEvent event) throws SQLException, IOException, ClassNotFoundException {
