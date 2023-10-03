@@ -9,27 +9,26 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.sqlite.SQLiteException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-
 import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main extends Application {
-    private Label fileNameLabel;
     private ProgressBar progressBar = new ProgressBar(0.0);
-    private HelloController helloController;
 
 
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(loader.load(), 320, 240);
-        helloController = loader.getController();
-        fileNameLabel = (Label) loader.getNamespace().get("fileNameLabel");
+        HelloController helloController = loader.getController();
         progressBar = (ProgressBar) loader.getNamespace().get("progressBar");
         stage.setTitle("Hello!");
         stage.setScene(scene);
@@ -89,14 +88,14 @@ public class Main extends Application {
                     ps.setString(10, columnNames[9]);
                     ps.setString(11, columnNames[10]);
                     ps.setString(12, columnNames[11]);
+
+                    ps.executeUpdate();
                 }
-            } catch (ArrayIndexOutOfBoundsException e) {
-                System.out.println("Empty Column skipped!");
+            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
+                e.printStackTrace();
             }
         }
-
         sc.close();
-
     }
 
     public void executeFunction(ActionEvent event) {
