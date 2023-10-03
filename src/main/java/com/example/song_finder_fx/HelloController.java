@@ -3,7 +3,6 @@ package com.example.song_finder_fx;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 
 import java.io.File;
