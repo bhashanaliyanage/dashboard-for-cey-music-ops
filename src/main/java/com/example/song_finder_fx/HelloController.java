@@ -7,8 +7,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.SQLException;
 
 public class HelloController {
@@ -27,11 +25,14 @@ public class HelloController {
         // progressBar.setProgress(100.0);
 
         // Creating Database
-        main.CreateBase();
+        Database.CreateBase();
     }
 
-    public void onProceedButtonClick() {
+    public void onProceedButtonClick() throws SQLException, ClassNotFoundException {
+        Main main = new Main();
         String text = textArea.getText();
-        System.out.println(text);
+
+        main.searchAudios(text);
+        /*System.out.println(Arrays.toString(isrcCodes));*/
     }
 }

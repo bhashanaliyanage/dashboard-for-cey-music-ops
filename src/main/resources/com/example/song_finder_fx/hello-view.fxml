@@ -16,7 +16,7 @@
 
     <TextArea fx:id="textArea" prefColumnCount="50"/>
 
-    <Button text="Browse" onAction="#onBrowseButtonClick"/>
+    <!--<Button text="Browse" onAction="#onBrowseButtonClick"/>-->
     <Button text="Proceed" onAction="#onProceedButtonClick"/>
     <!--<ProgressBar fx:id="progressBar" progress="0.0"/>-->
 

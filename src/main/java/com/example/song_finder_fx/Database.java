@@ -1,8 +1,13 @@
 package com.example.song_finder_fx;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import org.sqlite.SQLiteException;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.*;
+import java.util.Scanner;
 
 public class Database {
     private static Connection conn = null;
@@ -13,5 +18,126 @@ public class Database {
             conn = DriverManager.getConnection("jdbc:sqlite:songs.db");
         }
         return conn;
+    }
+
+    public static void CreateBase() throws SQLException, ClassNotFoundException {
+        // Load the JDBC driver
+        Connection db = Database.getConn();
+
+        PreparedStatement ps = db.prepareStatement("CREATE TABLE IF NOT EXISTS songData (" +
+                "ISRC TEXT PRIMARY KEY," +
+                "ALBUM_TITLE TEXT," +
+                "UPC INTEGER," +
+                "CAT_NO TEXT," +
+                "PRODUCT_PRIMARY TEXT," +
+                "ALBUM_FORMAT TEXT," +
+                "TRACK_TITLE TEXT," +
+                "TRACK_VERSION TEXT," +
+                "SINGER TEXT," +
+                "FEATURING TEXT," +
+                "COMPOSER TEXT," +
+                "LYRICIST TEXT," +
+                "FILE_NAME TEXT)");
+
+        ps.executeUpdate();
+    }
+
+    public static void updateBase(File file) throws SQLException, ClassNotFoundException, IOException {
+        Connection db = Database.getConn();
+        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
+        sc.useDelimiter(",");
+
+        PreparedStatement ps = db.prepareStatement("UPDATE 'songData'" +
+                "SET FILE_NAME = ?" +
+                "WHERE ISRC = ?");
+
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String line; // Test
+
+        while ((line = reader.readLine()) != null) {
+            String[] columnNames = line.split(",");
+
+            try {
+                if (columnNames.length > 0) {
+                    ps.setString(1, columnNames[12]);
+                    ps.setString(2, columnNames[0]);
+
+                    ps.executeUpdate();
+                }
+            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
+                e.printStackTrace();
+            }
+        }
+        sc.close();
+    }
+
+    public static void ImportToBase(File file) throws SQLException, ClassNotFoundException, IOException {
+        Connection db = Database.getConn();
+        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
+        sc.useDelimiter(",");
+
+        PreparedStatement ps = db.prepareStatement("INSERT INTO 'songData' (ISRC," +
+                "ALBUM_TITLE," +
+                "UPC," +
+                "CAT_NO," +
+                "PRODUCT_PRIMARY," +
+                "ALBUM_FORMAT," +
+                "TRACK_TITLE," +
+                "TRACK_VERSION," +
+                "SINGER," +
+                "FEATURING," +
+                "COMPOSER," +
+                "LYRICIST," +
+                "FILE_NAME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String line; // Test
+
+        while ((line = reader.readLine()) != null) {
+            String[] columnNames = line.split(",");
+
+            try {
+                if (columnNames.length > 0) {
+                    ps.setString(1, columnNames[0]);
+                    ps.setString(2, columnNames[1]);
+                    ps.setString(3, columnNames[2]);
+                    ps.setString(4, columnNames[3]);
+                    ps.setString(5, columnNames[4]);
+                    ps.setString(6, columnNames[5]);
+                    ps.setString(7, columnNames[6]);
+                    ps.setString(8, columnNames[7]);
+                    ps.setString(9, columnNames[8]);
+                    ps.setString(10, columnNames[9]);
+                    ps.setString(11, columnNames[10]);
+                    ps.setString(12, columnNames[11]);
+                    ps.setString(13, columnNames[12]);
+
+                    ps.executeUpdate();
+                }
+            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
+                e.printStackTrace();
+            }
+        }
+        sc.close();
+    }
+
+    public static void SearchSongs(String[] ISRCCodes) throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+        ResultSet rs;
+        String filename;
+
+        PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME " +
+                "FROM songData " +
+                "WHERE ISRC = ?");
+
+        for (String ISRCCode : ISRCCodes) {
+            ps.setString(1, ISRCCode);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                filename = rs.getString("FILE_NAME");
+                System.out.println(filename);
+            }
+        }
     }
 }
