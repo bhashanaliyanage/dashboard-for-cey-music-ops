@@ -4,10 +4,10 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ProgressBar;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -41,6 +41,19 @@ public class Main extends Application {
         return selectedFile;
     }
 
+    public File browseLocation() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Choose a directory");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int result = chooser.showOpenDialog(null);
+        File selectedDirectory = null;
+        if (result == JFileChooser.APPROVE_OPTION) {
+            selectedDirectory = chooser.getSelectedFile();
+            System.out.println("Selected directory: " + selectedDirectory.getAbsolutePath());
+        }
+        return selectedDirectory;
+    }
+
 /*    public void executeFunction(ActionEvent event) {
         Task<Void> task = new Task<Void>() {
             @Override
@@ -69,9 +82,9 @@ public class Main extends Application {
         thread.start();
     }*/
 
-    public void searchAudios(String ISRCs) throws SQLException, ClassNotFoundException {
+    public void searchAudios(String ISRCs, File directory) throws SQLException, ClassNotFoundException {
         String[] ISRCCodes = ISRCs.split("\\n");
-        Database.SearchSongs(ISRCCodes);
+        Database.SearchSongsFromDB(ISRCCodes, directory);
     }
 
 }

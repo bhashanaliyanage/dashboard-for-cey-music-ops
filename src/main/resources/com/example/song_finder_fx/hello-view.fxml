@@ -12,11 +12,11 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
-    <Label fx:id="fileNameLabel" text="Select a CSV"/>
+    <Label fx:id="audioLocation" text="Select Audio Database Location"/>
+    <Button text="Browse" onAction="#onBrowseButtonClick"/>
 
     <TextArea fx:id="textArea" prefColumnCount="50"/>
 
-    <!--<Button text="Browse" onAction="#onBrowseButtonClick"/>-->
     <Button text="Proceed" onAction="#onProceedButtonClick"/>
     <!--<ProgressBar fx:id="progressBar" progress="0.0"/>-->
 

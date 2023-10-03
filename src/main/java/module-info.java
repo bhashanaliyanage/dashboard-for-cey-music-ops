@@ -3,6 +3,7 @@ module com.example.song_finder_fx {
     requires javafx.fxml;
     requires java.sql;
     requires org.xerial.sqlitejdbc;
+    requires java.desktop;
 
 
     opens com.example.song_finder_fx to javafx.fxml;

@@ -12,27 +12,23 @@ import java.sql.SQLException;
 public class HelloController {
     @FXML
     public Label fileNameLabel;
-    public ProgressBar progressBar;
     public File file;
     public TextArea textArea;
+    public Label audioLocation;
+    File directory;
 
     @FXML
     protected void onBrowseButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException {
         Main main = new Main();
-        file = main.browseFile(event);
-        String fileName = file.getName();
-        fileNameLabel.setText(fileName);
-        // progressBar.setProgress(100.0);
-
-        // Creating Database
-        Database.CreateBase();
+        directory = main.browseLocation();
+        Database.SearchSongsFromAudioLibrary(directory);
     }
 
     public void onProceedButtonClick() throws SQLException, ClassNotFoundException {
         Main main = new Main();
         String text = textArea.getText();
 
-        main.searchAudios(text);
+        main.searchAudios(text, directory);
         /*System.out.println(Arrays.toString(isrcCodes));*/
     }
 }

@@ -6,8 +6,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 public class Database {
     private static Connection conn = null;
@@ -121,7 +125,7 @@ public class Database {
         sc.close();
     }
 
-    public static void SearchSongs(String[] ISRCCodes) throws SQLException, ClassNotFoundException {
+    public static void SearchSongsFromDB(String[] ISRCCodes, File directory) throws SQLException, ClassNotFoundException {
         Connection db = Database.getConn();
         ResultSet rs;
         String filename;
@@ -136,8 +140,31 @@ public class Database {
 
             while (rs.next()) {
                 filename = rs.getString("FILE_NAME");
-                System.out.println(filename);
+                Path start = Paths.get(directory.toURI());
+
+                try (Stream<Path> stream = Files.walk(start)) {
+                    String finalFilename = filename;
+                    Path file = stream
+                            .filter(path -> path.toFile().isFile())
+                            .filter(path -> path.getFileName().toString().equals(finalFilename))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (file != null) {
+                        System.out.println("File found: " + file.toString());
+                    } else {
+                        System.out.println("File not found.");
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // System.out.println(filename);
             }
         }
+    }
+
+    public static void SearchSongsFromAudioLibrary(File directory) {
+        Path start = Paths.get(directory.toURI());
     }
 }
