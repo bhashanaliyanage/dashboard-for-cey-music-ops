@@ -11,10 +11,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.sqlite.SQLiteException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -88,6 +85,7 @@ public class Main extends Application {
                     ps.setString(10, columnNames[9]);
                     ps.setString(11, columnNames[10]);
                     ps.setString(12, columnNames[11]);
+                    ps.setString(13, columnNames[12]);
 
                     ps.executeUpdate();
                 }
@@ -98,7 +96,36 @@ public class Main extends Application {
         sc.close();
     }
 
-    public void executeFunction(ActionEvent event) {
+    public void updateBase(File file) throws SQLException, ClassNotFoundException, IOException {
+        Connection db = Database.getConn();
+        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
+        sc.useDelimiter(",");
+
+        PreparedStatement ps = db.prepareStatement("UPDATE 'songData'" +
+                "SET FILE_NAME = ?" +
+                "WHERE ISRC = ?");
+
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String line; // Test
+
+        while ((line = reader.readLine()) != null) {
+            String[] columnNames = line.split(",");
+
+            try {
+                if (columnNames.length > 0) {
+                    ps.setString(1, columnNames[12]);
+                    ps.setString(2, columnNames[0]);
+
+                    ps.executeUpdate();
+                }
+            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
+                e.printStackTrace();
+            }
+        }
+        sc.close();
+    }
+
+/*    public void executeFunction(ActionEvent event) {
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -124,7 +151,7 @@ public class Main extends Application {
         Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
-    }
+    }*/
 
     public void CreateBase() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
@@ -147,6 +174,8 @@ public class Main extends Application {
 
         ps.executeUpdate();
     }
+
+
 
     public static void main(String[] args) {
         launch(args);

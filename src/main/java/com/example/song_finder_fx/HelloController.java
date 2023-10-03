@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextArea;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,6 +16,7 @@ public class HelloController {
     public Label fileNameLabel;
     public ProgressBar progressBar;
     public File file;
+    public TextArea textArea;
 
     @FXML
     protected void onBrowseButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException {
@@ -28,8 +30,8 @@ public class HelloController {
         main.CreateBase();
     }
 
-    public void onProceedButtonClick(ActionEvent event) throws SQLException, IOException, ClassNotFoundException {
-        Main main = new Main();
-        main.ImportToBase(file);
+    public void onProceedButtonClick() {
+        String text = textArea.getText();
+        System.out.println(text);
     }
 }
