@@ -3,35 +3,44 @@ package com.example.song_finder_fx;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
 public class HelloController {
-    @FXML
-    public Label fileNameLabel;
-    public ProgressBar progressBar;
-    public File file;
     public TextArea textArea;
+    public Label audioLocation;
+    File directory;
+    File destination;
 
     @FXML
-    protected void onBrowseButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException {
+    protected void onBrowseAudioButtonClick() {
         Main main = new Main();
-        file = main.browseFile(event);
-        String fileName = file.getName();
-        fileNameLabel.setText(fileName);
-        // progressBar.setProgress(100.0);
-
-        // Creating Database
-        main.CreateBase();
+        directory = main.browseLocation();
+        if (directory != null) {
+            Database.SearchSongsFromAudioLibrary(directory);
+        } else {
+            System.out.println("Directory not chosen!");
+        }
     }
 
-    public void onProceedButtonClick() {
+    public void onProceedButtonClick() throws SQLException, ClassNotFoundException, IOException {
+        Main main = new Main();
         String text = textArea.getText();
-        System.out.println(text);
+
+        if (text != null) {
+            main.searchAudios(text, directory, destination);
+        } else {
+            System.out.println("No ISRC codes given!");
+        }
+
+        /*System.out.println(Arrays.toString(isrcCodes));*/
+    }
+
+    public void onBrowseDestinationButtonClick(ActionEvent actionEvent) {
+        Main main = new Main();
+        destination = main.browseDestination();
     }
 }
