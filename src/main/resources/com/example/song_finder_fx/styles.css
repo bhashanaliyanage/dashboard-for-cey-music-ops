@@ -1,0 +1,16 @@
+.white-background{
+    -fx-background-color: '#fff';
+}
+
+.right-side-border {
+    -fx-border-color: '#ebebf2';
+    -fx-border-width: 0 1 0 0;
+}
+
+.primary-color{
+    -fx-background-color: '#EFF2F6';
+}
+
+.comment-color {
+    -fx-color: '#ebebf2';
+}

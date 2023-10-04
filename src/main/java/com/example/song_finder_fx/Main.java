@@ -21,24 +21,15 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(loader.load(), 320, 240);
+        Scene scene = new Scene(loader.load(), 720, 450);
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
     }
 
-    public File browseFile(ActionEvent event) {
+    public File browseFile() {
         FileChooser fileChooser = new FileChooser();
-        File selectedFile = fileChooser.showOpenDialog(null);
-        String name;
-
-        if (selectedFile != null) {
-            name = selectedFile.getName();
-        } else {
-            name = "No File Selected!";
-        }
-
-        return selectedFile;
+        return fileChooser.showOpenDialog(null);
     }
 
     public File browseLocation() {
