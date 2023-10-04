@@ -14,3 +14,18 @@
 .comment-color {
     -fx-color: '#ebebf2';
 }
+
+.button {
+    -fx-background-color: '#1b1b3f';
+    -fx-background-radius: 30;
+}
+
+.button:hover {
+    -fx-background-color: '#343677';
+    -fx-background-radius: 30;
+}
+
+.button:pressed {
+    -fx-background-color: '#0b0b19';
+    -fx-background-radius: 30;
+}

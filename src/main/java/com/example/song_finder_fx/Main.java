@@ -21,15 +21,24 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(loader.load(), 720, 450);
+        Scene scene = new Scene(loader.load(), 720, 600);
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
     }
 
-    public File browseFile() {
+    public File browseFile(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        return fileChooser.showOpenDialog(null);
+        File selectedFile = fileChooser.showOpenDialog(null);
+        String name;
+
+        if (selectedFile != null) {
+            name = selectedFile.getName();
+        } else {
+            name = "No File Selected!";
+        }
+
+        return selectedFile;
     }
 
     public File browseLocation() {
@@ -40,7 +49,7 @@ public class Main extends Application {
         File selectedDirectory = null;
         if (result == JFileChooser.APPROVE_OPTION) {
             selectedDirectory = chooser.getSelectedFile();
-            System.out.println("Selected directory: " + selectedDirectory.getAbsolutePath());
+            System.out.println("Selected audio database directory: " + selectedDirectory.getAbsolutePath());
         }
         return selectedDirectory;
     }
@@ -73,9 +82,21 @@ public class Main extends Application {
         thread.start();
     }*/
 
-    public void searchAudios(String ISRCs, File directory) throws SQLException, ClassNotFoundException {
+    public void searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, IOException {
         String[] ISRCCodes = ISRCs.split("\\n");
-        Database.SearchSongsFromDB(ISRCCodes, directory);
+        Database.SearchSongsFromDB(ISRCCodes, directory, destination);
     }
 
+    public File browseDestination() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Choose a directory");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int result = chooser.showOpenDialog(null);
+        File selectedDirectory = null;
+        if (result == JFileChooser.APPROVE_OPTION) {
+            selectedDirectory = chooser.getSelectedFile();
+            System.out.println("Selected destination directory: " + selectedDirectory.getAbsolutePath());
+        }
+        return selectedDirectory;
+    }
 }

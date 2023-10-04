@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.util.Scanner;
 import java.util.stream.Stream;
@@ -125,10 +126,11 @@ public class Database {
         sc.close();
     }
 
-    public static void SearchSongsFromDB(String[] ISRCCodes, File directory) throws SQLException, ClassNotFoundException {
+    public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException, IOException {
         Connection db = Database.getConn();
         ResultSet rs;
         String filename;
+        Path tempDir = destination.toPath();
 
         PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME " +
                 "FROM songData " +
@@ -151,18 +153,21 @@ public class Database {
                             .orElse(null);
 
                     if (file != null) {
-                        System.out.println("File found: " + file.toString());
+                        Path targetDir = destination.toPath();
+                        Path targetFile = targetDir.resolve(finalFilename);
+                        Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                        System.out.println("File copied to: " + targetFile.toString());
                     } else {
                         System.out.println("File not found.");
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
-                // System.out.println(filename);
             }
         }
     }
+
+
 
     public static void SearchSongsFromAudioLibrary(File directory) {
         Path start = Paths.get(directory.toURI());
