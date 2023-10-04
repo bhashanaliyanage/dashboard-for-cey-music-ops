@@ -35,8 +35,6 @@ public class HelloController {
         } else {
             System.out.println("No ISRC codes given!");
         }
-
-        /*System.out.println(Arrays.toString(isrcCodes));*/
     }
 
     public void onBrowseDestinationButtonClick(ActionEvent actionEvent) {

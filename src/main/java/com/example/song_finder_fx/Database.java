@@ -167,8 +167,6 @@ public class Database {
         }
     }
 
-
-
     public static void SearchSongsFromAudioLibrary(File directory) {
         Path start = Paths.get(directory.toURI());
     }
