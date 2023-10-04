@@ -14,102 +14,91 @@
 <BorderPane prefHeight="500.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.HelloController">
    <center>
       <VBox alignment="TOP_CENTER" maxWidth="-Infinity" prefHeight="444.0" prefWidth="500.0" BorderPane.alignment="CENTER">
-         <HBox alignment="CENTER_RIGHT" prefHeight="55.0" prefWidth="500.0" styleClass="white-background" stylesheets="@styles.css">
-            <children>
-               <Label stylesheets="@styles.css" text="// Search box to be implemented" textFill="#c3c3c3">
-                  <HBox.margin>
-                     <Insets />
-                  </HBox.margin>
-                  <padding>
-                     <Insets right="20.0" />
-                  </padding>
-               </Label>
-            </children>
+         <HBox alignment="CENTER_RIGHT" prefHeight="55.0" prefWidth="500.0" styleClass="white-background"
+               stylesheets="@styles.css">
+            <Label stylesheets="@styles.css" text="// Search box to be implemented" textFill="#c3c3c3">
+               <HBox.margin>
+                  <Insets/>
+               </HBox.margin>
+               <padding>
+                  <Insets right="20.0"/>
+               </padding>
+            </Label>
          </HBox>
          <VBox styleClass="primary-color" stylesheets="@styles.css" VBox.vgrow="ALWAYS">
-            <children>
-            
-                <Label fx:id="audioLocation" text="Search by ISRC">
+            <Label fx:id="audioLocation" text="Search by ISRC">
+               <padding>
+                  <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
+               </padding>
+               <font>
+                  <Font size="16.0"/>
+               </font>
+            </Label>
+            <HBox alignment="CENTER_LEFT" prefWidth="200.0">
+               <Label text="Browse for Audio Location:">
+                  <HBox.margin>
+                     <Insets/>
+                  </HBox.margin>
                   <padding>
-                     <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                     <Insets left="30.0"/>
                   </padding>
-                  <font>
-                     <Font size="16.0" />
-                  </font>
                </Label>
-               <HBox alignment="CENTER_LEFT" prefWidth="200.0">
-                  <children>
-                     <Label text="Browse for Audio Location:">
-                        <HBox.margin>
-                           <Insets />
-                        </HBox.margin>
-                        <padding>
-                           <Insets left="30.0" />
-                        </padding>
-                     </Label>
-                      <Button onAction="#onBrowseButtonClick" text="Browse">
-                        <HBox.margin>
-                           <Insets left="30.0" />
-                        </HBox.margin>
-                     </Button>
-                  </children>
-               </HBox>
-            
-                <TextArea fx:id="textArea" prefColumnCount="50" promptText="Enter ISRCs">
-                  <VBox.margin>
-                     <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
-                  </VBox.margin>
-               </TextArea>
-            
-                <Button onAction="#onProceedButtonClick" text="Proceed">
-                  <VBox.margin>
-                     <Insets left="30.0" />
-                  </VBox.margin>
+               <Button onAction="#onBrowseButtonClick" text="Browse">
+                  <HBox.margin>
+                     <Insets left="30.0"/>
+                  </HBox.margin>
                </Button>
-            </children>
+            </HBox>
+
+            <TextArea fx:id="textArea" prefColumnCount="50" promptText="Enter ISRCs">
+               <VBox.margin>
+                  <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
+               </VBox.margin>
+            </TextArea>
+
+            <Button onAction="#onProceedButtonClick" text="Proceed">
+               <VBox.margin>
+                  <Insets left="30.0"/>
+               </VBox.margin>
+            </Button>
          </VBox>
           <!--<ProgressBar fx:id="progressBar" progress="0.0"/>-->
       
       </VBox>
    </center>
    <left>
-      <VBox alignment="CENTER" prefHeight="444.0" prefWidth="221.0" spacing="5.0" stylesheets="@styles.css" BorderPane.alignment="CENTER">
-         <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="200.0">
-               <children>
-                  <Label lineSpacing="20.0" prefHeight="62.0" prefWidth="188.0" text="CeyMusic Operations">
-                     <font>
-                        <Font name="System Bold" size="16.0" />
-                     </font>
-                     <padding>
-                        <Insets left="20.0" />
-                     </padding>
-                  </Label>
-               </children>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-            </HBox>
-            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="210.0" prefHeight="45.0" prefWidth="200.0">
-               <children>
-                  <Label lineSpacing="20.0" prefHeight="62.0" prefWidth="188.0" text="Search by ISRC">
-                     <font>
-                        <Font size="15.0" />
-                     </font>
-                     <padding>
-                        <Insets left="20.0" />
-                     </padding>
-                  </Label>
-               </children>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-            </HBox>
-         </children>
+      <VBox alignment="CENTER" prefHeight="444.0" prefWidth="221.0" spacing="5.0" stylesheets="@styles.css"
+            BorderPane.alignment="CENTER">
          <styleClass>
-            <String fx:value="white-background" />
-            <String fx:value="right-side-border" />
+            <String fx:value="white-background"/>
+            <String fx:value="right-side-border"/>
          </styleClass>
+         <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="200.0">
+            <opaqueInsets>
+               <Insets/>
+            </opaqueInsets>
+            <Label lineSpacing="20.0" prefHeight="62.0" prefWidth="188.0" text="CeyMusic Operations">
+               <font>
+                  <Font name="System Bold" size="16.0"/>
+               </font>
+               <padding>
+                  <Insets left="20.0"/>
+               </padding>
+            </Label>
+         </HBox>
+         <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="210.0" prefHeight="45.0" prefWidth="200.0">
+            <opaqueInsets>
+               <Insets/>
+            </opaqueInsets>
+            <Label lineSpacing="20.0" prefHeight="62.0" prefWidth="188.0" text="Search by ISRC">
+               <font>
+                  <Font size="15.0"/>
+               </font>
+               <padding>
+                  <Insets left="20.0"/>
+               </padding>
+            </Label>
+         </HBox>
       </VBox>
    </left>
 </BorderPane>
