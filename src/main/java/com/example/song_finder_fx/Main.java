@@ -101,3 +101,6 @@ public class Main extends Application {
         return selectedDirectory;
     }
 }
+
+// TODO: Add transparency to user (Chosen directory/ Progress/ Completion)
+// TODO: Add different thread to UI
