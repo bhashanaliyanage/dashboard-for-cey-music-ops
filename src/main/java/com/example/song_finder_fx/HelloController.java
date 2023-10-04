@@ -10,16 +10,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class HelloController {
-    @FXML
-    public Label fileNameLabel;
-    public File file;
     public TextArea textArea;
     public Label audioLocation;
     File directory;
     File destination;
 
     @FXML
-    protected void onBrowseAudioButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException {
+    protected void onBrowseAudioButtonClick() {
         Main main = new Main();
         directory = main.browseLocation();
         if (directory != null) {
