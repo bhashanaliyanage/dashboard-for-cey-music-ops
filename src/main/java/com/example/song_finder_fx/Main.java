@@ -22,13 +22,13 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         // Loading layout file
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(loader.load(), 720, 600);
+        Scene scene = new Scene(loader.load(), 900, 600);
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
     }
 
-    public File browseFile(ActionEvent event) {
+    /*public File browseFile(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showOpenDialog(null);
         String name;
@@ -40,7 +40,7 @@ public class Main extends Application {
         }
 
         return selectedFile;
-    }
+    }*/
 
     public File browseLocation() {
         JFileChooser chooser = new JFileChooser();
@@ -101,3 +101,11 @@ public class Main extends Application {
         return selectedDirectory;
     }
 }
+
+// TODO: Check current progress with test cases
+// TODO: Run UI in a separate thread
+// TODO: Show location, and destination location
+// TODO: Show progress
+// TODO: Implement tabs
+// TODO: Implement get song data by ISRCs
+// TODO: Remember last entered database location, and destination location
