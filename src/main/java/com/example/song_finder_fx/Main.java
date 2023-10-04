@@ -20,6 +20,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        // Loading layout file
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(loader.load(), 720, 600);
         stage.setTitle("Hello!");
