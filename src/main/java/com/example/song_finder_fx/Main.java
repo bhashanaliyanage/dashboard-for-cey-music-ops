@@ -79,3 +79,5 @@ public class Main extends Application {
 // TODO: Implement tabs
 // TODO: Implement get song data by ISRCs
 // TODO: Check current progress with test cases
+// TODO: Using firebase
+// TODO: Adding admin switch
