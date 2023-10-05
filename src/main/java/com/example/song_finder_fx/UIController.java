@@ -7,20 +7,54 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static java.awt.SystemColor.text;
-
 public class UIController {
     public TextArea textArea;
     public Button btnDestination;
     public Button btnProceed;
+    public ImageView ProgressView;
+    public HBox searchAndCollect;
+    public VBox textAreaVbox;
     File directory;
     File destination;
     public Button btnAudioDatabase;
+    int toggle = 1;
+
+    @FXML
+    protected void onSearchByISRCButtonClick() {
+        if (toggle == 1) {
+            searchAndCollect.setStyle("-fx-background-color: #eeefee; -fx-border-color: '#c0c1c2';");
+            ProgressView.setVisible(true);
+            btnProceed.setText("Processing");
+            ProgressView.setVisible(true);
+            btnAudioDatabase.setDisable(true);
+            btnDestination.setDisable(true);
+            textArea.setDisable(true);
+            btnProceed.setDisable(true);
+            textAreaVbox.setDisable(true);
+            toggle = 0;
+        } else {
+            searchAndCollect.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
+            ProgressView.setVisible(false);
+            btnProceed.setText("Proceed");
+            ProgressView.setVisible(false);
+            btnAudioDatabase.setDisable(false);
+            btnDestination.setDisable(false);
+            textArea.setDisable(false);
+            btnProceed.setDisable(false);
+            textAreaVbox.setDisable(false);
+            toggle = 1;
+        }
+        System.out.println("onSearchByISRCButtonClick");
+    }
+
 
     @FXML
     protected void onBrowseAudioButtonClick() {
@@ -50,42 +84,79 @@ public class UIController {
     }
 
     public void onProceedButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, IOException {
+        searchAndCollect.setStyle("-fx-background-color: #eeefee; -fx-border-color: '#c0c1c2';");
+        ProgressView.setVisible(true);
+        btnAudioDatabase.setDisable(true);
+        btnDestination.setDisable(true);
+        textArea.setDisable(true);
+        btnProceed.setDisable(true);
+        textAreaVbox.setDisable(true);
         Task<Void> task = null;
         btnProceed.setText("Processing");
 
         if (directory == null || destination == null) {
             showErrorDialog("Empty Location Entry", "Please browse for Audio Database and Destination Location", "Use the location section for this");
+            btnProceed.setText("Proceed");
+            searchAndCollect.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
+            ProgressView.setVisible(false);
+            btnAudioDatabase.setDisable(false);
+            btnDestination.setDisable(false);
+            textArea.setDisable(false);
+            btnProceed.setDisable(false);
+            textAreaVbox.setDisable(false);
         } else {
-            System.out.println(text.toString());
-            task = new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    Main main = new Main();
-                    String text = textArea.getText();
+            String text = textArea.getText();
+            System.out.println(text);
+            System.out.println("Here");
+            if (!text.isEmpty()) {
+                task = new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        Main main = new Main();
 
-                    String[] ISRCCodes = text.split("\\n");
 
-                    for (String ISRCCode : ISRCCodes) {
-                        if (ISRCCode.length() == 12) {
-                            String done = main.searchAudios(text, directory, destination);
-                            if (done.equals("Done")) {
-                                Platform.runLater(() -> {
-                                    // Code that updates the UI goes here
-                                    btnProceed.setText("Proceed");
-                                });
+                        String[] ISRCCodes = text.split("\\n");
+
+                        for (String ISRCCode : ISRCCodes) {
+                            if (ISRCCode.length() == 12) {
+                                String done = main.searchAudios(text, directory, destination);
+                                if (done.equals("Done")) {
+                                    Platform.runLater(() -> {
+                                        // Code that updates the UI goes here
+                                        btnProceed.setText("Proceed");
+                                        searchAndCollect.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
+                                        ProgressView.setVisible(false);
+                                        btnAudioDatabase.setDisable(false);
+                                        btnDestination.setDisable(false);
+                                        textArea.setDisable(false);
+                                        btnProceed.setDisable(false);
+                                        textAreaVbox.setDisable(false);
+                                    });
+                                }
+                            } else {
+                                showErrorDialog("Invalid ISRC Code", "Invalid or empty ISRC Code", ISRCCode);
                             }
-                        } else {
-                            showErrorDialog("Invalid ISRC Code", "Invalid or empty ISRC Code", ISRCCode);
                         }
+                        return null;
                     }
-                    return null;
-                }
-            };
+                };
+            } else {
+                showErrorDialog("Invalid ISRC Code", "Empty ISRC Code", "Please enter ISRC codes in the text area");
+                btnProceed.setText("Proceed");
+                searchAndCollect.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
+                ProgressView.setVisible(false);
+                btnAudioDatabase.setDisable(false);
+                btnDestination.setDisable(false);
+                textArea.setDisable(false);
+                btnProceed.setDisable(false);
+                textAreaVbox.setDisable(false);
+            }
+
         }
 
         assert task != null;
         task.setOnSucceeded(e -> {
-            btnProceed.setText("Processing");
+            btnProceed.setText("Proceed");
         });
 
         new Thread(task).start();

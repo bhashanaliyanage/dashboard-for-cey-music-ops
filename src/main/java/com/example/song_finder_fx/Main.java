@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -21,9 +22,16 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         // Loading layout file
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("main-view.fxml"));
-        Scene scene = new Scene(loader.load(), 900, 600);
-        stage.setTitle("Hello!");
+        Scene scene = new Scene(loader.load(), 1030, 610);
+
+        stage.setTitle("CeyMusic Toolkit 2023.1");
         stage.setScene(scene);
+        stage.setMinWidth(995);
+        stage.setMinHeight(650);
+
+        Image image = new Image("com/example/song_finder_fx/icons/icon.png");
+
+        stage.getIcons().add(image);
         stage.show();
     }
 
@@ -46,34 +54,6 @@ public class Main extends Application {
         return selectedDirectory;
     }
 
-/*    public void executeFunction(ActionEvent event) {
-        Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                // Execute your function here
-                for (int i = 0; i < 100; i++) {
-                    // Simulate work
-                    Thread.sleep(50);
-
-                    // Update the progress property of the Task
-                    final int progressValue = i + 1;
-                    updateProgress(progressValue, 100);
-
-                    // Debug console output
-                    System.out.println("Here! Progress: " + progressValue);
-                }
-                return null;
-            }
-        };
-
-        // Bind the ProgressBar's progressProperty to the Task's progressProperty
-        progressBar.progressProperty().bind(task.progressProperty());
-
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
-    }*/
-
     public String searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, IOException {
         String[] ISRCCodes = ISRCs.split("\\n");
         Database.SearchSongsFromDB(ISRCCodes, directory, destination);
@@ -93,10 +73,9 @@ public class Main extends Application {
     }
 }
 
-// TODO: Show progress
-// TODO: Implement tabs
-// TODO: Implement get song data by ISRCs
 // TODO: Remember last entered database location, and destination location
 // TODO: Show a report of copied files, what are not found,
 //  offer a button to export the file names/ send an email to an admin to collect those audio files
+// TODO: Implement tabs
+// TODO: Implement get song data by ISRCs
 // TODO: Check current progress with test cases
