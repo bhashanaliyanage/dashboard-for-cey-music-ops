@@ -2,6 +2,7 @@ package com.example.song_finder_fx;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 
@@ -11,7 +12,6 @@ import java.sql.SQLException;
 
 public class HelloController {
     public TextArea textArea;
-    public Label audioLocation;
     File directory;
     File destination;
 
@@ -33,22 +33,40 @@ public class HelloController {
         Database.updateBase(file);
     }
 
-    @FXML
-    protected void onTempProceedButtonClick() {
-    }
-
     public void onProceedButtonClick() throws SQLException, ClassNotFoundException, IOException {
         Main main = new Main();
         String text = textArea.getText();
 
-        if (text != null) {
-            main.searchAudios(text, directory, destination);
+        if (directory == null || destination == null) {
+            showErrorDialog("Empty Location Entry", "Please browse for Audio Database and Destination Location", "Use the location section for this");
         } else {
-            System.out.println("No ISRC codes given!");
+            if (text != null) {
+                String[] ISRCCodes = text.split("\\n");
+
+                for (String ISRCCode : ISRCCodes) {
+                    if (ISRCCode.length() == 12) {
+                        main.searchAudios(text, directory, destination);
+                    } else {
+                        showErrorDialog("Invalid ISRC Code", "Invalid or empty ISRC Code", ISRCCode);
+                    }
+                }
+            } else {
+                System.out.println("No ISRC codes given!");
+            }
         }
+
     }
 
-    public void onBrowseDestinationButtonClick(ActionEvent actionEvent) {
+    private static void showErrorDialog(String title, String headerText, String contentText) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+
+        alert.showAndWait();
+    }
+
+    public void onBrowseDestinationButtonClick() {
         Main main = new Main();
         destination = main.browseDestination();
     }
