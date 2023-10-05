@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.swing.*;
@@ -26,7 +27,7 @@ public class Main extends Application {
         stage.show();
     }
 
-    /*public File browseFile(ActionEvent event) {
+    public File browseFile() {
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showOpenDialog(null);
         String name;
@@ -36,9 +37,8 @@ public class Main extends Application {
         } else {
             name = "No File Selected!";
         }
-
         return selectedFile;
-    }*/
+    }
 
     public File browseLocation() {
         JFileChooser chooser = new JFileChooser();
@@ -85,7 +85,6 @@ public class Main extends Application {
         String[] ISRCCodes = ISRCs.split("\\n");
         Database.SearchSongsFromDB(ISRCCodes, directory, destination);
     }
-
     public File browseDestination() {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Choose a directory");
@@ -107,3 +106,5 @@ public class Main extends Application {
 // TODO: Implement tabs
 // TODO: Implement get song data by ISRCs
 // TODO: Remember last entered database location, and destination location
+// TODO: Show a report of copied files, what are not found,
+//  offer a button to export the file names/ send an email to an admin to collect those audio files

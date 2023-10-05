@@ -26,6 +26,17 @@ public class HelloController {
         }
     }
 
+    @FXML
+    protected void onUpdateDatabaseButtonClick() throws SQLException, IOException, ClassNotFoundException {
+        Main main = new Main();
+        File file = main.browseFile();
+        Database.updateBase(file);
+    }
+
+    @FXML
+    protected void onTempProceedButtonClick() {
+    }
+
     public void onProceedButtonClick() throws SQLException, ClassNotFoundException, IOException {
         Main main = new Main();
         String text = textArea.getText();

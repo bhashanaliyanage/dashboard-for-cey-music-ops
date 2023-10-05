@@ -1,18 +1,17 @@
 package com.example.song_finder_fx;
 
+import javafx.scene.control.Alert;
 import org.sqlite.SQLiteException;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.sql.*;
 import java.util.Scanner;
 import java.util.stream.Stream;
+import javax.swing.JOptionPane;
 
 public class Database {
     private static Connection conn = null;
@@ -65,6 +64,7 @@ public class Database {
             try {
                 if (columnNames.length > 0) {
                     ps.setString(1, columnNames[12]);
+                    System.out.println(columnNames[12]);
                     ps.setString(2, columnNames[0]);
 
                     ps.executeUpdate();
@@ -131,6 +131,7 @@ public class Database {
         ResultSet rs;
         String filename;
         Path tempDir = destination.toPath();
+        String status = null;
 
         PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME " +
                 "FROM songData " +
@@ -142,6 +143,7 @@ public class Database {
 
             while (rs.next()) {
                 filename = rs.getString("FILE_NAME");
+                System.out.println("File Name: " + filename);
                 Path start = Paths.get(directory.toURI());
 
                 try (Stream<Path> stream = Files.walk(start)) {
@@ -160,14 +162,26 @@ public class Database {
                     } else {
                         System.out.println("File not found.");
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
+                    showErrorDialog("Error", "An error occurred during file copy.", e.getMessage().toString() + "\n Please consider using an accessible location");
                     throw new RuntimeException(e);
                 }
             }
         }
     }
 
+    private static void showErrorDialog(String title, String headerText, String contentText) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+
+        alert.showAndWait();
+    }
+
     public static void SearchSongsFromAudioLibrary(File directory) {
         Path start = Paths.get(directory.toURI());
     }
+
+
 }
