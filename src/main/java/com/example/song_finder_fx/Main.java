@@ -14,13 +14,13 @@ import java.sql.SQLException;
 public class Main extends Application {
 
     public static void main(String[] args) {
-        launch(args);
+        new Thread(() -> launch(args)).start();
     }
 
     @Override
     public void start(Stage stage) throws IOException {
         // Loading layout file
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("main-view.fxml"));
         Scene scene = new Scene(loader.load(), 900, 600);
         stage.setTitle("Hello!");
         stage.setScene(scene);
@@ -99,12 +99,10 @@ public class Main extends Application {
     }
 }
 
-// TODO: Check current progress with test cases
-// TODO: Run UI in a separate thread
-// TODO: Show location, and destination location
 // TODO: Show progress
 // TODO: Implement tabs
 // TODO: Implement get song data by ISRCs
 // TODO: Remember last entered database location, and destination location
 // TODO: Show a report of copied files, what are not found,
 //  offer a button to export the file names/ send an email to an admin to collect those audio files
+// TODO: Check current progress with test cases
