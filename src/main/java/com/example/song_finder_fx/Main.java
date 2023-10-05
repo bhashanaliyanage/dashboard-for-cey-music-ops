@@ -29,15 +29,8 @@ public class Main extends Application {
 
     public File browseFile() {
         FileChooser fileChooser = new FileChooser();
-        File selectedFile = fileChooser.showOpenDialog(null);
-        String name;
 
-        if (selectedFile != null) {
-            name = selectedFile.getName();
-        } else {
-            name = "No File Selected!";
-        }
-        return selectedFile;
+        return fileChooser.showOpenDialog(null);
     }
 
     public File browseLocation() {
@@ -81,9 +74,10 @@ public class Main extends Application {
         thread.start();
     }*/
 
-    public void searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, IOException {
+    public String searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, IOException {
         String[] ISRCCodes = ISRCs.split("\\n");
         Database.SearchSongsFromDB(ISRCCodes, directory, destination);
+        return "Done";
     }
     public File browseDestination() {
         JFileChooser chooser = new JFileChooser();

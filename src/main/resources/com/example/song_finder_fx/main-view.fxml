@@ -95,7 +95,7 @@
                         </Label>
                     </VBox>
 
-                    <Button minHeight="34.0" minWidth="220.0" onAction="#onProceedButtonClick"
+                    <Button fx:id="btnProceed" minHeight="34.0" minWidth="220.0" onAction="#onProceedButtonClick"
                             styleClass="button_inside" stylesheets="@styles.css" text="Proceed">
                         <font>
                             <Font name="Segoe UI Semilight" size="14.0"/>

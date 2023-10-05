@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,9 +17,9 @@ import static java.awt.SystemColor.text;
 public class UIController {
     public TextArea textArea;
     public Button btnDestination;
+    public Button btnProceed;
     File directory;
     File destination;
-    @FXML
     public Button btnAudioDatabase;
 
     @FXML
@@ -50,6 +51,7 @@ public class UIController {
 
     public void onProceedButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, IOException {
         Task<Void> task = null;
+        btnProceed.setText("Processing");
 
         if (directory == null || destination == null) {
             showErrorDialog("Empty Location Entry", "Please browse for Audio Database and Destination Location", "Use the location section for this");
@@ -65,7 +67,13 @@ public class UIController {
 
                     for (String ISRCCode : ISRCCodes) {
                         if (ISRCCode.length() == 12) {
-                            main.searchAudios(text, directory, destination);
+                            String done = main.searchAudios(text, directory, destination);
+                            if (done.equals("Done")) {
+                                Platform.runLater(() -> {
+                                    // Code that updates the UI goes here
+                                    btnProceed.setText("Proceed");
+                                });
+                            }
                         } else {
                             showErrorDialog("Invalid ISRC Code", "Invalid or empty ISRC Code", ISRCCode);
                         }
@@ -74,6 +82,12 @@ public class UIController {
                 }
             };
         }
+
+        assert task != null;
+        task.setOnSucceeded(e -> {
+            btnProceed.setText("Processing");
+        });
+
         new Thread(task).start();
     }
 
