@@ -83,6 +83,9 @@ public class Main extends Application {
     }
 }
 
+// TODO: Search by filename
+// TODO: Search by ISRC
+// TODO: Listen audios
 // TODO: Remember last entered database location, and destination location
 // TODO: Show a report of copied files, what are not found,
 //  offer a button to export the file names/ send an email to an admin to collect those audio files
@@ -91,4 +94,3 @@ public class Main extends Application {
 // TODO: Check current progress with test cases
 // TODO: Using firebase
 // TODO: Adding admin switch
-// TODO: Search by filename

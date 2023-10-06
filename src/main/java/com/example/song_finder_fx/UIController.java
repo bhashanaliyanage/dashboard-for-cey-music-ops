@@ -13,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -177,7 +178,15 @@ public class UIController {
         }
 
         assert task != null;
-        task.setOnSucceeded(e -> btnProceed.setText("Proceed"));
+        task.setOnSucceeded(e -> {
+            btnProceed.setText("Proceed");
+            NotificationBuilder nb = new NotificationBuilder();
+            try {
+                nb.displayTray();
+            } catch (AWTException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         new Thread(task).start();
     }
@@ -192,4 +201,9 @@ public class UIController {
     }
 
 
+    public void onTestNotifyButtonClick(ActionEvent event) throws AWTException {
+        System.out.println("Test Notify Button Click");
+        NotificationBuilder nb = new NotificationBuilder();
+        nb.displayTray();
+    }
 }
