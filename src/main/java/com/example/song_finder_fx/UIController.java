@@ -4,6 +4,8 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -22,14 +24,24 @@ public class UIController {
     public ImageView ProgressView;
     public HBox searchAndCollect;
     public VBox textAreaVbox;
+    public VBox mainVBox;
     File directory;
     File destination;
     public Button btnAudioDatabase;
     int toggle = 1;
 
     @FXML
-    protected void onSearchByISRCButtonClick() {
-        if (toggle == 1) {
+    protected void onSearchDetailsButtonClick(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("search-details.fxml"));
+            Parent newContent = loader.load();
+
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(newContent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        /*if (toggle == 1) {
             searchAndCollect.setStyle("-fx-background-color: #eeefee; -fx-border-color: '#c0c1c2';");
             ProgressView.setVisible(true);
             btnProceed.setText("Processing");
@@ -51,10 +63,21 @@ public class UIController {
             btnProceed.setDisable(false);
             textAreaVbox.setDisable(false);
             toggle = 1;
-        }
-        System.out.println("onSearchByISRCButtonClick");
+        }*/
+        System.out.println("onSearchDetailsButtonClick");
     }
 
+    public void onCollectSongsButtonClick(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("collect-songs.fxml"));
+            Parent newContent = loader.load();
+
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(newContent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @FXML
     protected void onBrowseAudioButtonClick() {
@@ -170,5 +193,6 @@ public class UIController {
 
         alert.showAndWait();
     }
+
 
 }

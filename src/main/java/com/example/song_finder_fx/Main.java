@@ -14,6 +14,8 @@ import java.sql.SQLException;
 
 public class Main extends Application {
 
+
+
     public static void main(String[] args) {
         new Thread(() -> launch(args)).start();
     }
@@ -32,6 +34,14 @@ public class Main extends Application {
         Image image = new Image("com/example/song_finder_fx/icons/icon.png");
 
         stage.getIcons().add(image);
+
+        /*FXMLLoader loader_sub = new FXMLLoader(getClass().getResource("search-details.fxml"));
+        Parent newContent = loader_sub.load();
+        UIController controller = loader.getController();
+
+        controller.mainVBox.getChildren().clear();
+        controller.mainVBox.getChildren().add(newContent);*/
+
         stage.show();
     }
 
