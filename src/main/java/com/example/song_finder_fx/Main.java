@@ -91,3 +91,4 @@ public class Main extends Application {
 // TODO: Check current progress with test cases
 // TODO: Using firebase
 // TODO: Adding admin switch
+// TODO: Search by filename

@@ -28,7 +28,6 @@ public class UIController {
     File directory;
     File destination;
     public Button btnAudioDatabase;
-    int toggle = 1;
 
     @FXML
     protected void onSearchDetailsButtonClick(ActionEvent event) {
@@ -84,7 +83,7 @@ public class UIController {
         Main main = new Main();
         directory = main.browseLocation();
         String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
-        btnAudioDatabase.setText("Database: " + shortenedString + "...");
+        btnAudioDatabase.setText("   Database: " + shortenedString + "...");
         if (directory != null) {
             Database.SearchSongsFromAudioLibrary(directory);
         } else {
@@ -96,7 +95,7 @@ public class UIController {
         Main main = new Main();
         destination = main.browseDestination();
         String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
-        btnDestination.setText("Destination: " + shortenedString + "...");
+        btnDestination.setText("   Destination: " + shortenedString + "...");
     }
 
     @FXML
@@ -132,7 +131,7 @@ public class UIController {
             System.out.println(text);
             System.out.println("Here");
             if (!text.isEmpty()) {
-                task = new Task<Void>() {
+                task = new Task<>() {
                     @Override
                     protected Void call() throws Exception {
                         Main main = new Main();
@@ -178,9 +177,7 @@ public class UIController {
         }
 
         assert task != null;
-        task.setOnSucceeded(e -> {
-            btnProceed.setText("Proceed");
-        });
+        task.setOnSucceeded(e -> btnProceed.setText("Proceed"));
 
         new Thread(task).start();
     }
