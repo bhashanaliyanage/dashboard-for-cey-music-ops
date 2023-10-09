@@ -4,13 +4,6 @@ module com.example.song_finder_fx {
     requires java.sql;
     requires org.xerial.sqlitejdbc;
     requires java.desktop;
-    requires com.google.api.client.auth;
-    requires com.google.api.client.extensions.java6.auth;
-    requires com.google.api.client.extensions.jetty.auth;
-    requires google.api.client;
-    requires com.google.api.client;
-    requires com.google.api.client.json.gson;
-    requires com.google.api.services.drive;
 
 
     opens com.example.song_finder_fx to javafx.fxml;

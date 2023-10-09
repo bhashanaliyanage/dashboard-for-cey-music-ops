@@ -203,7 +203,6 @@ public class UIController {
     }
 
     public void onTestGDriveButtonClick(ActionEvent event) throws GeneralSecurityException, IOException {
-        DriveQuickstart dqs = new DriveQuickstart();
-        // ReadJSONFile rjf = new ReadJSONFile();
+        // DriveQuickstart dqs = new DriveQuickstart();
     }
 }
