@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 
 public class UIController {
@@ -199,5 +200,10 @@ public class UIController {
         System.out.println("Test Notify Button Click");
         NotificationBuilder nb = new NotificationBuilder();
         nb.displayTray();
+    }
+
+    public void onTestGDriveButtonClick(ActionEvent event) throws GeneralSecurityException, IOException {
+        DriveQuickstart dqs = new DriveQuickstart();
+        // ReadJSONFile rjf = new ReadJSONFile();
     }
 }
