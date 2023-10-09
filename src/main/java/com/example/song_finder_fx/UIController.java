@@ -4,6 +4,8 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -11,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -22,14 +25,23 @@ public class UIController {
     public ImageView ProgressView;
     public HBox searchAndCollect;
     public VBox textAreaVbox;
+    public VBox mainVBox;
     File directory;
     File destination;
     public Button btnAudioDatabase;
-    int toggle = 1;
 
     @FXML
-    protected void onSearchByISRCButtonClick() {
-        if (toggle == 1) {
+    protected void onSearchDetailsButtonClick(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
+            Parent newContent = loader.load();
+
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(newContent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        /*if (toggle == 1) {
             searchAndCollect.setStyle("-fx-background-color: #eeefee; -fx-border-color: '#c0c1c2';");
             ProgressView.setVisible(true);
             btnProceed.setText("Processing");
@@ -51,17 +63,28 @@ public class UIController {
             btnProceed.setDisable(false);
             textAreaVbox.setDisable(false);
             toggle = 1;
-        }
-        System.out.println("onSearchByISRCButtonClick");
+        }*/
+        System.out.println("onSearchDetailsButtonClick");
     }
 
+    public void onCollectSongsButtonClick(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/collect-songs.fxml"));
+            Parent newContent = loader.load();
+
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(newContent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @FXML
     protected void onBrowseAudioButtonClick() {
         Main main = new Main();
         directory = main.browseLocation();
         String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
-        btnAudioDatabase.setText("Database: " + shortenedString + "...");
+        btnAudioDatabase.setText("   Database: " + shortenedString + "...");
         if (directory != null) {
             Database.SearchSongsFromAudioLibrary(directory);
         } else {
@@ -73,7 +96,7 @@ public class UIController {
         Main main = new Main();
         destination = main.browseDestination();
         String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
-        btnDestination.setText("Destination: " + shortenedString + "...");
+        btnDestination.setText("   Destination: " + shortenedString + "...");
     }
 
     @FXML
@@ -109,7 +132,7 @@ public class UIController {
             System.out.println(text);
             System.out.println("Here");
             if (!text.isEmpty()) {
-                task = new Task<Void>() {
+                task = new Task<>() {
                     @Override
                     protected Void call() throws Exception {
                         Main main = new Main();
@@ -171,4 +194,10 @@ public class UIController {
         alert.showAndWait();
     }
 
+
+    public void onTestNotifyButtonClick(ActionEvent event) throws AWTException {
+        System.out.println("Test Notify Button Click");
+        NotificationBuilder nb = new NotificationBuilder();
+        nb.displayTray();
+    }
 }
