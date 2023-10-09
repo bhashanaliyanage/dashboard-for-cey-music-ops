@@ -33,7 +33,7 @@ public class UIController {
     @FXML
     protected void onSearchDetailsButtonClick(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("search-details.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
             Parent newContent = loader.load();
 
             mainVBox.getChildren().clear();
@@ -69,7 +69,7 @@ public class UIController {
 
     public void onCollectSongsButtonClick(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("collect-songs.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/collect-songs.fxml"));
             Parent newContent = loader.load();
 
             mainVBox.getChildren().clear();
@@ -180,12 +180,6 @@ public class UIController {
         assert task != null;
         task.setOnSucceeded(e -> {
             btnProceed.setText("Proceed");
-            NotificationBuilder nb = new NotificationBuilder();
-            try {
-                nb.displayTray();
-            } catch (AWTException ex) {
-                throw new RuntimeException(ex);
-            }
         });
 
         new Thread(task).start();

@@ -8,6 +8,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -23,7 +24,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         // Loading layout file
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("main-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("layouts/main-view.fxml"));
         Scene scene = new Scene(loader.load(), 1030, 610);
 
         stage.setTitle("CeyMusic Toolkit 2023.1");
@@ -34,13 +35,6 @@ public class Main extends Application {
         Image image = new Image("com/example/song_finder_fx/icons/icon.png");
 
         stage.getIcons().add(image);
-
-        /*FXMLLoader loader_sub = new FXMLLoader(getClass().getResource("search-details.fxml"));
-        Parent newContent = loader_sub.load();
-        UIController controller = loader.getController();
-
-        controller.mainVBox.getChildren().clear();
-        controller.mainVBox.getChildren().add(newContent);*/
 
         stage.show();
     }
@@ -64,9 +58,11 @@ public class Main extends Application {
         return selectedDirectory;
     }
 
-    public String searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, IOException {
+    public String searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, IOException, AWTException {
         String[] ISRCCodes = ISRCs.split("\\n");
         Database.SearchSongsFromDB(ISRCCodes, directory, destination);
+        NotificationBuilder nb = new NotificationBuilder();
+        nb.displayTray();
         return "Done";
     }
     public File browseDestination() {
@@ -94,3 +90,4 @@ public class Main extends Application {
 // TODO: Check current progress with test cases
 // TODO: Using firebase
 // TODO: Adding admin switch
+// TODO: Add a function to open output folder when done
