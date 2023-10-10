@@ -7,11 +7,9 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import javax.swing.*;
 import java.awt.*;
-import java.beans.EventHandler;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -39,9 +37,7 @@ public class Main extends Application {
 
         stage.show();
 
-        stage.setOnCloseRequest(e -> {
-            Platform.exit();
-        });
+        stage.setOnCloseRequest(e -> Platform.exit());
     }
 
     public File browseFile() {
@@ -65,7 +61,7 @@ public class Main extends Application {
 
     public String searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, IOException, AWTException {
         String[] ISRCCodes = ISRCs.split("\\n");
-        Database.SearchSongsFromDB(ISRCCodes, directory, destination);
+        DatabaseMySQL.SearchSongsFromDB(ISRCCodes, directory, destination);
         NotificationBuilder nb = new NotificationBuilder();
         nb.displayTray();
         return "Done";

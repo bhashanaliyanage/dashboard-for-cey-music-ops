@@ -87,7 +87,7 @@ public class UIController {
         String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
         btnAudioDatabase.setText("   Database: " + shortenedString + "...");
         if (directory != null) {
-            Database.SearchSongsFromAudioLibrary(directory);
+            DatabaseMySQL.SearchSongsFromAudioLibrary(directory);
         } else {
             System.out.println("Directory not chosen!");
         }
@@ -104,7 +104,7 @@ public class UIController {
     protected void onUpdateDatabaseButtonClick() throws SQLException, IOException, ClassNotFoundException {
         Main main = new Main();
         File file = main.browseFile();
-        Database.updateBase(file);
+        DatabaseMySQL.updateBase(file);
     }
 
     public void onProceedButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, IOException {
@@ -137,7 +137,6 @@ public class UIController {
                     @Override
                     protected Void call() throws Exception {
                         Main main = new Main();
-
 
                         String[] ISRCCodes = text.split("\\n");
 
