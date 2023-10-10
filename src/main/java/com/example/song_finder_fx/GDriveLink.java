@@ -29,7 +29,7 @@ public class GDriveLink {
 
         private static final List<String> SCOPES =
                 Collections.singletonList(DriveScopes.DRIVE_METADATA_READONLY);
-        private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+        private static final String CREDENTIALS_FILE_PATH = "/com/example/song_finder_fx/credentials.json";
 
         private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
                 throws IOException {
