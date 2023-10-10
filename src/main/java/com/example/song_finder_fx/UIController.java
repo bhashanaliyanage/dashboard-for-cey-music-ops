@@ -202,7 +202,9 @@ public class UIController {
         nb.displayTray();
     }
 
-    public void onTestGDriveButtonClick(ActionEvent event) throws GeneralSecurityException, IOException {
-        // DriveQuickstart dqs = new DriveQuickstart();
+    public void onTestGDriveButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException {
+        // DatabaseMySQL dbmsql = new DatabaseMySQL();
+        GDriveLink gd = new GDriveLink();
+
     }
 }
