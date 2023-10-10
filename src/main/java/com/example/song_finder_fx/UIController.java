@@ -27,6 +27,7 @@ public class UIController {
     public HBox searchAndCollect;
     public VBox textAreaVbox;
     public VBox mainVBox;
+    public TextArea searchArea;
     File directory;
     File destination;
     public Button btnAudioDatabase;
@@ -213,4 +214,6 @@ public class UIController {
         // GDriveLink.DriveQuickstart.main();
         // UploadBasic.uploadBasic();
     }
+
+
 }
