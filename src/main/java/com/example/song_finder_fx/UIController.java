@@ -203,9 +203,15 @@ public class UIController {
     }
 
     public void onTestGDriveButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, GeneralSecurityException, IOException {
-        // DatabaseMySQL dbmsql = new DatabaseMySQL();
+        DatabaseMySQL dbmsql = new DatabaseMySQL();
+        Main main = new Main();
+
+        dbmsql.CreateBase();
+        File file = main.browseFile();
+        dbmsql.ImportToBase(file);
         // GDriveLink gd = new GDriveLink();
 
-        GDriveLink.DriveQuickstart.main();
+        // GDriveLink.DriveQuickstart.main();
+        // UploadBasic.uploadBasic();
     }
 }

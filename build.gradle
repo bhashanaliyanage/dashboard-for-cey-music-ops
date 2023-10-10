@@ -27,7 +27,7 @@ tasks.withType(JavaCompile).configureEach {
 
 application {
     mainModule = 'com.example.song_finder_fx'
-    mainClass = 'com.example.song_finder_fx.HelloApplication'
+    mainClass = 'com.example.song_finder_fx.Main'
 }
 
 javafx {
@@ -36,7 +36,6 @@ javafx {
 }
 
 dependencies {
-
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
@@ -47,19 +46,11 @@ dependencies {
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
     implementation 'mysql:mysql-connector-java:5.1.13'
 
-    // Google Drive Connection
-    // https://mvnrepository.com/artifact/com.google.apis/google-api-services-drive
-    implementation 'com.google.api-client:google-api-client:2.0.0'
-    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.34.1'
-    implementation 'com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0'
-    // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.10.1'
-
-
-
     // Firebase connection
     // https://mvnrepository.com/artifact/com.google.firebase/firebase-admin
-    // implementation 'com.google.firebase:firebase-admin:8.1.0'
+    // implementation 'com.google.firebase:firebase-admin:9.1.1'
+
+
     // Import the BoM for the Firebase platform
     // implementation platform('com.google.firebase:firebase-bom:28.4.0')
     // Declare the dependency for the Firebase Authentication library
@@ -67,6 +58,7 @@ dependencies {
     // implementation 'com.google.firebase:firebase-auth'
     // Declare the dependency for the Cloud Firestore library
     // implementation 'com.google.firebase:firebase-firestore'
+
 }
 
 test {
