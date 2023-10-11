@@ -36,11 +36,14 @@
             <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
          </VBox.margin>
       </TextField>
-      <Label fx:id="searchResult" text="Search">
+      <VBox fx:id="vboxSong">
          <VBox.margin>
-            <Insets bottom="30.0" left="30.0" />
+            <Insets bottom="30.0" left="30.0" right="30.0" />
          </VBox.margin>
-      </Label>
+         <children>
+            <Label fx:id="searchResult" text="Search" />
+         </children>
+      </VBox>
    </VBox>
    <HBox fx:id="searchAndCollect" alignment="CENTER_RIGHT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
       <VBox.margin>

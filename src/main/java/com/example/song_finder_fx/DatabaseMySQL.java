@@ -200,7 +200,7 @@ public class DatabaseMySQL {
 
         Connection db = DatabaseMySQL.getConn();
 
-        PreparedStatement ps = db.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ?");
+        PreparedStatement ps = db.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 3");
         ps.setString(1, "%" + searchText + "%");
 
         System.out.println("Here");
@@ -208,13 +208,11 @@ public class DatabaseMySQL {
 
         while (rs.next()) {
             String trackTitle = rs.getString(1);
-            songs.clear();
+            // songs.clear();
             songs.add(trackTitle);
         }
 
         System.out.println(songs);
-        /*for (String song : songs) {
-        }*/
 
         return songs;
     }

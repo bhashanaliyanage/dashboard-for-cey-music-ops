@@ -36,29 +36,20 @@ public class UIController {
     public HBox searchAndCollect;
     public VBox textAreaVbox;
     public VBox mainVBox;
+    public VBox vboxSong;
     File directory;
     File destination;
     public Button btnAudioDatabase;
 
     // Search TextField
-    public Label searchResult;
+    // public Label searchResult;
     @FXML
     public TextField searchArea;
-    private AutoCompletionBinding<String> autoCompleteBinding;
-    private String[] _possibleSuggestions = {"Test 01", "Test 02", "Test 03"};
-    private Set<String> possibleSuggestions = new HashSet<>(Arrays.asList(_possibleSuggestions));
 
-    // Search Autocompletion Initialization
-    public void initialize() {
-        // TextFields.bindAutoCompletion(searchArea, "Test 01", "Test 02", "Test 03");
-    }
 
     @FXML
     protected void onSearchDetailsButtonClick(ActionEvent event) {
         try {
-            // initialize();
-            System.out.println(System.getProperty("javafx.runtime.version"));
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
             Parent newContent = loader.load();
             mainVBox.getChildren().clear();
@@ -67,6 +58,60 @@ public class UIController {
             throw new RuntimeException(e);
         }
         System.out.println("onSearchDetailsButtonClick");
+    }
+
+    public void getText(KeyEvent inputMethodEvent) throws SQLException, ClassNotFoundException, IOException {
+        String text = searchArea.getText();
+        DatabaseMySQL db = new DatabaseMySQL();
+        ArrayList<String> songList;
+
+        songList = db.searchSongNames(text);
+        System.out.println(songList.size());
+
+        if (songList.size() == 3) {
+            vboxSong.getChildren().clear();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song.fxml"));
+            Parent newContent = loader.load();
+            Label searchResult = (Label) newContent.lookup("#searchResult");
+            Label searchResult2 = (Label) newContent.lookup("#searchResult2");
+            Label searchResult3 = (Label) newContent.lookup("#searchResult3");
+            searchResult.setText(songList.get(0));
+            searchResult2.setText(songList.get(1));
+            searchResult3.setText(songList.get(2));
+            vboxSong.getChildren().add(newContent);
+        } else if (songList.size() == 2) {
+            vboxSong.getChildren().clear();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song.fxml"));
+            Parent newContent = loader.load();
+            Label searchResult = (Label) newContent.lookup("#searchResult");
+            Label searchResult2 = (Label) newContent.lookup("#searchResult2");
+            Label searchResult3 = (Label) newContent.lookup("#searchResult3");
+            searchResult.setText(songList.get(0));
+            searchResult2.setText(songList.get(1));
+            searchResult3.setVisible(false);
+            vboxSong.getChildren().add(newContent);
+        } else if (songList.size() == 1) {
+            // vboxSong.getChildren().clear();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song.fxml"));
+            Parent newContent = loader.load();
+            Label searchResult = (Label) newContent.lookup("#searchResult");
+            Label searchResult2 = (Label) newContent.lookup("#searchResult2");
+            Label searchResult3 = (Label) newContent.lookup("#searchResult3");
+            System.out.println(songList.get(0));
+            searchResult.setText(songList.get(0));
+            // searchResult2.setVisible(false);
+            // searchResult3.setVisible(false);
+        }
+
+        /*for (String song : songList) {
+            try {
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }*/
+
+
+        System.out.println(text);
     }
 
     public void onCollectSongsButtonClick(ActionEvent event) {
@@ -213,17 +258,5 @@ public class UIController {
 
         // GDriveLink.DriveQuickstart.main();
         // UploadBasic.uploadBasic();
-    }
-
-
-    public void getText(KeyEvent inputMethodEvent) throws SQLException, ClassNotFoundException {
-        String text = searchArea.getText();
-        DatabaseMySQL db = new DatabaseMySQL();
-        ArrayList<String> songList;
-
-        songList = db.searchSongNames(text);
-        searchResult.setText(songList.get(0));
-
-        System.out.println(text);
     }
 }
