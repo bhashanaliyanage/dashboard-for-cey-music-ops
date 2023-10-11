@@ -139,12 +139,12 @@ public class DatabaseMySQL {
                         Path targetDir = destination.toPath();
                         Path targetFile = targetDir.resolve(finalFilename);
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("File copied to: " + targetFile.toString());
+                        System.out.println("File copied to: " + targetFile);
                     } else {
                         System.out.println("File not found.");
                     }
                 } catch (Exception e) {
-                    showErrorDialog("Error", "An error occurred during file copy.", e.getMessage().toString() + "\n Please consider using an accessible location");
+                    showErrorDialog("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
                     throw new RuntimeException(e);
                 }
             }
@@ -195,7 +195,7 @@ public class DatabaseMySQL {
     }
 
     public ArrayList<String> searchSongNames(String searchText) throws SQLException, ClassNotFoundException {
-        ArrayList<String> songs = new ArrayList<String>();
+        ArrayList<String> songs = new ArrayList<>();
         ResultSet rs;
 
         Connection db = DatabaseMySQL.getConn();
@@ -207,8 +207,7 @@ public class DatabaseMySQL {
         rs = ps.executeQuery();
 
         while (rs.next()) {
-            String trackTitle = rs.getString(1);
-            // songs.clear();
+            String trackTitle = rs.getString(2) + " | " + rs.getString(1);
             songs.add(trackTitle);
         }
 

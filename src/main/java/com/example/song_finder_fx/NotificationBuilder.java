@@ -28,4 +28,17 @@ public class NotificationBuilder {
 
         trayIcon.displayMessage("CeyMusic Toolkit", "Execution Completed", MessageType.INFO);
     }
+
+    public void build(String message) throws AWTException {
+        SystemTray tray = SystemTray.getSystemTray();
+
+        Image image = new ImageIcon("com/example/song_finder_fx/icons/icon.png").getImage();
+
+        TrayIcon trayIcon = new TrayIcon(image, "CeyMusic Toolkit");
+        trayIcon.setImageAutoSize(true);
+        trayIcon.setToolTip("CeyMusic Toolkit");
+        tray.add(trayIcon);
+
+        trayIcon.displayMessage("CeyMusic Toolkit", message, MessageType.INFO);
+    }
 }
