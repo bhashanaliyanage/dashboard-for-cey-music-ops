@@ -109,12 +109,10 @@ public class DatabaseMySQL {
         sc.close();
     }
 
-    public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException, IOException {
+    public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException {
         Connection db = Database.getConn();
         ResultSet rs;
         String filename;
-        Path tempDir = destination.toPath();
-        String status = null;
 
         PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME " +
                 "FROM songData " +
