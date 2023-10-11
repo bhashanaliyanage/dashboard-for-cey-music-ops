@@ -46,9 +46,14 @@ dependencies {
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
     implementation 'mysql:mysql-connector-java:5.1.13'
 
+    // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
+    implementation 'org.controlsfx:controlsfx:11.1.2'
+
+
     // Firebase connection
     // https://mvnrepository.com/artifact/com.google.firebase/firebase-admin
     // implementation 'com.google.firebase:firebase-admin:9.1.1'
+    // compile 'com.firebase:firebase-client-android:2.5.0'
 
 
     // Import the BoM for the Firebase platform

@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -194,5 +195,31 @@ public class DatabaseMySQL {
         }
         sc.close();
     }
+
+    public ArrayList<String> searchSongNames(String searchText) throws SQLException, ClassNotFoundException {
+        ArrayList<String> songs = new ArrayList<String>();
+        ResultSet rs;
+
+        Connection db = DatabaseMySQL.getConn();
+
+        PreparedStatement ps = db.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ?");
+        ps.setString(1, "%" + searchText + "%");
+
+        System.out.println("Here");
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+            String trackTitle = rs.getString(1);
+            songs.clear();
+            songs.add(trackTitle);
+        }
+
+        System.out.println(songs);
+        /*for (String song : songs) {
+        }*/
+
+        return songs;
+    }
+
 
 }

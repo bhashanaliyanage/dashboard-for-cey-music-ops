@@ -8,8 +8,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -18,6 +21,12 @@ import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 public class UIController {
     public TextArea textArea;
@@ -27,45 +36,36 @@ public class UIController {
     public HBox searchAndCollect;
     public VBox textAreaVbox;
     public VBox mainVBox;
-    public TextArea searchArea;
     File directory;
     File destination;
     public Button btnAudioDatabase;
 
+    // Search TextField
+    public Label searchResult;
+    @FXML
+    public TextField searchArea;
+    private AutoCompletionBinding<String> autoCompleteBinding;
+    private String[] _possibleSuggestions = {"Test 01", "Test 02", "Test 03"};
+    private Set<String> possibleSuggestions = new HashSet<>(Arrays.asList(_possibleSuggestions));
+
+    // Search Autocompletion Initialization
+    public void initialize() {
+        // TextFields.bindAutoCompletion(searchArea, "Test 01", "Test 02", "Test 03");
+    }
+
     @FXML
     protected void onSearchDetailsButtonClick(ActionEvent event) {
         try {
+            // initialize();
+            System.out.println(System.getProperty("javafx.runtime.version"));
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
             Parent newContent = loader.load();
-
             mainVBox.getChildren().clear();
             mainVBox.getChildren().add(newContent);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        /*if (toggle == 1) {
-            searchAndCollect.setStyle("-fx-background-color: #eeefee; -fx-border-color: '#c0c1c2';");
-            ProgressView.setVisible(true);
-            btnProceed.setText("Processing");
-            ProgressView.setVisible(true);
-            btnAudioDatabase.setDisable(true);
-            btnDestination.setDisable(true);
-            textArea.setDisable(true);
-            btnProceed.setDisable(true);
-            textAreaVbox.setDisable(true);
-            toggle = 0;
-        } else {
-            searchAndCollect.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
-            ProgressView.setVisible(false);
-            btnProceed.setText("Proceed");
-            ProgressView.setVisible(false);
-            btnAudioDatabase.setDisable(false);
-            btnDestination.setDisable(false);
-            textArea.setDisable(false);
-            btnProceed.setDisable(false);
-            textAreaVbox.setDisable(false);
-            toggle = 1;
-        }*/
         System.out.println("onSearchDetailsButtonClick");
     }
 
@@ -216,4 +216,14 @@ public class UIController {
     }
 
 
+    public void getText(KeyEvent inputMethodEvent) throws SQLException, ClassNotFoundException {
+        String text = searchArea.getText();
+        DatabaseMySQL db = new DatabaseMySQL();
+        ArrayList<String> songList;
+
+        songList = db.searchSongNames(text);
+        searchResult.setText(songList.get(0));
+
+        System.out.println(text);
+    }
 }
