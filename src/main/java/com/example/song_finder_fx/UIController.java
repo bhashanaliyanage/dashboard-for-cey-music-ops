@@ -201,7 +201,7 @@ public class UIController {
     }
 
     // Search Items
-    public void getText(KeyEvent inputMethodEvent) throws SQLException, ClassNotFoundException, IOException {
+    /*public void getText(KeyEvent inputMethodEvent) throws SQLException, ClassNotFoundException, IOException {
         String text = searchArea.getText();
         DatabaseMySQL db = new DatabaseMySQL();
         ArrayList<String> songList;
@@ -244,16 +244,16 @@ public class UIController {
             // searchResult3.setVisible(false);
         }
 
-        /*for (String song : songList) {
+        *//*for (String song : songList) {
             try {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }*/
+        }*//*
 
 
         System.out.println(text);
-    }
+    }*/
     public void onSearchedSong1Clicked(MouseEvent mouseEvent) throws AWTException {
         String text = searchResult.getText();
         nb.build(text);

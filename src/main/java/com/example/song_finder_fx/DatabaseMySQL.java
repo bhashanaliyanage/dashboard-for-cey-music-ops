@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -194,24 +195,27 @@ public class DatabaseMySQL {
         sc.close();
     }
 
-    public ArrayList<String> searchSongNames(String searchText) throws SQLException, ClassNotFoundException {
-        ArrayList<String> songs = new ArrayList<>();
+    public List<Songs> searchSongNames(String searchText) throws SQLException, ClassNotFoundException {
+        List<Songs> songs = new ArrayList<>();
         ResultSet rs;
 
         Connection db = DatabaseMySQL.getConn();
 
         PreparedStatement ps = db.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 3");
         ps.setString(1, "%" + searchText + "%");
-
-        System.out.println("Here");
         rs = ps.executeQuery();
 
         while (rs.next()) {
-            String trackTitle = rs.getString(2) + " | " + rs.getString(1);
-            songs.add(trackTitle);
+            songs.add(new Songs(rs.getString(1), rs.getString(2)));
         }
 
-        System.out.println(songs);
+        try {
+            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName());
+            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName());
+            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName());
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("End of results");
+        }
 
         return songs;
     }
