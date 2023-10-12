@@ -11,8 +11,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class UIControllerSearch {
@@ -31,9 +33,11 @@ public class UIControllerSearch {
     public void getText(KeyEvent inputMethodEvent) throws SQLException, ClassNotFoundException {
         String text = searchArea.getText();
         DatabaseMySQL db = new DatabaseMySQL();
-        ArrayList<String> songList;
-        songList = db.searchSongNames(text);
-        Node[] nodes = new Node[songList.size()];
+        ArrayList<String> songList = db.searchSongNames(text);
+
+        List<Songs> songs = new ArrayList<>();
+        songs.add(new Songs("Kaari Na Sanda", "Methun SK"));
+        Node[] nodes = new Node[songs.size()];
 
         // FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-song.fxml"));
         // Parent newContent = loader.load();
@@ -42,6 +46,10 @@ public class UIControllerSearch {
         for (int i = 0; i < nodes.length; i++) {
             try {
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
+                Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
+                Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
+                lblSongName.setText(songs.get(i).getSongName());
+                lblISRC.setText(songs.get(i).getISRC());
                 vboxSong.getChildren().add(nodes[i]);
             } catch (Exception e) {
                 e.printStackTrace();
