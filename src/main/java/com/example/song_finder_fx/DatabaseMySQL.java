@@ -38,7 +38,7 @@ public class DatabaseMySQL {
         PreparedStatement ps = db.prepareStatement("CREATE TABLE IF NOT EXISTS songs (" +
                 "ISRC VARCHAR(255) PRIMARY KEY," +
                 "ALBUM_TITLE VARCHAR(255)," +
-                "UPC INT," +
+                "UPC BIGINT," +
                 "CAT_NO VARCHAR(255)," +
                 "PRODUCT_PRIMARY VARCHAR(255)," +
                 "ALBUM_FORMAT VARCHAR(255)," +
@@ -83,7 +83,6 @@ public class DatabaseMySQL {
                 if (columnNames.length > 0) {
                     ps.setString(1, columnNames[0]);
                     ps.setString(2, columnNames[1]);
-                    System.out.println(columnNames[2]);
                     ps.setString(3, columnNames[2]);
                     ps.setString(4, columnNames[3]);
                     ps.setString(5, columnNames[4]);
@@ -98,8 +97,9 @@ public class DatabaseMySQL {
 
                     try {
                         ps.executeUpdate();
-                    } catch (DataTruncation | SQLIntegrityConstraintViolationException e) {
-                        System.out.println("Invalid or Duplicate entry found");
+                        System.out.println("Executed: " + columnNames[2]);
+                    } catch (DataTruncation | SQLIntegrityConstraintViolationException | ArrayIndexOutOfBoundsException e) {
+                        System.out.println("Invalid: " + columnNames[2]);
                     }
                 }
             } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
