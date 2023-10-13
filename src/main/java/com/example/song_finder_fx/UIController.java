@@ -70,11 +70,6 @@ public class UIController {
         directory = main.browseLocation();
         String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
         btnAudioDatabase.setText("   Database: " + shortenedString + "...");
-        if (directory != null) {
-            DatabaseMySQL.SearchSongsFromAudioLibrary(directory);
-        } else {
-            System.out.println("Directory not chosen!");
-        }
     }
     public void onBrowseDestinationButtonClick() {
         Main main = new Main();
@@ -175,7 +170,6 @@ public class UIController {
 
         alert.showAndWait();
     }
-
 
     // Testing
     public void onTestNotifyButtonClick(ActionEvent event) throws AWTException {

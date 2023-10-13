@@ -72,3 +72,31 @@
     -fx-border-width: 1;
     -fx-background-radius: 3;
 }
+
+.text-field {
+    -fx-background-color: '#FFFFFF';
+}
+
+.search-container {
+    -fx-border-color: '#e9ebee';
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+}
+
+.scroll-pane {
+    -fx-background-color: '#FFFFFF';
+    -fx-border-color: '#e9ebee';
+    -fx-border-width: 1;
+}
+
+.search-results-pane {
+    -fx-background-color: '#FFFFFF';
+}
+
+.search-result {
+    -fx-background-color: '#FFFFFF';
+}
+
+.search-result:hover {
+    -fx-background-color: '#f6f6f6';
+}

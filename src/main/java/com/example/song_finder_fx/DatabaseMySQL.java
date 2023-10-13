@@ -201,7 +201,7 @@ public class DatabaseMySQL {
 
         Connection db = DatabaseMySQL.getConn();
 
-        PreparedStatement ps = db.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 3");
+        PreparedStatement ps = db.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 15");
         ps.setString(1, searchText + "%");
         rs = ps.executeQuery();
 
@@ -210,9 +210,13 @@ public class DatabaseMySQL {
         }
 
         try {
+            // Printing Searched Content
             System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName());
             System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName());
             System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName());
+
+            // Printing new line
+            System.out.println("================");
         } catch (IndexOutOfBoundsException e) {
             System.out.println("End of results");
         }
