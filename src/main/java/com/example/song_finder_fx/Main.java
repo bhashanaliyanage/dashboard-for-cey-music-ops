@@ -59,7 +59,7 @@ public class Main extends Application {
         return selectedDirectory;
     }
 
-    public String searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, IOException, AWTException {
+    public String searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, AWTException {
         String[] ISRCCodes = ISRCs.split("\\n");
         DatabaseMySQL.SearchSongsFromDB(ISRCCodes, directory, destination);
         NotificationBuilder nb = new NotificationBuilder();
@@ -89,3 +89,4 @@ public class Main extends Application {
 // TODO: Check current progress with test cases
 // TODO: Adding admin switch
 // TODO: Add a function to open output folder when done
+// TODO: Make about section
