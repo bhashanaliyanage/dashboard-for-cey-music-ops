@@ -81,17 +81,11 @@ public class Main extends Application {
     }
 }
 
-// TODO: Search by filename
-    // TODO: New thread for search
-    // TODO: Scroll layout
 // TODO: Search by ISRC
 // TODO: Listen audios
 // TODO: Remember last entered database location, and destination location
 // TODO: Show a report of copied files, what are not found,
 //  offer a button to export the file names/ send an email to an admin to collect those audio files
-// TODO: Implement tabs
-// TODO: Implement get song data by ISRCs
 // TODO: Check current progress with test cases
-// TODO: Using firebase
 // TODO: Adding admin switch
 // TODO: Add a function to open output folder when done
