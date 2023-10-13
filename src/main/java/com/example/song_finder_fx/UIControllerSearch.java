@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -15,13 +16,9 @@ import java.util.Objects;
 public class UIControllerSearch {
 
     public VBox textAreaVbox;
+    @FXML
     public TextField searchArea;
     public VBox vboxSong;
-    public Label searchResult;
-    public Label srchRsSongName;
-    public Label srchRsISRC;
-    public HBox searchAndCollect;
-    public ImageView ProgressView;
 
     // Search Items
     public void getText() throws SQLException, ClassNotFoundException {

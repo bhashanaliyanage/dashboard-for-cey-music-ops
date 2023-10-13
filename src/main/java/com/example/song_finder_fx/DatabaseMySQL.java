@@ -110,6 +110,36 @@ public class DatabaseMySQL {
         sc.close();
     }
 
+    public static void updateBase(File file) throws SQLException, ClassNotFoundException, IOException {
+        Connection db = Database.getConn();
+        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
+        sc.useDelimiter(",");
+
+        PreparedStatement ps = db.prepareStatement("UPDATE 'songData'" +
+                "SET FILE_NAME = ?" +
+                "WHERE ISRC = ?");
+
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String line; // Test
+
+        while ((line = reader.readLine()) != null) {
+            String[] columnNames = line.split(",");
+
+            try {
+                if (columnNames.length > 0) {
+                    ps.setString(1, columnNames[12]);
+                    System.out.println(columnNames[12]);
+                    ps.setString(2, columnNames[0]);
+
+                    ps.executeUpdate();
+                }
+            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
+                e.printStackTrace();
+            }
+        }
+        sc.close();
+    }
+
     public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException {
         Connection db = Database.getConn();
         ResultSet rs;
@@ -165,36 +195,6 @@ public class DatabaseMySQL {
         Path start = Paths.get(directory.toURI());
     }
 
-    public static void updateBase(File file) throws SQLException, ClassNotFoundException, IOException {
-        Connection db = Database.getConn();
-        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
-        sc.useDelimiter(",");
-
-        PreparedStatement ps = db.prepareStatement("UPDATE 'songData'" +
-                "SET FILE_NAME = ?" +
-                "WHERE ISRC = ?");
-
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line; // Test
-
-        while ((line = reader.readLine()) != null) {
-            String[] columnNames = line.split(",");
-
-            try {
-                if (columnNames.length > 0) {
-                    ps.setString(1, columnNames[12]);
-                    System.out.println(columnNames[12]);
-                    ps.setString(2, columnNames[0]);
-
-                    ps.executeUpdate();
-                }
-            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
-                e.printStackTrace();
-            }
-        }
-        sc.close();
-    }
-
     public List<Songs> searchSongNames(String searchText) throws SQLException, ClassNotFoundException {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;
@@ -202,7 +202,7 @@ public class DatabaseMySQL {
         Connection db = DatabaseMySQL.getConn();
 
         PreparedStatement ps = db.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 3");
-        ps.setString(1, "%" + searchText + "%");
+        ps.setString(1, searchText + "%");
         rs = ps.executeQuery();
 
         while (rs.next()) {

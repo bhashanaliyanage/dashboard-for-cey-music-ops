@@ -2,6 +2,10 @@
     -fx-background-color: '#f3f3f3';
 }
 
+.white-pane-background{
+    -fx-background-color: '#c0c0c0';
+}
+
 .right-side-border {
     -fx-border-color: '#ebebf2';
     -fx-border-width: 0 1 0 0;
@@ -20,12 +24,12 @@
 }
 
 .button {
-    -fx-background-color: '#f3f3f3';
+    -fx-background-color: '#c0c0c0';
     -fx-background-radius: 4;
 }
 
 .button:hover {
-    -fx-background-color: '#eaeaea';
+    -fx-background-color: '#8d8d8d';
     -fx-background-radius: 4;
 }
 

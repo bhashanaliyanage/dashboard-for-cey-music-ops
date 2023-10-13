@@ -12,8 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -22,12 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 public class UIController {
     public TextArea textArea;
@@ -187,83 +179,22 @@ public class UIController {
 
     // Testing
     public void onTestNotifyButtonClick(ActionEvent event) throws AWTException {
-        System.out.println("Test Notify Button Click");
+        System.out.println("Test Notification Sent");
         NotificationBuilder nb = new NotificationBuilder();
         nb.displayTray();
     }
-    public void onTestGDriveButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, GeneralSecurityException, IOException {
+
+    // Database Things
+    public void onImportToBaseButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, GeneralSecurityException, IOException {
         DatabaseMySQL dbmsql = new DatabaseMySQL();
         Main main = new Main();
 
         dbmsql.CreateBase();
         File file = main.browseFile();
-        dbmsql.ImportToBase(file);
-    }
-
-    // Search Items
-    /*public void getText(KeyEvent inputMethodEvent) throws SQLException, ClassNotFoundException, IOException {
-        String text = searchArea.getText();
-        DatabaseMySQL db = new DatabaseMySQL();
-        ArrayList<String> songList;
-
-        songList = db.searchSongNames(text);
-        System.out.println(songList.size());
-
-        if (songList.size() == 3) {
-            vboxSong.getChildren().clear();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song.fxml"));
-            Parent newContent = loader.load();
-            Label searchResult = (Label) newContent.lookup("#searchResult");
-            Label searchResult2 = (Label) newContent.lookup("#searchResult2");
-            Label searchResult3 = (Label) newContent.lookup("#searchResult3");
-            searchResult.setText(songList.get(0));
-            searchResult2.setText(songList.get(1));
-            searchResult3.setText(songList.get(2));
-            vboxSong.getChildren().add(newContent);
-        } else if (songList.size() == 2) {
-            vboxSong.getChildren().clear();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song.fxml"));
-            Parent newContent = loader.load();
-            Label searchResult = (Label) newContent.lookup("#searchResult");
-            Label searchResult2 = (Label) newContent.lookup("#searchResult2");
-            Label searchResult3 = (Label) newContent.lookup("#searchResult3");
-            searchResult.setText(songList.get(0));
-            searchResult2.setText(songList.get(1));
-            searchResult3.setVisible(false);
-            vboxSong.getChildren().add(newContent);
-        } else if (songList.size() == 1) {
-            // vboxSong.getChildren().clear();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song.fxml"));
-            Parent newContent = loader.load();
-            Label searchResult = (Label) newContent.lookup("#searchResult");
-            Label searchResult2 = (Label) newContent.lookup("#searchResult2");
-            Label searchResult3 = (Label) newContent.lookup("#searchResult3");
-            System.out.println(songList.get(0));
-            searchResult.setText(songList.get(0));
-            // searchResult2.setVisible(false);
-            // searchResult3.setVisible(false);
+        if (file != null) {
+            dbmsql.ImportToBase(file);
+        } else {
+            System.out.println("Error! No file selected to import into Database");
         }
-
-        *//*for (String song : songList) {
-            try {
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }*//*
-
-
-        System.out.println(text);
-    }*/
-    public void onSearchedSong1Clicked(MouseEvent mouseEvent) throws AWTException {
-        String text = searchResult.getText();
-        nb.build(text);
-    }
-    public void onSearchedSong2Clicked(MouseEvent mouseEvent) throws AWTException {
-        String text = searchResult2.getText();
-        nb.build(text);
-    }
-    public void onSearchedSong3Clicked(MouseEvent mouseEvent) throws AWTException {
-        String text = searchResult3.getText();
-        nb.build(text);
     }
 }

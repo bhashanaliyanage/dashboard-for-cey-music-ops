@@ -82,8 +82,8 @@ public class Main extends Application {
 }
 
 // TODO: Search by filename
-// TODO: New thread for search
-// TODO: Scroll layout
+    // TODO: New thread for search
+    // TODO: Scroll layout
 // TODO: Search by ISRC
 // TODO: Listen audios
 // TODO: Remember last entered database location, and destination location
