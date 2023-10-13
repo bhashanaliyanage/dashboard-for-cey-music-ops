@@ -8,7 +8,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -16,6 +18,7 @@ import javafx.scene.layout.VBox;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 
 public class UIController {
@@ -26,47 +29,30 @@ public class UIController {
     public HBox searchAndCollect;
     public VBox textAreaVbox;
     public VBox mainVBox;
+    public VBox vboxSong;
+    public Label searchResult;
+    public Label searchResult2;
+    public Label searchResult3;
     File directory;
     File destination;
     public Button btnAudioDatabase;
+    @FXML
+    public TextField searchArea;
+    private NotificationBuilder nb = new NotificationBuilder();
 
+    // Primary UI Buttons
     @FXML
     protected void onSearchDetailsButtonClick(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
             Parent newContent = loader.load();
-
             mainVBox.getChildren().clear();
             mainVBox.getChildren().add(newContent);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        /*if (toggle == 1) {
-            searchAndCollect.setStyle("-fx-background-color: #eeefee; -fx-border-color: '#c0c1c2';");
-            ProgressView.setVisible(true);
-            btnProceed.setText("Processing");
-            ProgressView.setVisible(true);
-            btnAudioDatabase.setDisable(true);
-            btnDestination.setDisable(true);
-            textArea.setDisable(true);
-            btnProceed.setDisable(true);
-            textAreaVbox.setDisable(true);
-            toggle = 0;
-        } else {
-            searchAndCollect.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
-            ProgressView.setVisible(false);
-            btnProceed.setText("Proceed");
-            ProgressView.setVisible(false);
-            btnAudioDatabase.setDisable(false);
-            btnDestination.setDisable(false);
-            textArea.setDisable(false);
-            btnProceed.setDisable(false);
-            textAreaVbox.setDisable(false);
-            toggle = 1;
-        }*/
         System.out.println("onSearchDetailsButtonClick");
     }
-
     public void onCollectSongsButtonClick(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/collect-songs.fxml"));
@@ -78,34 +64,25 @@ public class UIController {
             throw new RuntimeException(e);
         }
     }
-
     @FXML
     protected void onBrowseAudioButtonClick() {
         Main main = new Main();
         directory = main.browseLocation();
         String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
         btnAudioDatabase.setText("   Database: " + shortenedString + "...");
-        if (directory != null) {
-            Database.SearchSongsFromAudioLibrary(directory);
-        } else {
-            System.out.println("Directory not chosen!");
-        }
     }
-
     public void onBrowseDestinationButtonClick() {
         Main main = new Main();
         destination = main.browseDestination();
         String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
         btnDestination.setText("   Destination: " + shortenedString + "...");
     }
-
     @FXML
     protected void onUpdateDatabaseButtonClick() throws SQLException, IOException, ClassNotFoundException {
         Main main = new Main();
         File file = main.browseFile();
-        Database.updateBase(file);
+        DatabaseMySQL.updateBase(file);
     }
-
     public void onProceedButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, IOException {
         searchAndCollect.setStyle("-fx-background-color: #eeefee; -fx-border-color: '#c0c1c2';");
         ProgressView.setVisible(true);
@@ -136,7 +113,6 @@ public class UIController {
                     @Override
                     protected Void call() throws Exception {
                         Main main = new Main();
-
 
                         String[] ISRCCodes = text.split("\\n");
 
@@ -185,6 +161,7 @@ public class UIController {
         new Thread(task).start();
     }
 
+    // Error Dialog
     private static void showErrorDialog(String title, String headerText, String contentText) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -194,10 +171,24 @@ public class UIController {
         alert.showAndWait();
     }
 
-
+    // Testing
     public void onTestNotifyButtonClick(ActionEvent event) throws AWTException {
-        System.out.println("Test Notify Button Click");
+        System.out.println("Test Notification Sent");
         NotificationBuilder nb = new NotificationBuilder();
         nb.displayTray();
+    }
+
+    // Database Things
+    public void onImportToBaseButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, GeneralSecurityException, IOException {
+        DatabaseMySQL dbmsql = new DatabaseMySQL();
+        Main main = new Main();
+
+        dbmsql.CreateBase();
+        File file = main.browseFile();
+        if (file != null) {
+            dbmsql.ImportToBase(file);
+        } else {
+            System.out.println("Error! No file selected to import into Database");
+        }
     }
 }

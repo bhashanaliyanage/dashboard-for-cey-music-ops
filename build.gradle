@@ -6,8 +6,10 @@ plugins {
     id 'org.beryx.jlink' version '2.25.0'
 }
 
+
 group 'com.example'
 version '1.0-SNAPSHOT'
+
 
 repositories {
     mavenCentral()
@@ -17,16 +19,15 @@ ext {
     junitVersion = '5.9.2'
 }
 
-sourceCompatibility = '19'
-targetCompatibility = '19'
+version = '1.0'
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
 application {
     mainModule = 'com.example.song_finder_fx'
-    mainClass = 'com.example.song_finder_fx.HelloApplication'
+    mainClass = 'com.example.song_finder_fx.Main'
 }
 
 javafx {
@@ -35,10 +36,34 @@ javafx {
 }
 
 dependencies {
-
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-    implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
+
+    // SQLite connection
+    implementation "org.xerial:sqlite-jdbc:3.36.0.3"
+
+    // MySQL Connection
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    implementation 'mysql:mysql-connector-java:5.1.13'
+
+    // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
+    implementation 'org.controlsfx:controlsfx:11.1.2'
+
+
+    // Firebase connection
+    // https://mvnrepository.com/artifact/com.google.firebase/firebase-admin
+    // implementation 'com.google.firebase:firebase-admin:9.1.1'
+    // compile 'com.firebase:firebase-client-android:2.5.0'
+
+
+    // Import the BoM for the Firebase platform
+    // implementation platform('com.google.firebase:firebase-bom:28.4.0')
+    // Declare the dependency for the Firebase Authentication library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    // implementation 'com.google.firebase:firebase-auth'
+    // Declare the dependency for the Cloud Firestore library
+    // implementation 'com.google.firebase:firebase-firestore'
+
 }
 
 test {
