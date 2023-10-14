@@ -90,3 +90,4 @@ public class Main extends Application {
 // TODO: Adding admin switch
 // TODO: Add a function to open output folder when done
 // TODO: Make about section
+// TODO: Add singer's name when searching songs
