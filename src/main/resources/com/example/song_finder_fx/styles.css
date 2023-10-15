@@ -38,6 +38,22 @@
     -fx-background-radius: 4;
 }
 
+.button-vbox {
+    -fx-alignment: 'center-left';
+    -fx-background-color: '#c0c0c0';
+    -fx-background-radius: 4;
+}
+
+.button-vbox:hover {
+    -fx-background-color: '#8d8d8d';
+    -fx-background-radius: 4;
+}
+
+.button-vbox:pressed {
+    -fx-background-color: '#ededed';
+    -fx-background-radius: 4;
+}
+
 .button_inside {
     -fx-background-color: '#FFFFFF';
     -fx-background-radius: 4;

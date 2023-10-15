@@ -37,6 +37,8 @@ public class Main extends Application {
 
         stage.show();
 
+
+
         stage.setOnCloseRequest(e -> Platform.exit());
     }
 
@@ -63,7 +65,7 @@ public class Main extends Application {
         String[] ISRCCodes = ISRCs.split("\\n");
         DatabaseMySQL.SearchSongsFromDB(ISRCCodes, directory, destination);
         NotificationBuilder nb = new NotificationBuilder();
-        nb.displayTray();
+        nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
         return "Done";
     }
 
@@ -91,3 +93,4 @@ public class Main extends Application {
 // TODO: Add a function to open output folder when done
 // TODO: Make about section
 // TODO: Add singer's name when searching songs
+// TODO: Handle database not connected error

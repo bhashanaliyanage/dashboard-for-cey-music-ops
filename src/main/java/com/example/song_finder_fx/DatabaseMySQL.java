@@ -21,6 +21,7 @@ public class DatabaseMySQL {
     private static Connection conn = null;
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
+
         if (conn == null) {
             Class.forName("com.mysql.jdbc.Driver");
             String url = "jdbc:mysql://localhost:3306/songData";
@@ -99,7 +100,8 @@ public class DatabaseMySQL {
                     try {
                         ps.executeUpdate();
                         System.out.println("Executed: " + columnNames[2]);
-                    } catch (DataTruncation | SQLIntegrityConstraintViolationException | ArrayIndexOutOfBoundsException e) {
+                    } catch (DataTruncation | SQLIntegrityConstraintViolationException |
+                             ArrayIndexOutOfBoundsException e) {
                         System.out.println("Invalid: " + columnNames[2]);
                     }
                 }
@@ -189,10 +191,6 @@ public class DatabaseMySQL {
         alert.setContentText(contentText);
 
         alert.showAndWait();
-    }
-
-    public static void SearchSongsFromAudioLibrary(File directory) {
-        Path start = Paths.get(directory.toURI());
     }
 
     public List<Songs> searchSongNames(String searchText) throws SQLException, ClassNotFoundException {

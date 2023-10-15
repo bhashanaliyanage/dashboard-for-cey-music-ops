@@ -5,16 +5,16 @@ import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 
 public class NotificationBuilder {
-    public static void main(String[] args) throws AWTException {
+    /*public static void main(String[] args) throws AWTException {
         if (SystemTray.isSupported()) {
             NotificationBuilder nb = new NotificationBuilder();
-            nb.displayTray();
+            nb.displayTrayInfo("Test", "Test");
         } else {
             System.err.println("System tray not supported!");
         }
-    }
+    }*/
 
-    public void displayTray() throws AWTException {
+    public void displayTrayInfo(String caption, String message) throws AWTException {
         SystemTray tray = SystemTray.getSystemTray();
 
         // Image image = Toolkit.getDefaultToolkit().createImage("com/example/song_finder_fx/icons/icon.png");
@@ -26,7 +26,20 @@ public class NotificationBuilder {
         trayIcon.setToolTip("CeyMusic Toolkit");
         tray.add(trayIcon);
 
-        trayIcon.displayMessage("CeyMusic Toolkit", "Execution Completed", MessageType.INFO);
+        trayIcon.displayMessage(caption, message, MessageType.INFO);
+    }
+
+    public void displayTrayError(String caption, String message) throws AWTException {
+        SystemTray tray = SystemTray.getSystemTray();
+
+        Image image = new ImageIcon("com/example/song_finder_fx/icons/icon.png").getImage();
+
+        TrayIcon trayIcon = new TrayIcon(image, "CeyMusic Toolkit");
+        trayIcon.setImageAutoSize(true);
+        trayIcon.setToolTip("CeyMusic Toolkit");
+        tray.add(trayIcon);
+
+        trayIcon.displayMessage(caption, message, MessageType.ERROR);
     }
 
     public void build(String message) throws AWTException {
