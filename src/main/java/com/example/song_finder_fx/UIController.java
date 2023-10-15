@@ -5,10 +5,13 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -23,6 +26,8 @@ import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Objects;
 
 public class UIController {
     public TextArea textArea;
@@ -43,11 +48,85 @@ public class UIController {
     public Button btnAudioDatabase;
     @FXML
     public TextField searchArea;
+    public ScrollPane scrlpneSong;
+    public Label srchRsSongName;
+    public Label srchRsISRC;
+    public VBox vBoxInSearchSong;
+
     private NotificationBuilder nb = new NotificationBuilder();
+
+    // Search Items
+    public void getText() throws IOException {
+        // Getting search keywords
+        String text = searchArea.getText();
+
+        // Connecting to database
+        DatabaseMySQL db = new DatabaseMySQL();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+        Parent newContent = loader.load();
+
+        scrlpneSong.setVisible(true);
+        scrlpneSong.setContent(vboxSong);
+
+        Task<java.util.List<Songs>> task = new Task<>() {
+            @Override
+            protected java.util.List<Songs> call() throws Exception {
+                return db.searchSongNames(text);
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            List<Songs> songList = task.getValue();
+            Node[] nodes;
+            nodes = new Node[songList.size()];
+            vboxSong.getChildren().clear();
+            for (int i = 0; i < nodes.length; i++) {
+                try {
+                    nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
+                    Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
+                    Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
+                    lblSongName.setText(songList.get(i).getSongName());
+                    lblISRC.setText(songList.get(i).getISRC().trim());
+                    int finalI = i;
+                    /*nodes[i].setOnMouseClicked(event -> {
+                        Scene scene = nodes[finalI].getScene();
+                        VBox theThing = (VBox) scene.lookup("#mainVBox");
+                        theThing.getChildren().clear();
+                        // VBox parentVBox = (VBox) nodes[finalI].getParent();
+                        // parentVBox.getChildren().clear();
+                        // parentVBox.getChildren().add(newContent);
+                        // Add new nodes to parentVBox
+                    });*/
+                    vboxSong.getChildren().add(nodes[i]);
+                } catch (NullPointerException | IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        Thread thread = new Thread(task);
+        thread.start();
+    }
+
+    @FXML
+    public void onSearchedSongClick(MouseEvent mouseEvent) throws IOException {
+        String name = srchRsSongName.getText();
+        String isrc = srchRsISRC.getText();
+        System.out.println("Song name: " + name);
+        System.out.println("ISRC: " + isrc);
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+        Parent newContent = loader.load();
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+        mainVBox.getChildren().clear();
+        mainVBox.getChildren().add(newContent);
+    }
 
     // Primary UI Buttons
     @FXML
-    protected void onSearchDetailsButtonClick(ActionEvent event) throws ClassNotFoundException, AWTException {
+    protected void onSearchDetailsButtonClick(ActionEvent event) throws ClassNotFoundException, AWTException, IOException {
         Connection con = checkDatabaseConnection();
 
         if (con != null) {
@@ -215,7 +294,7 @@ public class UIController {
         }
     }
 
-    public void onDatabaseConnectionBtnClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, AWTException {
+    public void onDatabaseConnectionBtnClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, AWTException, IOException {
         Connection con = checkDatabaseConnection();
         if (con != null) {
             nb.displayTrayInfo("Database Connected", "Database Connection Success");
@@ -224,7 +303,11 @@ public class UIController {
         }
     }
 
-    private Connection checkDatabaseConnection() throws ClassNotFoundException, AWTException {
+    private Connection checkDatabaseConnection() throws ClassNotFoundException, AWTException, IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+        Parent newContent = loader.load();
+        mainVBox.getChildren().clear();
+        mainVBox.getChildren().add(newContent);
         Connection con = null;
         NotificationBuilder nb = new NotificationBuilder();
         try {

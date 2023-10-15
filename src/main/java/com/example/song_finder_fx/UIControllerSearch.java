@@ -4,6 +4,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -16,7 +17,7 @@ import java.util.Objects;
 
 public class UIControllerSearch {
 
-    public VBox textAreaVbox;
+    public VBox vBoxInSearchSong;
     @FXML
     public TextField searchArea;
     public VBox vboxSong;
@@ -65,10 +66,15 @@ public class UIControllerSearch {
         thread.start();
     }
 
-    public void onSearchedSongClick(MouseEvent mouseEvent) {
-        String name = srchRsSongName.getText();
+    public void onSearchedSongClick(MouseEvent mouseEvent) throws IOException {
+        /*String name = srchRsSongName.getText();
         String isrc = srchRsISRC.getText();
         System.out.println("Song name: " + name);
         System.out.println("ISRC: " + isrc);
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+        Parent newContent = loader.load();
+        UIController uiController = loader.getController();
+        uiController.getMainVBox().getChildren().add(newContent);*/
     }
 }
