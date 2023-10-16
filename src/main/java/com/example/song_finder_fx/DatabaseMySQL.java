@@ -222,5 +222,37 @@ public class DatabaseMySQL {
         return songs;
     }
 
+    public List<Songs> searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
+        List<Songs> songs = new ArrayList<>();
+        ResultSet rs;
 
+        Connection db = DatabaseMySQL.getConn();
+
+        PreparedStatement ps = db.prepareStatement("SELECT ISRC, " +
+                "ALBUM_TITLE, " +
+                "UPC, " +
+                "TRACK_TITLE, " +
+                "SINGER, " +
+                "FEATURING, " +
+                "COMPOSER, " +
+                "LYRICIST, " +
+                "FILE_NAME FROM songs WHERE ISRC = ? LIMIT 1");
+        ps.setString(1, isrc);
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+            String isrcFromDatabase = rs.getString(1);
+            String albumTitle = rs.getString(2);
+            int upc = rs.getInt(3);
+            String trackTitle = rs.getString(4);
+            String singer = rs.getString(5);
+            String featuringArtist = rs.getString(6);
+            String composer = rs.getString(7);
+            String lyricist = rs.getString(8);
+            String fileName = rs.getString(9);
+            // songs.add(new Songs())
+        }
+
+        return songs;
+    }
 }
