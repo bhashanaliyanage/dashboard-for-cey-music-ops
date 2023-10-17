@@ -105,11 +105,7 @@ public class UIController {
         Node node = (Node) actionEvent.getSource();
         Scene scene = node.getScene();
         Label isrc = (Label) scene.lookup("#songISRC");
-        songList.add(isrc.getText());
-        System.out.println("========================");
-        for (String isrcs : songList) {
-            System.out.println(isrcs);
-        }
+        Main.addToList(isrc.getText());
     }
 
     @FXML
