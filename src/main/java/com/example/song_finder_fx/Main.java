@@ -94,3 +94,6 @@ public class Main extends Application {
 // TODO: Make about section
 // TODO: Add singer's name when searching songs
 // TODO: Handle database not connected error
+// TODO: Add a place to show the featuring artist in song-view.fxml
+// TODO: Implement a column in database to put CeyMusic share
+// TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something

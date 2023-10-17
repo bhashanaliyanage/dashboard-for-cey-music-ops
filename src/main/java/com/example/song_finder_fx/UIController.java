@@ -26,6 +26,7 @@ import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,6 +53,7 @@ public class UIController {
     public Label srchRsSongName;
     public Label srchRsISRC;
     public VBox vBoxInSearchSong;
+    private List<String> songList = new ArrayList<>();
 
     private NotificationBuilder nb = new NotificationBuilder();
 
@@ -88,15 +90,6 @@ public class UIController {
                     lblSongName.setText(songList.get(i).getSongName());
                     lblISRC.setText(songList.get(i).getISRC().trim());
                     int finalI = i;
-                    /*nodes[i].setOnMouseClicked(event -> {
-                        Scene scene = nodes[finalI].getScene();
-                        VBox theThing = (VBox) scene.lookup("#mainVBox");
-                        theThing.getChildren().clear();
-                        // VBox parentVBox = (VBox) nodes[finalI].getParent();
-                        // parentVBox.getChildren().clear();
-                        // parentVBox.getChildren().add(newContent);
-                        // Add new nodes to parentVBox
-                    });*/
                     vboxSong.getChildren().add(nodes[i]);
                 } catch (NullPointerException | IOException ex) {
                     ex.printStackTrace();
@@ -108,20 +101,60 @@ public class UIController {
         thread.start();
     }
 
+    public void onAddToListButtonClicked(ActionEvent actionEvent) {
+        Node node = (Node) actionEvent.getSource();
+        Scene scene = node.getScene();
+        Label isrc = (Label) scene.lookup("#songISRC");
+        songList.add(isrc.getText());
+        System.out.println("========================");
+        for (String isrcs : songList) {
+            System.out.println(isrcs);
+        }
+    }
+
     @FXML
-    public void onSearchedSongClick(MouseEvent mouseEvent) throws IOException {
+    public void onSearchedSongClick(MouseEvent mouseEvent) throws IOException, SQLException, ClassNotFoundException {
         String name = srchRsSongName.getText();
         String isrc = srchRsISRC.getText();
+
+        DatabaseMySQL db = new DatabaseMySQL();
+        List<String> songDetails = db.searchSongDetails(isrc);
+
+        // For reference
         System.out.println("Song name: " + name);
         System.out.println("ISRC: " + isrc);
 
+        // Getting the current parent layout
         FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
         Parent newContent = loader.load();
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
         VBox mainVBox = (VBox) scene.lookup("#mainVBox");
         mainVBox.getChildren().clear();
+
+
+        // Setting the new layout
         mainVBox.getChildren().add(newContent);
+
+        // Setting values for labels
+        Label songNameViewTitle = (Label) scene.lookup("#songNameViewTitle");
+        Label songName = (Label) scene.lookup("#songName");
+        Label songISRC = (Label) scene.lookup("#songISRC");
+        Label songSinger = (Label) scene.lookup("#songSinger");
+        Label songComposer = (Label) scene.lookup("#songComposer");
+        Label songLyricist = (Label) scene.lookup("#songLyricist");
+        Label songUPC = (Label) scene.lookup("#songUPC");
+        Label songProductName = (Label) scene.lookup("#songProductName");
+        Label songShare = (Label) scene.lookup("#songShare");
+        songISRC.setText(songDetails.get(0));
+        songProductName.setText(songDetails.get(1));
+        songUPC.setText(songDetails.get(2));
+        songName.setText(songDetails.get(3));
+        songNameViewTitle.setText(songDetails.get(3));
+        songSinger.setText(songDetails.get(4));
+        songComposer.setText(songDetails.get(6));
+        songLyricist.setText(songDetails.get(7));
+        songShare.setText("No Detail");
     }
 
     // Primary UI Buttons
@@ -328,4 +361,6 @@ public class UIController {
         }
         return con;
     }
+
+
 }

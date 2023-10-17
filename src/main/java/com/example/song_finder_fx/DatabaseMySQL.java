@@ -222,9 +222,10 @@ public class DatabaseMySQL {
         return songs;
     }
 
-    public List<Songs> searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
-        List<Songs> songs = new ArrayList<>();
+    public List<String> searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
+        // Songs songDetails = new Songs();
         ResultSet rs;
+        List<String> songDetails = new ArrayList<>();
 
         Connection db = DatabaseMySQL.getConn();
 
@@ -243,16 +244,26 @@ public class DatabaseMySQL {
         while (rs.next()) {
             String isrcFromDatabase = rs.getString(1);
             String albumTitle = rs.getString(2);
-            int upc = rs.getInt(3);
+            String upc = rs.getString(3);
             String trackTitle = rs.getString(4);
             String singer = rs.getString(5);
             String featuringArtist = rs.getString(6);
             String composer = rs.getString(7);
             String lyricist = rs.getString(8);
             String fileName = rs.getString(9);
-            // songs.add(new Songs())
+            songDetails.add(isrcFromDatabase);
+            songDetails.add(albumTitle);
+            songDetails.add(upc);
+            songDetails.add(trackTitle);
+            songDetails.add(singer);
+            songDetails.add(featuringArtist);
+            songDetails.add(composer);
+            songDetails.add(lyricist);
+            songDetails.add(fileName);
+            // System.out.println("Here");
+            // songDetails.songDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist, fileName);
         }
 
-        return songs;
+        return songDetails;
     }
 }
