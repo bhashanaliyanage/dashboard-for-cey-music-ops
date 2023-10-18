@@ -19,6 +19,7 @@ import java.util.List;
 public class Main extends Application {
 
     static List<String> songList = new ArrayList<>();
+    static File selectedDirectory = null;
 
     public static void main(String[] args) {
         new Thread(() -> launch(args)).start();
@@ -64,12 +65,12 @@ public class Main extends Application {
         return fileChooser.showOpenDialog(null);
     }
 
-    public File browseLocation() {
+    public static File browseLocation() {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Choose a directory");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int result = chooser.showOpenDialog(null);
-        File selectedDirectory = null;
+
         if (result == JFileChooser.APPROVE_OPTION) {
             selectedDirectory = chooser.getSelectedFile();
             System.out.println("Selected audio database directory: " + selectedDirectory.getAbsolutePath());
@@ -115,3 +116,4 @@ public class Main extends Application {
 // TODO: Add a place to show the featuring artist in song-view.fxml
 // TODO: Implement a column in database to put CeyMusic share
 // TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
+// TODO: In DatabaseMySQL, make SearchSongsFromDB method uses MySQL database

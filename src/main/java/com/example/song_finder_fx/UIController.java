@@ -22,11 +22,15 @@ import javafx.scene.layout.VBox;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class UIController {
     public TextArea textArea;
@@ -198,8 +202,7 @@ public class UIController {
 
     @FXML
     protected void onBrowseAudioButtonClick() {
-        Main main = new Main();
-        directory = main.browseLocation();
+        directory = Main.browseLocation();
         String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
         btnAudioDatabase.setText("   Database: " + shortenedString + "...");
     }
@@ -209,13 +212,6 @@ public class UIController {
         destination = main.browseDestination();
         String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
         btnDestination.setText("   Destination: " + shortenedString + "...");
-    }
-
-    @FXML
-    protected void onUpdateDatabaseButtonClick() throws SQLException, IOException, ClassNotFoundException {
-        Main main = new Main();
-        File file = main.browseFile();
-        DatabaseMySQL.updateBase(file);
     }
 
     public void onProceedButtonClick(ActionEvent event) throws ClassNotFoundException {
@@ -245,7 +241,7 @@ public class UIController {
             } else {
                 String text = textArea.getText();
                 System.out.println(text);
-                System.out.println("Here");
+                // System.out.println("Here");
                 if (!text.isEmpty()) {
                     task = new Task<>() {
                         @Override
@@ -367,5 +363,21 @@ public class UIController {
 
     public void onSongListButtonClicked(MouseEvent mouseEvent) {
         // TODO: Make song list
+    }
+
+    public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException {
+        if (Main.selectedDirectory != null) {
+            System.out.println(Main.selectedDirectory.getAbsolutePath());
+        } else {
+            System.out.println("No audio database directory specified");
+            directory = Main.browseLocation();
+            System.out.println(directory.getAbsolutePath());
+        }
+
+        Path start = Paths.get(directory.toURI());
+        try (Stream<Path> stream = Files.walk(start)) {
+            // Get file name to search for location from database
+            // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
+        }
     }
 }
