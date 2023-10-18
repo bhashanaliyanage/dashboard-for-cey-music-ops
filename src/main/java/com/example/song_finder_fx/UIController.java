@@ -393,6 +393,7 @@ public class UIController {
 
             if (file != null) {
                 Path filePath = file.getParent();
+                Desktop.getDesktop().open(filePath.toFile());
                 System.out.println(filePath);
             } else {
                 Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
