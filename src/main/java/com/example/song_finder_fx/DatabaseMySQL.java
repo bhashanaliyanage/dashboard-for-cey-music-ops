@@ -32,6 +32,23 @@ public class DatabaseMySQL {
         return conn;
     }
 
+    public static String searchFileName(String isrc) throws SQLException, ClassNotFoundException {
+        Connection db = getConn();
+        ResultSet rs;
+        String filename = null;
+
+        PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME FROM songs WHERE ISRC = ?");
+        ps.setString(1, isrc);
+
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+            filename = rs.getString(1);
+        }
+
+        return filename;
+    }
+
     public void CreateBase() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = DatabaseMySQL.getConn();

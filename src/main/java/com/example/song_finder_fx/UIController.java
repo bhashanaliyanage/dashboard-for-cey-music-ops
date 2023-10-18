@@ -366,18 +366,42 @@ public class UIController {
     }
 
     public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException {
-        if (Main.selectedDirectory != null) {
-            System.out.println(Main.selectedDirectory.getAbsolutePath());
+        if (directory != null) {
+            System.out.println(directory.getAbsolutePath());
         } else {
             System.out.println("No audio database directory specified");
             directory = Main.browseLocation();
             System.out.println(directory.getAbsolutePath());
         }
 
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Label lblISRC = (Label) scene.lookup("#songISRC");
+
+        String isrc = lblISRC.getText();
+
         Path start = Paths.get(directory.toURI());
         try (Stream<Path> stream = Files.walk(start)) {
             // Get file name to search for location from database
+            String fileName = DatabaseMySQL.searchFileName(isrc);
             // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
+            Path file = stream
+                    .filter(path -> path.toFile().isFile())
+                    .filter(path -> path.getFileName().toString().equals(fileName))
+                    .findFirst()
+                    .orElse(null);
+
+            if (file != null) {
+                Path filePath = file.getParent();
+                System.out.println(filePath);
+            } else {
+                Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+                btnOpenFileLocation.setText("File not found on audio database");
+                btnOpenFileLocation.setStyle("-fx-text-fill: '#931621'");
+                System.out.println("File variable null");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 }
