@@ -22,11 +22,9 @@ import javafx.scene.layout.VBox;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,9 +37,6 @@ public class UIController {
     public VBox textAreaVbox;
     public VBox mainVBox;
     public VBox vboxSong;
-    public Label searchResult;
-    public Label searchResult2;
-    public Label searchResult3;
     public VBox btnDatabaseCheck;
     public Label lblDatabaseStatus;
     File directory;
@@ -53,9 +48,8 @@ public class UIController {
     public Label srchRsSongName;
     public Label srchRsISRC;
     public VBox vBoxInSearchSong;
-    private List<String> songList = new ArrayList<>();
 
-    private NotificationBuilder nb = new NotificationBuilder();
+    private final NotificationBuilder nb = new NotificationBuilder();
 
     // Search Items
     public void getText() throws IOException {
@@ -65,7 +59,7 @@ public class UIController {
         // Connecting to database
         DatabaseMySQL db = new DatabaseMySQL();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
-        Parent newContent = loader.load();
+        loader.load();
 
         scrlpneSong.setVisible(true);
         scrlpneSong.setContent(vboxSong);
@@ -89,7 +83,6 @@ public class UIController {
                     Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
                     lblSongName.setText(songList.get(i).getSongName());
                     lblISRC.setText(songList.get(i).getISRC().trim());
-                    int finalI = i;
                     vboxSong.getChildren().add(nodes[i]);
                 } catch (NullPointerException | IOException ex) {
                     ex.printStackTrace();
@@ -102,10 +95,28 @@ public class UIController {
     }
 
     public void onAddToListButtonClicked(ActionEvent actionEvent) {
+        // Getting scene
         Node node = (Node) actionEvent.getSource();
         Scene scene = node.getScene();
+
+        // Getting label from scene
         Label isrc = (Label) scene.lookup("#songISRC");
-        Main.addToList(isrc.getText());
+        Label songListButtonSubtitle = (Label) scene.lookup("#lblSongListSub");
+
+        // Adding songs to list
+        Main.addSongToList(isrc.getText());
+
+        List<String> songList = Main.getSongList();
+        int songListLength = songList.size();
+
+        if (songListLength > 1) {
+            String text = songList.get(0) + " + " + (songListLength - 1) + " other songs added";
+            songListButtonSubtitle.setText(text);
+            System.out.println(text);
+        } else {
+            songListButtonSubtitle.setText(songList.get(0));
+            System.out.println(songList.get(0));
+        }
     }
 
     @FXML
@@ -155,7 +166,7 @@ public class UIController {
 
     // Primary UI Buttons
     @FXML
-    protected void onSearchDetailsButtonClick(ActionEvent event) throws ClassNotFoundException, AWTException, IOException {
+    protected void onSearchDetailsButtonClick(ActionEvent event) throws ClassNotFoundException {
         Connection con = checkDatabaseConnection();
 
         if (con != null) {
@@ -207,7 +218,7 @@ public class UIController {
         DatabaseMySQL.updateBase(file);
     }
 
-    public void onProceedButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, IOException, AWTException {
+    public void onProceedButtonClick(ActionEvent event) throws ClassNotFoundException {
         Connection con = checkDatabaseConnection();
         if (con != null) {
 
@@ -310,7 +321,7 @@ public class UIController {
     }
 
     // Database Things
-    public void onImportToBaseButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, GeneralSecurityException, IOException {
+    public void onImportToBaseButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, IOException {
         DatabaseMySQL dbmsql = new DatabaseMySQL();
         Main main = new Main();
 
@@ -323,7 +334,7 @@ public class UIController {
         }
     }
 
-    public void onDatabaseConnectionBtnClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, AWTException, IOException {
+    public void onDatabaseConnectionBtnClick(MouseEvent mouseEvent) throws ClassNotFoundException, AWTException {
         Connection con = checkDatabaseConnection();
         if (con != null) {
             nb.displayTrayInfo("Database Connected", "Database Connection Success");
@@ -332,11 +343,7 @@ public class UIController {
         }
     }
 
-    private Connection checkDatabaseConnection() throws ClassNotFoundException, AWTException, IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
-        Parent newContent = loader.load();
-        mainVBox.getChildren().clear();
-        mainVBox.getChildren().add(newContent);
+    private Connection checkDatabaseConnection() throws ClassNotFoundException {
         Connection con = null;
         NotificationBuilder nb = new NotificationBuilder();
         try {
@@ -358,5 +365,7 @@ public class UIController {
         return con;
     }
 
-
+    public void onSongListButtonClicked(MouseEvent mouseEvent) {
+        // TODO: Make song list
+    }
 }

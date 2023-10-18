@@ -17,18 +17,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main extends Application {
+
     static List<String> songList = new ArrayList<>();
 
     public static void main(String[] args) {
         new Thread(() -> launch(args)).start();
     }
 
-    public static void addToList(String isrc) {
+    public static void addSongToList(String isrc) {
         songList.add(isrc);
         System.out.println("========================");
         for (String isrcs : songList) {
             System.out.println(isrcs);
         }
+    }
+
+    public static List<String> getSongList() {
+        return songList;
     }
 
     @Override
