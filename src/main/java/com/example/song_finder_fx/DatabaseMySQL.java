@@ -24,7 +24,7 @@ public class DatabaseMySQL {
 
         if (conn == null) {
             Class.forName("com.mysql.jdbc.Driver");
-            String url = "jdbc:mysql://localhost:3306/songData";
+            String url = "jdbc:mysql://192.168.1.200:3306/songData";
             String username = "ceymusic";
             String password = "ceymusic";
             conn = DriverManager.getConnection(url, username, password);

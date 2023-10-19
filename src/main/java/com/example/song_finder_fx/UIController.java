@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -208,8 +209,7 @@ public class UIController {
     }
 
     public void onBrowseDestinationButtonClick() {
-        Main main = new Main();
-        destination = main.browseDestination();
+        destination = Main.browseDestination();
         String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
         btnDestination.setText("   Destination: " + shortenedString + "...");
     }
@@ -363,13 +363,7 @@ public class UIController {
     }
 
     public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException {
-        if (directory != null) {
-            System.out.println(directory.getAbsolutePath());
-        } else {
-            System.out.println("No audio database directory specified");
-            directory = Main.browseLocation();
-            System.out.println(directory.getAbsolutePath());
-        }
+        directoryCheck();
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
@@ -396,7 +390,51 @@ public class UIController {
                 Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
                 btnOpenFileLocation.setText("File not found on audio database");
                 btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
-                System.out.println("File variable null");
+                System.out.println("File not found on audio database");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void directoryCheck() {
+        if (directory != null) {
+            System.out.println(directory.getAbsolutePath());
+        } else {
+            System.out.println("No audio database directory specified");
+            directory = Main.browseLocation();
+            System.out.println(directory.getAbsolutePath());
+        }
+    }
+
+    public void onCopyToButtonClicked(MouseEvent mouseEvent) throws IOException {
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Label lblISRC = (Label) scene.lookup("#songISRC");
+        String isrc = lblISRC.getText();
+
+        Path start = Paths.get(directory.toURI());
+        destination = Main.browseDestination();
+
+        try (Stream<Path> stream = Files.walk(start)) {
+            String fileName = DatabaseMySQL.searchFileName(isrc);
+            Path file = stream
+                    .filter(path -> path.toFile().isFile())
+                    .filter(path -> path.getFileName().toString().equals(fileName))
+                    .findFirst()
+                    .orElse(null);
+
+            if (file != null) {
+                System.out.println("Executing file: " + file.getFileName());
+                Path targetDir = destination.toPath();
+                Path targetFile = targetDir.resolve(fileName);
+                Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("File copied to: " + targetFile);
+            } else {
+                Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
+                btnCopyTo.setText("File not found on audio database");
+                btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
+                System.out.println("File not found on audio database");
             }
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);

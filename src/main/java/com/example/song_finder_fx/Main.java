@@ -86,7 +86,7 @@ public class Main extends Application {
         return "Done";
     }
 
-    public File browseDestination() {
+    public static File browseDestination() {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Choose a directory");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
