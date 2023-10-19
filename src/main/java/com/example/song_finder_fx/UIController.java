@@ -287,9 +287,7 @@ public class UIController {
 
             }
             assert task != null;
-            task.setOnSucceeded(e -> {
-                btnProceed.setText("Proceed");
-            });
+            task.setOnSucceeded(e -> btnProceed.setText("Proceed"));
 
             new Thread(task).start();
         } else {
@@ -341,7 +339,6 @@ public class UIController {
 
     private Connection checkDatabaseConnection() throws ClassNotFoundException {
         Connection con = null;
-        NotificationBuilder nb = new NotificationBuilder();
         try {
             Class.forName("com.mysql.jdbc.Driver");
             String url = "jdbc:mysql://localhost:3306/songData";
@@ -398,7 +395,7 @@ public class UIController {
             } else {
                 Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
                 btnOpenFileLocation.setText("File not found on audio database");
-                btnOpenFileLocation.setStyle("-fx-text-fill: '#931621'");
+                btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
                 System.out.println("File variable null");
             }
         } catch (SQLException | ClassNotFoundException e) {
