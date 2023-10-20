@@ -340,8 +340,8 @@ public class UIController {
     private Connection checkDatabaseConnection() throws ClassNotFoundException {
         Connection con = null;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            String url = "jdbc:mysql://localhost:3306/songData";
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            String url = "jdbc:mysql://192.168.1.200/songData";
             String username = "ceymusic";
             String password = "ceymusic";
             con = DriverManager.getConnection(url, username, password);
