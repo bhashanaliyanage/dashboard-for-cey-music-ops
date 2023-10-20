@@ -24,7 +24,7 @@ public class DatabaseMySQL {
 
         if (conn == null) {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            String url = "jdbc:mysql://192.168.1.200:3306/songData";
+            String url = "jdbc:mysql://192.168.1.200/songData";
             String username = "ceymusic";
             String password = "ceymusic";
             conn = DriverManager.getConnection(url, username, password);
@@ -215,7 +215,7 @@ public class DatabaseMySQL {
         ResultSet rs;
 
         Class.forName("com.mysql.cj.jdbc.Driver");
-        String url = "jdbc:mysql://192.168.1.200:3306/songData";
+        String url = "jdbc:mysql://192.168.1.200/songData";
         String username = "ceymusic";
         String password = "ceymusic";
         conn = DriverManager.getConnection(url, username, password);
