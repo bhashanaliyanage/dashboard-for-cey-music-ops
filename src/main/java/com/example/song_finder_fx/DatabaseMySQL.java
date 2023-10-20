@@ -23,7 +23,7 @@ public class DatabaseMySQL {
     public static Connection getConn() throws ClassNotFoundException, SQLException {
 
         if (conn == null) {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://192.168.1.200:3306/songData";
             String username = "ceymusic";
             String password = "ceymusic";
@@ -214,14 +214,19 @@ public class DatabaseMySQL {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;
 
-        Connection db = DatabaseMySQL.getConn();
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        String url = "jdbc:mysql://192.168.1.200:3306/songData";
+        String username = "ceymusic";
+        String password = "ceymusic";
+        conn = DriverManager.getConnection(url, username, password);
 
-        PreparedStatement ps = db.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 15");
+        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 15");
         ps.setString(1, searchText + "%");
         rs = ps.executeQuery();
 
         while (rs.next()) {
             songs.add(new Songs(rs.getString(1), rs.getString(2)));
+            System.out.println(rs.getString(1));
         }
 
         try {

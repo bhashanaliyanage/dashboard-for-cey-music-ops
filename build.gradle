@@ -4,6 +4,7 @@ plugins {
     id 'org.javamodularity.moduleplugin' version '1.8.12'
     id 'org.openjfx.javafxplugin' version '0.0.13'
     id 'org.beryx.jlink' version '2.25.0'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 
@@ -30,6 +31,12 @@ application {
     mainClass = 'com.example.song_finder_fx.Main'
 }
 
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'com.example.Main'
+    }
+}
+
 javafx {
     version = '21-ea+24'
     modules = ['javafx.controls', 'javafx.fxml']
@@ -38,13 +45,12 @@ javafx {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-
     // SQLite connection
     implementation "org.xerial:sqlite-jdbc:3.36.0.3"
 
     // MySQL Connection
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
-    implementation 'mysql:mysql-connector-java:5.1.13'
+    implementation 'mysql:mysql-connector-java:8.0.28'
 
     // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
     implementation 'org.controlsfx:controlsfx:11.1.2'
