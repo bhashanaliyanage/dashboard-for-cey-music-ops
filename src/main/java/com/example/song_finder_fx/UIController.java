@@ -19,6 +19,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import javax.sound.sampled.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -457,16 +458,26 @@ public class UIController {
         Path start = Paths.get(Main.selectedDirectory.toURI());
 
         try (Stream<Path> stream = Files.walk(start)) {
-            Path file = getFileByISRC(isrc, stream);
+            Path path = getFileByISRC(isrc, stream);
 
-            if (file != null) {
+            if (path != null) {
                 // TODO: Play audio, handle audio player UI
+                File file = new File(path.toUri());
+                System.out.println(file.getName());
+
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioInputStream);
+                clip.start();
             } else {
                 // TODO: Handle UI showing audio file is missing
+                System.out.println("Cannot load file!");
             }
 
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException | LineUnavailableException e) {
             throw new RuntimeException(e);
+        } catch (UnsupportedAudioFileException e) {
+            System.out.println("Unsupported audio");
         }
     }
 
