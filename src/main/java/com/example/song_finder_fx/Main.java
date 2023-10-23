@@ -37,6 +37,16 @@ public class Main extends Application {
         return songList;
     }
 
+    public static void directoryCheck() {
+        if (selectedDirectory != null) {
+            System.out.println(selectedDirectory.getAbsolutePath());
+        } else {
+            System.out.println("No audio database directory specified");
+            selectedDirectory = Main.browseLocation();
+            System.out.println(selectedDirectory.getAbsolutePath());
+        }
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         // Loading layout file
@@ -116,7 +126,7 @@ public class Main extends Application {
 // TODO: Add a place to show the featuring artist in song-view.fxml
 // TODO: Implement a column in database to put CeyMusic share
 // TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
-// TODO: In DatabaseMySQL, make SearchSongsFromDB method uses MySQL database
-// TODO: Keyboard movement handling for search
 // TODO: Implement a settings page to set database location
 // TODO: Add a separate threads for open file location, copy to, and check database
+// TODO: In DatabaseMySQL, make SearchSongsFromDB which is used to copy songs by ISRC method uses MySQL database
+// TODO: Keyboard movement handling for search

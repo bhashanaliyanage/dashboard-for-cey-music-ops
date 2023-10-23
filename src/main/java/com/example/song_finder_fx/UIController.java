@@ -171,7 +171,7 @@ public class UIController {
 
     // Primary UI Buttons
     @FXML
-    protected void onSearchDetailsButtonClick(ActionEvent event) throws ClassNotFoundException {
+    protected void onSearchDetailsButtonClick() throws ClassNotFoundException {
         Connection con = checkDatabaseConnection();
 
         if (con != null) {
@@ -189,7 +189,7 @@ public class UIController {
         }
     }
 
-    public void onCollectSongsButtonClick(ActionEvent event) {
+    public void onCollectSongsButtonClick() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/collect-songs.fxml"));
             Parent newContent = loader.load();
@@ -214,7 +214,7 @@ public class UIController {
         btnDestination.setText("   Destination: " + shortenedString + "...");
     }
 
-    public void onProceedButtonClick(ActionEvent event) throws ClassNotFoundException {
+    public void onProceedButtonClick() throws ClassNotFoundException {
         Connection con = checkDatabaseConnection();
         if (con != null) {
 
@@ -329,6 +329,7 @@ public class UIController {
     }
 
     public void onDatabaseConnectionBtnClick(MouseEvent mouseEvent) throws ClassNotFoundException, AWTException {
+        // TODO: Do this on a separate thread
         Connection con = checkDatabaseConnection();
         if (con != null) {
             nb.displayTrayInfo("Database Connected", "Database Connection Success");
@@ -363,7 +364,7 @@ public class UIController {
     }
 
     public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException {
-        directoryCheck();
+        Main.directoryCheck();
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
@@ -371,7 +372,7 @@ public class UIController {
 
         String isrc = lblISRC.getText();
 
-        Path start = Paths.get(directory.toURI());
+        Path start = Paths.get(Main.selectedDirectory.toURI());
         try (Stream<Path> stream = Files.walk(start)) {
             // Get file name to search for location from database
             String fileName = DatabaseMySQL.searchFileName(isrc);
@@ -398,6 +399,7 @@ public class UIController {
     }
 
     private void directoryCheck() {
+        Main.directoryCheck();
         if (directory != null) {
             System.out.println(directory.getAbsolutePath());
         } else {
@@ -408,14 +410,14 @@ public class UIController {
     }
 
     public void onCopyToButtonClicked(MouseEvent mouseEvent) throws IOException {
-        directoryCheck();
+        Main.directoryCheck();
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
         Label lblISRC = (Label) scene.lookup("#songISRC");
         String isrc = lblISRC.getText();
 
-        Path start = Paths.get(directory.toURI());
+        Path start = Paths.get(Main.selectedDirectory.toURI());
         destination = Main.browseDestination();
 
         try (Stream<Path> stream = Files.walk(start)) {
@@ -443,7 +445,37 @@ public class UIController {
         }
     }
 
-    public void onBtnPlayClicked(MouseEvent mouseEvent) {
+    public void onBtnPlayClicked(MouseEvent mouseEvent) throws IOException {
+        Main.directoryCheck();
 
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Label lblISRC = (Label) scene.lookup("#songISRC");
+        String isrc = lblISRC.getText();
+        System.out.println(isrc);
+
+        Path start = Paths.get(Main.selectedDirectory.toURI());
+
+        try (Stream<Path> stream = Files.walk(start)) {
+            Path file = getFileByISRC(isrc, stream);
+
+            if (file != null) {
+                // TODO: Play audio, handle audio player UI
+            } else {
+                // TODO: Handle UI showing audio file is missing
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Path getFileByISRC(String isrc, Stream<Path> stream) throws SQLException, ClassNotFoundException {
+        String fileName = DatabaseMySQL.searchFileName(isrc);
+        return stream
+                .filter(path -> path.toFile().isFile())
+                .filter(path -> path.getFileName().toString().equals(fileName))
+                .findFirst()
+                .orElse(null);
     }
 }
