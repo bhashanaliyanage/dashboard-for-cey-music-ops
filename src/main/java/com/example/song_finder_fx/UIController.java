@@ -346,13 +346,13 @@ public class UIController {
             String password = "ceymusic";
             con = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
-            lblDatabaseStatus.setText("Error connecting database");
+            lblDatabaseStatus.setText("Database offline");
             lblDatabaseStatus.setStyle("-fx-text-fill: '#931621'");
 
             return con;
         }
         if (con != null) {
-            lblDatabaseStatus.setText("Database connected");
+            lblDatabaseStatus.setText("Database online");
             lblDatabaseStatus.setStyle("-fx-text-fill: '#32746D'");
         }
         return con;
@@ -441,5 +441,9 @@ public class UIController {
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void onBtnPlayClicked(MouseEvent mouseEvent) {
+
     }
 }
