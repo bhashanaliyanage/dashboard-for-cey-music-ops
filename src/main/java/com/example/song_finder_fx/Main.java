@@ -117,3 +117,4 @@ public class Main extends Application {
 // TODO: Implement a column in database to put CeyMusic share
 // TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
 // TODO: In DatabaseMySQL, make SearchSongsFromDB method uses MySQL database
+// TODO: Keyboard movement handling for search

@@ -408,6 +408,8 @@ public class UIController {
     }
 
     public void onCopyToButtonClicked(MouseEvent mouseEvent) throws IOException {
+        directoryCheck();
+
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
         Label lblISRC = (Label) scene.lookup("#songISRC");
