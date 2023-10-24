@@ -151,20 +151,18 @@ public class Main extends Application {
 }
 
 // TODO: Search by ISRC
-// TODO: Listen audios
-// TODO: Remember last entered database location, and destination location
 // TODO: Show a report of copied files, what are not found,
 //  offer a button to export the file names/ send an email to an admin to collect those audio files
 // TODO: Check current progress with test cases
-// TODO: Adding admin switch
 // TODO: Add a function to open output folder when done
-// TODO: Make about section
 // TODO: Add singer's name when searching songs
-// TODO: Handle database not connected error
-// TODO: Add a place to show the featuring artist in song-view.fxml
-// TODO: Implement a column in database to put CeyMusic share
-// TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
+// TODO: Adding admin switch
+// TODO: Make about section
 // TODO: Implement a settings page to set database location
 // TODO: Add a separate threads for open file location, copy to, and check database
 // TODO: In DatabaseMySQL, make SearchSongsFromDB which is used to copy songs by ISRC method uses MySQL database
+// TODO: Add loading GIF to audio player
+// TODO: Add a place to show the featuring artist in song-view.fxml
+// TODO: Implement a column in database to put CeyMusic share
+// TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
 // TODO: Keyboard movement handling for search
