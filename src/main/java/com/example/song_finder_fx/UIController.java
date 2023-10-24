@@ -19,7 +19,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import javax.sound.sampled.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -308,7 +307,7 @@ public class UIController {
     }
 
     // Testing
-    public void onTestNotifyButtonClick(ActionEvent event) throws AWTException {
+    public void onTestNotifyButtonClick() throws AWTException {
         System.out.println("Test Notification Sent");
         NotificationBuilder nb = new NotificationBuilder();
         // nb.displayTrayInfo();
@@ -316,7 +315,7 @@ public class UIController {
     }
 
     // Database Things
-    public void onImportToBaseButtonClick(ActionEvent event) throws SQLException, ClassNotFoundException, IOException {
+    public void onImportToBaseButtonClick() throws SQLException, ClassNotFoundException, IOException {
         DatabaseMySQL dbmsql = new DatabaseMySQL();
         Main main = new Main();
 
@@ -329,7 +328,7 @@ public class UIController {
         }
     }
 
-    public void onDatabaseConnectionBtnClick(MouseEvent mouseEvent) throws ClassNotFoundException, AWTException {
+    public void onDatabaseConnectionBtnClick() throws ClassNotFoundException, AWTException {
         // TODO: Do this on a separate thread
         Connection con = checkDatabaseConnection();
         if (con != null) {
@@ -452,41 +451,42 @@ public class UIController {
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
         Label lblISRC = (Label) scene.lookup("#songISRC");
+        Label lblSongName = (Label) scene.lookup("#songName");
+        Label lblArtist = (Label) scene.lookup("#songSinger");
         String isrc = lblISRC.getText();
+        Task<Void> task = null;
+        Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
+        Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
+        Path start = Paths.get(Main.selectedDirectory.toURI());
+        final boolean[] status = new boolean[1];
+
         System.out.println(isrc);
 
-        Path start = Paths.get(Main.selectedDirectory.toURI());
+        lblPlayerSongName.setText("Loading audio");
 
-        try (Stream<Path> stream = Files.walk(start)) {
-            Path path = getFileByISRC(isrc, stream);
-
-            if (path != null) {
-                // TODO: Play audio, handle audio player UI
-                File file = new File(path.toUri());
-                System.out.println(file.getName());
-
-                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
-                Clip clip = AudioSystem.getClip();
-                clip.open(audioInputStream);
-                clip.start();
-            } else {
-                // TODO: Handle UI showing audio file is missing
-                System.out.println("Cannot load file!");
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                status[0] = Main.playAudio(start, isrc);
+                return null;
             }
+        };
 
-        } catch (SQLException | ClassNotFoundException | LineUnavailableException e) {
-            throw new RuntimeException(e);
-        } catch (UnsupportedAudioFileException e) {
-            System.out.println("Unsupported audio");
+        task.setOnSucceeded(event -> {
+            setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist);
+        });
+
+        new Thread(task).start();
+    }
+
+    private static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist) {
+        if (status[0]) {
+            lblPlayerSongName.setText(lblSongName.getText());
+            lblPlayerArtist.setText(lblArtist.getText());
+        } else {
+            lblPlayerSongName.setText("Error Loading Audio");
+            lblPlayerSongName.setStyle("-fx-text-fill: '#931621'");
         }
     }
 
-    private static Path getFileByISRC(String isrc, Stream<Path> stream) throws SQLException, ClassNotFoundException {
-        String fileName = DatabaseMySQL.searchFileName(isrc);
-        return stream
-                .filter(path -> path.toFile().isFile())
-                .filter(path -> path.getFileName().toString().equals(fileName))
-                .findFirst()
-                .orElse(null);
-    }
 }

@@ -8,13 +8,17 @@ import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class Main extends Application {
 
@@ -47,6 +51,42 @@ public class Main extends Application {
         }
     }
 
+    static boolean playAudio(Path start, String isrc) throws IOException {
+        try (Stream<Path> stream = Files.walk(start)) {
+            Path path = getFileByISRC(isrc, stream);
+
+            if (path != null) {
+                // TODO: Play audio, handle audio player UI
+                File file = new File(path.toUri());
+
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioInputStream);
+                clip.start();
+                return true;
+            } else {
+                // TODO: Handle UI showing audio file is missing
+                System.out.println("Cannot load file!");
+                return false;
+            }
+
+        } catch (SQLException | ClassNotFoundException | LineUnavailableException e) {
+            throw new RuntimeException(e);
+        } catch (UnsupportedAudioFileException e) {
+            System.out.println("Unsupported audio");
+        }
+        return false;
+    }
+
+    private static Path getFileByISRC(String isrc, Stream<Path> stream) throws SQLException, ClassNotFoundException {
+        String fileName = DatabaseMySQL.searchFileName(isrc);
+        return stream
+                .filter(path -> path.toFile().isFile())
+                .filter(path -> path.getFileName().toString().equals(fileName))
+                .findFirst()
+                .orElse(null);
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         // Loading layout file
@@ -63,8 +103,6 @@ public class Main extends Application {
         stage.getIcons().add(image);
 
         stage.show();
-
-
 
         stage.setOnCloseRequest(e -> Platform.exit());
     }
