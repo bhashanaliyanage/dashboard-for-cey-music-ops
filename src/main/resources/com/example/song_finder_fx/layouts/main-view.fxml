@@ -219,7 +219,7 @@
                     <VBox.margin>
                         <Insets bottom="20.0" left="20.0" right="20.0" />
                     </VBox.margin>
-                    <ImageView fitHeight="23.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+                    <ImageView fx:id="imgMediaPico" fitHeight="23.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
                         <HBox.margin>
                             <Insets left="15.0" right="5.0" />
                         </HBox.margin>

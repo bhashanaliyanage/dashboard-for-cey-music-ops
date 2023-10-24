@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -446,23 +447,31 @@ public class UIController {
     }
 
     public void onBtnPlayClicked(MouseEvent mouseEvent) throws IOException {
+        Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
+
         Main.directoryCheck();
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
+
         Label lblISRC = (Label) scene.lookup("#songISRC");
         Label lblSongName = (Label) scene.lookup("#songName");
         Label lblArtist = (Label) scene.lookup("#songSinger");
-        String isrc = lblISRC.getText();
-        Task<Void> task = null;
         Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
         Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
+        ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
+
+        String isrc = lblISRC.getText();
+
+        Task<Void> task = null;
         Path start = Paths.get(Main.selectedDirectory.toURI());
         final boolean[] status = new boolean[1];
 
         System.out.println(isrc);
 
         lblPlayerSongName.setText("Loading audio");
+        lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
+        imgMediaPico.setImage(img);
 
         task = new Task<>() {
             @Override
@@ -473,20 +482,26 @@ public class UIController {
         };
 
         task.setOnSucceeded(event -> {
-            setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist);
+            setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist, imgMediaPico);
         });
 
         new Thread(task).start();
     }
 
-    private static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist) {
+    private static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico) {
+        Image pauseImg = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
+        Image errorImg = new Image("com/example/song_finder_fx/images/icon _error (xrp)_.png");
+
         if (status[0]) {
+            imgMediaPico.setImage(pauseImg);
+            lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
             lblPlayerSongName.setText(lblSongName.getText());
             lblPlayerArtist.setText(lblArtist.getText());
         } else {
+            imgMediaPico.setImage(errorImg);
+            lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
             lblPlayerSongName.setText("Error Loading Audio");
             lblPlayerSongName.setStyle("-fx-text-fill: '#931621'");
         }
     }
-
 }
