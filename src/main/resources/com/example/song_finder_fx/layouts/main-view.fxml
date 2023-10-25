@@ -11,10 +11,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="610.0" prefWidth="1030.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<BorderPane prefHeight="610.0" prefWidth="1030.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
     <center>
         <VBox fx:id="mainVBox" alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="650.0" prefHeight="444.0" BorderPane.alignment="CENTER">
-            <VBox prefWidth="696.0" spacing="10.0" styleClass="white-background" stylesheets="@../styles.css" VBox.vgrow="ALWAYS">
+            <VBox prefWidth="696.0" styleClass="white-background" stylesheets="@../styles.css" VBox.vgrow="ALWAYS">
                 <Label text="Search and Collect Songs">
                     <font>
                         <Font name="Segoe UI Semibold" size="28.0" />
@@ -25,7 +25,7 @@
                 </Label>
                 <Label layoutX="40.0" layoutY="40.0" text="Location">
                     <VBox.margin>
-                        <Insets left="31.0" top="30.0" />
+                        <Insets bottom="10.0" left="31.0" top="30.0" />
                     </VBox.margin>
                     <font>
                         <Font name="Segoe UI Semibold" size="12.0" />
@@ -36,7 +36,7 @@
                         <Insets left="20.0" />
                     </padding>
                     <VBox.margin>
-                        <Insets left="30.0" />
+                        <Insets bottom="10.0" left="30.0" />
                     </VBox.margin>
                     <font>
                         <Font name="Segoe UI Semilight" size="14.0" />
@@ -65,7 +65,7 @@
                 </Button>
                 <Label layoutX="41.0" layoutY="115.0" text="Audios">
                     <VBox.margin>
-                        <Insets left="31.0" top="30.0" />
+                        <Insets bottom="10.0" left="31.0" top="30.0" />
                     </VBox.margin>
                     <font>
                         <Font name="Segoe UI Semibold" size="12.0" />
@@ -73,7 +73,7 @@
                 </Label>
                 <VBox fx:id="textAreaVbox" maxWidth="606.0" minWidth="600.0" prefWidth="606.0" styleClass="textarea-bg" stylesheets="@../styles.css">
                     <VBox.margin>
-                        <Insets left="30.0" right="30.0" />
+                        <Insets bottom="10.0" left="30.0" right="30.0" />
                     </VBox.margin>
                     <TextArea fx:id="textArea" maxHeight="100.0" prefColumnCount="50" promptText="Enter ISRCs" styleClass="textarea-bg" stylesheets="@../styles.css">
                         <VBox.margin>
@@ -84,7 +84,7 @@
                         </font>
                     </TextArea>
                 </VBox>
-                <HBox fx:id="searchAndCollect" alignment="CENTER_RIGHT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+                <HBox fx:id="searchAndCollect" alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
                     <VBox.margin>
                         <Insets left="30.0" right="30.0" />
                     </VBox.margin>
@@ -101,25 +101,34 @@
                             </VBox.margin>
                         </Label>
                     </VBox>
-                    <ImageView fx:id="ProgressView" fitHeight="64.0" fitWidth="81.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                        <HBox.margin>
-                            <Insets />
-                        </HBox.margin>
-                        <Image url="@../windows11-loading.gif" />
-                    </ImageView>
-
-                    <Button fx:id="btnProceed" minHeight="30.0" minWidth="220.0" onAction="#onProceedButtonClick" styleClass="button_inside" stylesheets="@../styles.css" text="Proceed">
-                        <font>
-                            <Font name="Segoe UI Semilight" size="14.0" />
-                        </font>
-                        <HBox.margin>
-                            <Insets bottom="20.0" right="30.0" top="20.0" />
-                        </HBox.margin>
-                    </Button>
                <padding>
                   <Insets left="20.0" />
                </padding>
                 </HBox>
+            <HBox fx:id="searchAndCollect1" alignment="CENTER_LEFT" layoutX="40.0" layoutY="510.0" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+               <children>
+                  <Button fx:id="btnProceed" minHeight="30.0" minWidth="220.0" onAction="#onProceedButtonClick" styleClass="button_inside" stylesheets="@../styles.css" text="Proceed">
+                     <font>
+                        <Font name="Segoe UI Semilight" size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets bottom="20.0" right="30.0" top="20.0" />
+                     </HBox.margin>
+                  </Button>
+                       <ImageView fx:id="ProgressView" fitHeight="64.0" fitWidth="81.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                           <HBox.margin>
+                               <Insets />
+                           </HBox.margin>
+                           <Image url="@../windows11-loading.gif" />
+                       </ImageView>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="30.0" left="30.0" />
+               </VBox.margin>
+            </HBox>
             </VBox>
 
         </VBox>
@@ -247,14 +256,6 @@
                         </Label>
                         <Label fx:id="lblPlayerSongArtst" text="-" />
                     </VBox>
-               <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
-                  <image>
-                     <Image url="@../images/audio_play.gif" />
-                  </image>
-                  <HBox.margin>
-                     <Insets right="5.0" />
-                  </HBox.margin>
-               </ImageView>
                 </HBox>
             </VBox>
         </VBox>
