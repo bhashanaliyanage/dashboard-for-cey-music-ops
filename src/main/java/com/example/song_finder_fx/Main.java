@@ -24,6 +24,11 @@ public class Main extends Application {
 
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
+    static Clip clip;
+
+    public static Clip getClip() {
+        return clip;
+    }
 
     public static void main(String[] args) {
         new Thread(() -> launch(args)).start();
@@ -60,7 +65,7 @@ public class Main extends Application {
                 File file = new File(path.toUri());
 
                 AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
-                Clip clip = AudioSystem.getClip();
+                clip = AudioSystem.getClip();
                 clip.open(audioInputStream);
                 clip.start();
                 return true;

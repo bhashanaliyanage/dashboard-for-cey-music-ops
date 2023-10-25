@@ -20,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import javax.sound.sampled.Clip;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -476,7 +477,13 @@ public class UIController {
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                status[0] = Main.playAudio(start, isrc);
+                Clip clip = Main.getClip();
+                if (clip != null) {
+                    clip.stop();
+                    status[0] = Main.playAudio(start, isrc);
+                } else {
+                    status[0] = Main.playAudio(start, isrc);
+                }
                 return null;
             }
         };
@@ -502,6 +509,24 @@ public class UIController {
             lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
             lblPlayerSongName.setText("Error Loading Audio");
             lblPlayerSongName.setStyle("-fx-text-fill: '#931621'");
+        }
+    }
+
+    public void onMusicPlayerBtnClick(MouseEvent mouseEvent) {
+        Clip clip = Main.getClip();
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
+        Image imgPlay = new Image("com/example/song_finder_fx/images/icon _play circle_.png");
+        Image imgPause = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
+
+        if (clip.isRunning()) {
+            // System.out.println("Clip is running");
+            clip.stop();
+            imgMediaPico.setImage(imgPlay);
+        } else {
+            clip.start();
+            imgMediaPico.setImage(imgPause);
         }
     }
 }
