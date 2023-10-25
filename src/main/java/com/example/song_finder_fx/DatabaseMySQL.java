@@ -3,10 +3,7 @@ package com.example.song_finder_fx;
 import javafx.scene.control.Alert;
 import org.sqlite.SQLiteException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +16,7 @@ import java.util.stream.Stream;
 
 public class DatabaseMySQL {
     private static Connection conn = null;
+    static StringBuilder errorBuffer = new StringBuilder();
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
 
@@ -160,12 +158,14 @@ public class DatabaseMySQL {
     }
 
     public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException {
-        Connection db = Database.getConn();
+        Connection db = DatabaseMySQL.getConn();
         ResultSet rs;
         String filename;
 
+        errorBuffer.setLength(0);
+
         PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME " +
-                "FROM songData " +
+                "FROM songs " +
                 "WHERE ISRC = ?");
 
         for (String ISRCCode : ISRCCodes) {
@@ -191,7 +191,8 @@ public class DatabaseMySQL {
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
                         System.out.println("File copied to: " + targetFile);
                     } else {
-                        System.out.println("File not found.");
+                        addSongNotFoundError("File not found for ISRC: " + ISRCCode + "\n");
+                        System.out.println("File not found for ISRC: " + ISRCCode);
                     }
                 } catch (Exception e) {
                     showErrorDialog("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
@@ -199,6 +200,10 @@ public class DatabaseMySQL {
                 }
             }
         }
+    }
+
+    private static void addSongNotFoundError(String error) {
+        errorBuffer.append(error);
     }
 
     private static void showErrorDialog(String title, String headerText, String contentText) {

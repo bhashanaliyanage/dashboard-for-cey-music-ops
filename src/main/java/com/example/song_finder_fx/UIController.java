@@ -8,12 +8,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -24,6 +24,7 @@ import javafx.scene.layout.VBox;
 import javax.sound.sampled.Clip;
 import java.awt.*;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,6 +35,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class UIController {
@@ -100,7 +102,8 @@ public class UIController {
         Thread thread = new Thread(task);
         thread.start();
     }
-    public void getTextForISRC(KeyEvent keyEvent) throws IOException {
+
+    public void getTextForISRC() throws IOException {
         // Getting search keywords
         String text = searchArea.getText();
 
@@ -141,6 +144,7 @@ public class UIController {
         Thread thread = new Thread(task);
         thread.start();
     }
+
     public void onAddToListButtonClicked(ActionEvent actionEvent) {
         // Getting scene
         Node node = (Node) actionEvent.getSource();
@@ -165,6 +169,7 @@ public class UIController {
             System.out.println(songList.get(0));
         }
     }
+
     @FXML
     public void onSearchedSongClick(MouseEvent mouseEvent) throws IOException, SQLException, ClassNotFoundException {
         String name = srchRsSongName.getText();
@@ -209,6 +214,7 @@ public class UIController {
         songLyricist.setText(songDetails.get(7));
         songShare.setText("No Detail");
     }
+
     public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException {
         Main.directoryCheck();
 
@@ -243,6 +249,7 @@ public class UIController {
             throw new RuntimeException(e);
         }
     }
+
     public void onCopyToButtonClicked(MouseEvent mouseEvent) throws IOException {
         Main.directoryCheck();
 
@@ -278,6 +285,7 @@ public class UIController {
             throw new RuntimeException(e);
         }
     }
+
     public void onBtnPlayClicked(MouseEvent mouseEvent) {
         Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
 
@@ -295,7 +303,7 @@ public class UIController {
 
         String isrc = lblISRC.getText();
 
-        Task<Void> task = null;
+        Task<Void> task;
         Path start = Paths.get(Main.selectedDirectory.toURI());
         final boolean[] status = new boolean[1];
 
@@ -345,6 +353,7 @@ public class UIController {
             showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
         }
     }
+
     public void onSearchByISRCButtonClick() throws ClassNotFoundException {
         Connection con = checkDatabaseConnection();
 
@@ -362,6 +371,7 @@ public class UIController {
             showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
         }
     }
+
     public void onDatabaseConnectionBtnClick() throws ClassNotFoundException, AWTException {
         // TODO: Do this on a separate thread
         Connection con = checkDatabaseConnection();
@@ -371,6 +381,7 @@ public class UIController {
             nb.displayTrayError("Error", "Error connecting database");
         }
     }
+
     private Connection checkDatabaseConnection() throws ClassNotFoundException {
         Connection con = null;
         try {
@@ -391,9 +402,11 @@ public class UIController {
         }
         return con;
     }
+
     public void onSongListButtonClicked() {
         // TODO: Make song list
     }
+
     private static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico) {
         Image pauseImg = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
         Image errorImg = new Image("com/example/song_finder_fx/images/icon _error (xrp)_.png");
@@ -410,6 +423,7 @@ public class UIController {
             lblPlayerSongName.setStyle("-fx-text-fill: '#931621'");
         }
     }
+
     public void onMusicPlayerBtnClick(MouseEvent mouseEvent) {
         Clip clip = Main.getClip();
         Node node = (Node) mouseEvent.getSource();
@@ -440,17 +454,20 @@ public class UIController {
             throw new RuntimeException(e);
         }
     }
+
     @FXML
     protected void onBrowseAudioButtonClick() {
         directory = Main.browseLocation();
         String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
         btnAudioDatabase.setText("   Database: " + shortenedString + "...");
     }
+
     public void onBrowseDestinationButtonClick() {
         destination = Main.browseDestination();
         String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
         btnDestination.setText("   Destination: " + shortenedString + "...");
     }
+
     public void onProceedButtonClick() throws ClassNotFoundException {
         Connection con = checkDatabaseConnection();
         if (con != null) {
@@ -489,6 +506,7 @@ public class UIController {
 
                             for (String ISRCCode : ISRCCodes) {
                                 if (ISRCCode.length() == 12) {
+                                    // System.out.println("Proceeding to search");
                                     String done = main.searchAudios(text, directory, destination);
                                     if (done.equals("Done")) {
                                         Platform.runLater(() -> {
@@ -527,10 +545,19 @@ public class UIController {
             task.setOnSucceeded(e -> btnProceed.setText("Proceed"));
 
             new Thread(task).start();
+
+            task.setOnSucceeded(event -> {
+                if (!DatabaseMySQL.errorBuffer.isEmpty()) {
+                    try {
+                        showErrorDialogWithLog("File Not Found Error", "Error! Some files are missing in your audio database", DatabaseMySQL.errorBuffer.toString());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
         } else {
             showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
         }
-
     }
 
     // Error Dialog
@@ -539,14 +566,34 @@ public class UIController {
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
+    }
 
-        alert.showAndWait();
+    private static void showErrorDialogWithLog(String title, String headerText, String contentText) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText + "\nPress ok to save log, or click cancel");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            System.out.println("Ok button");
+            String fileName = "error_log.txt";
+            File destination = Main.browseLocation();
+            File file = new File(destination, fileName);
+
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write(contentText);
+            } catch (IOException e) {
+                System.err.println("An error occurred: " + e.getMessage());
+            }
+        }
     }
 
     // Testing
     public void onTestButtonClick() throws AWTException {
         Test.flacTest();
     }
+
     public void onImportToBaseButtonClick() throws SQLException, ClassNotFoundException, IOException {
         DatabaseMySQL dbmsql = new DatabaseMySQL();
         Main main = new Main();
