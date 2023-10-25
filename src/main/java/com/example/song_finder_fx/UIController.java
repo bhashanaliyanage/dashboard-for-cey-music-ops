@@ -16,6 +16,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -74,6 +75,47 @@ public class UIController {
             @Override
             protected java.util.List<Songs> call() throws Exception {
                 return db.searchSongNames(text);
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            List<Songs> songList = task.getValue();
+            Node[] nodes;
+            nodes = new Node[songList.size()];
+            vboxSong.getChildren().clear();
+            for (int i = 0; i < nodes.length; i++) {
+                try {
+                    nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
+                    Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
+                    Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
+                    lblSongName.setText(songList.get(i).getSongName());
+                    lblISRC.setText(songList.get(i).getISRC().trim());
+                    vboxSong.getChildren().add(nodes[i]);
+                } catch (NullPointerException | IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        Thread thread = new Thread(task);
+        thread.start();
+    }
+    public void getTextForISRC(KeyEvent keyEvent) throws IOException {
+        // Getting search keywords
+        String text = searchArea.getText();
+
+        // Connecting to database
+        DatabaseMySQL db = new DatabaseMySQL();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+        loader.load();
+
+        scrlpneSong.setVisible(true);
+        scrlpneSong.setContent(vboxSong);
+
+        Task<java.util.List<Songs>> task = new Task<>() {
+            @Override
+            protected java.util.List<Songs> call() throws Exception {
+                return db.searchSongNamesByISRC(text);
             }
         };
 
@@ -303,7 +345,22 @@ public class UIController {
             showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
         }
     }
-    public void onSearchByISRCButtonClick() {
+    public void onSearchByISRCButtonClick() throws ClassNotFoundException {
+        Connection con = checkDatabaseConnection();
+
+        if (con != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details-by-isrc.fxml"));
+                Parent newContent = loader.load();
+                mainVBox.getChildren().clear();
+                mainVBox.getChildren().add(newContent);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("onSearchDetailsButtonClick");
+        } else {
+            showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
+        }
     }
     public void onDatabaseConnectionBtnClick() throws ClassNotFoundException, AWTException {
         // TODO: Do this on a separate thread
@@ -502,4 +559,6 @@ public class UIController {
             System.out.println("Error! No file selected to import into Database");
         }
     }
+
+
 }

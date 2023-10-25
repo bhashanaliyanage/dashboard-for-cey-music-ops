@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="mainVBox" prefWidth="696.0" spacing="10.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+   <Label text="Search Song Details">
+      <font>
+         <Font name="Segoe UI Semibold" size="28.0" />
+      </font>
+      <VBox.margin>
+         <Insets left="30.0" top="30.0" />
+      </VBox.margin>
+   </Label>
+   <Label layoutX="41.0" layoutY="115.0" text="Audios">
+      <VBox.margin>
+         <Insets left="31.0" top="30.0" />
+      </VBox.margin>
+      <font>
+         <Font name="Segoe UI Semibold" size="12.0" />
+      </font>
+   </Label>
+   <VBox fx:id="vBoxInSearchSong" maxWidth="606.0" minWidth="600.0" prefWidth="606.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+      <VBox.margin>
+         <Insets left="30.0" right="30.0" />
+      </VBox.margin>
+      <HBox styleClass="search-container" stylesheets="@../styles.css">
+         <VBox.margin>
+            <Insets left="30.0" right="30.0" top="30.0" />
+         </VBox.margin>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+         <TextField fx:id="searchArea" onKeyPressed="#getTextForISRC" prefHeight="30.0" prefWidth="500.0" promptText="Enter an ISRC">
+            <font>
+               <Font size="14.0" />
+            </font>
+            <HBox.margin>
+               <Insets />
+            </HBox.margin>
+         </TextField>
+         <ImageView fitHeight="20.0" fitWidth="20.0" onMouseClicked="#getText" pickOnBounds="true" preserveRatio="true">
+            <HBox.margin>
+               <Insets left="5.0" right="5.0" top="5.0" />
+            </HBox.margin>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+            <Image url="@../images/icon%20_search%20normal%201_.png" />
+         </ImageView>
+      </HBox>
+      <ScrollPane fx:id="scrlpneSong" prefHeight="320.0" prefWidth="544.0" styleClass="scroll-pane" stylesheets="@../styles.css" visible="false">
+         <VBox.margin>
+            <Insets bottom="30.0" left="30.0" right="30.0" />
+         </VBox.margin>
+         <VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css" />
+      </ScrollPane>
+   </VBox>
+</VBox>

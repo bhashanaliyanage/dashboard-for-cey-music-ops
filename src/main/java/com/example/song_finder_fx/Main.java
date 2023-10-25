@@ -155,7 +155,6 @@ public class Main extends Application {
 
 }
 
-// TODO: Search by ISRC
 // TODO: Show a report of copied files, what are not found,
 //  offer a button to export the file names/ send an email to an admin to collect those audio files
 // TODO: Check current progress with test cases
