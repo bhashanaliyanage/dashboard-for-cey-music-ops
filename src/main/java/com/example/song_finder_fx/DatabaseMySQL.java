@@ -3,10 +3,7 @@ package com.example.song_finder_fx;
 import javafx.scene.control.Alert;
 import org.sqlite.SQLiteException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,16 +16,35 @@ import java.util.stream.Stream;
 
 public class DatabaseMySQL {
     private static Connection conn = null;
+    static StringBuilder errorBuffer = new StringBuilder();
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
+
         if (conn == null) {
-            Class.forName("com.mysql.jdbc.Driver");
-            String url = "jdbc:mysql://localhost:3306/songData";
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            String url = "jdbc:mysql://192.168.1.200/songData";
             String username = "ceymusic";
             String password = "ceymusic";
             conn = DriverManager.getConnection(url, username, password);
         }
         return conn;
+    }
+
+    public static String searchFileName(String isrc) throws SQLException, ClassNotFoundException {
+        Connection db = getConn();
+        ResultSet rs;
+        String filename = null;
+
+        PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME FROM songs WHERE ISRC = ?");
+        ps.setString(1, isrc);
+
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+            filename = rs.getString(1);
+        }
+
+        return filename;
     }
 
     public void CreateBase() throws SQLException, ClassNotFoundException {
@@ -99,7 +115,8 @@ public class DatabaseMySQL {
                     try {
                         ps.executeUpdate();
                         System.out.println("Executed: " + columnNames[2]);
-                    } catch (DataTruncation | SQLIntegrityConstraintViolationException | ArrayIndexOutOfBoundsException e) {
+                    } catch (DataTruncation | SQLIntegrityConstraintViolationException |
+                             ArrayIndexOutOfBoundsException e) {
                         System.out.println("Invalid: " + columnNames[2]);
                     }
                 }
@@ -141,12 +158,14 @@ public class DatabaseMySQL {
     }
 
     public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException {
-        Connection db = Database.getConn();
+        Connection db = DatabaseMySQL.getConn();
         ResultSet rs;
         String filename;
 
+        errorBuffer.setLength(0);
+
         PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME " +
-                "FROM songData " +
+                "FROM songs " +
                 "WHERE ISRC = ?");
 
         for (String ISRCCode : ISRCCodes) {
@@ -172,7 +191,8 @@ public class DatabaseMySQL {
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
                         System.out.println("File copied to: " + targetFile);
                     } else {
-                        System.out.println("File not found.");
+                        addSongNotFoundError("File not found for ISRC: " + ISRCCode + "\n");
+                        System.out.println("File not found for ISRC: " + ISRCCode);
                     }
                 } catch (Exception e) {
                     showErrorDialog("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
@@ -180,6 +200,10 @@ public class DatabaseMySQL {
                 }
             }
         }
+    }
+
+    private static void addSongNotFoundError(String error) {
+        errorBuffer.append(error);
     }
 
     private static void showErrorDialog(String title, String headerText, String contentText) {
@@ -191,22 +215,19 @@ public class DatabaseMySQL {
         alert.showAndWait();
     }
 
-    public static void SearchSongsFromAudioLibrary(File directory) {
-        Path start = Paths.get(directory.toURI());
-    }
-
     public List<Songs> searchSongNames(String searchText) throws SQLException, ClassNotFoundException {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;
 
-        Connection db = DatabaseMySQL.getConn();
+        Connection conn = getConn();
 
-        PreparedStatement ps = db.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 15");
+        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 15");
         ps.setString(1, searchText + "%");
         rs = ps.executeQuery();
 
         while (rs.next()) {
             songs.add(new Songs(rs.getString(1), rs.getString(2)));
+            System.out.println(rs.getString(1));
         }
 
         try {
@@ -222,6 +243,80 @@ public class DatabaseMySQL {
         }
 
         return songs;
+    }
+    public List<Songs> searchSongNamesByISRC(String searchText) throws ClassNotFoundException, SQLException {
+        List<Songs> songs = new ArrayList<>();
+        ResultSet rs;
+
+        Connection conn = getConn();
+
+        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE ISRC LIKE ? LIMIT 15");
+        ps.setString(1, "%" + searchText + "%");
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+            songs.add(new Songs(rs.getString(1), rs.getString(2)));
+            System.out.println(rs.getString(1));
+        }
+
+        try {
+            // Printing Searched Content
+            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName());
+            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName());
+            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName());
+
+            // Printing new line
+            System.out.println("================");
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("End of results");
+        }
+
+        return songs;
+    }
+
+    public List<String> searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
+        // Songs songDetails = new Songs();
+        ResultSet rs;
+        List<String> songDetails = new ArrayList<>();
+
+        Connection db = DatabaseMySQL.getConn();
+
+        PreparedStatement ps = db.prepareStatement("SELECT ISRC, " +
+                "ALBUM_TITLE, " +
+                "UPC, " +
+                "TRACK_TITLE, " +
+                "SINGER, " +
+                "FEATURING, " +
+                "COMPOSER, " +
+                "LYRICIST, " +
+                "FILE_NAME FROM songs WHERE ISRC = ? LIMIT 1");
+        ps.setString(1, isrc);
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+            String isrcFromDatabase = rs.getString(1);
+            String albumTitle = rs.getString(2);
+            String upc = rs.getString(3);
+            String trackTitle = rs.getString(4);
+            String singer = rs.getString(5);
+            String featuringArtist = rs.getString(6);
+            String composer = rs.getString(7);
+            String lyricist = rs.getString(8);
+            String fileName = rs.getString(9);
+            songDetails.add(isrcFromDatabase);
+            songDetails.add(albumTitle);
+            songDetails.add(upc);
+            songDetails.add(trackTitle);
+            songDetails.add(singer);
+            songDetails.add(featuringArtist);
+            songDetails.add(composer);
+            songDetails.add(lyricist);
+            songDetails.add(fileName);
+            // System.out.println("Here");
+            // songDetails.songDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist, fileName);
+        }
+
+        return songDetails;
     }
 
 
