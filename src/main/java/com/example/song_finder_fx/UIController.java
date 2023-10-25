@@ -55,7 +55,6 @@ public class UIController {
     public Label srchRsSongName;
     public Label srchRsISRC;
     public VBox vBoxInSearchSong;
-
     private final NotificationBuilder nb = new NotificationBuilder();
 
     // Search Items
@@ -100,7 +99,6 @@ public class UIController {
         Thread thread = new Thread(task);
         thread.start();
     }
-
     public void onAddToListButtonClicked(ActionEvent actionEvent) {
         // Getting scene
         Node node = (Node) actionEvent.getSource();
@@ -125,7 +123,6 @@ public class UIController {
             System.out.println(songList.get(0));
         }
     }
-
     @FXML
     public void onSearchedSongClick(MouseEvent mouseEvent) throws IOException, SQLException, ClassNotFoundException {
         String name = srchRsSongName.getText();
@@ -170,6 +167,122 @@ public class UIController {
         songLyricist.setText(songDetails.get(7));
         songShare.setText("No Detail");
     }
+    public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException {
+        Main.directoryCheck();
+
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Label lblISRC = (Label) scene.lookup("#songISRC");
+
+        String isrc = lblISRC.getText();
+
+        Path start = Paths.get(Main.selectedDirectory.toURI());
+        try (Stream<Path> stream = Files.walk(start)) {
+            // Get file name to search for location from database
+            String fileName = DatabaseMySQL.searchFileName(isrc);
+            // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
+            Path file = stream
+                    .filter(path -> path.toFile().isFile())
+                    .filter(path -> path.getFileName().toString().equals(fileName))
+                    .findFirst()
+                    .orElse(null);
+
+            if (file != null) {
+                Path filePath = file.getParent();
+                Desktop.getDesktop().open(filePath.toFile());
+                System.out.println(filePath);
+            } else {
+                Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+                btnOpenFileLocation.setText("File not found on audio database");
+                btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
+                System.out.println("File not found on audio database");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void onCopyToButtonClicked(MouseEvent mouseEvent) throws IOException {
+        Main.directoryCheck();
+
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Label lblISRC = (Label) scene.lookup("#songISRC");
+        String isrc = lblISRC.getText();
+
+        Path start = Paths.get(Main.selectedDirectory.toURI());
+        destination = Main.browseDestination();
+
+        try (Stream<Path> stream = Files.walk(start)) {
+            String fileName = DatabaseMySQL.searchFileName(isrc);
+            Path file = stream
+                    .filter(path -> path.toFile().isFile())
+                    .filter(path -> path.getFileName().toString().equals(fileName))
+                    .findFirst()
+                    .orElse(null);
+
+            if (file != null) {
+                System.out.println("Executing file: " + file.getFileName());
+                Path targetDir = destination.toPath();
+                Path targetFile = targetDir.resolve(fileName);
+                Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("File copied to: " + targetFile);
+            } else {
+                Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
+                btnCopyTo.setText("File not found on audio database");
+                btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
+                System.out.println("File not found on audio database");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void onBtnPlayClicked(MouseEvent mouseEvent) {
+        Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
+
+        Main.directoryCheck();
+
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+
+        Label lblISRC = (Label) scene.lookup("#songISRC");
+        Label lblSongName = (Label) scene.lookup("#songName");
+        Label lblArtist = (Label) scene.lookup("#songSinger");
+        Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
+        Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
+        ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
+
+        String isrc = lblISRC.getText();
+
+        Task<Void> task = null;
+        Path start = Paths.get(Main.selectedDirectory.toURI());
+        final boolean[] status = new boolean[1];
+
+        System.out.println(isrc);
+
+        lblPlayerSongName.setText("Loading audio");
+        lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
+        imgMediaPico.setImage(img);
+
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Clip clip = Main.getClip();
+                if (clip != null) {
+                    clip.stop();
+                    status[0] = Main.playAudio(start, isrc);
+                } else {
+                    status[0] = Main.playAudio(start, isrc);
+                }
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist, imgMediaPico);
+        });
+
+        new Thread(task).start();
+    }
 
     // Primary UI Buttons
     @FXML
@@ -190,7 +303,75 @@ public class UIController {
             showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
         }
     }
+    public void onSearchByISRCButtonClick() {
+    }
+    public void onDatabaseConnectionBtnClick() throws ClassNotFoundException, AWTException {
+        // TODO: Do this on a separate thread
+        Connection con = checkDatabaseConnection();
+        if (con != null) {
+            nb.displayTrayInfo("Database Connected", "Database Connection Success");
+        } else {
+            nb.displayTrayError("Error", "Error connecting database");
+        }
+    }
+    private Connection checkDatabaseConnection() throws ClassNotFoundException {
+        Connection con = null;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            String url = "jdbc:mysql://192.168.1.200/songData";
+            String username = "ceymusic";
+            String password = "ceymusic";
+            con = DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            lblDatabaseStatus.setText("Database offline");
+            lblDatabaseStatus.setStyle("-fx-text-fill: '#931621'");
 
+            return con;
+        }
+        if (con != null) {
+            lblDatabaseStatus.setText("Database online");
+            lblDatabaseStatus.setStyle("-fx-text-fill: '#32746D'");
+        }
+        return con;
+    }
+    public void onSongListButtonClicked() {
+        // TODO: Make song list
+    }
+    private static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico) {
+        Image pauseImg = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
+        Image errorImg = new Image("com/example/song_finder_fx/images/icon _error (xrp)_.png");
+
+        if (status[0]) {
+            imgMediaPico.setImage(pauseImg);
+            lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
+            lblPlayerSongName.setText(lblSongName.getText());
+            lblPlayerArtist.setText(lblArtist.getText());
+        } else {
+            imgMediaPico.setImage(errorImg);
+            lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
+            lblPlayerSongName.setText("Error Loading Audio");
+            lblPlayerSongName.setStyle("-fx-text-fill: '#931621'");
+        }
+    }
+    public void onMusicPlayerBtnClick(MouseEvent mouseEvent) {
+        Clip clip = Main.getClip();
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
+        Image imgPlay = new Image("com/example/song_finder_fx/images/icon _play circle_.png");
+        Image imgPause = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
+
+        if (clip.isRunning()) {
+            // System.out.println("Clip is running");
+            clip.stop();
+            imgMediaPico.setImage(imgPlay);
+        } else {
+            clip.start();
+            imgMediaPico.setImage(imgPause);
+        }
+    }
+
+    // Collect Songs View
     public void onCollectSongsButtonClick() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/collect-songs.fxml"));
@@ -202,20 +383,17 @@ public class UIController {
             throw new RuntimeException(e);
         }
     }
-
     @FXML
     protected void onBrowseAudioButtonClick() {
         directory = Main.browseLocation();
         String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
         btnAudioDatabase.setText("   Database: " + shortenedString + "...");
     }
-
     public void onBrowseDestinationButtonClick() {
         destination = Main.browseDestination();
         String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
         btnDestination.setText("   Destination: " + shortenedString + "...");
     }
-
     public void onProceedButtonClick() throws ClassNotFoundException {
         Connection con = checkDatabaseConnection();
         if (con != null) {
@@ -309,14 +487,9 @@ public class UIController {
     }
 
     // Testing
-    public void onTestNotifyButtonClick() throws AWTException {
-        System.out.println("Test Notification Sent");
-        NotificationBuilder nb = new NotificationBuilder();
-        // nb.displayTrayInfo();
-        nb.displayTrayError("Error", "Test Error Notification");
+    public void onTestButtonClick() throws AWTException {
+        Test.flacTest();
     }
-
-    // Database Things
     public void onImportToBaseButtonClick() throws SQLException, ClassNotFoundException, IOException {
         DatabaseMySQL dbmsql = new DatabaseMySQL();
         Main main = new Main();
@@ -327,206 +500,6 @@ public class UIController {
             dbmsql.ImportToBase(file);
         } else {
             System.out.println("Error! No file selected to import into Database");
-        }
-    }
-
-    public void onDatabaseConnectionBtnClick() throws ClassNotFoundException, AWTException {
-        // TODO: Do this on a separate thread
-        Connection con = checkDatabaseConnection();
-        if (con != null) {
-            nb.displayTrayInfo("Database Connected", "Database Connection Success");
-        } else {
-            nb.displayTrayError("Error", "Error connecting database");
-        }
-    }
-
-    private Connection checkDatabaseConnection() throws ClassNotFoundException {
-        Connection con = null;
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            String url = "jdbc:mysql://192.168.1.200/songData";
-            String username = "ceymusic";
-            String password = "ceymusic";
-            con = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            lblDatabaseStatus.setText("Database offline");
-            lblDatabaseStatus.setStyle("-fx-text-fill: '#931621'");
-
-            return con;
-        }
-        if (con != null) {
-            lblDatabaseStatus.setText("Database online");
-            lblDatabaseStatus.setStyle("-fx-text-fill: '#32746D'");
-        }
-        return con;
-    }
-
-    public void onSongListButtonClicked(MouseEvent mouseEvent) {
-        // TODO: Make song list
-    }
-
-    public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException {
-        Main.directoryCheck();
-
-        Node node = (Node) mouseEvent.getSource();
-        Scene scene = node.getScene();
-        Label lblISRC = (Label) scene.lookup("#songISRC");
-
-        String isrc = lblISRC.getText();
-
-        Path start = Paths.get(Main.selectedDirectory.toURI());
-        try (Stream<Path> stream = Files.walk(start)) {
-            // Get file name to search for location from database
-            String fileName = DatabaseMySQL.searchFileName(isrc);
-            // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
-            Path file = stream
-                    .filter(path -> path.toFile().isFile())
-                    .filter(path -> path.getFileName().toString().equals(fileName))
-                    .findFirst()
-                    .orElse(null);
-
-            if (file != null) {
-                Path filePath = file.getParent();
-                Desktop.getDesktop().open(filePath.toFile());
-                System.out.println(filePath);
-            } else {
-                Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
-                btnOpenFileLocation.setText("File not found on audio database");
-                btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
-                System.out.println("File not found on audio database");
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void directoryCheck() {
-        Main.directoryCheck();
-        if (directory != null) {
-            System.out.println(directory.getAbsolutePath());
-        } else {
-            System.out.println("No audio database directory specified");
-            directory = Main.browseLocation();
-            System.out.println(directory.getAbsolutePath());
-        }
-    }
-
-    public void onCopyToButtonClicked(MouseEvent mouseEvent) throws IOException {
-        Main.directoryCheck();
-
-        Node node = (Node) mouseEvent.getSource();
-        Scene scene = node.getScene();
-        Label lblISRC = (Label) scene.lookup("#songISRC");
-        String isrc = lblISRC.getText();
-
-        Path start = Paths.get(Main.selectedDirectory.toURI());
-        destination = Main.browseDestination();
-
-        try (Stream<Path> stream = Files.walk(start)) {
-            String fileName = DatabaseMySQL.searchFileName(isrc);
-            Path file = stream
-                    .filter(path -> path.toFile().isFile())
-                    .filter(path -> path.getFileName().toString().equals(fileName))
-                    .findFirst()
-                    .orElse(null);
-
-            if (file != null) {
-                System.out.println("Executing file: " + file.getFileName());
-                Path targetDir = destination.toPath();
-                Path targetFile = targetDir.resolve(fileName);
-                Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("File copied to: " + targetFile);
-            } else {
-                Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
-                btnCopyTo.setText("File not found on audio database");
-                btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
-                System.out.println("File not found on audio database");
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void onBtnPlayClicked(MouseEvent mouseEvent) throws IOException {
-        Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
-
-        Main.directoryCheck();
-
-        Node node = (Node) mouseEvent.getSource();
-        Scene scene = node.getScene();
-
-        Label lblISRC = (Label) scene.lookup("#songISRC");
-        Label lblSongName = (Label) scene.lookup("#songName");
-        Label lblArtist = (Label) scene.lookup("#songSinger");
-        Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
-        Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
-        ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
-
-        String isrc = lblISRC.getText();
-
-        Task<Void> task = null;
-        Path start = Paths.get(Main.selectedDirectory.toURI());
-        final boolean[] status = new boolean[1];
-
-        System.out.println(isrc);
-
-        lblPlayerSongName.setText("Loading audio");
-        lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-        imgMediaPico.setImage(img);
-
-        task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                Clip clip = Main.getClip();
-                if (clip != null) {
-                    clip.stop();
-                    status[0] = Main.playAudio(start, isrc);
-                } else {
-                    status[0] = Main.playAudio(start, isrc);
-                }
-                return null;
-            }
-        };
-
-        task.setOnSucceeded(event -> {
-            setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist, imgMediaPico);
-        });
-
-        new Thread(task).start();
-    }
-
-    private static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico) {
-        Image pauseImg = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
-        Image errorImg = new Image("com/example/song_finder_fx/images/icon _error (xrp)_.png");
-
-        if (status[0]) {
-            imgMediaPico.setImage(pauseImg);
-            lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-            lblPlayerSongName.setText(lblSongName.getText());
-            lblPlayerArtist.setText(lblArtist.getText());
-        } else {
-            imgMediaPico.setImage(errorImg);
-            lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-            lblPlayerSongName.setText("Error Loading Audio");
-            lblPlayerSongName.setStyle("-fx-text-fill: '#931621'");
-        }
-    }
-
-    public void onMusicPlayerBtnClick(MouseEvent mouseEvent) {
-        Clip clip = Main.getClip();
-        Node node = (Node) mouseEvent.getSource();
-        Scene scene = node.getScene();
-        ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
-        Image imgPlay = new Image("com/example/song_finder_fx/images/icon _play circle_.png");
-        Image imgPause = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
-
-        if (clip.isRunning()) {
-            // System.out.println("Clip is running");
-            clip.stop();
-            imgMediaPico.setImage(imgPlay);
-        } else {
-            clip.start();
-            imgMediaPico.setImage(imgPause);
         }
     }
 }

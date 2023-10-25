@@ -168,6 +168,7 @@ public class Main extends Application {
 // TODO: In DatabaseMySQL, make SearchSongsFromDB which is used to copy songs by ISRC method uses MySQL database
 // TODO: Add loading GIF to audio player
 // TODO: Add a place to show the featuring artist in song-view.fxml
+// TODO: Song list view
 // TODO: Implement a column in database to put CeyMusic share
 // TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
 // TODO: Keyboard movement handling for search
