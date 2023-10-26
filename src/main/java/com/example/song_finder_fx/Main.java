@@ -131,12 +131,11 @@ public class Main extends Application {
         return selectedDirectory;
     }
 
-    public String searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, AWTException {
+    public void searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, AWTException {
         String[] ISRCCodes = ISRCs.split("\\n");
-        DatabaseMySQL.SearchSongsFromDB(ISRCCodes, directory, destination);
-        NotificationBuilder nb = new NotificationBuilder();
-        nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
-        return "Done";
+        DatabaseMySQL.SearchSongsFromDB(ISRCs, directory, destination);
+        // NotificationBuilder nb = new NotificationBuilder();
+        // nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
     }
 
     public static File browseDestination() {
