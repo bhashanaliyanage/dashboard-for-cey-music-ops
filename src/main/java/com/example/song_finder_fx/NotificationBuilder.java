@@ -5,19 +5,8 @@ import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 
 public class NotificationBuilder {
-    /*public static void main(String[] args) throws AWTException {
-        if (SystemTray.isSupported()) {
-            NotificationBuilder nb = new NotificationBuilder();
-            nb.displayTrayInfo("Test", "Test");
-        } else {
-            System.err.println("System tray not supported!");
-        }
-    }*/
-
     public void displayTrayInfo(String caption, String message) throws AWTException {
         SystemTray tray = SystemTray.getSystemTray();
-
-        // Image image = Toolkit.getDefaultToolkit().createImage("com/example/song_finder_fx/icons/icon.png");
 
         Image image = new ImageIcon("com/example/song_finder_fx/icons/icon.png").getImage();
 

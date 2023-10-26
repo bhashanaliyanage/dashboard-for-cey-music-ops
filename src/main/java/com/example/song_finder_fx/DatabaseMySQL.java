@@ -157,7 +157,7 @@ public class DatabaseMySQL {
         sc.close();
     }
 
-    public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException {
+    public static void SearchSongsFromDB(String ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
         ResultSet rs;
         String filename;
@@ -168,11 +168,15 @@ public class DatabaseMySQL {
                 "FROM songs " +
                 "WHERE ISRC = ?");
 
-        for (String ISRCCode : ISRCCodes) {
-            ps.setString(1, ISRCCode);
-            rs = ps.executeQuery();
+        System.out.println("Before for loop for ISRC Codes");
 
+        ps.setString(1, ISRCCodes);
+        rs = ps.executeQuery();
+
+        if (rs != null) {
+            System.out.println("Result set is not null");
             while (rs.next()) {
+                System.out.println("Inside Result Set");
                 filename = rs.getString("FILE_NAME");
                 System.out.println("File Name: " + filename);
                 Path start = Paths.get(directory.toURI());
@@ -191,8 +195,8 @@ public class DatabaseMySQL {
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
                         System.out.println("File copied to: " + targetFile);
                     } else {
-                        addSongNotFoundError("File not found for ISRC: " + ISRCCode + "\n");
-                        System.out.println("File not found for ISRC: " + ISRCCode);
+                        addSongNotFoundError("File not found for ISRC: " + ISRCCodes + "\n");
+                        System.out.println("File not found for ISRC: " + ISRCCodes);
                     }
                 } catch (Exception e) {
                     showErrorDialog("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
@@ -200,6 +204,7 @@ public class DatabaseMySQL {
                 }
             }
         }
+
     }
 
     private static void addSongNotFoundError(String error) {

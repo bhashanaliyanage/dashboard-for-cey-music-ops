@@ -16,7 +16,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -41,9 +40,11 @@ import java.util.stream.Stream;
 public class UIController {
     public TextArea textArea;
     public Button btnDestination;
+    @FXML
     public Button btnProceed;
     public ImageView ProgressView;
     public HBox searchAndCollect;
+    public HBox searchAndCollect1;
     public VBox textAreaVbox;
     public VBox mainVBox;
     public VBox vboxSong;
@@ -59,6 +60,14 @@ public class UIController {
     public Label srchRsISRC;
     public VBox vBoxInSearchSong;
     private final NotificationBuilder nb = new NotificationBuilder();
+
+    private void updateButtonProceed(String isrcCode) {
+        if (btnProceed != null) {
+            btnProceed.setText(isrcCode);
+        } else {
+            System.out.println("Proceed button variable is null");
+        }
+    }
 
     // Search Items
     public void getText() throws IOException {
@@ -327,9 +336,7 @@ public class UIController {
             }
         };
 
-        task.setOnSucceeded(event -> {
-            setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist, imgMediaPico);
-        });
+        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist, imgMediaPico));
 
         new Thread(task).start();
     }
@@ -470,9 +477,10 @@ public class UIController {
 
     public void onProceedButtonClick() throws ClassNotFoundException {
         Connection con = checkDatabaseConnection();
-        if (con != null) {
 
-            searchAndCollect.setStyle("-fx-background-color: #eeefee; -fx-border-color: '#c0c1c2';");
+        if (con != null) {
+            // Connection Checked
+            searchAndCollect1.setStyle("-fx-background-color: #eeefee; -fx-border-color: '#c0c1c2';");
             ProgressView.setVisible(true);
             btnAudioDatabase.setDisable(true);
             btnDestination.setDisable(true);
@@ -483,9 +491,10 @@ public class UIController {
             btnProceed.setText("Processing");
 
             if (directory == null || destination == null) {
+                // Directories Checked
                 showErrorDialog("Empty Location Entry", "Please browse for Audio Database and Destination Location", "Use the location section for this");
                 btnProceed.setText("Proceed");
-                searchAndCollect.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
+                searchAndCollect1.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
                 ProgressView.setVisible(false);
                 btnAudioDatabase.setDisable(false);
                 btnDestination.setDisable(false);
@@ -493,10 +502,11 @@ public class UIController {
                 btnProceed.setDisable(false);
                 textAreaVbox.setDisable(false);
             } else {
+                // If directories available
                 String text = textArea.getText();
                 System.out.println(text);
-                // System.out.println("Here");
                 if (!text.isEmpty()) {
+                    // If text area is not empty
                     task = new Task<>() {
                         @Override
                         protected Void call() throws Exception {
@@ -504,34 +514,29 @@ public class UIController {
 
                             String[] ISRCCodes = text.split("\\n");
 
-                            for (String ISRCCode : ISRCCodes) {
-                                if (ISRCCode.length() == 12) {
-                                    // System.out.println("Proceeding to search");
-                                    String done = main.searchAudios(text, directory, destination);
-                                    if (done.equals("Done")) {
-                                        Platform.runLater(() -> {
-                                            // Code that updates the UI goes here
-                                            btnProceed.setText("Proceed");
-                                            searchAndCollect.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
-                                            ProgressView.setVisible(false);
-                                            btnAudioDatabase.setDisable(false);
-                                            btnDestination.setDisable(false);
-                                            textArea.setDisable(false);
-                                            btnProceed.setDisable(false);
-                                            textAreaVbox.setDisable(false);
-                                        });
-                                    }
-                                } else {
+                            int length = ISRCCodes.length;
+
+                            // Looping through ISRCs
+                            for (int i = 0; i < length; i++) {
+                                String ISRCCode = ISRCCodes[i];
+                                if (ISRCCode.length() != 12) {
+                                    // If there are any wrong ISRCs
                                     showErrorDialog("Invalid ISRC Code", "Invalid or empty ISRC Code", ISRCCode);
+                                } else {
+                                    // If ISRC number is correct
+                                    int finalI = i;
+                                    Platform.runLater(() -> updateButtonProceed("Processing " + (finalI + 1) + " of " + length));
+                                    main.searchAudios(ISRCCode, directory, destination);
                                 }
                             }
                             return null;
                         }
                     };
                 } else {
+                    // If text area is empty
                     showErrorDialog("Invalid ISRC Code", "Empty ISRC Code", "Please enter ISRC codes in the text area");
                     btnProceed.setText("Proceed");
-                    searchAndCollect.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
+                    searchAndCollect1.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
                     ProgressView.setVisible(false);
                     btnAudioDatabase.setDisable(false);
                     btnDestination.setDisable(false);
@@ -539,24 +544,52 @@ public class UIController {
                     btnProceed.setDisable(false);
                     textAreaVbox.setDisable(false);
                 }
-
             }
-            assert task != null;
-            task.setOnSucceeded(e -> btnProceed.setText("Proceed"));
 
-            new Thread(task).start();
+            if (task != null) {
+                task.setOnSucceeded(e -> {
+                    // After task is succeeded
+                    btnProceed.setText("Proceed");
+                    searchAndCollect1.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: '#e9ebee';");
+                    ProgressView.setVisible(false);
+                    btnAudioDatabase.setDisable(false);
+                    btnDestination.setDisable(false);
+                    textArea.setDisable(false);
+                    btnProceed.setDisable(false);
+                    textAreaVbox.setDisable(false);
 
-            task.setOnSucceeded(event -> {
-                if (!DatabaseMySQL.errorBuffer.isEmpty()) {
-                    try {
-                        showErrorDialogWithLog("File Not Found Error", "Error! Some files are missing in your audio database", DatabaseMySQL.errorBuffer.toString());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    // If there are any missing files
+                    if (!DatabaseMySQL.errorBuffer.isEmpty()) {
+                        try {
+                            showErrorDialogWithLog("File Not Found Error", "Error! Some files are missing in your audio database", DatabaseMySQL.errorBuffer.toString());
+                        } catch (IOException exception) {
+                            throw new RuntimeException(exception);
+                        }
                     }
-                }
-            });
+
+                    // Send a notification when task is completed
+                    NotificationBuilder nb = new NotificationBuilder();
+
+                    try {
+                        nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
+                    } catch (AWTException excep) {
+                        throw new RuntimeException(excep);
+                    }
+                });
+            }
+
+            // Start thread
+            new Thread(task).start();
         } else {
+            // If database not working
             showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
+        }
+    }
+
+    public void onOpenDestinationButtonClick(ActionEvent event) throws IOException {
+        if (destination != null) {
+            Path path = destination.toPath();
+            Desktop.getDesktop().open(path.toFile());
         }
     }
 
@@ -572,19 +605,22 @@ public class UIController {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
-        alert.setContentText(contentText + "\nPress ok to save log, or click cancel");
+        alert.setContentText(contentText + "\nPress ok to save log, or click close");
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            System.out.println("Ok button");
-            String fileName = "error_log.txt";
-            File destination = Main.browseLocation();
-            File file = new File(destination, fileName);
 
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write(contentText);
-            } catch (IOException e) {
-                System.err.println("An error occurred: " + e.getMessage());
+        if (result.isPresent()) {
+            if (result.get() == ButtonType.OK) {
+                System.out.println("Ok button");
+                String fileName = "error_log.txt";
+                File destination = Main.browseLocation();
+                File file = new File(destination, fileName);
+
+                try (FileWriter writer = new FileWriter(file)) {
+                    writer.write(contentText);
+                } catch (IOException e) {
+                    System.err.println("An error occurred: " + e.getMessage());
+                }
             }
         }
     }
@@ -606,6 +642,4 @@ public class UIController {
             System.out.println("Error! No file selected to import into Database");
         }
     }
-
-
 }
