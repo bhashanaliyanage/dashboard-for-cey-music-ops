@@ -23,6 +23,9 @@ import java.util.stream.Stream;
 public class Main extends Application {
 
     static List<String> songList = new ArrayList<>();
+
+
+
     static File selectedDirectory = null;
     static Clip clip;
 
@@ -54,6 +57,10 @@ public class Main extends Application {
             selectedDirectory = Main.browseLocation();
             System.out.println(selectedDirectory.getAbsolutePath());
         }
+    }
+
+    public static File getSelectedDirectory() {
+        return selectedDirectory;
     }
 
     static boolean playAudio(Path start, String isrc) throws IOException {

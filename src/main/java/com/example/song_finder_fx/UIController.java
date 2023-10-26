@@ -449,15 +449,33 @@ public class UIController {
         }
     }
 
+    // Settings
     public void onSettingsButtonClicked(MouseEvent mouseEvent) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/settings.fxml"));
         Parent newContent = loader.load();
         mainVBox.getChildren().clear();
         mainVBox.getChildren().add(newContent);
+
+        File directory = Main.getSelectedDirectory();
+
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Button btnDirectory = (Button) scene.lookup("#btnAudioDatabase");
+
+        if (directory != null) {
+            System.out.println(directory.getAbsolutePath());
+            btnDirectory.setText("   " + directory.getAbsolutePath());
+        } else {
+            System.out.println("Directory null!");
+        }
+    }
+
+    public void onSaveButtonClicked(ActionEvent event) {
     }
 
     // Collect Songs View
-    public void onCollectSongsButtonClick() {
+    public void onCollectSongsButtonClick() throws ClassNotFoundException {
+        checkDatabaseConnection();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/collect-songs.fxml"));
             Parent newContent = loader.load();
@@ -482,8 +500,8 @@ public class UIController {
         btnDestination.setText("   Destination: " + shortenedString + "...");
     }
 
-    public void onProceedButtonClick() throws ClassNotFoundException {
-        Connection con = checkDatabaseConnection();
+    public void onProceedButtonClick() throws ClassNotFoundException, SQLException {
+        Connection con = DatabaseMySQL.getConn();
 
         if (con != null) {
             // Connection Checked
@@ -593,7 +611,7 @@ public class UIController {
         }
     }
 
-    public void onOpenDestinationButtonClick(ActionEvent event) throws IOException {
+    public void onOpenDestinationButtonClick() throws IOException {
         if (destination != null) {
             Path path = destination.toPath();
             Desktop.getDesktop().open(path.toFile());
@@ -648,9 +666,5 @@ public class UIController {
         } else {
             System.out.println("Error! No file selected to import into Database");
         }
-    }
-
-
-    public void onSaveButtonClicked(ActionEvent event) {
     }
 }
