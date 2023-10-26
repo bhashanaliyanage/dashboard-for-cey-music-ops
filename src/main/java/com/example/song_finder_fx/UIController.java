@@ -449,6 +449,13 @@ public class UIController {
         }
     }
 
+    public void onSettingsButtonClicked(MouseEvent mouseEvent) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/settings.fxml"));
+        Parent newContent = loader.load();
+        mainVBox.getChildren().clear();
+        mainVBox.getChildren().add(newContent);
+    }
+
     // Collect Songs View
     public void onCollectSongsButtonClick() {
         try {
@@ -641,5 +648,9 @@ public class UIController {
         } else {
             System.out.println("Error! No file selected to import into Database");
         }
+    }
+
+
+    public void onSaveButtonClicked(ActionEvent event) {
     }
 }

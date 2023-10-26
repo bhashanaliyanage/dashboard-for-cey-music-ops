@@ -153,7 +153,6 @@ public class Main extends Application {
 }
 
 // TODO: Check current progress with test cases
-// TODO: Add a function to open output folder when done
 // TODO: Implement a settings page to set database location
 // TODO: Add singer's name when searching songs
 // TODO: In DatabaseMySQL, make SearchSongsFromDB which is used to copy songs by ISRC method uses MySQL database
