@@ -99,6 +99,11 @@ public class Main extends Application {
                 .orElse(null);
     }
 
+    public static String getDirectoryFromDB() throws SQLException, ClassNotFoundException {
+        Database.createTableForAudioDatabaseLocation();
+        return Database.searchForAudioDB();
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         // Loading layout file

@@ -450,27 +450,42 @@ public class UIController {
     }
 
     // Settings
-    public void onSettingsButtonClicked(MouseEvent mouseEvent) throws IOException {
+    public void onSettingsButtonClicked(MouseEvent mouseEvent) throws IOException, SQLException, ClassNotFoundException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/settings.fxml"));
         Parent newContent = loader.load();
         mainVBox.getChildren().clear();
         mainVBox.getChildren().add(newContent);
 
-        File directory = Main.getSelectedDirectory();
+        String directorySQLite = Main.getDirectoryFromDB();
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
         Button btnDirectory = (Button) scene.lookup("#btnAudioDatabase");
 
-        if (directory != null) {
-            System.out.println(directory.getAbsolutePath());
-            btnDirectory.setText("   " + directory.getAbsolutePath());
+        if (directorySQLite == null) {
+            System.out.println("Directory Null!");
         } else {
-            System.out.println("Directory null!");
+            System.out.println("Audio Database Directory: " + directorySQLite);
+            btnDirectory.setText("   " + directorySQLite);
         }
     }
 
-    public void onSaveButtonClicked(ActionEvent event) {
+    public void onSaveButtonClicked(ActionEvent event) throws SQLException, ClassNotFoundException {
+        File directory = Main.getSelectedDirectory();
+
+        if (directory != null) {
+            String directoryString = directory.getAbsolutePath();
+            Boolean status = Database.saveDirectory(directoryString);
+            Node node = (Node) event.getSource();
+            Scene scene = node.getScene();
+            Button saveBtn = (Button) scene.lookup("#btnSave");
+
+            if (status) {
+                saveBtn.setText("Saved");
+            } else {
+                saveBtn.setText("Error Saving!");
+            }
+        }
     }
 
     // Collect Songs View
