@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,7 +39,7 @@ public class Main extends Application {
         Task<Void> task;
         final String[] audioDatabasePath = {null};
 
-        stage.setTitle("CeyMusic Toolkit 2023.1");
+        stage.setTitle("CeyMusic Toolkit 2023.2");
         stage.setScene(scene);
         stage.setMinWidth(995);
         stage.setMinHeight(650);
@@ -182,8 +181,6 @@ public class Main extends Application {
 }
 
 // TODO: Check current progress with test cases
-// TODO: Add singer's name when searching songs
-// TODO: In DatabaseMySQL, make SearchSongsFromDB which is used to copy songs by ISRC method uses MySQL database
 // TODO: Adding admin switch
 // TODO: Song list view
 // TODO: Click to copy data
@@ -197,3 +194,4 @@ public class Main extends Application {
 // TODO: File copying thread works again and again
 // TODO: Disable button of the main UI when the proceed button clicked
 // TODO: Offer cancel method after proceed button clicked
+// TODO: Improve search to search by singer, composer, lyricist, and also search by all at once

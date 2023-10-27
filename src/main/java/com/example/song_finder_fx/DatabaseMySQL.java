@@ -284,9 +284,9 @@ public class DatabaseMySQL {
         ResultSet rs;
         List<String> songDetails = new ArrayList<>();
 
-        Connection db = DatabaseMySQL.getConn();
+        Connection conn = getConn();
 
-        PreparedStatement ps = db.prepareStatement("SELECT ISRC, " +
+        PreparedStatement ps = conn.prepareStatement("SELECT ISRC, " +
                 "ALBUM_TITLE, " +
                 "UPC, " +
                 "TRACK_TITLE, " +
@@ -295,11 +295,14 @@ public class DatabaseMySQL {
                 "COMPOSER, " +
                 "LYRICIST, " +
                 "FILE_NAME FROM songs WHERE ISRC = ? LIMIT 1");
+        System.out.println("ISRC: " + isrc);
         ps.setString(1, isrc);
         rs = ps.executeQuery();
 
         while (rs.next()) {
+            // System.out.println("Here");
             String isrcFromDatabase = rs.getString(1);
+            System.out.println(isrcFromDatabase);
             String albumTitle = rs.getString(2);
             String upc = rs.getString(3);
             String trackTitle = rs.getString(4);
@@ -317,9 +320,10 @@ public class DatabaseMySQL {
             songDetails.add(composer);
             songDetails.add(lyricist);
             songDetails.add(fileName);
-            // System.out.println("Here");
             // songDetails.songDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist, fileName);
         }
+
+        System.out.println(songDetails.size());
 
         return songDetails;
     }

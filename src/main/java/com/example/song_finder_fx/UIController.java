@@ -29,9 +29,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -76,8 +78,8 @@ public class UIController {
 
         // Connecting to database
         DatabaseMySQL db = new DatabaseMySQL();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
-        loader.load();
+        /*FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+        loader.load();*/
 
         scrlpneSong.setVisible(true);
         scrlpneSong.setContent(vboxSong);
@@ -99,8 +101,10 @@ public class UIController {
                     nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
                     Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
                     Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
+                    Label lblArtist = (Label) nodes[i].lookup("#srchRsArtist");
                     lblSongName.setText(songList.get(i).getSongName());
-                    lblISRC.setText(songList.get(i).getISRC().trim() + " | " + songList.get(i).getSinger().trim());
+                    lblISRC.setText(songList.get(i).getISRC().trim());
+                    lblArtist.setText(songList.get(i).getSinger().trim());
                     vboxSong.getChildren().add(nodes[i]);
                 } catch (NullPointerException | IOException ex) {
                     ex.printStackTrace();
@@ -141,8 +145,10 @@ public class UIController {
                     nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
                     Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
                     Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
+                    Label lblArtist = (Label) nodes[i].lookup("#srchRsArtist");
                     lblSongName.setText(songList.get(i).getSongName());
-                    lblISRC.setText(songList.get(i).getISRC().trim() + " | " + songList.get(i).getSinger().trim());
+                    lblISRC.setText(songList.get(i).getISRC().trim());
+                    lblArtist.setText(songList.get(i).getSinger().trim());
                     vboxSong.getChildren().add(nodes[i]);
                 } catch (NullPointerException | IOException ex) {
                     ex.printStackTrace();
@@ -186,6 +192,8 @@ public class UIController {
 
         DatabaseMySQL db = new DatabaseMySQL();
         List<String> songDetails = db.searchSongDetails(isrc);
+
+        // System.out.println(songDetails.size());
 
         // For reference
         System.out.println("Song name: " + name);
@@ -410,8 +418,50 @@ public class UIController {
         return con;
     }
 
-    public void onSongListButtonClicked() {
-        // TODO: Make song list
+    public void onSongListButtonClicked(MouseEvent mouseEvent) throws IOException, ClassNotFoundException {
+        List<String> songs = Main.getSongList();
+        DatabaseMySQL db = new DatabaseMySQL();
+
+        if (!songs.isEmpty()) {
+            Connection con = checkDatabaseConnection();
+            if (con != null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-list.fxml"));
+                Parent newContent = loader.load();
+                mainVBox.getChildren().clear();
+                mainVBox.getChildren().add(newContent);
+
+                Node node = (Node) mouseEvent.getSource();
+                Scene scene = node.getScene();
+                ScrollPane scrlpneSong = (ScrollPane) scene.lookup("#scrlpneSong");
+                VBox vboxSong = (VBox) scene.lookup("#vboxSong");
+
+                // scrlpneSong.setVisible(true);
+                scrlpneSong.setContent(vboxSong);
+
+                Node[] nodes;
+                nodes = new Node[songs.size()];
+
+                for (int i = 0; i < nodes.length; i++) {
+                    System.out.println("Song: " + (i + 1));
+                    nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
+                    // VBox vboxSong = (VBox) nodes[i].lookup("#vboxSong");
+                    vboxSong.getChildren().add(nodes[i]);
+                }
+                /*Task<java.util.List<Songs>> task = new Task<>() {
+                    @Override
+                    protected java.util.List<Songs> call() throws Exception {
+                        return null;
+                    }
+                };*/
+            }
+        }
+
+        /*FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+        loader.load();*/
+
+        for (String song : songs) {
+            System.out.println(song);
+        }
     }
 
     private static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico) {
@@ -674,8 +724,8 @@ public class UIController {
     }
 
     // Testing
-    public void onTestButtonClick() throws AWTException {
-        Test.flacTest();
+    public void onTestButtonClick() throws GeneralSecurityException, IOException {
+        // SheetsForJava.getSheetTest();
     }
 
     public void onImportToBaseButtonClick() throws SQLException, ClassNotFoundException, IOException {
