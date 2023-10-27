@@ -25,11 +25,16 @@
                <Font size="14.0" />
             </font>
          </Label>
-         <Label fx:id="srchRsISRC" text="ISRC">
+         <HBox>
             <VBox.margin>
                <Insets top="5.0" />
             </VBox.margin>
-         </Label>
+            <children>
+               <Label fx:id="srchRsISRC" text="ISRC" />
+               <Label fx:id="srchRsSplit" layoutX="10.0" layoutY="10.0" text=" | " />
+               <Label fx:id="srchRsArtist" layoutX="10.0" layoutY="10.0" text="Artist" />
+            </children>
+         </HBox>
       </VBox>
    </HBox>
 </VBox>
