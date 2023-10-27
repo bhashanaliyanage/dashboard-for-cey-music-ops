@@ -220,7 +220,7 @@ public class DatabaseMySQL {
         alert.showAndWait();
     }
 
-    public List<Songs> searchSongNames(String searchText) throws SQLException, ClassNotFoundException {
+    public List<Songs> searchSongDetailsBySongName(String searchText) throws SQLException, ClassNotFoundException {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;
 
