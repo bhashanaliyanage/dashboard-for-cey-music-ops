@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainVBox" prefWidth="696.0" spacing="10.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<VBox fx:id="mainVBox" prefWidth="696.0" spacing="10.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <Label text="Search Song Details">
       <font>
          <Font name="Segoe UI Semibold" size="28.0" />
@@ -34,36 +34,34 @@
       </VBox.margin>
       <HBox styleClass="search-container" stylesheets="@../styles.css">
          <VBox.margin>
-            <Insets left="30.0" right="30.0" top="30.0"/>
+            <Insets left="30.0" right="30.0" top="30.0" />
          </VBox.margin>
          <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
-         <TextField fx:id="searchArea" onKeyPressed="#getText" prefHeight="30.0" prefWidth="500.0"
-                    promptText="Enter song name">
+         <TextField fx:id="searchArea" onKeyPressed="#getText" prefHeight="30.0" prefWidth="500.0" promptText="Enter song name">
             <font>
-               <Font size="14.0"/>
+               <Font size="14.0" />
             </font>
             <HBox.margin>
-               <Insets/>
+               <Insets />
             </HBox.margin>
          </TextField>
          <ImageView fitHeight="20.0" fitWidth="20.0" onMouseClicked="#getText" pickOnBounds="true" preserveRatio="true">
             <HBox.margin>
-               <Insets left="5.0" right="5.0" top="5.0"/>
+               <Insets left="5.0" right="5.0" top="5.0" />
             </HBox.margin>
             <cursor>
-               <Cursor fx:constant="HAND"/>
+               <Cursor fx:constant="HAND" />
             </cursor>
-            <Image url="@../images/icon%20_search%20normal%201_.png"/>
+            <Image url="@../images/icon%20_search%20normal%201_.png" />
          </ImageView>
       </HBox>
-      <ScrollPane fx:id="scrlpneSong" prefHeight="320.0" prefWidth="544.0" styleClass="scroll-pane"
-                  stylesheets="@../styles.css" visible="false">
+      <ScrollPane fx:id="scrlpneSong" prefHeight="320.0" prefWidth="544.0" styleClass="scroll-pane" stylesheets="@../styles.css" visible="false">
          <VBox.margin>
-            <Insets bottom="30.0" left="30.0" right="30.0"/>
+            <Insets bottom="30.0" left="30.0" right="30.0" />
          </VBox.margin>
-         <VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css"/>
+         <VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css" />
       </ScrollPane>
    </VBox>
 </VBox>

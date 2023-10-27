@@ -214,71 +214,11 @@ public class UIController {
         new Thread(task).start();
     }
 
-    public void getText() throws IOException {
-        // Getting search keywords
-        String text = searchArea.getText();
-
-        // Connecting to database
-        DatabaseMySQL db = new DatabaseMySQL();
-        /*FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
-        loader.load();*/
-
-        scrlpneSong.setVisible(true);
-        scrlpneSong.setContent(vboxSong);
-
-        Task<java.util.List<Songs>> task = new Task<>() {
-            @Override
-            protected java.util.List<Songs> call() throws Exception {
-                return db.searchSongDetailsBySongName(text);
-            }
-        };
-
-        task.setOnSucceeded(e -> {
-            List<Songs> songList = task.getValue();
-            Node[] nodes;
-            nodes = new Node[songList.size()];
-            vboxSong.getChildren().clear();
-            for (int i = 0; i < nodes.length; i++) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-song.fxml"));
-                    nodes[i] = loader.load();
-                    Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
-                    Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
-                    Label lblArtist = (Label) nodes[i].lookup("#srchRsArtist");
-                    lblSongName.setText(songList.get(i).getSongName());
-                    lblISRC.setText(songList.get(i).getISRC().trim());
-                    lblArtist.setText(songList.get(i).getSinger().trim());
-                    vboxSong.getChildren().add(nodes[i]);
-                } catch (NullPointerException | IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-
-        Thread thread = new Thread(task);
-        thread.start();
-    }
-
     // Primary UI Buttons
     @FXML
     protected void onSearchDetailsButtonClick() throws ClassNotFoundException {
-        /*ControllerSearch controllerSearch = new ControllerSearch(this);
-        controllerSearch.loadThingsTempForSongName();*/
-        Connection con = checkDatabaseConnection();
-
-        if (con != null) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
-                Parent newContent = loader.load();
-                mainVBox.getChildren().clear();
-                mainVBox.getChildren().add(newContent);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            System.out.println("onSearchDetailsButtonClick");
-        } else {
-            showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
-        }
+        ControllerSearch controllerSearch = new ControllerSearch(this);
+        controllerSearch.loadThingsTempForSongName();
     }
 
     public void onSearchByISRCButtonClick() throws ClassNotFoundException {
