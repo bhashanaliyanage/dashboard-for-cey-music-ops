@@ -51,7 +51,7 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </HBox.margin>
       </Button>
-      <Button minHeight="30.0" mnemonicParsing="false" onAction="#onSaveButtonClicked" prefHeight="30.0" prefWidth="590.0" styleClass="button_inside" stylesheets="@../styles.css" text="Save">
+      <Button fx:id="btnSave" minHeight="30.0" mnemonicParsing="false" onAction="#onSaveButtonClicked" prefHeight="30.0" prefWidth="590.0" styleClass="button_inside" stylesheets="@../styles.css" text="Save">
          <HBox.margin>
             <Insets bottom="10.0" right="10.0" top="10.0" />
          </HBox.margin>

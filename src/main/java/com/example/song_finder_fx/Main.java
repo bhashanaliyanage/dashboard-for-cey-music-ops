@@ -2,8 +2,10 @@ package com.example.song_finder_fx;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -23,18 +25,54 @@ import java.util.stream.Stream;
 public class Main extends Application {
 
     static List<String> songList = new ArrayList<>();
-
-
-
     static File selectedDirectory = null;
     static Clip clip;
 
-    public static Clip getClip() {
-        return clip;
-    }
-
     public static void main(String[] args) {
         new Thread(() -> launch(args)).start();
+    }
+
+    @Override
+    public void start(Stage stage) throws IOException, InterruptedException {
+        // Loading layout file
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("layouts/main-view.fxml"));
+        Scene scene = new Scene(loader.load(), 1030, 610);
+        Task<Void> task;
+        final String[] audioDatabasePath = {null};
+
+        stage.setTitle("CeyMusic Toolkit 2023.1");
+        stage.setScene(scene);
+        stage.setMinWidth(995);
+        stage.setMinHeight(650);
+
+        Image image = new Image("com/example/song_finder_fx/icons/icon.png");
+
+        stage.getIcons().add(image);
+
+        stage.show();
+
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                audioDatabasePath[0] = getDirectoryFromDB();
+                return null;
+            }
+        };
+
+        Thread t = new Thread(task);
+        t.start();
+        t.join();
+
+        Platform.runLater(() -> {
+            Button btnAudioDatabase = (Button) scene.lookup("#btnAudioDatabase");
+            btnAudioDatabase.setText("   Audio Database: " + audioDatabasePath[0]);
+        });
+
+        stage.setOnCloseRequest(e -> Platform.exit());
+    }
+
+    public static Clip getClip() {
+        return clip;
     }
 
     public static void addSongToList(String isrc) {
@@ -101,27 +139,9 @@ public class Main extends Application {
 
     public static String getDirectoryFromDB() throws SQLException, ClassNotFoundException {
         Database.createTableForAudioDatabaseLocation();
-        return Database.searchForAudioDB();
-    }
-
-    @Override
-    public void start(Stage stage) throws IOException {
-        // Loading layout file
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("layouts/main-view.fxml"));
-        Scene scene = new Scene(loader.load(), 1030, 610);
-
-        stage.setTitle("CeyMusic Toolkit 2023.1");
-        stage.setScene(scene);
-        stage.setMinWidth(995);
-        stage.setMinHeight(650);
-
-        Image image = new Image("com/example/song_finder_fx/icons/icon.png");
-
-        stage.getIcons().add(image);
-
-        stage.show();
-
-        stage.setOnCloseRequest(e -> Platform.exit());
+        String directoryTemp = Database.searchForAudioDB();
+        selectedDirectory = new File(directoryTemp);
+        return directoryTemp;
     }
 
     public File browseFile() {
@@ -143,11 +163,8 @@ public class Main extends Application {
         return selectedDirectory;
     }
 
-    public void searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException, AWTException {
-        String[] ISRCCodes = ISRCs.split("\\n");
+    public static void searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException {
         DatabaseMySQL.SearchSongsFromDB(ISRCs, directory, destination);
-        // NotificationBuilder nb = new NotificationBuilder();
-        // nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
     }
 
     public static File browseDestination() {
@@ -165,7 +182,6 @@ public class Main extends Application {
 }
 
 // TODO: Check current progress with test cases
-// TODO: Implement a settings page to set database location
 // TODO: Add singer's name when searching songs
 // TODO: In DatabaseMySQL, make SearchSongsFromDB which is used to copy songs by ISRC method uses MySQL database
 // TODO: Adding admin switch
@@ -179,3 +195,5 @@ public class Main extends Application {
 // TODO: Keyboard movement handling for search
 // TODO: Code is malfunctioning when pasted UPCs
 // TODO: File copying thread works again and again
+// TODO: Disable button of the main UI when the proceed button clicked
+// TODO: Offer cancel method after proceed button clicked

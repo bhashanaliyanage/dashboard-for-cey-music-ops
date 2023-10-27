@@ -489,8 +489,10 @@ public class UIController {
     }
 
     // Collect Songs View
-    public void onCollectSongsButtonClick() throws ClassNotFoundException {
+    public void onCollectSongsButtonClick(MouseEvent event) throws ClassNotFoundException, SQLException {
         checkDatabaseConnection();
+        /*Task<Void> task;*/
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/collect-songs.fxml"));
             Parent newContent = loader.load();
@@ -500,6 +502,28 @@ public class UIController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        String directoryString = Main.getDirectoryFromDB();
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+        Button btnAudioDatabase = (Button) scene.lookup("#btnAudioDatabase");
+        btnAudioDatabase.setText("   Audio Database: " + directoryString);
+
+        /*task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                // Path directoryPath = Path.of(Main.getDirectoryFromDB());
+                System.out.println(directory.getAbsolutePath());
+                return null;
+            }
+        };
+
+        Thread t = new Thread(task);
+        t.start();
+        t.join();
+
+        Platform.runLater(() -> {
+        });*/
     }
 
     @FXML
@@ -517,6 +541,7 @@ public class UIController {
 
     public void onProceedButtonClick() throws ClassNotFoundException, SQLException {
         Connection con = DatabaseMySQL.getConn();
+        directory = Main.getSelectedDirectory();
 
         if (con != null) {
             // Connection Checked
@@ -529,6 +554,7 @@ public class UIController {
             textAreaVbox.setDisable(true);
             Task<Void> task = null;
             btnProceed.setText("Processing");
+            System.out.println("Directory: " + directory.getAbsolutePath());
 
             if (directory == null || destination == null) {
                 // Directories Checked
@@ -550,8 +576,6 @@ public class UIController {
                     task = new Task<>() {
                         @Override
                         protected Void call() throws Exception {
-                            Main main = new Main();
-
                             String[] ISRCCodes = text.split("\\n");
 
                             int length = ISRCCodes.length;
@@ -566,7 +590,7 @@ public class UIController {
                                     // If ISRC number is correct
                                     int finalI = i;
                                     Platform.runLater(() -> updateButtonProceed("Processing " + (finalI + 1) + " of " + length));
-                                    main.searchAudios(ISRCCode, directory, destination);
+                                    Main.searchAudios(ISRCCode, directory, destination);
                                 }
                             }
                             return null;
