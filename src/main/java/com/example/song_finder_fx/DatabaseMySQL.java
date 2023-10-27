@@ -226,20 +226,20 @@ public class DatabaseMySQL {
 
         Connection conn = getConn();
 
-        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 15");
+        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER FROM songs WHERE TRACK_TITLE LIKE ? LIMIT 15");
         ps.setString(1, searchText + "%");
         rs = ps.executeQuery();
 
         while (rs.next()) {
-            songs.add(new Songs(rs.getString(1), rs.getString(2)));
+            songs.add(new Songs(rs.getString(1), rs.getString(2), rs.getString(3)));
             System.out.println(rs.getString(1));
         }
 
         try {
             // Printing Searched Content
-            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName());
-            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName());
-            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName());
+            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName() + " | " + songs.get(0).getSinger());
+            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName() + " | " + songs.get(1).getSinger());
+            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName() + " | " + songs.get(2).getSinger());
 
             // Printing new line
             System.out.println("================");
@@ -255,20 +255,20 @@ public class DatabaseMySQL {
 
         Connection conn = getConn();
 
-        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC FROM songs WHERE ISRC LIKE ? LIMIT 15");
+        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER FROM songs WHERE ISRC LIKE ? LIMIT 15");
         ps.setString(1, "%" + searchText + "%");
         rs = ps.executeQuery();
 
         while (rs.next()) {
-            songs.add(new Songs(rs.getString(1), rs.getString(2)));
+            songs.add(new Songs(rs.getString(1), rs.getString(2), rs.getString(3)));
             System.out.println(rs.getString(1));
         }
 
         try {
             // Printing Searched Content
-            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName());
-            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName());
-            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName());
+            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName() + " | " + songs.get(0).getSinger());
+            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName() + " | " + songs.get(1).getSinger());
+            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName() + " | " + songs.get(2).getSinger());
 
             // Printing new line
             System.out.println("================");

@@ -100,7 +100,7 @@ public class UIController {
                     Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
                     Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
                     lblSongName.setText(songList.get(i).getSongName());
-                    lblISRC.setText(songList.get(i).getISRC().trim());
+                    lblISRC.setText(songList.get(i).getISRC().trim() + " | " + songList.get(i).getSinger().trim());
                     vboxSong.getChildren().add(nodes[i]);
                 } catch (NullPointerException | IOException ex) {
                     ex.printStackTrace();
@@ -142,7 +142,7 @@ public class UIController {
                     Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
                     Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
                     lblSongName.setText(songList.get(i).getSongName());
-                    lblISRC.setText(songList.get(i).getISRC().trim());
+                    lblISRC.setText(songList.get(i).getISRC().trim() + " | " + songList.get(i).getSinger().trim());
                     vboxSong.getChildren().add(nodes[i]);
                 } catch (NullPointerException | IOException ex) {
                     ex.printStackTrace();
@@ -508,22 +508,6 @@ public class UIController {
         Scene scene = node.getScene();
         Button btnAudioDatabase = (Button) scene.lookup("#btnAudioDatabase");
         btnAudioDatabase.setText("   Audio Database: " + directoryString);
-
-        /*task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                // Path directoryPath = Path.of(Main.getDirectoryFromDB());
-                System.out.println(directory.getAbsolutePath());
-                return null;
-            }
-        };
-
-        Thread t = new Thread(task);
-        t.start();
-        t.join();
-
-        Platform.runLater(() -> {
-        });*/
     }
 
     @FXML
