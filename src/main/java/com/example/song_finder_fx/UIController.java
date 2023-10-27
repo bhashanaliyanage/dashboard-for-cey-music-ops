@@ -418,7 +418,7 @@ public class UIController {
         return con;
     }
 
-    public void onSongListButtonClicked(MouseEvent mouseEvent) throws IOException, ClassNotFoundException {
+    public void onSongListButtonClicked() throws IOException, ClassNotFoundException {
         List<String> songs = Main.getSongList();
         DatabaseMySQL db = new DatabaseMySQL();
 
@@ -430,22 +430,18 @@ public class UIController {
                 mainVBox.getChildren().clear();
                 mainVBox.getChildren().add(newContent);
 
-                Node node = (Node) mouseEvent.getSource();
-                Scene scene = node.getScene();
-                ScrollPane scrlpneSong = (ScrollPane) scene.lookup("#scrlpneSong");
-                VBox vboxSong = (VBox) scene.lookup("#vboxSong");
-
                 // scrlpneSong.setVisible(true);
                 scrlpneSong.setContent(vboxSong);
+                vboxSong.getChildren().clear();
 
                 Node[] nodes;
                 nodes = new Node[songs.size()];
+                nodes[0] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
+                // VBox vboxSong = (VBox) nodes[i].lookup("#vboxSong");
+                vboxSong.getChildren().add(nodes[0]);
 
                 for (int i = 0; i < nodes.length; i++) {
                     System.out.println("Song: " + (i + 1));
-                    nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
-                    // VBox vboxSong = (VBox) nodes[i].lookup("#vboxSong");
-                    vboxSong.getChildren().add(nodes[i]);
                 }
                 /*Task<java.util.List<Songs>> task = new Task<>() {
                     @Override
