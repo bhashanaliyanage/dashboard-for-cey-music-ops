@@ -2,20 +2,24 @@ package com.example.song_finder_fx;
 
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
+import javax.sound.sampled.Clip;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -27,24 +31,12 @@ public class ControllerSearch {
     public ScrollPane scrlpneSong;
     public VBox vboxSong;
     public VBox vboxSongSearch;
-    public VBox vBoxInSearchSong;
     public Label searchResultSongName;
     public Label searchResultISRC;
     public Label searchResultArtist;
-    public Label songNameViewTitle;
     public Label songName;
     public Label songISRC;
     public Label songSinger;
-    public Label songComposer;
-    public Label songLyricist;
-    public Label songUPC;
-    public Label songProductName;
-    public Label songShare;
-    public ImageView songArtwork;
-    public ImageView btnPlay;
-    public Button btnAddToList;
-    public Button btnOpenLocation;
-    public Button btnCopyTo;
 
     public ControllerSearch(UIController uiController) {
         this.uiController = uiController;
@@ -132,38 +124,6 @@ public class ControllerSearch {
         thread.start();
     }
 
-    public void onSearchedSongClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, IOException {
-        String name = searchResultSongName.getText();
-        String isrc = searchResultISRC.getText();
-
-        DatabaseMySQL db = new DatabaseMySQL();
-        List<String> songDetails = db.searchSongDetails(isrc);
-
-        // For reference
-        System.out.println("Song name: " + name);
-        System.out.println("ISRC: " + isrc);
-
-        // Getting the current parent layout
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
-        loader.setController(this);
-        Parent newContent = loader.load();
-        uiController.mainVBox.getChildren().clear();
-
-        // Setting the new layout
-        uiController.mainVBox.getChildren().add(newContent);
-
-        // Setting values for labels
-        songISRC.setText(songDetails.get(0));
-        songProductName.setText(songDetails.get(1));
-        songUPC.setText(songDetails.get(2));
-        songName.setText(songDetails.get(3));
-        songNameViewTitle.setText(songDetails.get(3));
-        songSinger.setText(songDetails.get(4));
-        songComposer.setText(songDetails.get(6));
-        songLyricist.setText(songDetails.get(7));
-        songShare.setText("No Detail");
-    }
-
     public void getText(KeyEvent keyEvent) {
         // Getting search keywords
         String text = searchArea.getText();
@@ -206,6 +166,50 @@ public class ControllerSearch {
     }
 
     public void onBtnPlayClicked(MouseEvent mouseEvent) {
+        Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
+
+        Main.directoryCheck();
+
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+
+        /*Label lblISRC = (Label) scene.lookup("#songISRC");
+        Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
+        ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
+        Label lblSongName = (Label) scene.lookup("#songName");
+        Label lblArtist = (Label) scene.lookup("#songSinger");
+        Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
+        */
+
+        String isrc = songISRC.getText();
+
+        Task<Void> task;
+        Path start = Paths.get(Main.selectedDirectory.toURI());
+        final boolean[] status = new boolean[1];
+
+        System.out.println(isrc);
+
+        uiController.lblPlayerSongName.setText("Loading audio");
+        uiController.lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
+        uiController.imgMediaPico.setImage(img);
+
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Clip clip = Main.getClip();
+                if (clip != null) {
+                    clip.stop();
+                    status[0] = Main.playAudio(start, isrc);
+                } else {
+                    status[0] = Main.playAudio(start, isrc);
+                }
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(event -> UIController.setPlayerInfo(status, uiController.lblPlayerSongName, songName, uiController.lblPlayerSongArtst, songSinger, uiController.imgMediaPico));
+
+        new Thread(task).start();
     }
 
     public void onAddToListButtonClicked(ActionEvent actionEvent) {

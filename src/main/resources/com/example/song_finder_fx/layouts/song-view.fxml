@@ -11,7 +11,9 @@
 <?import javafx.scene.text.Font?>
 
 <VBox prefWidth="696.0" spacing="10.0" styleClass="white-background" stylesheets="@../styles.css"
-      xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+      xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.song_finder_fx.UIController"
+>
     <Label fx:id="songNameViewTitle" text="Kaari Na Sanda">
         <font>
             <Font name="Segoe UI Semibold" size="28.0"/>
