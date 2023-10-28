@@ -32,6 +32,8 @@ public class ControllerSongList {
                 Parent newContent = loader.load();
                 mainUIController.mainVBox.getChildren().clear();
                 mainUIController.mainVBox.getChildren().add(newContent);
+
+                loadList();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -43,14 +45,14 @@ public class ControllerSongList {
         }
     }
 
-    public void songListTestButton() {
-        // Getting search keywords
-        String songName = "Mawathe Geethaya";
+    public void loadList() {
+        // Song List
         List<String> songList = Main.getSongList();
 
         // Connecting to database
         DatabaseMySQL db = new DatabaseMySQL();
 
+        // Setting up UI
         scrlpneSong.setVisible(true);
         scrlpneSong.setContent(vboxSong);
 
