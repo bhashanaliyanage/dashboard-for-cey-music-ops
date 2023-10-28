@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vboxSong" onMouseClicked="#onSearchedSongClick" prefWidth="183.0" styleClass="search-result" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<VBox fx:id="vboxSongSearch" onMouseClicked="#onSearchedSongClick" prefWidth="183.0" styleClass="search-result" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <padding>
       <Insets bottom="10.0" left="10.0" right="30.0" top="10.0" />
    </padding>
@@ -20,7 +20,7 @@
          <HBox.margin>
             <Insets left="20.0" top="2.5" />
          </HBox.margin>
-         <Label fx:id="srchRsSongName" text="Song Name">
+         <Label fx:id="searchResultSongName" text="Song Name">
             <font>
                <Font size="14.0" />
             </font>
@@ -29,9 +29,9 @@
             <VBox.margin>
                <Insets top="5.0" />
             </VBox.margin>
-            <Label fx:id="srchRsISRC" text="ISRC" />
+            <Label fx:id="searchResultISRC" text="ISRC" />
             <Label layoutX="10.0" layoutY="10.0" text=" | " />
-            <Label fx:id="srchRsArtist" layoutX="10.0" layoutY="10.0" text="Artist" />
+            <Label fx:id="searchResultArtist" layoutX="10.0" layoutY="10.0" text="Artist" />
          </HBox>
       </VBox>
    </HBox>
