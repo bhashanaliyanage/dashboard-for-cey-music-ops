@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainVBox" prefWidth="696.0" spacing="10.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<VBox fx:id="mainVBox" prefWidth="696.0" spacing="10.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
    <Label text="Search Song Details">
       <font>
          <Font name="Segoe UI Semibold" size="28.0" />
@@ -57,7 +57,7 @@
             <Image url="@../images/icon%20_search%20normal%201_.png" />
          </ImageView>
       </HBox>
-      <ScrollPane fx:id="scrlpneSong" prefHeight="320.0" prefWidth="544.0" styleClass="scroll-pane" stylesheets="@../styles.css" visible="false">
+      <ScrollPane fx:id="scrlpneSong" prefHeight="320.0" prefWidth="544.0" styleClass="scroll-pane" stylesheets="@../styles.css" vbarPolicy="ALWAYS" visible="false">
          <VBox.margin>
             <Insets bottom="30.0" left="30.0" right="30.0" />
          </VBox.margin>
