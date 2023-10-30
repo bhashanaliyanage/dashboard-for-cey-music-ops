@@ -31,6 +31,14 @@ public class Main extends Application {
         new Thread(() -> launch(args)).start();
     }
 
+    public static boolean deleteSongFromList(String isrc) {
+        boolean status = songList.remove(isrc);
+        if (status) {
+            System.out.println("ISRC: " + isrc + " Removed from Song List");
+        }
+        return status;
+    }
+
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
         // Loading layout file
@@ -195,3 +203,4 @@ public class Main extends Application {
 // TODO: Disable button of the main UI when the proceed button clicked
 // TODO: Offer cancel method after proceed button clicked
 // TODO: Improve search to search by singer, composer, lyricist, and also search by all at once
+// TODO: Most viewed and recently viewed songs

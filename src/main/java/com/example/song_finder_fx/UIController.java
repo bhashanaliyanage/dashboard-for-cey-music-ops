@@ -61,6 +61,10 @@ public class UIController {
     public ImageView imgMediaPico;
     public Label lblPlayerSongArtst;
     public Label lblSongListSub;
+    public Label srchRsSongName;
+    public Label srchRsISRC;
+    public ImageView imgDeleteSong;
+    public ImageView imgPlaySong;
     File destination;
     public Button btnAudioDatabase;
     public Label searchResultSongName;
@@ -368,6 +372,76 @@ public class UIController {
         controllerSongList.loadThings();
         // songListTestButton();
     }
+
+    public void onDeleteSongClicked(MouseEvent event) {
+        String isrc = srchRsISRC.getText();
+        System.out.println(isrc);
+
+        boolean status = Main.deleteSongFromList(isrc);
+
+        if (status) {
+            srchRsISRC.setText("-");
+            srchRsISRC.setDisable(true);
+            srchRsArtist.setText("-");
+            srchRsArtist.setDisable(true);
+            srchRsSongName.setText(isrc + " Removed from the list");
+            srchRsSongName.setDisable(true);
+            imgDeleteSong.setVisible(false);
+            imgPlaySong.setVisible(false);
+
+            Node node = (Node) event.getSource();
+            Scene scene = node.getScene();
+
+            int listSize = Main.getSongList().size();
+            Label lblListCount = (Label) scene.lookup("#lblListCount");
+            lblListCount.setText("Total: " + listSize);
+        }
+    }
+
+    public void onPlaySongClicked(MouseEvent mouseEvent) {
+        Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
+
+        Main.directoryCheck();
+
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+
+        Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
+        Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
+        ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
+
+        String isrc = srchRsISRC.getText();
+
+        System.out.println("Song Name: " + srchRsSongName.getText());
+        System.out.println("ISRC: " + isrc);
+        System.out.println("Artist: " + srchRsArtist.getText());
+
+        Task<Void> task;
+        Path start = Paths.get(Main.selectedDirectory.toURI());
+        final boolean[] status = new boolean[1];
+
+        lblPlayerSongName.setText("Loading audio");
+        lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
+        imgMediaPico.setImage(img);
+
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Clip clip = Main.getClip();
+                if (clip != null) {
+                    clip.stop();
+                    status[0] = Main.playAudio(start, isrc);
+                } else {
+                    status[0] = Main.playAudio(start, isrc);
+                }
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(event -> UIController.setPlayerInfo(status, lblPlayerSongName, srchRsSongName, lblPlayerArtist, srchRsArtist, imgMediaPico));
+
+        new Thread(task).start();
+    }
     //</editor-fold>
 
     //<editor-fold desc="Music Player Stuff">
@@ -629,4 +703,6 @@ public class UIController {
         }
     }
     //</editor-fold>
+
+
 }

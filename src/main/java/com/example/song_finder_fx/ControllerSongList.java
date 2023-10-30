@@ -17,6 +17,7 @@ public class ControllerSongList {
     private final UIController mainUIController;
     public ScrollPane scrlpneSong;
     public VBox vboxSong;
+    public Label lblListCount;
 
     public ControllerSongList(UIController mainUIController) {
         this.mainUIController = mainUIController;
@@ -34,6 +35,9 @@ public class ControllerSongList {
                 mainUIController.mainVBox.getChildren().add(newContent);
 
                 loadList();
+
+                int listSize = Main.getSongList().size();
+                lblListCount.setText("Total: " + listSize);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
