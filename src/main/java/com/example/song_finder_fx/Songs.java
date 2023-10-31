@@ -20,9 +20,10 @@ public class Songs {
     public Songs() {
     }
 
-    public Songs(String songName, String isrc) {
+    public Songs(String songName, String isrc, String singer) {
         this.songName = songName;
         this.isrc = isrc;
+        this.singer = singer;
     }
 
     public void songDetails(String isrc, String albumTitle, String upc, String trackTitle, String singer, String featuringArtist, String Composer, String lyricist, String fileName) {
@@ -59,5 +60,9 @@ public class Songs {
 
     public String getISRC() {
         return isrc;
+    }
+
+    public String getSinger() {
+        return singer;
     }
 }

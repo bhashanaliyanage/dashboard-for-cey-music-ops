@@ -48,6 +48,17 @@ public class Database {
         ps.executeUpdate();
     }
 
+    public static void createTableForAudioDatabaseLocation() throws SQLException, ClassNotFoundException {
+        // Load the JDBC driver
+        Connection db = Database.getConn();
+
+        PreparedStatement ps = db.prepareStatement("CREATE TABLE IF NOT EXISTS directory_paths (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "PATH TEXT)");
+
+        ps.executeUpdate();
+    }
+
     public static void updateBase(File file) throws SQLException, ClassNotFoundException, IOException {
         Connection db = Database.getConn();
         Scanner sc = new Scanner(new File(file.getAbsolutePath()));
@@ -128,12 +139,10 @@ public class Database {
         sc.close();
     }
 
-    public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException, IOException {
+    public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException {
         Connection db = Database.getConn();
         ResultSet rs;
         String filename;
-        Path tempDir = destination.toPath();
-        String status = null;
 
         PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME " +
                 "FROM songData " +
@@ -181,9 +190,39 @@ public class Database {
         alert.showAndWait();
     }
 
-    public static void SearchSongsFromAudioLibrary(File directory) {
-        Path start = Paths.get(directory.toURI());
+    public static String searchForAudioDB() throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+        ResultSet rs;
+        String path = null;
+
+        PreparedStatement ps = db.prepareStatement("SELECT PATH " +
+                "FROM directory_paths " +
+                "WHERE ID = 1");
+
+        rs = ps.executeQuery();
+        while (rs.next()) {
+            path = rs.getString("PATH");
+        }
+
+        return path;
     }
 
+    public static Boolean saveDirectory(String directoryString) throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+        int status;
 
+        String path = searchForAudioDB();
+
+        if (path == null) {
+            PreparedStatement ps = db.prepareStatement("INSERT INTO directory_paths (PATH) VALUES (?);");
+            ps.setString(1, directoryString);
+            status = ps.executeUpdate();
+        } else {
+            PreparedStatement ps = db.prepareStatement("UPDATE directory_paths SET PATH = ? WHERE ID = 1;");
+            ps.setString(1, directoryString);
+            status = ps.executeUpdate();
+        }
+
+        return status > 0;
+    }
 }

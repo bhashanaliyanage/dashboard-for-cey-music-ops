@@ -116,3 +116,7 @@
 .search-result:hover {
     -fx-background-color: '#f6f6f6';
 }
+
+.scroll-pane > .viewport {
+   -fx-background-color: transparent;
+}
