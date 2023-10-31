@@ -50,7 +50,7 @@ public class Invoice {
         table.addCell(new Cell().add(new Paragraph("Sri Lankan Account Details")));
         table.addCell(new Cell().add(new Paragraph("Total Due").setTextAlignment(TextAlignment.RIGHT)));
 
-        // Row 05
+        // Row 05-
         table.addCell(new Cell().add(new Paragraph("""
                 CeyMusic Pty Ltd
                 BSB: 062-914
