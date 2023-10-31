@@ -2,9 +2,11 @@ package com.example.song_finder_fx;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -12,7 +14,9 @@ import javafx.scene.layout.VBox;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -143,6 +147,23 @@ public class ControllerSongList {
                 new Thread(task).start();
             }
         }
+    }
+
+    public void onAddMoreButtonClicked(ActionEvent actionEvent) throws IOException {
+        // System.out.println("Add more button clicked");
+        Node node = (Node) actionEvent.getSource();
+        Scene scene = node.getScene();
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+        mainVBox.getChildren().clear();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
+        Parent newContent = loader.load();
+        mainVBox.getChildren().add(newContent);
+    }
+
+    public void onGenerateInvoiceButtonClicked() throws FileNotFoundException, MalformedURLException {
+        System.out.println("onGenerateInvoiceButtonClicked");
+        Invoice.generateTest();
     }
 
     private void updateButtonProceed(String s) {

@@ -113,12 +113,12 @@
             <Insets />
          </VBox.margin>
         </Button>
-      <Button fx:id="btnAddMore" layoutX="213.0" layoutY="21.0" minHeight="30.0" minWidth="580.0" styleClass="button_inside" stylesheets="@../styles.css" text="Add More Songs">
+      <Button fx:id="btnAddMore" layoutX="213.0" layoutY="21.0" minHeight="30.0" minWidth="580.0" onAction="#onAddMoreButtonClicked" styleClass="button_inside" stylesheets="@../styles.css" text="Add More Songs">
          <VBox.margin>
             <Insets top="10.0" />
          </VBox.margin>
       </Button>
-        <Button fx:id="btnGenerateInvoice" layoutX="31.0" layoutY="29.0" minHeight="30.0" minWidth="580.0" styleClass="button_inside" stylesheets="@../styles.css" text="Generate Invoice">
+        <Button fx:id="btnGenerateInvoice" layoutX="31.0" layoutY="29.0" minHeight="30.0" minWidth="580.0" onAction="#onGenerateInvoiceButtonClicked" styleClass="button_inside" stylesheets="@../styles.css" text="Generate Invoice">
          <VBox.margin>
             <Insets top="10.0" />
          </VBox.margin></Button>
