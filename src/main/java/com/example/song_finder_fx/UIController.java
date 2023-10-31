@@ -345,7 +345,10 @@ public class UIController {
     }
 
     Connection checkDatabaseConnection() throws ClassNotFoundException {
+        lblDatabaseStatus.setText("Connecting");
+
         Connection con = null;
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://192.168.1.200/songData";
@@ -355,13 +358,14 @@ public class UIController {
         } catch (SQLException e) {
             lblDatabaseStatus.setText("Database offline");
             lblDatabaseStatus.setStyle("-fx-text-fill: '#931621'");
-
             return con;
         }
+
         if (con != null) {
             lblDatabaseStatus.setText("Database online");
             lblDatabaseStatus.setStyle("-fx-text-fill: '#32746D'");
         }
+
         return con;
     }
     //</editor-fold>
@@ -570,21 +574,21 @@ public class UIController {
                     task = new Task<>() {
                         @Override
                         protected Void call() throws Exception {
-                            String[] ISRCCodes = text.split("\\n");
+                            String[] isrcCodes = text.split("\\n");
 
-                            int length = ISRCCodes.length;
+                            int length = isrcCodes.length;
 
                             // Looping through ISRCs
                             for (int i = 0; i < length; i++) {
-                                String ISRCCode = ISRCCodes[i];
-                                if (ISRCCode.length() != 12) {
+                                String isrc = isrcCodes[i];
+                                if (isrc.length() != 12) {
                                     // If there are any wrong ISRCs
-                                    showErrorDialog("Invalid ISRC Code", "Invalid or empty ISRC Code", ISRCCode);
+                                    showErrorDialog("Invalid ISRC Code", "Invalid or empty ISRC Code", isrc);
                                 } else {
                                     // If ISRC number is correct
                                     int finalI = i;
                                     Platform.runLater(() -> updateButtonProceed("Processing " + (finalI + 1) + " of " + length));
-                                    Main.searchAudios(ISRCCode, directory, destination);
+                                    Main.copyAudio(isrc, directory, destination);
                                 }
                             }
                             return null;
@@ -630,8 +634,8 @@ public class UIController {
 
                     try {
                         nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
-                    } catch (AWTException excep) {
-                        throw new RuntimeException(excep);
+                    } catch (AWTException exception) {
+                        throw new RuntimeException(exception);
                     }
                 });
             }

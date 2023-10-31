@@ -170,8 +170,8 @@ public class Main extends Application {
         return selectedDirectory;
     }
 
-    public static void searchAudios(String ISRCs, File directory, File destination) throws SQLException, ClassNotFoundException {
-        DatabaseMySQL.SearchSongsFromDB(ISRCs, directory, destination);
+    public static void copyAudio(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
+        DatabaseMySQL.searchAndCopySongs(isrc, directory, destination);
     }
 
     public static File browseDestination() {

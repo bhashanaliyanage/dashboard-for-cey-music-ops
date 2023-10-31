@@ -157,7 +157,7 @@ public class DatabaseMySQL {
         sc.close();
     }
 
-    public static void SearchSongsFromDB(String ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException {
+    public static void searchAndCopySongs(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
         ResultSet rs;
         String filename;
@@ -170,7 +170,7 @@ public class DatabaseMySQL {
 
         System.out.println("Before for loop for ISRC Codes");
 
-        ps.setString(1, ISRCCodes);
+        ps.setString(1, isrc);
         rs = ps.executeQuery();
 
         if (rs != null) {
@@ -195,8 +195,8 @@ public class DatabaseMySQL {
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
                         System.out.println("File copied to: " + targetFile);
                     } else {
-                        addSongNotFoundError("File not found for ISRC: " + ISRCCodes + "\n");
-                        System.out.println("File not found for ISRC: " + ISRCCodes);
+                        addSongNotFoundError("File not found for ISRC: " + isrc + "\n");
+                        System.out.println("File not found for ISRC: " + isrc);
                     }
                 } catch (Exception e) {
                     showErrorDialog("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
