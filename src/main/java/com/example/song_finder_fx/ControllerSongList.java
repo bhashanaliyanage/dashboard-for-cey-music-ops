@@ -90,7 +90,7 @@ public class ControllerSongList {
     }
 
     public void onCopyToButtonClicked() throws SQLException, ClassNotFoundException {
-        // System.out.println("Copy to button clicked!");
+        // System.out.println("Copy to button clicked!!");
         Task<Void> task;
         List<String> songList = Main.getSongList();
         if (songList.isEmpty()) {
