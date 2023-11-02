@@ -204,3 +204,7 @@ public class Main extends Application {
 // TODO: Offer cancel method after proceed button clicked
 // TODO: Improve search to search by singer, composer, lyricist, and also search by all at once
 // TODO: Most viewed and recently viewed songs
+// TODO: Try to add a waveform for audio
+// TODO: List is not updating when deleting a song
+// TODO: Parent window is showing a not responded situation when browsing for a location
+// TODO: In the search and collect songs if a song is missing, after the completion, no error is showing

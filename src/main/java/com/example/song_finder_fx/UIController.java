@@ -1,10 +1,13 @@
 package com.example.song_finder_fx;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,10 +19,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
+import org.controlsfx.control.textfield.TextFields;
 
 import javax.sound.sampled.Clip;
 import java.awt.*;
@@ -65,6 +71,18 @@ public class UIController {
     public Label srchRsISRC;
     public ImageView imgDeleteSong;
     public ImageView imgPlaySong;
+    public Label songProductName;
+    public Label songUPC;
+    public Label songLyricist;
+    public Label songComposer;
+    public Label songSinger;
+    public Label songISRC;
+    public Label songISRCCopied;
+    public Label songSingerCopied;
+    public Label songComposerCopied;
+    public Label songLyricistCopied;
+    public Label songUPCCopied;
+    public Label songAlbumNameCopied;
     File destination;
     public Button btnAudioDatabase;
     public Label searchResultSongName;
@@ -289,6 +307,7 @@ public class UIController {
     }
 
     public void getText() throws IOException {
+        TextFields.bindAutoCompletion(searchArea, "Test1", "Test2", "Test3");
         // Getting search keywords
         String text = searchArea.getText();
 
@@ -718,7 +737,77 @@ public class UIController {
         mainVBox.getChildren().clear();
         mainVBox.getChildren().add(newContent);
     }
+
+    public void copyISRC(MouseEvent event) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songISRC.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songISRCCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songISRCCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copySinger(MouseEvent event) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songSinger.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songSingerCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songSingerCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyComposer(MouseEvent event) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songComposer.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songComposerCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songComposerCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyLyricist(MouseEvent event) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songLyricist.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songLyricistCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songLyricistCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyUPC(MouseEvent event) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songUPC.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songUPCCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songUPCCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyProductName(MouseEvent event) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songProductName.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songAlbumNameCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songAlbumNameCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
     //</editor-fold>
-
-
 }

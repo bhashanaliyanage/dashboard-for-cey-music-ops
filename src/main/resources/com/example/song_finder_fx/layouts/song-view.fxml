@@ -13,20 +13,19 @@
 <VBox prefWidth="696.0" spacing="10.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
     <HBox>
         <VBox.margin>
-            <Insets left="30.0" top="30.0"/>
+            <Insets left="30.0" top="30.0" />
         </VBox.margin>
-        <Label fx:id="songNameViewTitle1" layoutX="10.0" layoutY="10.0"
-               onMouseClicked="#backButtonImplementationForSearchSong" text="Search Song Details &gt; ">
+        <Label fx:id="songNameViewTitle1" layoutX="10.0" layoutY="10.0" onMouseClicked="#backButtonImplementationForSearchSong" text="Search Song Details &gt; ">
            <font>
-               <Font name="Segoe UI Semibold" size="28.0"/>
+               <Font name="Segoe UI Semibold" size="28.0" />
            </font>
            <cursor>
-               <Cursor fx:constant="HAND"/>
+               <Cursor fx:constant="HAND" />
            </cursor>
         </Label>
         <Label fx:id="songNameViewTitle" text="Kaari Na Sanda">
             <font>
-                <Font name="Segoe UI Semibold" size="28.0"/>
+                <Font name="Segoe UI Semibold" size="28.0" />
             </font>
         </Label>
     </HBox>
@@ -65,84 +64,132 @@
                     <Insets top="8.0" />
                 </VBox.margin>
                 <Label text="ISRC:" />
-                <Label fx:id="songISRC" layoutX="10.0" layoutY="10.0" text="LKA0W2213086">
+                <Label fx:id="songISRC" layoutX="10.0" layoutY="10.0" onMouseClicked="#copyISRC" text="LKA0W2213086" underline="true">
                     <HBox.margin>
                         <Insets left="5.0" />
                     </HBox.margin>
-                    <font>
-                        <Font name="System Italic" size="12.0" />
-                    </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
                 </Label>
+            <Label fx:id="songISRCCopied" disable="true" layoutX="10.0" layoutY="10.0" text="Copied to Clipboard" visible="false">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
             </HBox>
             <HBox>
                 <VBox.margin>
                     <Insets top="8.0" />
                 </VBox.margin>
                 <Label text="Singer:" />
-                <Label fx:id="songSinger" layoutX="10.0" layoutY="10.0" text="Methun SK">
+                <Label fx:id="songSinger" layoutX="10.0" layoutY="10.0" onMouseClicked="#copySinger" text="Methun SK" underline="true">
                     <HBox.margin>
                         <Insets left="5.0" />
                     </HBox.margin>
-                    <font>
-                        <Font name="System Italic" size="12.0" />
-                    </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
                 </Label>
+            <Label fx:id="songSingerCopied" disable="true" text="Copied to Clipboard" visible="false">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
             </HBox>
             <HBox>
                 <VBox.margin>
                     <Insets top="8.0" />
                 </VBox.margin>
                 <Label text="Composer:" />
-                <Label fx:id="songComposer" layoutX="10.0" layoutY="10.0" text="Methun SK">
+                <Label fx:id="songComposer" layoutX="10.0" layoutY="10.0" onMouseClicked="#copyComposer" text="Methun SK" underline="true">
                     <HBox.margin>
                         <Insets left="5.0" />
                     </HBox.margin>
-                    <font>
-                        <Font name="System Italic" size="12.0" />
-                    </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
                 </Label>
+            <Label fx:id="songComposerCopied" disable="true" text="Copied to Clipboard" visible="false">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
             </HBox>
             <HBox>
                 <VBox.margin>
                     <Insets top="8.0" />
                 </VBox.margin>
                 <Label text="Lyricist:" />
-                <Label fx:id="songLyricist" layoutX="10.0" layoutY="10.0" text="Methun SK">
+                <Label fx:id="songLyricist" layoutX="10.0" layoutY="10.0" onMouseClicked="#copyLyricist" text="Methun SK" underline="true">
                     <HBox.margin>
                         <Insets left="5.0" />
                     </HBox.margin>
-                    <font>
-                        <Font name="System Italic" size="12.0" />
-                    </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
                 </Label>
+            <Label fx:id="songLyricistCopied" disable="true" text="Copied to Clipboard" visible="false">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
             </HBox>
             <HBox>
                 <VBox.margin>
                     <Insets top="8.0" />
                 </VBox.margin>
                 <Label text="UPC:" />
-                <Label fx:id="songUPC" layoutX="10.0" layoutY="10.0" text="8720765994063">
+                <Label fx:id="songUPC" layoutX="10.0" layoutY="10.0" onMouseClicked="#copyUPC" text="8720765994063" underline="true">
                     <HBox.margin>
                         <Insets left="5.0" />
                     </HBox.margin>
-                    <font>
-                        <Font name="System Italic" size="12.0" />
-                    </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
                 </Label>
+            <Label fx:id="songUPCCopied" disable="true" text="Copied to Clipboard" visible="false">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
             </HBox>
             <HBox>
                 <VBox.margin>
                     <Insets top="8.0" />
                 </VBox.margin>
                 <Label text="Album Name:" />
-                <Label fx:id="songProductName" layoutX="10.0" layoutY="10.0" text="Kaari Na Sanda">
+                <Label fx:id="songProductName" layoutX="10.0" layoutY="10.0" onMouseClicked="#copyProductName" text="Kaari Na Sanda" underline="true">
                     <HBox.margin>
                         <Insets left="5.0" />
                     </HBox.margin>
-                    <font>
-                        <Font name="System Italic" size="12.0" />
-                    </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
                 </Label>
+            <Label fx:id="songAlbumNameCopied" disable="true" text="Copied to Clipboard" visible="false">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
             </HBox>
             <HBox layoutX="10.0" layoutY="168.0">
                 <VBox.margin>
@@ -153,9 +200,6 @@
                     <HBox.margin>
                         <Insets left="5.0" />
                     </HBox.margin>
-                    <font>
-                        <Font name="System Italic" size="12.0" />
-                    </font>
                 </Label>
             </HBox>
         </VBox>
