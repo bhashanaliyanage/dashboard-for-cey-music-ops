@@ -288,7 +288,7 @@ public class UIController {
         songShare.setText("No Detail");
     }
 
-    public void getText(KeyEvent keyEvent) throws IOException {
+    public void getText() throws IOException {
         // Getting search keywords
         String text = searchArea.getText();
 
@@ -488,7 +488,7 @@ public class UIController {
     //</editor-fold>
 
     //<editor-fold desc="Settings">
-    public void onSettingsButtonClicked(MouseEvent mouseEvent) throws IOException, SQLException, ClassNotFoundException {
+    public void onSettingsButtonClicked() throws IOException, SQLException, ClassNotFoundException {
         ControllerSettings cs = new ControllerSettings(this);
         cs.loadThings();
     }
@@ -705,6 +705,18 @@ public class UIController {
         } else {
             System.out.println("Error! No file selected to import into Database");
         }
+    }
+
+    public void backButtonImplementationForSearchSong(MouseEvent event) throws IOException {
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
+        // loader.setController(this);
+        Parent newContent = loader.load();
+        mainVBox.getChildren().clear();
+        mainVBox.getChildren().add(newContent);
     }
     //</editor-fold>
 

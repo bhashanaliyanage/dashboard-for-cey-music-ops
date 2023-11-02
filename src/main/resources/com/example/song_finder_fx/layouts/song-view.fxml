@@ -10,182 +10,182 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="696.0" spacing="10.0" styleClass="white-background" stylesheets="@../styles.css"
-      xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.song_finder_fx.UIController"
->
-    <Label fx:id="songNameViewTitle" text="Kaari Na Sanda">
-        <font>
-            <Font name="Segoe UI Semibold" size="28.0"/>
-        </font>
+<VBox prefWidth="696.0" spacing="10.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+    <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0"/>
         </VBox.margin>
-    </Label>
+        <Label fx:id="songNameViewTitle1" layoutX="10.0" layoutY="10.0"
+               onMouseClicked="#backButtonImplementationForSearchSong" text="Search Song Details &gt; ">
+           <font>
+               <Font name="Segoe UI Semibold" size="28.0"/>
+           </font>
+           <cursor>
+               <Cursor fx:constant="HAND"/>
+           </cursor>
+        </Label>
+        <Label fx:id="songNameViewTitle" text="Kaari Na Sanda">
+            <font>
+                <Font name="Segoe UI Semibold" size="28.0"/>
+            </font>
+        </Label>
+    </HBox>
     <Label layoutX="41.0" layoutY="115.0" text="Song">
         <VBox.margin>
-            <Insets left="31.0" top="30.0"/>
+            <Insets left="31.0" top="30.0" />
         </VBox.margin>
         <font>
-            <Font name="Segoe UI Semibold" size="12.0"/>
+            <Font name="Segoe UI Semibold" size="12.0" />
         </font>
     </Label>
     <HBox maxWidth="606.0" prefHeight="100.0" styleClass="textarea-bg" stylesheets="@../styles.css">
         <VBox.margin>
-            <Insets left="30.0" right="30.0"/>
+            <Insets left="30.0" right="30.0" />
         </VBox.margin>
         <ImageView fx:id="songArtwork" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
             <HBox.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </HBox.margin>
-            <Image url="@../images/Green%20Gradient.jpg"/>
+            <Image url="@../images/Green%20Gradient.jpg" />
         </ImageView>
         <VBox prefHeight="200.0" prefWidth="320.0">
             <HBox.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </HBox.margin>
             <Label fx:id="songName" text="Kaari Na Sanda">
                 <VBox.margin>
-                    <Insets top="5.0"/>
+                    <Insets top="5.0" />
                 </VBox.margin>
                 <font>
-                    <Font name="System Bold" size="14.0"/>
+                    <Font name="System Bold" size="14.0" />
                 </font>
             </Label>
             <HBox>
                 <VBox.margin>
-                    <Insets top="8.0"/>
+                    <Insets top="8.0" />
                 </VBox.margin>
-                <Label text="ISRC:"/>
+                <Label text="ISRC:" />
                 <Label fx:id="songISRC" layoutX="10.0" layoutY="10.0" text="LKA0W2213086">
                     <HBox.margin>
-                        <Insets left="5.0"/>
+                        <Insets left="5.0" />
                     </HBox.margin>
                     <font>
-                        <Font name="System Italic" size="12.0"/>
+                        <Font name="System Italic" size="12.0" />
                     </font>
                 </Label>
             </HBox>
             <HBox>
                 <VBox.margin>
-                    <Insets top="8.0"/>
+                    <Insets top="8.0" />
                 </VBox.margin>
-                <Label text="Singer:"/>
+                <Label text="Singer:" />
                 <Label fx:id="songSinger" layoutX="10.0" layoutY="10.0" text="Methun SK">
                     <HBox.margin>
-                        <Insets left="5.0"/>
+                        <Insets left="5.0" />
                     </HBox.margin>
                     <font>
-                        <Font name="System Italic" size="12.0"/>
+                        <Font name="System Italic" size="12.0" />
                     </font>
                 </Label>
             </HBox>
             <HBox>
                 <VBox.margin>
-                    <Insets top="8.0"/>
+                    <Insets top="8.0" />
                 </VBox.margin>
-                <Label text="Composer:"/>
+                <Label text="Composer:" />
                 <Label fx:id="songComposer" layoutX="10.0" layoutY="10.0" text="Methun SK">
                     <HBox.margin>
-                        <Insets left="5.0"/>
+                        <Insets left="5.0" />
                     </HBox.margin>
                     <font>
-                        <Font name="System Italic" size="12.0"/>
+                        <Font name="System Italic" size="12.0" />
                     </font>
                 </Label>
             </HBox>
             <HBox>
                 <VBox.margin>
-                    <Insets top="8.0"/>
+                    <Insets top="8.0" />
                 </VBox.margin>
-                <Label text="Lyricist:"/>
+                <Label text="Lyricist:" />
                 <Label fx:id="songLyricist" layoutX="10.0" layoutY="10.0" text="Methun SK">
                     <HBox.margin>
-                        <Insets left="5.0"/>
+                        <Insets left="5.0" />
                     </HBox.margin>
                     <font>
-                        <Font name="System Italic" size="12.0"/>
+                        <Font name="System Italic" size="12.0" />
                     </font>
                 </Label>
             </HBox>
             <HBox>
                 <VBox.margin>
-                    <Insets top="8.0"/>
+                    <Insets top="8.0" />
                 </VBox.margin>
-                <Label text="UPC:"/>
+                <Label text="UPC:" />
                 <Label fx:id="songUPC" layoutX="10.0" layoutY="10.0" text="8720765994063">
                     <HBox.margin>
-                        <Insets left="5.0"/>
+                        <Insets left="5.0" />
                     </HBox.margin>
                     <font>
-                        <Font name="System Italic" size="12.0"/>
+                        <Font name="System Italic" size="12.0" />
                     </font>
                 </Label>
             </HBox>
             <HBox>
                 <VBox.margin>
-                    <Insets top="8.0"/>
+                    <Insets top="8.0" />
                 </VBox.margin>
-                <Label text="Album Name:"/>
+                <Label text="Album Name:" />
                 <Label fx:id="songProductName" layoutX="10.0" layoutY="10.0" text="Kaari Na Sanda">
                     <HBox.margin>
-                        <Insets left="5.0"/>
+                        <Insets left="5.0" />
                     </HBox.margin>
                     <font>
-                        <Font name="System Italic" size="12.0"/>
+                        <Font name="System Italic" size="12.0" />
                     </font>
                 </Label>
             </HBox>
             <HBox layoutX="10.0" layoutY="168.0">
                 <VBox.margin>
-                    <Insets top="8.0"/>
+                    <Insets top="8.0" />
                 </VBox.margin>
-                <Label text="CeyMusic Share:"/>
+                <Label text="CeyMusic Share:" />
                 <Label fx:id="songShare" layoutX="10.0" layoutY="10.0" text="50%">
                     <HBox.margin>
-                        <Insets left="5.0"/>
+                        <Insets left="5.0" />
                     </HBox.margin>
                     <font>
-                        <Font name="System Italic" size="12.0"/>
+                        <Font name="System Italic" size="12.0" />
                     </font>
                 </Label>
             </HBox>
         </VBox>
-        <ImageView fx:id="btnPlay" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#onBtnPlayClicked"
-                   pickOnBounds="true" preserveRatio="true">
+        <ImageView fx:id="btnPlay" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#onBtnPlayClicked" pickOnBounds="true" preserveRatio="true">
             <HBox.margin>
-                <Insets right="20.0" top="20.0"/>
+                <Insets right="20.0" top="20.0" />
             </HBox.margin>
-            <Image url="@../images/icon%20_play%20circle_.png"/>
+            <Image url="@../images/icon%20_play%20circle_.png" />
             <cursor>
-                <Cursor fx:constant="HAND"/>
+                <Cursor fx:constant="HAND" />
             </cursor>
         </ImageView>
     </HBox>
-    <VBox fx:id="vBoxInSearchSong" maxWidth="606.0" minWidth="600.0" prefHeight="0.0" prefWidth="606.0"
-          styleClass="textarea-bg" stylesheets="@../styles.css">
+    <VBox fx:id="vBoxInSearchSong" maxWidth="606.0" minWidth="600.0" prefHeight="0.0" prefWidth="606.0" styleClass="textarea-bg" stylesheets="@../styles.css">
         <VBox.margin>
-            <Insets bottom="10.0" left="30.0" right="30.0"/>
+            <Insets bottom="10.0" left="30.0" right="30.0" />
         </VBox.margin>
-        <Button fx:id="btnAddToList" minHeight="30.0" mnemonicParsing="false" onAction="#onAddToListButtonClicked"
-                prefHeight="30.0" prefWidth="590.0" styleClass="button_inside" stylesheets="@../styles.css"
-                text="Add to List">
+        <Button fx:id="btnAddToList" minHeight="30.0" mnemonicParsing="false" onAction="#onAddToListButtonClicked" prefHeight="30.0" prefWidth="590.0" styleClass="button_inside" stylesheets="@../styles.css" text="Add to List">
             <VBox.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </VBox.margin>
         </Button>
-        <Button fx:id="btnOpenLocation" layoutX="21.0" layoutY="21.0" minHeight="30.0" mnemonicParsing="false"
-                onMouseClicked="#onOpenFileLocationButtonClicked" prefHeight="30.0" prefWidth="590.0"
-                styleClass="button_inside" stylesheets="@../styles.css" text="Open File Location">
+        <Button fx:id="btnOpenLocation" layoutX="21.0" layoutY="21.0" minHeight="30.0" mnemonicParsing="false" onMouseClicked="#onOpenFileLocationButtonClicked" prefHeight="30.0" prefWidth="590.0" styleClass="button_inside" stylesheets="@../styles.css" text="Open File Location">
             <VBox.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" />
             </VBox.margin>
         </Button>
-        <Button fx:id="btnCopyTo" layoutX="21.0" layoutY="61.0" minHeight="30.0" mnemonicParsing="false"
-                onMouseClicked="#onCopyToButtonClicked" prefHeight="30.0" prefWidth="590.0" styleClass="button_inside"
-                stylesheets="@../styles.css" text="Copy to">
+        <Button fx:id="btnCopyTo" layoutX="21.0" layoutY="61.0" minHeight="30.0" mnemonicParsing="false" onMouseClicked="#onCopyToButtonClicked" prefHeight="30.0" prefWidth="590.0" styleClass="button_inside" stylesheets="@../styles.css" text="Copy to">
             <VBox.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" />
             </VBox.margin>
         </Button>
     </VBox>
