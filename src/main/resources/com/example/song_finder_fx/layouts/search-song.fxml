@@ -8,33 +8,30 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vboxSongSearch" onMouseClicked="#onSearchedSongClick" prefWidth="183.0" styleClass="search-result"
-      stylesheets="@../styles.css"
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.song_finder_fx.UIController">
+<VBox fx:id="vboxSongSearch" onKeyPressed="#onSearchedSongPress2" onMouseClicked="#onSearchedSongClick" prefWidth="183.0" styleClass="search-result" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
     <padding>
-        <Insets bottom="10.0" left="10.0" right="30.0" top="10.0"/>
+        <Insets bottom="10.0" left="10.0" right="30.0" top="10.0" />
     </padding>
     <HBox prefHeight="50.0">
         <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-            <Image url="@../images/Green%20Gradient.jpg"/>
+            <Image url="@../images/Green%20Gradient.jpg" />
         </ImageView>
         <VBox>
             <HBox.margin>
-                <Insets left="20.0" top="2.5"/>
+                <Insets left="20.0" top="2.5" />
             </HBox.margin>
             <Label fx:id="searchResultSongName" text="Song Name">
                 <font>
-                    <Font size="14.0"/>
+                    <Font size="14.0" />
                 </font>
             </Label>
             <HBox>
                 <VBox.margin>
-                    <Insets top="5.0"/>
+                    <Insets top="5.0" />
                 </VBox.margin>
-                <Label fx:id="searchResultISRC" text="ISRC"/>
-                <Label layoutX="10.0" layoutY="10.0" text=" | "/>
-                <Label fx:id="searchResultArtist" layoutX="10.0" layoutY="10.0" text="Artist"/>
+                <Label fx:id="searchResultISRC" text="ISRC" />
+                <Label layoutX="10.0" layoutY="10.0" text=" | " />
+                <Label fx:id="searchResultArtist" layoutX="10.0" layoutY="10.0" text="Artist" />
             </HBox>
         </VBox>
     </HBox>

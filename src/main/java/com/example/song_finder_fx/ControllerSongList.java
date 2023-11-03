@@ -161,9 +161,20 @@ public class ControllerSongList {
         mainVBox.getChildren().add(newContent);
     }
 
-    public void onGenerateInvoiceButtonClicked() throws FileNotFoundException, MalformedURLException {
+    public void onGenerateInvoiceButtonClicked(ActionEvent actionEvent) throws IOException {
         System.out.println("onGenerateInvoiceButtonClicked");
-        Invoice.generateTest();
+
+        /*ControllerInvoice controllerInvoice = new ControllerInvoice(this);
+        controllerInvoice.loadThings();*/
+
+        Node node = (Node) actionEvent.getSource();
+        Scene scene = node.getScene();
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+        mainVBox.getChildren().clear();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-list-invoice.fxml"));
+        Parent newContent = loader.load();
+        mainVBox.getChildren().add(newContent);
     }
 
     private void updateButtonProceed(String s) {

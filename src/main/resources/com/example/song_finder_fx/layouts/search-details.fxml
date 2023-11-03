@@ -61,7 +61,7 @@
          <VBox.margin>
             <Insets bottom="30.0" left="30.0" right="30.0" />
          </VBox.margin>
-         <VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css" />
+         <VBox fx:id="vboxSong" onKeyPressed="#onSearchedSongPress" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css" />
       </ScrollPane>
    </VBox>
 </VBox>

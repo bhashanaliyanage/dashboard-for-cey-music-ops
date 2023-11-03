@@ -99,6 +99,30 @@
     -fx-border-radius: 3;
 }
 
+/*CSS for Date Picker*/
+.date-picker {
+    -fx-border-color: '#e9ebee';
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-color: '#FFFFFF';
+}
+
+/*.date-picker:editable > .arrow-button > * {
+    -fx-opacity: 0; *//* Set the node in the button to be visible *//*
+}*/
+
+.date-picker > .arrow-button {
+    -fx-background-color: '#FFFFFF';
+}
+
+.date-picker > .arrow-button:hover {
+    -fx-background-color: '#f6f6f6';
+}
+
+.date-picker > .arrow-button:pressed {
+    -fx-background-color: '#ededed';
+}
+
 .scroll-pane {
     -fx-background-color: '#FFFFFF';
     -fx-border-color: '#e9ebee';
