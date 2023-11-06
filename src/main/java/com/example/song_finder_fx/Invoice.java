@@ -18,12 +18,13 @@ import com.itextpdf.layout.property.VerticalAlignment;
 
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
+import java.time.LocalDate;
 
 public class Invoice {
     private static final Color INVOICEBLUE = new DeviceRgb(136, 193, 232);
     private static final Color INVOICLIGHTEBLUE = new DeviceRgb(232, 243, 251);
 
-    public static void generateInvoice() throws FileNotFoundException, MalformedURLException {
+    public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date) throws FileNotFoundException, MalformedURLException {
         String path = "invoice2.pdf";
         PdfWriter pdfWriter = new PdfWriter(path);
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
@@ -61,7 +62,7 @@ public class Invoice {
                 .setBold()
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER));
-        table02.addCell(new Cell().add(new Paragraph("{INVOICE TO}"))
+        table02.addCell(new Cell().add(new Paragraph(invoiceTo))
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER));
         table02.addCell(new Cell().add(new Paragraph("TOTAL DUE"))
@@ -74,7 +75,7 @@ public class Invoice {
                 .setBold()
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER));
-        table02.addCell(new Cell().add(new Paragraph("{INVOICE NO}"))
+        table02.addCell(new Cell().add(new Paragraph(invoiceNo))
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER));
         table02.addCell(new Cell(2, 1).add(new Paragraph("{TOTAL DUE}"))
@@ -90,7 +91,7 @@ public class Invoice {
                 .setBold()
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER));
-        table02.addCell(new Cell().add(new Paragraph("{DATE}"))
+        table02.addCell(new Cell().add(new Paragraph(date.toString()))
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER));
         // table02.addCell(new Cell().add(new Paragraph("")));
@@ -100,7 +101,7 @@ public class Invoice {
         document.close();
     }
 
-    public static void main(String[] args) throws MalformedURLException, FileNotFoundException {
-        generateInvoice();
+    public static void main(String[] args) {
+        // generateInvoice(invoiceTo, invoiceNo, date);
     }
 }

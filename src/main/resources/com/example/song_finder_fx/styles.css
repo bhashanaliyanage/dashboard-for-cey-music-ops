@@ -107,10 +107,6 @@
     -fx-background-color: '#FFFFFF';
 }
 
-/*.date-picker:editable > .arrow-button > * {
-    -fx-opacity: 0; *//* Set the node in the button to be visible *//*
-}*/
-
 .date-picker > .arrow-button {
     -fx-background-color: '#FFFFFF';
 }
@@ -143,4 +139,8 @@
 
 .scroll-pane > .viewport {
    -fx-background-color: transparent;
+}
+
+.invoice-table {
+    -fx-background-color: '#8dc1e7';
 }

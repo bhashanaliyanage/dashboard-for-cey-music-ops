@@ -50,7 +50,7 @@ public class Main extends Application {
         stage.setTitle("CeyMusic Toolkit 2023.2");
         stage.setScene(scene);
         stage.setMinWidth(995);
-        stage.setMinHeight(650);
+        stage.setMinHeight(700);
 
         Image image = new Image("com/example/song_finder_fx/icons/icon.png");
 
@@ -188,7 +188,6 @@ public class Main extends Application {
     }
 }
 
-// TODO: Check current progress with test cases
 // TODO: Adding admin switch
 // TODO: Song list view
 // TODO: Click to copy data
@@ -208,3 +207,5 @@ public class Main extends Application {
 // TODO: List is not updating when deleting a song
 // TODO: Parent window is showing a not responded situation when browsing for a location
 // TODO: In the search and collect songs if a song is missing, after the completion, no error is showing
+// TODO: In the list view, copying must be improved by the UI side. The application must be transparent better than it is.
+// TODO: When I trying to copy some list of songs of Chandralekha, the audio of Kusumata Lanwee is not copied, therefore no error is shown.

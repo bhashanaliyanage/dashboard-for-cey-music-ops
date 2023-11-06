@@ -14,9 +14,7 @@ import javafx.scene.layout.VBox;
 
 import java.awt.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -162,19 +160,15 @@ public class ControllerSongList {
     }
 
     public void onGenerateInvoiceButtonClicked(ActionEvent actionEvent) throws IOException {
-        System.out.println("onGenerateInvoiceButtonClicked");
-
-        /*ControllerInvoice controllerInvoice = new ControllerInvoice(this);
-        controllerInvoice.loadThings();*/
-
-        Node node = (Node) actionEvent.getSource();
+        ControllerInvoice.loadThings(actionEvent);
+        /*Node node = (Node) actionEvent.getSource();
         Scene scene = node.getScene();
         VBox mainVBox = (VBox) scene.lookup("#mainVBox");
         mainVBox.getChildren().clear();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-list-invoice.fxml"));
         Parent newContent = loader.load();
-        mainVBox.getChildren().add(newContent);
+        mainVBox.getChildren().add(newContent);*/
     }
 
     private void updateButtonProceed(String s) {
