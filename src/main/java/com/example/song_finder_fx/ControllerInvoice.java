@@ -15,26 +15,43 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 public class ControllerInvoice {
+    private final UIController mainUIController;
     public TextField txtInvoiceTo;
     public TextField txtInvoiceNo;
     public DatePicker dpInvoiceDate;
     public HBox hboxInvoiceTo;
     public HBox hboxInvoiceNo;
-    public VBox vboxSongInvoice;
     public ScrollPane scrlpneSongInvoice;
+    public VBox vboxSong;
 
-    public static void loadThings(ActionEvent actionEvent) throws IOException {
-        Node node = (Node) actionEvent.getSource();
-        Scene scene = node.getScene();
-        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
-        mainVBox.getChildren().clear();
+    public ControllerInvoice(UIController mainUIController) {
+        this.mainUIController = mainUIController;
+    }
 
+    public void loadThings(ActionEvent actionEvent) throws IOException {
         FXMLLoader loader = new FXMLLoader(ControllerInvoice.class.getResource("layouts/song-list-invoice.fxml"));
+        loader.setController(this);
         Parent newContent = loader.load();
-        mainVBox.getChildren().add(newContent);
+        mainUIController.mainVBox.getChildren().clear();
+        mainUIController.mainVBox.getChildren().add(newContent);
+
+        // Song List
+        List<String> songList = Main.getSongList();
+
+        // Connecting to database
+        DatabaseMySQL db = new DatabaseMySQL();
+
+        // Setting up UI
+        scrlpneSongInvoice.setVisible(true);
+        scrlpneSongInvoice.setContent(vboxSong);
+
+        Node[] nodes;
+        nodes = new Node[songList.size()];
+        vboxSong.getChildren().clear();
     }
 
     public void onGenerateInvoice(ActionEvent event) throws MalformedURLException, FileNotFoundException {

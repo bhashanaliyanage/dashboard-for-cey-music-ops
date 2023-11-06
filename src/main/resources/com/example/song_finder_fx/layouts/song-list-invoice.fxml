@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainVBox" prefWidth="696.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerInvoice">
+<VBox fx:id="mainVBox" prefWidth="696.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <Label text="Song List &gt; Invoice">
         <font>
             <Font name="Segoe UI Semibold" size="28.0" />
@@ -110,88 +110,79 @@
            </HBox.margin>
         </DatePicker>
     </HBox>
-    <VBox fx:id="vBoxInSearchSong" maxWidth="606.0" minWidth="600.0" prefWidth="606.0" styleClass="textarea-bg"
-          stylesheets="@../styles.css">
+    <VBox fx:id="vBoxInSearchSong" maxWidth="606.0" minWidth="600.0" prefWidth="606.0" styleClass="textarea-bg" stylesheets="@../styles.css">
         <VBox.margin>
-            <Insets left="30.0" top="5.0"/>
+            <Insets left="30.0" top="5.0" />
         </VBox.margin>
-        <HBox alignment="CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="200.0" styleClass="invoice-table"
-              stylesheets="@../styles.css">
+        <HBox alignment="CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="200.0" styleClass="invoice-table" stylesheets="@../styles.css">
             <VBox.margin>
-                <Insets left="30.0" right="30.0" top="20.0"/>
+                <Insets left="30.0" right="30.0" top="20.0" />
             </VBox.margin>
             <Label text="SONG" textFill="WHITE">
                 <font>
-                    <Font name="System Bold" size="12.0"/>
+                    <Font name="System Bold" size="12.0" />
                 </font>
                 <HBox.margin>
-                    <Insets left="70.0" right="80.0"/>
+                    <Insets left="70.0" right="80.0" />
                 </HBox.margin>
             </Label>
-            <Separator orientation="VERTICAL" prefHeight="200.0"/>
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
             <Label layoutX="10.0" layoutY="10.0" text="CONTROL" textFill="WHITE">
                 <font>
-                    <Font name="System Bold" size="12.0"/>
+                    <Font name="System Bold" size="12.0" />
                 </font>
                 <HBox.margin>
-                    <Insets left="10.0" right="10.0"/>
+                    <Insets left="10.0" right="10.0" />
                 </HBox.margin>
             </Label>
-            <Separator orientation="VERTICAL" prefHeight="200.0"/>
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
             <Label layoutX="38.0" layoutY="10.0" text="COPYRIGHT OWNER" textFill="WHITE">
                 <font>
-                    <Font name="System Bold" size="12.0"/>
+                    <Font name="System Bold" size="12.0" />
                 </font>
                 <HBox.margin>
-                    <Insets left="30.0" right="30.0"/>
+                    <Insets left="30.0" right="30.0" />
                 </HBox.margin>
             </Label>
-            <Separator orientation="VERTICAL" prefHeight="200.0"/>
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
             <Label layoutX="66.0" layoutY="10.0" text="AMOUNT" textFill="WHITE">
                 <font>
-                    <Font name="System Bold" size="12.0"/>
+                    <Font name="System Bold" size="12.0" />
                 </font>
                 <HBox.margin>
-                    <Insets left="10.0"/>
+                    <Insets left="10.0" />
                 </HBox.margin>
             </Label>
         </HBox>
         <ScrollPane fx:id="scrlpneSongInvoice" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="544.0"
                     styleClass="scroll-pane" stylesheets="@../styles.css" vbarPolicy="ALWAYS">
-           <VBox.margin>
-               <Insets bottom="30.0" left="30.0" right="30.0"/>
-           </VBox.margin>
-           <content>
-               <VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css">
-                   <children>
-                       <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0">
-                           <children>
-                               <Label prefWidth="185.0" text="Song Name by Singer">
-                                   <HBox.margin>
-                                       <Insets left="10.0"/>
-                                   </HBox.margin>
-                               </Label>
-                               <Label prefWidth="30.0" text="100%" textAlignment="RIGHT">
-                                   <HBox.margin>
-                                       <Insets left="27.0"/>
-                                   </HBox.margin>
-                               </Label>
-                               <Label prefWidth="168.0" text="Composer and Lyricist">
-                                   <HBox.margin>
-                                       <Insets left="40.0"/>
-                                   </HBox.margin>
-                               </Label>
-                               <Label layoutX="302.0" layoutY="17.0" prefWidth="40.0" text="\$2000"
-                                      textAlignment="RIGHT">
-                                   <HBox.margin>
-                                       <Insets left="26.0"/>
-                                   </HBox.margin>
-                               </Label>
-                           </children>
-                       </HBox>
-                   </children>
-               </VBox>
-           </content>
+            <VBox.margin>
+                <Insets bottom="30.0" left="30.0" right="30.0"/>
+            </VBox.margin>
+            <VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css">
+                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0">
+                    <Label prefWidth="185.0" text="Song Name by Singer">
+                        <HBox.margin>
+                            <Insets left="10.0"/>
+                        </HBox.margin>
+                    </Label>
+                    <Label prefWidth="30.0" text="100%" textAlignment="RIGHT">
+                        <HBox.margin>
+                            <Insets left="27.0"/>
+                        </HBox.margin>
+                    </Label>
+                    <Label prefWidth="168.0" text="Composer and Lyricist">
+                        <HBox.margin>
+                            <Insets left="40.0"/>
+                        </HBox.margin>
+                    </Label>
+                    <Label layoutX="302.0" layoutY="17.0" prefWidth="40.0" text="\$2000" textAlignment="RIGHT">
+                        <HBox.margin>
+                            <Insets left="26.0"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+            </VBox>
         </ScrollPane>
     </VBox>
     <VBox fx:id="hboxListActions" alignment="CENTER" maxWidth="606.0" minWidth="600.0" prefHeight="0.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">

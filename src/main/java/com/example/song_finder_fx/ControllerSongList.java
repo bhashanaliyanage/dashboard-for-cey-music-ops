@@ -160,15 +160,8 @@ public class ControllerSongList {
     }
 
     public void onGenerateInvoiceButtonClicked(ActionEvent actionEvent) throws IOException {
-        ControllerInvoice.loadThings(actionEvent);
-        /*Node node = (Node) actionEvent.getSource();
-        Scene scene = node.getScene();
-        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
-        mainVBox.getChildren().clear();
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-list-invoice.fxml"));
-        Parent newContent = loader.load();
-        mainVBox.getChildren().add(newContent);*/
+        ControllerInvoice controllerInvoice = new ControllerInvoice(mainUIController);
+        controllerInvoice.loadThings(actionEvent);
     }
 
     private void updateButtonProceed(String s) {
