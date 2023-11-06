@@ -2,29 +2,33 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0">
-      <Label fx:id="songName" prefWidth="185.0" text="Song Name">
+      <Label fx:id="songName" prefWidth="184.0" text="Song Name">
          <HBox.margin>
             <Insets left="10.0" />
          </HBox.margin>
       </Label>
-      <Label fx:id="songShare" prefWidth="30.0" text="100%" textAlignment="RIGHT">
+      <Separator orientation="VERTICAL" prefHeight="200.0" />
+      <Label fx:id="songShare" alignment="CENTER_RIGHT" prefWidth="30.0" text="0%" textAlignment="RIGHT">
          <HBox.margin>
-            <Insets left="27.0" />
+            <Insets left="40.0" right="7.0" />
          </HBox.margin>
       </Label>
-      <Label fx:id="songArtist" prefWidth="168.0" text="Composer and Lyricist">
+      <Separator orientation="VERTICAL" prefHeight="200.0" />
+      <Label fx:id="songArtist" prefWidth="166.0" text="Composer and Lyricist">
          <HBox.margin>
-            <Insets left="40.0" />
+            <Insets left="10.0" />
          </HBox.margin>
       </Label>
-      <Label fx:id="songAmount" layoutX="302.0" layoutY="17.0" prefWidth="40.0" text="\$2000" textAlignment="RIGHT">
+      <Separator orientation="VERTICAL" prefHeight="200.0" />
+      <Label fx:id="songAmount" alignment="CENTER_RIGHT" layoutX="302.0" layoutY="17.0" prefWidth="50.0" text="\$0" textAlignment="RIGHT">
          <HBox.margin>
-            <Insets left="26.0" />
+            <Insets />
          </HBox.margin>
       </Label>
    </HBox>

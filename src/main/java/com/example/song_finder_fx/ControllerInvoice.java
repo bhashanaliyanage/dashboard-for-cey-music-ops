@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -14,6 +15,7 @@ import javafx.scene.layout.VBox;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -52,6 +54,22 @@ public class ControllerInvoice {
         Node[] nodes;
         nodes = new Node[songList.size()];
         vboxSong.getChildren().clear();
+
+        for (int i = 0; i < nodes.length; i++) {
+            try {
+                List<String> songDetail = db.searchSongDetails(songList.get(i));
+                nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist-invoice.fxml")));
+                Label lblSongName = (Label) nodes[i].lookup("#songName");
+                Label lblArtist = (Label) nodes[i].lookup("#songArtist");
+                lblSongName.setText(songDetail.get(3));
+                lblArtist.setText(songDetail.get(4));
+                vboxSong.getChildren().add(nodes[i]);
+            } catch (NullPointerException | IOException ex) {
+                ex.printStackTrace();
+            } catch (SQLException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void onGenerateInvoice(ActionEvent event) throws MalformedURLException, FileNotFoundException {
