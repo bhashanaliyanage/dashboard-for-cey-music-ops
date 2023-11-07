@@ -7,8 +7,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
@@ -102,6 +104,10 @@ public class Main extends Application {
             selectedDirectory = Main.browseLocation();
             System.out.println(selectedDirectory.getAbsolutePath());
         }
+    }
+
+    public static Boolean directoryCheckNew() {
+        return selectedDirectory != null;
     }
 
     public static File getSelectedDirectory() {

@@ -57,4 +57,30 @@
          </HBox.margin>
       </Button>
    </HBox>
+   <Label layoutX="41.0" layoutY="110.0" text="Testing">
+      <font>
+         <Font name="Segoe UI Semibold" size="12.0" />
+      </font>
+      <VBox.margin>
+         <Insets bottom="10.0" left="31.0" />
+      </VBox.margin>
+   </Label>
+   <Button fx:id="btnImportArtists" alignment="BASELINE_LEFT" layoutX="40.0" layoutY="137.0" minHeight="67.0" minWidth="600.0" onAction="#onImportArtistsButtonClick" prefHeight="67.0" prefWidth="606.0" styleClass="button-big" stylesheets="@../styles.css" text="   Import Artists">
+      <padding>
+         <Insets left="20.0" />
+      </padding>
+      <font>
+         <Font name="Segoe UI Semilight" size="14.0" />
+      </font>
+      <graphic>
+         <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+            <image>
+               <Image url="@../images/icon_user.png" />
+            </image>
+         </ImageView>
+      </graphic>
+      <VBox.margin>
+         <Insets bottom="30.0" left="30.0" />
+      </VBox.margin>
+   </Button>
 </VBox>

@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.stage.DirectoryChooser;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,11 +39,36 @@ public class ControllerSettings {
         }
     }
 
-    public void onBrowseAudioButtonClick(ActionEvent actionEvent) {
-        System.out.println("Test");
-        UIController.directory = Main.browseLocation();
+    public void onBrowseAudioButtonClick() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select a directory");
+        // File selectedDirectory = chooser.showDialog(btnAudioDatabase.getScene().getWindow());
+
+        UIController.directory = chooser.showDialog(btnAudioDatabase.getScene().getWindow());
         String shortenedString = UIController.directory.getAbsolutePath().substring(0, Math.min(UIController.directory.getAbsolutePath().length(), 73));
         btnAudioDatabase.setText("   Database: " + shortenedString + "...");
+    }
+
+    public void onImportArtistsButtonClick() {
+        System.out.println("ControllerSettings.onImportArtistsButtonClick");
+
+        // Prompt user to import CSV
+        /*FileChooser fileChooser = new FileChooser();
+        File csv = fileChooser.showOpenDialog(btnAudioDatabase.getScene().getWindow());*/
+
+        // Connect to database
+
+
+        // Make table
+
+
+        // Read CSV
+
+
+        // Import to table in a separate thread
+
+
+        // Update user interface
     }
 
     public void onSaveButtonClicked(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {

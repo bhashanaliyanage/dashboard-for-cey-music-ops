@@ -1,16 +1,13 @@
 package com.example.song_finder_fx;
 
-import com.itextpdf.kernel.color.Lab;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,8 +22,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.util.Duration;
-import org.controlsfx.control.textfield.TextFields;
 
 import javax.sound.sampled.Clip;
 import java.awt.*;
@@ -85,6 +82,8 @@ public class UIController {
     public Label songUPCCopied;
     public Label songAlbumNameCopied;
     public TextField searchArea1;
+    public Button btnOpenLocation;
+    public Button btnCopyTo;
     File destination;
     public Button btnAudioDatabase;
     public Label searchResultSongName;
@@ -119,7 +118,13 @@ public class UIController {
     }
 
     public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException {
-        Main.directoryCheck();
+        boolean directoryStatus = Main.directoryCheckNew();
+
+        if (!directoryStatus) {
+            DirectoryChooser chooser = new DirectoryChooser();
+            chooser.setTitle("Audio Database Location");
+            Main.selectedDirectory = chooser.showDialog(btnOpenLocation.getScene().getWindow());
+        }
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
@@ -127,34 +132,53 @@ public class UIController {
 
         String isrc = lblISRC.getText();
 
-        Path start = Paths.get(Main.selectedDirectory.toURI());
-        try (Stream<Path> stream = Files.walk(start)) {
-            // Get file name to search for location from database
-            String fileName = DatabaseMySQL.searchFileName(isrc);
-            // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
-            Path file = stream
-                    .filter(path -> path.toFile().isFile())
-                    .filter(path -> path.getFileName().toString().equals(fileName))
-                    .findFirst()
-                    .orElse(null);
+        if (Main.selectedDirectory.exists()) { // check if the directory exists
+            if (Main.selectedDirectory.isDirectory()) { // check if the directory is a directory
+                if (Main.selectedDirectory.canWrite()) { // check if the directory is writable
+                    System.out.println("The directory is accessible and writable.");
+                    Path start = Paths.get(Main.selectedDirectory.toURI());
+                    try (Stream<Path> stream = Files.walk(start)) {
+                        // Get file name to search for location from database
+                        String fileName = DatabaseMySQL.searchFileName(isrc);
+                        // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
+                        Path file = stream
+                                .filter(path -> path.toFile().isFile())
+                                .filter(path -> path.getFileName().toString().equals(fileName))
+                                .findFirst()
+                                .orElse(null);
 
-            if (file != null) {
-                Path filePath = file.getParent();
-                Desktop.getDesktop().open(filePath.toFile());
-                System.out.println(filePath);
-            } else {
-                Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
-                btnOpenFileLocation.setText("File not found on audio database");
-                btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
-                System.out.println("File not found on audio database");
+                        if (file != null) {
+                            Path filePath = file.getParent();
+                            Desktop.getDesktop().open(filePath.toFile());
+                            System.out.println(filePath);
+                        } else {
+                            Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+                            btnOpenFileLocation.setText("File not found on audio database");
+                            btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
+                            System.out.println("File not found on audio database");
+                        }
+                    } catch (SQLException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        } else {
+            System.out.println("The directory does not exist.");
+            Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+            btnOpenFileLocation.setText("Error in selected audio database directory");
+            btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
         }
+
     }
 
     public void onCopyToButtonClicked(MouseEvent mouseEvent) throws IOException {
-        Main.directoryCheck();
+        boolean directoryStatus = Main.directoryCheckNew();
+        DirectoryChooser chooser = new DirectoryChooser();
+
+        if (!directoryStatus) {
+            chooser.setTitle("Audio Database Location");
+            Main.selectedDirectory = chooser.showDialog(btnCopyTo.getScene().getWindow());
+        }
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
@@ -162,31 +186,45 @@ public class UIController {
         String isrc = lblISRC.getText();
 
         Path start = Paths.get(Main.selectedDirectory.toURI());
-        destination = Main.browseDestination();
+        chooser.setTitle("Select a directory");
+        destination = chooser.showDialog(btnCopyTo.getScene().getWindow());
 
-        try (Stream<Path> stream = Files.walk(start)) {
-            String fileName = DatabaseMySQL.searchFileName(isrc);
-            Path file = stream
-                    .filter(path -> path.toFile().isFile())
-                    .filter(path -> path.getFileName().toString().equals(fileName))
-                    .findFirst()
-                    .orElse(null);
+        if (Main.selectedDirectory.exists()) { // check if the directory exists
+            if (Main.selectedDirectory.isDirectory()) { // check if the directory is a directory
+                if (Main.selectedDirectory.canWrite()) { // check if the directory is writable
+                    System.out.println("The directory is accessible and writable.");
+                    try (Stream<Path> stream = Files.walk(start)) {
+                        String fileName = DatabaseMySQL.searchFileName(isrc);
+                        Path file = stream
+                                .filter(path -> path.toFile().isFile())
+                                .filter(path -> path.getFileName().toString().equals(fileName))
+                                .findFirst()
+                                .orElse(null);
 
-            if (file != null) {
-                System.out.println("Executing file: " + file.getFileName());
-                Path targetDir = destination.toPath();
-                Path targetFile = targetDir.resolve(fileName);
-                Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("File copied to: " + targetFile);
-            } else {
-                Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
-                btnCopyTo.setText("File not found on audio database");
-                btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
-                System.out.println("File not found on audio database");
+                        if (file != null) {
+                            System.out.println("Executing file: " + file.getFileName());
+                            Path targetDir = destination.toPath();
+                            Path targetFile = targetDir.resolve(fileName);
+                            Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                            System.out.println("File copied to: " + targetFile);
+                        } else {
+                            Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
+                            btnCopyTo.setText("File not found on audio database");
+                            btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
+                            System.out.println("File not found on audio database");
+                        }
+                    } catch (SQLException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    System.out.println("The directory is accessible but not writable.");
+                    Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
+                    btnCopyTo.setText("Cannot copy to selected destination");
+                    btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
+                }
             }
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
+
     }
 
     public void onBtnPlayClicked(MouseEvent mouseEvent) {
@@ -309,6 +347,7 @@ public class UIController {
     }
 
     final int[] pressCount = {0};
+
     public void getText(KeyEvent event) throws IOException {
         // Getting search keywords
         String text = searchArea.getText();
@@ -564,15 +603,29 @@ public class UIController {
 
     @FXML
     protected void onBrowseAudioButtonClick() {
-        directory = Main.browseLocation();
-        String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
-        btnAudioDatabase.setText("   Database: " + shortenedString + "...");
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select audio database directory");
+        directory = chooser.showDialog(btnAudioDatabase.getScene().getWindow());
+
+        if (directory != null) {
+            String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
+            btnAudioDatabase.setText("   Database: " + shortenedString + "...");
+        } else {
+            System.out.println("No directory selected");
+        }
     }
 
     public void onBrowseDestinationButtonClick() {
-        destination = Main.browseDestination();
-        String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
-        btnDestination.setText("   Destination: " + shortenedString + "...");
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select your destination");
+        destination = chooser.showDialog(btnAudioDatabase.getScene().getWindow());
+
+        if (destination != null) {
+            String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
+            btnDestination.setText("   Destination: " + shortenedString + "...");
+        } else {
+            System.out.println("No destination selected");
+        }
     }
 
     public void onProceedButtonClick() throws ClassNotFoundException, SQLException {

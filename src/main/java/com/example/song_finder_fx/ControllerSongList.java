@@ -91,7 +91,7 @@ public class ControllerSongList {
         }
     }
 
-    public void onCopyToButtonClicked() throws SQLException, ClassNotFoundException {
+    public void onCopyToButtonClicked(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
         // System.out.println("Copy to button clicked!!");
         Task<Void> task;
         List<String> songList = Main.getSongList();
@@ -100,49 +100,55 @@ public class ControllerSongList {
             btnCopyTo.setStyle("-fx-border-color: '#931621'");
         } else {
             Connection con = DatabaseMySQL.getConn();
-            File directory = Main.getSelectedDirectory();
+            File selectedDirectory = Main.getSelectedDirectory();
             // System.out.println("Selected Audio Database Directory: " + directory.getAbsolutePath());
 
-            if (directory == null) {
+            if (selectedDirectory.exists()) { // check if the directory exists
+                if (selectedDirectory.isDirectory()) { // check if the directory is a directory
+                    if (selectedDirectory.canWrite()) { // check if the directory is writable
+                        System.out.println("The directory is accessible and writable.");
+                        File destination = Main.browseDestination();
+
+                        task = new Task<>() {
+                            @Override
+                            protected Void call() throws Exception {
+                                int songListSize = songList.size();
+
+                                for (int i = 0; i < songListSize; i++) {
+                                    String isrc = songList.get(i);
+                                    // System.out.println(isrc);
+
+                                    int finalI = i;
+                                    Platform.runLater(() -> updateButtonProceed("Copying " + (finalI + 1) + " of " + songListSize));
+                                    Main.copyAudio(isrc, selectedDirectory, destination);
+                                }
+                                return null;
+                            }
+                        };
+
+                        task.setOnSucceeded(event -> {
+                            updateButtonProceed("Copy List to Location");
+
+                            if (!DatabaseMySQL.errorBuffer.isEmpty()) {
+                                ErrorDialog.showErrorDialogWithLog("File Not Found Error", "Error! Some files are missing in your audio database", DatabaseMySQL.errorBuffer.toString());
+                            }
+
+                            NotificationBuilder nb = new NotificationBuilder();
+
+                            try {
+                                nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
+                            } catch (AWTException exception) {
+                                throw new RuntimeException(exception);
+                            }
+                        });
+
+                        new Thread(task).start();
+                    }
+                }
+            } else {
+                System.out.println("The directory does not exist.");
                 btnCopyTo.setText("Error! Please set audio database location in settings");
                 btnCopyTo.setStyle("-fx-border-color: '#931621'");
-            } else {
-                File destination = Main.browseDestination();
-
-                task = new Task<>() {
-                    @Override
-                    protected Void call() throws Exception {
-                        int songListSize = songList.size();
-
-                        for (int i = 0; i < songListSize; i++) {
-                            String isrc = songList.get(i);
-                            // System.out.println(isrc);
-
-                            int finalI = i;
-                            Platform.runLater(() -> updateButtonProceed("Copying " + (finalI + 1) + " of " + songListSize));
-                            Main.copyAudio(isrc, directory, destination);
-                        }
-                        return null;
-                    }
-                };
-
-                task.setOnSucceeded(event -> {
-                    updateButtonProceed("Copy List to Location");
-
-                    if (!DatabaseMySQL.errorBuffer.isEmpty()) {
-                        ErrorDialog.showErrorDialogWithLog("File Not Found Error", "Error! Some files are missing in your audio database", DatabaseMySQL.errorBuffer.toString());
-                    }
-
-                    NotificationBuilder nb = new NotificationBuilder();
-
-                    try {
-                        nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
-                    } catch (AWTException exception) {
-                        throw new RuntimeException(exception);
-                    }
-                });
-
-                new Thread(task).start();
             }
         }
     }
