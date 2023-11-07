@@ -45,8 +45,13 @@ public class ControllerSettings {
         // File selectedDirectory = chooser.showDialog(btnAudioDatabase.getScene().getWindow());
 
         UIController.directory = chooser.showDialog(btnAudioDatabase.getScene().getWindow());
-        String shortenedString = UIController.directory.getAbsolutePath().substring(0, Math.min(UIController.directory.getAbsolutePath().length(), 73));
-        btnAudioDatabase.setText("   Database: " + shortenedString + "...");
+
+        if (UIController.directory != null) {
+            String shortenedString = UIController.directory.getAbsolutePath().substring(0, Math.min(UIController.directory.getAbsolutePath().length(), 73));
+            btnAudioDatabase.setText("   Database: " + shortenedString + "...");
+        } else {
+            System.out.println("No directory specified");
+        }
     }
 
     public void onImportArtistsButtonClick() {
@@ -71,7 +76,7 @@ public class ControllerSettings {
         // Update user interface
     }
 
-    public void onSaveButtonClicked(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
+    public void onSaveButtonClicked() throws SQLException, ClassNotFoundException {
         System.out.println("Save Button Clicked");
         File directory = Main.getSelectedDirectory();
 
