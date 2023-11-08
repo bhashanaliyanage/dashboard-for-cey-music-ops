@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ public class ControllerSettings {
     private UIController mainUIController = null;
     public Button btnAudioDatabase;
     public Button btnSave;
+    public Button btnImportArtists;
 
     public ControllerSettings() {}
 
@@ -49,29 +51,27 @@ public class ControllerSettings {
         btnAudioDatabase.setText("   Database: " + shortenedString + "...");
     }
 
-    public void onImportArtistsButtonClick() {
+    public void onImportArtistsButtonClick() throws SQLException, ClassNotFoundException, IOException {
         System.out.println("ControllerSettings.onImportArtistsButtonClick");
 
         // Prompt user to import CSV
-        /*FileChooser fileChooser = new FileChooser();
-        File csv = fileChooser.showOpenDialog(btnAudioDatabase.getScene().getWindow());*/
-
-        // Connect to database
-
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
+        fileChooser.getExtensionFilters().add(extFilter);
+        File csv = fileChooser.showOpenDialog(btnAudioDatabase.getScene().getWindow());
+        btnImportArtists.setText("   " + csv.getName());
 
         // Make table
-
-
-        // Read CSV
-
+        DatabaseMySQL.createTableArtists();
 
         // Import to table in a separate thread
-
+        DatabaseMySQL.importToArtistsTable(csv);
 
         // Update user interface
+        btnImportArtists.setText("   Execution Complete");
     }
 
-    public void onSaveButtonClicked(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
+    public void onSaveButtonClicked() throws SQLException, ClassNotFoundException {
         System.out.println("Save Button Clicked");
         File directory = Main.getSelectedDirectory();
 

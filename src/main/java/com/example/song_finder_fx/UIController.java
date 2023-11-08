@@ -789,7 +789,7 @@ public class UIController {
         DatabaseMySQL dbmsql = new DatabaseMySQL();
         Main main = new Main();
 
-        dbmsql.CreateBase();
+        dbmsql.CreateTable();
         File file = main.browseFile();
         if (file != null) {
             dbmsql.ImportToBase(file);

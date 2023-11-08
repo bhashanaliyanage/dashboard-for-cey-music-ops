@@ -47,7 +47,37 @@ public class DatabaseMySQL {
         return filename;
     }
 
-    public void CreateBase() throws SQLException, ClassNotFoundException {
+    public static void createTableArtists() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+
+        PreparedStatement ps = db.prepareStatement("CREATE TABLE IF NOT EXISTS artists (ARTIST_NAME VARCHAR(100) PRIMARY KEY)");
+        ps.executeUpdate();
+    }
+
+    public static void importToArtistsTable(File csv) throws SQLException, ClassNotFoundException, IOException {
+        Connection db = DatabaseMySQL.getConn();
+
+        PreparedStatement preparedStatement = db.prepareStatement("INSERT INTO artists (ARTIST_NAME) VALUES (?)");
+
+        BufferedReader reader = new BufferedReader(new FileReader(csv));
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            System.out.println("line = " + line);
+            preparedStatement.setString(1, line);
+
+            int result = preparedStatement.executeUpdate();
+            if (result > 0) {
+                System.out.println("Added: " + line);
+            } else {
+                System.out.println("Error Adding: " + line);
+            }
+        }
+
+        reader.close();
+    }
+
+    public void CreateTable() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = DatabaseMySQL.getConn();
         int rs;
