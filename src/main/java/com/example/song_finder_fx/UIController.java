@@ -81,7 +81,6 @@ public class UIController {
     public Label songLyricistCopied;
     public Label songUPCCopied;
     public Label songAlbumNameCopied;
-    public TextField searchArea1;
     public Button btnOpenLocation;
     public Button btnCopyTo;
     File destination;
@@ -307,6 +306,23 @@ public class UIController {
         DatabaseMySQL db = new DatabaseMySQL();
         List<String> songDetails = db.searchSongDetails(isrc);
 
+        // Get Composer and Lyricist
+        String composer = songDetails.get(6);
+        String lyricist = songDetails.get(7);
+
+        // Search Composer and Lyricist from Artists Table
+        Boolean composerCeyMusic = db.searchArtistTable(composer);
+        Boolean lyricistCeyMusic = db.searchArtistTable(lyricist);
+
+        String percentage;
+        if (composerCeyMusic && lyricistCeyMusic) {
+            percentage = "100%";
+        } else if (composerCeyMusic || lyricistCeyMusic) {
+            percentage = "50%";
+        } else {
+            percentage = "0%";
+        }
+
         // System.out.println(songDetails.size());
 
         // For reference
@@ -343,12 +359,12 @@ public class UIController {
         songSinger.setText(songDetails.get(4));
         songComposer.setText(songDetails.get(6));
         songLyricist.setText(songDetails.get(7));
-        songShare.setText("No Detail");
+        songShare.setText(percentage);
     }
 
     final int[] pressCount = {0};
 
-    public void getText(KeyEvent event) throws IOException {
+    public void getText() throws IOException {
         // Getting search keywords
         String text = searchArea.getText();
 
@@ -388,21 +404,6 @@ public class UIController {
                     ex.printStackTrace();
                 }
             }
-
-            /*KeyCode keyCode = event.getCode();
-            if (keyCode == KeyCode.DOWN) {
-                // vboxSong.requestFocus();
-                ObservableList<Node> children = vboxSong.getChildren();
-                children.getFirst().requestFocus();
-                // Node node = children.get(pressCount[0]);
-
-                // System.out.println(pressCount[0]);
-                // node.requestFocus();
-            } else if (keyCode == KeyCode.ENTER) {
-                ObservableList<Node> children = vboxSong.getChildren();
-                Node node = children.get(pressCount[0]);
-                node.requestFocus();
-            }*/
         });
 
         Thread thread = new Thread(task);

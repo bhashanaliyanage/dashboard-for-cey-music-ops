@@ -359,4 +359,19 @@ public class DatabaseMySQL {
     }
 
 
+    public Boolean searchArtistTable(String artist) throws SQLException, ClassNotFoundException {
+        ResultSet rs;
+        Connection conn = getConn();
+        String artistName = null;
+
+        PreparedStatement ps = conn.prepareStatement("SELECT ARTIST_NAME FROM artists WHERE ARTIST_NAME = ?");
+        ps.setString(1, artist);
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+            artistName = rs.getString(1);
+        }
+
+        return artistName != null;
+    }
 }
