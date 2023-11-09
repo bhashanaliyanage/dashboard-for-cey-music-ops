@@ -332,7 +332,6 @@ public class DatabaseMySQL {
         while (rs.next()) {
             // System.out.println("Here");
             String isrcFromDatabase = rs.getString(1);
-            System.out.println(isrcFromDatabase);
             String albumTitle = rs.getString(2);
             String upc = rs.getString(3);
             String trackTitle = rs.getString(4);

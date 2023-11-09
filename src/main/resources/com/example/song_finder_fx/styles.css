@@ -3,7 +3,7 @@
 }
 
 .white-pane-background{
-    -fx-background-color: '#c0c0c0';
+    -fx-background-color: '#f3f3f3';
 }
 
 .right-side-border {
@@ -24,34 +24,36 @@
 }
 
 .button {
-    -fx-background-color: '#c0c0c0';
+    -fx-background-color: '#f3f3f3';
     -fx-background-radius: 4;
 }
 
 .button:hover {
-    -fx-background-color: '#8d8d8d';
+    -fx-background-color: '#eaeaea';
     -fx-background-radius: 4;
 }
 
 .button:pressed {
     -fx-background-color: '#ededed';
     -fx-background-radius: 4;
+    -fx-text-fill: '#666666';
 }
 
 .button-vbox {
     -fx-alignment: 'center-left';
-    -fx-background-color: '#c0c0c0';
+    -fx-background-color: '#f3f3f3';
     -fx-background-radius: 4;
 }
 
 .button-vbox:hover {
-    -fx-background-color: '#8d8d8d';
+    -fx-background-color: '#eaeaea';
     -fx-background-radius: 4;
 }
 
 .button-vbox:pressed {
     -fx-background-color: '#ededed';
     -fx-background-radius: 4;
+    -fx-text-fill: '#666666';
 }
 
 .button_inside {
@@ -120,8 +122,9 @@
 }
 
 .scroll-pane {
-    -fx-background-color: '#FFFFFF';
-    -fx-border-color: '#e9ebee';
+    -fx-background-color: transparent;
+    /*-fx-background-color: '#FFFFFF';*/
+    -fx-border-color: transparent;
     -fx-border-width: 1;
 }
 

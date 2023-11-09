@@ -12,202 +12,250 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainVBox" prefWidth="696.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
-    <Label text="Song List &gt; Invoice">
-        <font>
-            <Font name="Segoe UI Semibold" size="28.0" />
-        </font>
-        <VBox.margin>
-            <Insets left="30.0" top="30.0" />
-        </VBox.margin>
-    </Label>
-   <Label layoutX="41.0" layoutY="120.0" text="Invoice Details">
-      <font>
-         <Font name="Segoe UI Semibold" size="12.0" />
-      </font>
+<VBox fx:id="mainVBox" prefWidth="696.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <HBox>
       <VBox.margin>
-         <Insets bottom="10.0" left="31.0" top="30.0" />
+         <Insets left="30.0" top="30.0" />
       </VBox.margin>
-   </Label>
-    <HBox alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-        <padding>
-            <Insets left="20.0" />
-        </padding>
-        <VBox.margin>
-            <Insets left="30.0" />
-        </VBox.margin>
-        <Label prefWidth="80.0" text="Invoice To">
-           <font>
-               <Font name="Segoe UI Semilight" size="14.0" />
-           </font>
-           <HBox.margin>
-               <Insets />
-           </HBox.margin>
-        </Label>
-        <HBox fx:id="hboxInvoiceTo" maxHeight="35.0" prefHeight="0.0" prefWidth="470.0" styleClass="search-container" stylesheets="@../styles.css">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-            <HBox.margin>
-                <Insets left="20.0" />
-            </HBox.margin>
-            <TextField fx:id="txtInvoiceTo" prefHeight="30.0" prefWidth="460.0" promptText="Invoice To" stylesheets="@../styles.css">
-                <styleClass>
-                    <String fx:value="text-field" />
-                    <String fx:value="text-field" />
-                </styleClass>
-            </TextField>
-        </HBox>
-    </HBox>
-    <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="137.0" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-        <padding>
-            <Insets left="20.0" />
-        </padding>
-        <VBox.margin>
-            <Insets left="30.0" top="5.0" />
-        </VBox.margin>
-        <Label prefWidth="80.0" text="Invoice No">
-           <font>
-               <Font name="Segoe UI Semilight" size="14.0" />
-           </font>
-           <HBox.margin>
-               <Insets />
-           </HBox.margin>
-        </Label>
-        <HBox fx:id="hboxInvoiceNo" maxHeight="35.0" prefHeight="0.0" prefWidth="470.0" styleClass="search-container" stylesheets="@../styles.css">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-            <HBox.margin>
-                <Insets left="20.0" />
-            </HBox.margin>
-            <TextField fx:id="txtInvoiceNo" prefHeight="30.0" prefWidth="460.0" promptText="Invoice No" stylesheets="@../styles.css">
-                <styleClass>
-                    <String fx:value="text-field" />
-                    <String fx:value="text-field" />
-                </styleClass>
-            </TextField>
-        </HBox>
-    </HBox>
-    <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="376.0" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-        <padding>
-            <Insets left="20.0" />
-        </padding>
-        <VBox.margin>
-            <Insets left="30.0" top="5.0" />
-        </VBox.margin>
-        <Label prefWidth="80.0" text="Invoice Date">
-           <font>
-               <Font name="Segoe UI Semilight" size="14.0" />
-           </font>
-           <HBox.margin>
-               <Insets />
-           </HBox.margin>
-        </Label>
-        <DatePicker fx:id="dpInvoiceDate" prefHeight="35.0" prefWidth="470.0" stylesheets="@../styles.css">
-           <HBox.margin>
-               <Insets left="20.0" />
-           </HBox.margin>
-        </DatePicker>
-    </HBox>
-    <VBox fx:id="vBoxInSearchSong" maxWidth="606.0" minWidth="600.0" prefWidth="606.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-        <VBox.margin>
-            <Insets left="30.0" top="5.0" />
-        </VBox.margin>
-        <HBox alignment="CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="200.0" styleClass="invoice-table" stylesheets="@../styles.css">
-            <VBox.margin>
-                <Insets left="30.0" right="30.0" top="20.0" />
-            </VBox.margin>
-            <Label text="SONG" textFill="WHITE">
-                <font>
-                    <Font name="System Bold" size="12.0" />
-                </font>
-                <HBox.margin>
-                    <Insets left="70.0" right="80.0" />
-                </HBox.margin>
-            </Label>
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
-            <Label layoutX="10.0" layoutY="10.0" text="CONTROL" textFill="WHITE">
-                <font>
-                    <Font name="System Bold" size="12.0" />
-                </font>
-                <HBox.margin>
-                    <Insets left="10.0" right="10.0" />
-                </HBox.margin>
-            </Label>
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
-            <Label layoutX="38.0" layoutY="10.0" text="COPYRIGHT OWNER" textFill="WHITE">
-                <font>
-                    <Font name="System Bold" size="12.0" />
-                </font>
-                <HBox.margin>
-                    <Insets left="30.0" right="30.0" />
-                </HBox.margin>
-            </Label>
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
-            <Label layoutX="66.0" layoutY="10.0" text="AMOUNT" textFill="WHITE">
-                <font>
-                    <Font name="System Bold" size="12.0" />
-                </font>
-                <HBox.margin>
-                    <Insets left="10.0" />
-                </HBox.margin>
-            </Label>
-        </HBox>
-        <ScrollPane fx:id="scrlpneSongInvoice" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="544.0"
-                    styleClass="scroll-pane" stylesheets="@../styles.css" vbarPolicy="ALWAYS">
-            <VBox.margin>
-                <Insets bottom="30.0" left="30.0" right="30.0"/>
-            </VBox.margin>
-            <VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css">
-                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0">
-                    <Label prefWidth="185.0" text="Song Name by Singer">
-                        <HBox.margin>
-                            <Insets left="10.0"/>
-                        </HBox.margin>
+      <children>
+          <Label text="Song List &gt;" textFill="#656565">
+              <font>
+                  <Font name="Segoe UI Semibold" size="28.0" />
+              </font>
+          </Label>
+         <Label layoutX="10.0" layoutY="10.0" text=" Invoice">
+            <font>
+               <Font name="Segoe UI Semibold" size="28.0" />
+            </font>
+         </Label>
+      </children>
+   </HBox>
+   <ScrollPane hbarPolicy="NEVER" stylesheets="@../styles.css" vbarPolicy="NEVER">
+      <VBox.margin>
+         <Insets top="30.0" />
+      </VBox.margin>
+      <content>
+         <VBox spacing="10.0" styleClass="white-background" stylesheets="@../styles.css">
+            <children>
+               <Label text="Invoice Details">
+                  <font>
+                     <Font name="Segoe UI Semibold" size="12.0" />
+                  </font>
+                  <VBox.margin>
+                     <Insets left="31.0" />
+                  </VBox.margin>
+               </Label>
+                <HBox alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+                    <padding>
+                        <Insets left="20.0" />
+                    </padding>
+                    <Label prefWidth="120.0" text="Invoice To">
+                       <font>
+                           <Font name="Segoe UI Semilight" size="14.0" />
+                       </font>
+                       <HBox.margin>
+                           <Insets />
+                       </HBox.margin>
                     </Label>
-                    <Label prefWidth="30.0" text="100%" textAlignment="RIGHT">
+                    <HBox fx:id="hboxInvoiceTo" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0" styleClass="search-container" stylesheets="@../styles.css">
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </padding>
                         <HBox.margin>
-                            <Insets left="27.0"/>
+                            <Insets />
                         </HBox.margin>
-                    </Label>
-                    <Label prefWidth="168.0" text="Composer and Lyricist">
-                        <HBox.margin>
-                            <Insets left="40.0"/>
-                        </HBox.margin>
-                    </Label>
-                    <Label layoutX="302.0" layoutY="17.0" prefWidth="40.0" text="\$2000" textAlignment="RIGHT">
-                        <HBox.margin>
-                            <Insets left="26.0"/>
-                        </HBox.margin>
-                    </Label>
+                        <TextField fx:id="txtInvoiceTo" prefHeight="30.0" prefWidth="440.0" promptText="Invoice To" stylesheets="@../styles.css">
+                            <styleClass>
+                                <String fx:value="text-field" />
+                                <String fx:value="text-field" />
+                            </styleClass>
+                        </TextField>
+                    </HBox>
+                  <VBox.margin>
+                     <Insets left="30.0" />
+                  </VBox.margin>
                 </HBox>
-            </VBox>
-        </ScrollPane>
-    </VBox>
-    <VBox fx:id="hboxListActions" alignment="CENTER" maxWidth="606.0" minWidth="600.0" prefHeight="0.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-        <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-        </padding>
-        <VBox.margin>
-            <Insets bottom="30.0" left="30.0" top="10.0" />
-        </VBox.margin>
-        <Button fx:id="btnGenerateInvoice" layoutX="31.0" layoutY="29.0" minHeight="30.0" minWidth="580.0" onAction="#onGenerateInvoice" styleClass="button_inside" stylesheets="@../styles.css" text="Generate Invoice">
-         <VBox.margin>
-            <Insets />
-         </VBox.margin></Button>
-        <Button fx:id="btnCopyTo" minHeight="30.0" minWidth="580.0" styleClass="button_inside" stylesheets="@../styles.css" text="Copy List to Location">
-           <HBox.margin>
-               <Insets bottom="20.0" right="30.0" top="20.0" />
-           </HBox.margin>
-         <VBox.margin>
-            <Insets top="10.0" />
-         </VBox.margin>
-        </Button>
-      <Button fx:id="btnAddMore" layoutX="213.0" layoutY="21.0" minHeight="30.0" minWidth="580.0" styleClass="button_inside" stylesheets="@../styles.css" text="Add More Songs">
-         <VBox.margin>
-            <Insets top="10.0" />
-         </VBox.margin>
-      </Button>
-    </VBox>
+                <HBox alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+                    <padding>
+                        <Insets left="20.0" />
+                    </padding>
+                    <Label prefWidth="120.0" text="Invoice No">
+                       <font>
+                           <Font name="Segoe UI Semilight" size="14.0" />
+                       </font>
+                       <HBox.margin>
+                           <Insets />
+                       </HBox.margin>
+                    </Label>
+                    <HBox fx:id="hboxInvoiceNo" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0" styleClass="search-container" stylesheets="@../styles.css">
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </padding>
+                        <HBox.margin>
+                            <Insets />
+                        </HBox.margin>
+                        <TextField fx:id="txtInvoiceNo" prefHeight="30.0" prefWidth="440.0" promptText="Invoice No" stylesheets="@../styles.css">
+                            <styleClass>
+                                <String fx:value="text-field" />
+                                <String fx:value="text-field" />
+                            </styleClass>
+                        </TextField>
+                    </HBox>
+                  <VBox.margin>
+                     <Insets left="30.0" />
+                  </VBox.margin>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+                    <padding>
+                        <Insets left="20.0" />
+                    </padding>
+                    <Label prefWidth="120.0" text="Invoice Date">
+                       <font>
+                           <Font name="Segoe UI Semilight" size="14.0" />
+                       </font>
+                       <HBox.margin>
+                           <Insets />
+                       </HBox.margin>
+                    </Label>
+                    <DatePicker fx:id="dpInvoiceDate" prefHeight="35.0" prefWidth="450.0" stylesheets="@../styles.css">
+                       <HBox.margin>
+                           <Insets />
+                       </HBox.margin>
+                    </DatePicker>
+                  <VBox.margin>
+                     <Insets left="30.0" />
+                  </VBox.margin>
+                </HBox>
+               <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="114.0" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+                  <padding>
+                     <Insets left="20.0" />
+                  </padding>
+                  <children>
+                     <Label prefHeight="40.0" prefWidth="120.0" text="Amount Per Item" wrapText="true">
+                        <font>
+                           <Font name="Segoe UI Semilight" size="14.0" />
+                        </font>
+                        <HBox.margin>
+                           <Insets />
+                        </HBox.margin>
+                     </Label>
+                     <HBox fx:id="hboxInvoiceNo1" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0" styleClass="search-container" stylesheets="@../styles.css">
+                        <padding>
+                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </padding>
+                        <HBox.margin>
+                           <Insets />
+                        </HBox.margin>
+                        <children>
+                           <TextField fx:id="txtAmountPerItem" prefHeight="30.0" prefWidth="440.0" promptText="Amount Per Item" stylesheets="@../styles.css">
+                              <styleClass>
+                                 <String fx:value="text-field" />
+                                 <String fx:value="text-field" />
+                              </styleClass>
+                           </TextField>
+                        </children>
+                     </HBox>
+                  </children>
+                  <VBox.margin>
+                     <Insets left="30.0" />
+                  </VBox.margin>
+               </HBox>
+                <VBox fx:id="vBoxInSearchSong" maxWidth="606.0" minWidth="600.0" prefWidth="606.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+                    <HBox alignment="CENTER_LEFT" minHeight="40.0" prefHeight="40.0" prefWidth="200.0" styleClass="invoice-table" stylesheets="@../styles.css">
+                        <VBox.margin>
+                            <Insets left="30.0" right="30.0" top="20.0" />
+                        </VBox.margin>
+                        <Label text="SONG" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                            <HBox.margin>
+                                <Insets left="82.0" right="82.0" />
+                            </HBox.margin>
+                        </Label>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <Label layoutX="10.0" layoutY="10.0" text="CONTROL" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                            <HBox.margin>
+                                <Insets left="9.0" right="9.0" />
+                            </HBox.margin>
+                        </Label>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <Label layoutX="38.0" layoutY="10.0" text="COPYRIGHT OWNER" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                            <HBox.margin>
+                                <Insets left="70.0" right="30.0" />
+                            </HBox.margin>
+                        </Label>
+                    </HBox>
+                    <ScrollPane fx:id="scrlpneSongInvoice" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="544.0" style="-fx-border-color: #ebedf0;" styleClass="scroll-pane" stylesheets="@../styles.css">
+                        <VBox.margin>
+                            <Insets bottom="30.0" left="30.0" right="30.0" />
+                        </VBox.margin>
+                        <VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css">
+                            <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0">
+                                <Label prefWidth="186.0" text="Song Name by Singer">
+                                    <HBox.margin>
+                                        <Insets left="10.0" />
+                                    </HBox.margin>
+                                </Label>
+                           <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                <Label prefWidth="30.0" text="100%" textAlignment="RIGHT">
+                                    <HBox.margin>
+                                        <Insets left="40.0" right="5.0" />
+                                    </HBox.margin>
+                                </Label>
+                           <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                <Label prefWidth="176.0" text="Composer and Lyricist">
+                                    <HBox.margin>
+                                        <Insets />
+                                    </HBox.margin>
+                                </Label>
+                           <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                <Label layoutX="302.0" layoutY="17.0" prefWidth="40.0" text="\$2000" textAlignment="RIGHT">
+                                    <HBox.margin>
+                                        <Insets left="5.0" />
+                                    </HBox.margin>
+                                </Label>
+                            </HBox>
+                        </VBox>
+                    </ScrollPane>
+                  <VBox.margin>
+                     <Insets left="30.0" />
+                  </VBox.margin>
+                </VBox>
+                <VBox fx:id="hboxListActions" alignment="CENTER" maxWidth="606.0" minWidth="600.0" prefHeight="0.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                    <Button fx:id="btnGenerateInvoice" layoutX="31.0" layoutY="29.0" minHeight="30.0" minWidth="580.0" onAction="#onGenerateInvoice" styleClass="button_inside" stylesheets="@../styles.css" text="Generate Invoice">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Button>
+                    <Button fx:id="btnCopyTo" minHeight="30.0" minWidth="580.0" styleClass="button_inside" stylesheets="@../styles.css" text="Copy List to Location">
+                       <HBox.margin>
+                           <Insets bottom="20.0" right="30.0" top="20.0" />
+                       </HBox.margin>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                    </Button>
+                  <Button fx:id="btnAddMore" layoutX="213.0" layoutY="21.0" minHeight="30.0" minWidth="580.0" styleClass="button_inside" stylesheets="@../styles.css" text="Add More Songs">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </Button>
+                  <VBox.margin>
+                     <Insets bottom="30.0" left="30.0" />
+                  </VBox.margin>
+                </VBox>
+            </children>
+         </VBox>
+      </content>
+   </ScrollPane>
 </VBox>

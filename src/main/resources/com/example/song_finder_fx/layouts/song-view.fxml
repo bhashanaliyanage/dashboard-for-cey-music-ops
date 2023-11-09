@@ -15,7 +15,7 @@
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
         </VBox.margin>
-        <Label fx:id="songNameViewTitle1" layoutX="10.0" layoutY="10.0" onMouseClicked="#backButtonImplementationForSearchSong" text="Search Song Details &gt; ">
+        <Label fx:id="songNameViewTitle1" layoutX="10.0" layoutY="10.0" onMouseClicked="#backButtonImplementationForSearchSong" text="Search Song Details &gt; " textFill="#656565">
            <font>
                <Font name="Segoe UI Semibold" size="28.0" />
            </font>

@@ -31,7 +31,7 @@
         <VBox.margin>
             <Insets bottom="30.0" left="30.0" right="30.0" />
         </VBox.margin>
-        <ScrollPane fx:id="scrlpneSong" hbarPolicy="NEVER" prefWidth="544.0" styleClass="scroll-pane" stylesheets="@../styles.css" vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">
+        <ScrollPane fx:id="scrlpneSong" hbarPolicy="NEVER" prefWidth="544.0" style="-fx-border-color: #ebedf0;" styleClass="scroll-pane" stylesheets="@../styles.css" vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">
             <VBox.margin>
                 <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
             </VBox.margin>
@@ -78,23 +78,22 @@
          <Insets bottom="10.0" left="31.0" />
       </VBox.margin>
    </Label>
-    <HBox fx:id="searchAndCollect" alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0"
-          prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+    <HBox fx:id="searchAndCollect" alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
         <padding>
-            <Insets left="20.0"/>
+            <Insets left="20.0" />
         </padding>
         <VBox.margin>
-            <Insets left="30.0"/>
+            <Insets left="30.0" />
         </VBox.margin>
         <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-            <Image url="@../images/icon%20_shopping%20cart_.png"/>
+            <Image url="@../images/icon%20_shopping%20cart_.png" />
         </ImageView>
         <Label fx:id="lblListCount" text="Count of List Items">
            <font>
-               <Font name="Segoe UI Semilight" size="14.0"/>
+               <Font name="Segoe UI Semilight" size="14.0" />
            </font>
            <HBox.margin>
-               <Insets left="15.0"/>
+               <Insets left="15.0" />
            </HBox.margin>
         </Label>
     </HBox>

@@ -4,7 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -24,6 +23,7 @@ public class ControllerInvoice {
     private final UIController mainUIController;
     public TextField txtInvoiceTo;
     public TextField txtInvoiceNo;
+    public TextField txtAmountPerItem;
     public DatePicker dpInvoiceDate;
     public HBox hboxInvoiceTo;
     public HBox hboxInvoiceNo;
@@ -58,11 +58,34 @@ public class ControllerInvoice {
         for (int i = 0; i < nodes.length; i++) {
             try {
                 List<String> songDetail = db.searchSongDetails(songList.get(i));
+                // Search Composer and Lyricist from Artists Table
+                Boolean composerCeyMusic = db.searchArtistTable(songDetail.get(6)); // 6
+                Boolean lyricistCeyMusic = db.searchArtistTable(songDetail.get(7)); // 7
+                String percentage;
+                String copyrightOwner = null;
+                if (composerCeyMusic && lyricistCeyMusic) {
+                    percentage = "100%";
+                    copyrightOwner = songDetail.get(6) + "\n" + songDetail.get(7);
+                } else if (composerCeyMusic || lyricistCeyMusic) {
+                    percentage = "50%";
+                    if (composerCeyMusic) {
+                        copyrightOwner = songDetail.get(6);
+                    } else {
+                        copyrightOwner = songDetail.get(7);
+                    }
+                } else {
+                    percentage = "0%";
+                }
+
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist-invoice.fxml")));
                 Label lblSongName = (Label) nodes[i].lookup("#songName");
                 Label lblArtist = (Label) nodes[i].lookup("#songArtist");
+                Label lblSongShare = (Label) nodes[i].lookup("#songShare");
+
                 lblSongName.setText(songDetail.get(3));
-                lblArtist.setText(songDetail.get(4));
+                lblArtist.setText(copyrightOwner);
+                lblSongShare.setText(percentage);
+
                 vboxSong.getChildren().add(nodes[i]);
             } catch (NullPointerException | IOException ex) {
                 ex.printStackTrace();
@@ -72,7 +95,7 @@ public class ControllerInvoice {
         }
     }
 
-    public void onGenerateInvoice(ActionEvent event) throws MalformedURLException, FileNotFoundException {
+    public void onGenerateInvoice() throws MalformedURLException, FileNotFoundException {
         String invoiceTo = txtInvoiceTo.getText().toUpperCase();
         String invoiceNo = txtInvoiceNo.getText().toUpperCase();
         LocalDate date = dpInvoiceDate.getValue();
@@ -91,6 +114,5 @@ public class ControllerInvoice {
             // Invoice.generateInvoice(invoiceTo, invoiceNo, date);
         }
     }
-    
-    
+
 }
