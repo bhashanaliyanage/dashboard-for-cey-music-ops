@@ -165,7 +165,7 @@ public class ControllerSongList {
         mainVBox.getChildren().add(newContent);
     }
 
-    public void onGenerateInvoiceButtonClicked(ActionEvent actionEvent) throws IOException {
+    public void onGenerateInvoiceButtonClicked(ActionEvent actionEvent) throws IOException, SQLException, ClassNotFoundException {
         ControllerInvoice controllerInvoice = new ControllerInvoice(mainUIController);
         controllerInvoice.loadThings(actionEvent);
     }

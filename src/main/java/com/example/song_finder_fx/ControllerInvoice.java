@@ -27,14 +27,16 @@ public class ControllerInvoice {
     public DatePicker dpInvoiceDate;
     public HBox hboxInvoiceTo;
     public HBox hboxInvoiceNo;
+    public HBox hboxAmountPerItem;
     public ScrollPane scrlpneSongInvoice;
+    public ScrollPane scrlpneMain;
     public VBox vboxSong;
 
     public ControllerInvoice(UIController mainUIController) {
         this.mainUIController = mainUIController;
     }
 
-    public void loadThings(ActionEvent actionEvent) throws IOException {
+    public void loadThings(ActionEvent actionEvent) throws IOException, SQLException, ClassNotFoundException {
         FXMLLoader loader = new FXMLLoader(ControllerInvoice.class.getResource("layouts/song-list-invoice.fxml"));
         loader.setController(this);
         Parent newContent = loader.load();
@@ -55,27 +57,44 @@ public class ControllerInvoice {
         nodes = new Node[songList.size()];
         vboxSong.getChildren().clear();
 
+        boolean deleted = Database.emptyTableSongListTemp();
+        if (deleted) {
+            System.out.println("Table Emptied");
+        } else {
+            System.out.println("Table doesn't exists or an error occurred");
+        }
+
         for (int i = 0; i < nodes.length; i++) {
             try {
                 List<String> songDetail = db.searchSongDetails(songList.get(i));
+
                 // Search Composer and Lyricist from Artists Table
                 Boolean composerCeyMusic = db.searchArtistTable(songDetail.get(6)); // 6
                 Boolean lyricistCeyMusic = db.searchArtistTable(songDetail.get(7)); // 7
                 String percentage;
                 String copyrightOwner = null;
+                String copyrightOwnerTemp = null;
+
                 if (composerCeyMusic && lyricistCeyMusic) {
                     percentage = "100%";
                     copyrightOwner = songDetail.get(6) + "\n" + songDetail.get(7);
+                    copyrightOwnerTemp = songDetail.get(6) + " | " + songDetail.get(7);
                 } else if (composerCeyMusic || lyricistCeyMusic) {
                     percentage = "50%";
                     if (composerCeyMusic) {
                         copyrightOwner = songDetail.get(6);
+                        copyrightOwnerTemp = songDetail.get(6);
                     } else {
                         copyrightOwner = songDetail.get(7);
+                        copyrightOwnerTemp = songDetail.get(7);
                     }
                 } else {
                     percentage = "0%";
                 }
+
+                // Adding song details to a temporary SQLite table
+                String songName = songDetail.get(3);
+                boolean status = Database.handleSongListTemp(songName, percentage, copyrightOwnerTemp);
 
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist-invoice.fxml")));
                 Label lblSongName = (Label) nodes[i].lookup("#songName");
@@ -99,19 +118,38 @@ public class ControllerInvoice {
         String invoiceTo = txtInvoiceTo.getText().toUpperCase();
         String invoiceNo = txtInvoiceNo.getText().toUpperCase();
         LocalDate date = dpInvoiceDate.getValue();
+        String amountPerItemString = txtAmountPerItem.getText();
+        double amountPerItem = 0;
+
+        try {
+            amountPerItem = Double.parseDouble(amountPerItemString);
+            System.out.println("amountPerItem = " + amountPerItem);
+        } catch (NumberFormatException numberFormatException) {
+            hboxAmountPerItem.setStyle("-fx-border-color: '#931621';");
+            txtAmountPerItem.requestFocus();
+            scrlpneMain.setVvalue(0);
+        }
 
         if (Objects.equals(invoiceTo, "")) {
             hboxInvoiceTo.setStyle("-fx-border-color: '#931621';");
+            txtInvoiceTo.requestFocus();
+            scrlpneMain.setVvalue(0);
         } else if (Objects.equals(invoiceNo, "")) {
             hboxInvoiceNo.setStyle("-fx-border-color: '#931621';");
+            txtInvoiceNo.requestFocus();
+            scrlpneMain.setVvalue(0);
         } else if (date == null) {
             dpInvoiceDate.setStyle("-fx-border-color: '#931621';");
+            dpInvoiceDate.requestFocus();
+            scrlpneMain.setVvalue(0);
         } else {
             System.out.println("invoiceTo = " + invoiceTo);
             System.out.println("invoiceNo = " + invoiceNo);
             System.out.println("date = " + date);
 
-            // Invoice.generateInvoice(invoiceTo, invoiceNo, date);
+            if (amountPerItem > 0) {
+                Invoice.generateInvoice(invoiceTo, invoiceNo, date, amountPerItem);
+            }
         }
     }
 

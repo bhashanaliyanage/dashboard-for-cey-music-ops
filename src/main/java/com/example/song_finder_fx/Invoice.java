@@ -19,12 +19,13 @@ import com.itextpdf.layout.property.VerticalAlignment;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Invoice {
     private static final Color INVOICEBLUE = new DeviceRgb(136, 193, 232);
     private static final Color INVOICLIGHTEBLUE = new DeviceRgb(232, 243, 251);
 
-    public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date) throws FileNotFoundException, MalformedURLException {
+    public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date, double amountPerItem) throws FileNotFoundException, MalformedURLException {
         String path = "invoice2.pdf";
         PdfWriter pdfWriter = new PdfWriter(path);
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
@@ -36,6 +37,8 @@ public class Invoice {
         ImageData data = ImageDataFactory.create(ceyMusicLogoPath);
         Image ceyMusicLogo = new Image(data);
         ceyMusicLogo.setAutoScale(true);
+
+        List<String> songList = Main.getSongList();
 
         // Table 01
         float[] columnWidth = {1000f};

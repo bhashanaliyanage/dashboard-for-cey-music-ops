@@ -225,4 +225,53 @@ public class Database {
 
         return status > 0;
     }
+
+    public static boolean handleSongListTemp(String song, String control, String copyrightOwner) throws SQLException, ClassNotFoundException {
+        makeTableSongList();
+
+        Connection db = Database.getConn();
+
+        PreparedStatement ps = db.prepareStatement("INSERT INTO 'list_temp' (SONG," +
+                "CONTROL," +
+                "COPYRIGHT_OWNER) VALUES (?, ?, ?)"
+        );
+
+        ps.setString(1, song);
+        ps.setString(2, control);
+        ps.setString(3, copyrightOwner);
+
+        int rs = ps.executeUpdate();
+
+        return rs > 0;
+    }
+
+    private static void makeTableSongList() throws SQLException, ClassNotFoundException {
+        // Load the JDBC driver
+        Connection db = Database.getConn();
+
+        PreparedStatement ps = db.prepareStatement("CREATE TABLE IF NOT EXISTS list_temp (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "SONG TEXT," +
+                "CONTROL TEXT," +
+                "COPYRIGHT_OWNER TEXT)"
+        );
+
+        ps.executeUpdate();
+    }
+
+    public static boolean emptyTableSongListTemp() throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+
+        PreparedStatement checkTable = db.prepareStatement("SELECT name FROM sqlite_master WHERE type='table' AND name='list_temp';");
+        ResultSet resultSet = checkTable.executeQuery();
+
+        if (resultSet.next()) {
+            PreparedStatement ps = db.prepareStatement("DELETE FROM list_temp");
+            int rs = ps.executeUpdate();
+            return rs > 0;
+        } else {
+            System.out.println("Table does not exist");
+            return false;
+        }
+    }
 }
