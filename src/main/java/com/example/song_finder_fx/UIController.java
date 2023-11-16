@@ -83,6 +83,9 @@ public class UIController {
     public Label songAlbumNameCopied;
     public Button btnOpenLocation;
     public Button btnCopyTo;
+    public Label songShare;
+    public ImageView btnPercentageChange;
+    public Label songName;
     File destination;
     public Button btnAudioDatabase;
     public Label searchResultSongName;
@@ -1017,5 +1020,26 @@ public class UIController {
             songShare.setText("No Detail");
         }
     }
+
     //</editor-fold>
+    public void onPercentageChangeButtonClicked(MouseEvent event) throws SQLException, ClassNotFoundException {
+        String song_share = songShare.getText();
+        String song_name = songName.getText();
+        Image plusImg = new Image("com/example/song_finder_fx/images/icon_plus.png");
+        Image minusImg = new Image("com/example/song_finder_fx/images/icon_minus.png");
+
+        if (Objects.equals(song_share, "100%")) {
+            boolean status = Database.changePercentage(song_name, "50%");
+            if (status) {
+                songShare.setText("50%");
+                btnPercentageChange.setImage(plusImg);
+            }
+        } else {
+            boolean status = Database.changePercentage(song_name, "100%");
+            if (status) {
+                songShare.setText("100%");
+                btnPercentageChange.setImage(minusImg);
+            }
+        }
+    }
 }

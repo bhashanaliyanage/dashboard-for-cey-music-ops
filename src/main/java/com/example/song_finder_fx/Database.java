@@ -169,7 +169,7 @@ public class Database {
                         Path targetDir = destination.toPath();
                         Path targetFile = targetDir.resolve(finalFilename);
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("File copied to: " + targetFile.toString());
+                        System.out.println("File copied to: " + targetFile);
                     } else {
                         System.out.println("File not found.");
                     }
@@ -273,5 +273,15 @@ public class Database {
             System.out.println("Table does not exist");
             return false;
         }
+    }
+
+    public static boolean changePercentage(String songName, String percentage) throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+
+        PreparedStatement preparedStatement = db.prepareStatement("UPDATE 'list_temp' SET CONTROL = ? WHERE SONG = ?");
+        preparedStatement.setString(1, percentage);
+        preparedStatement.setString(2, songName);
+        int rs = preparedStatement.executeUpdate();
+        return rs > 0;
     }
 }

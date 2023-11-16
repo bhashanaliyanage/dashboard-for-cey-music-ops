@@ -8,6 +8,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -31,6 +33,7 @@ public class ControllerInvoice {
     public ScrollPane scrlpneSongInvoice;
     public ScrollPane scrlpneMain;
     public VBox vboxSong;
+    public ImageView btnPercentageChange;
 
     public ControllerInvoice(UIController mainUIController) {
         this.mainUIController = mainUIController;
@@ -97,6 +100,21 @@ public class ControllerInvoice {
                 boolean status = Database.handleSongListTemp(songName, percentage, copyrightOwnerTemp);
 
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist-invoice.fxml")));
+
+                // Loading plus and minus icons
+                Image plusImg = new Image("com/example/song_finder_fx/images/icon_plus.png");
+                Image minusImg = new Image("com/example/song_finder_fx/images/icon_minus.png");
+
+                // Getting percentage image view
+                ImageView ingPercentageChange = (ImageView) nodes[i].lookup("#btnPercentageChange");
+
+                // Setting percentage change icon, plus or minus according to the situation
+                if (Objects.equals(percentage, "100%")) {
+                    ingPercentageChange.setImage(minusImg);
+                } else {
+                    ingPercentageChange.setImage(plusImg);
+                }
+
                 Label lblSongName = (Label) nodes[i].lookup("#songName");
                 Label lblArtist = (Label) nodes[i].lookup("#songArtist");
                 Label lblSongShare = (Label) nodes[i].lookup("#songShare");
@@ -149,8 +167,13 @@ public class ControllerInvoice {
 
             if (amountPerItem > 0) {
                 Invoice.generateInvoice(invoiceTo, invoiceNo, date, amountPerItem);
+            } else {
+                hboxAmountPerItem.setStyle("-fx-border-color: '#931621';");
+                txtAmountPerItem.requestFocus();
+                scrlpneMain.setVvalue(0);
             }
         }
     }
+
 
 }

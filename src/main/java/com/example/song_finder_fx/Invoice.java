@@ -44,6 +44,7 @@ public class Invoice {
         float[] columnWidth = {1000f};
         Table table = new Table(columnWidth);
 
+        //<editor-fold desc="Header">
         // Table 01 Row 01
         table.addCell(new Cell().add(ceyMusicLogo).setBorder(Border.NO_BORDER).setMargin(0f));
         // Table 01 Row 02
@@ -52,6 +53,7 @@ public class Invoice {
                 .setBackgroundColor(Invoice.INVOICLIGHTEBLUE)
                 .setBorder(Border.NO_BORDER)
         );
+        //</editor-fold>
 
         // Table 02
         float[] columnWidthTable02 = {100f, 300f, 200f};
@@ -60,6 +62,7 @@ public class Invoice {
         table02.setMarginLeft(30f);
         table02.setMarginRight(30f);
 
+        //<editor-fold desc="Sub Header">
         // Table 02 Row 01
         table02.addCell(new Cell().add(new Paragraph("INVOICE TO:"))
                 .setBold()
@@ -98,9 +101,18 @@ public class Invoice {
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER));
         // table02.addCell(new Cell().add(new Paragraph("")));
+        //</editor-fold>
+
+        // Songs Table
+        float[] columnWidthTable03 = {300f, 50f, 200f, 50f};
+        Table table03 = new Table(columnWidthTable03);
+        table02.setMarginTop(20f);
+        table02.setMarginLeft(30f);
+        table02.setMarginRight(30f);
 
         document.add(table);
         document.add(table02);
+        document.add(table03);
         document.close();
     }
 

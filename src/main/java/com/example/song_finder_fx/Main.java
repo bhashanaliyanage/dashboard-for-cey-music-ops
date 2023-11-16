@@ -7,10 +7,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
@@ -215,3 +213,4 @@ public class Main extends Application {
 // TODO: In the search and collect songs if a song is missing, after the completion, no error is showing
 // TODO: In the list view, copying must be improved by the UI side. The application must be transparent better than it is.
 // TODO: When I trying to copy some list of songs of Chandralekha, the audio of Kusumata Lanwee is not copied, therefore no error is shown.
+// TODO: 11/14/2023 https://youtu.be/V9nDH2iBJSM?si=oCx3NjivV7nBJl8y&t=1022

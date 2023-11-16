@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="vboxSong" prefWidth="525.0" styleClass="search-results-pane" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
    <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0">
       <Label fx:id="songName" prefWidth="184.0" text="Song Name">
          <HBox.margin>
@@ -17,16 +17,16 @@
          </HBox.margin>
       </Label>
       <Separator orientation="VERTICAL" prefHeight="200.0" />
-      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/icon_pen.png" />
-         </image>
+      <ImageView fx:id="btnPercentageChange" fitHeight="20.0" fitWidth="20.0"
+                 onMouseClicked="#onPercentageChangeButtonClicked" opacity="0.8" pickOnBounds="true"
+                 preserveRatio="true">
          <HBox.margin>
-            <Insets left="10.0" />
+            <Insets left="10.0"/>
          </HBox.margin>
          <cursor>
-            <Cursor fx:constant="HAND" />
+            <Cursor fx:constant="HAND"/>
          </cursor>
+         <Image url="@../images/icon_minus.png"/>
       </ImageView>
       <Label fx:id="songShare" alignment="CENTER_RIGHT" prefWidth="30.0" text="0%" textAlignment="RIGHT">
          <HBox.margin>
