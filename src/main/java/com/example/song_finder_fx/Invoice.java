@@ -129,11 +129,6 @@ public class Invoice {
                 .setFontSize(12f)
                 .setTextAlignment(TextAlignment.CENTER);
 
-        // Songs Table Header
-        Table table04 = new Table(columnWidthTable03and04);
-        table04.setMarginLeft(30f);
-        table04.setMarginRight(30f);
-
         // Getting Song List to generate Invoice
         ResultSet songList = Database.getSongList();
         while (songList.next()) {
@@ -143,20 +138,23 @@ public class Invoice {
             // System.out.println("control = " + control);
             String copyright = songList.getString("COPYRIGHT_OWNER");
             // System.out.println("copyright = " + copyright);
-            table04.addCell(new Cell().add(new Paragraph(song)))
-                    .setBackgroundColor(Invoice.INVOICEWHITE);
-            table04.addCell(new Cell().add(new Paragraph(control)))
-                    .setBackgroundColor(Invoice.INVOICEWHITE);
-            table04.addCell(new Cell().add(new Paragraph(copyright)))
-                    .setBackgroundColor(Invoice.INVOICEWHITE);
-            table04.addCell(new Cell().add(new Paragraph("{AMOUNT}")))
-                    .setBackgroundColor(Invoice.INVOICEWHITE);
+            table03.addCell(new Cell().add(new Paragraph(song)))
+                    .setBackgroundColor(Invoice.INVOICEWHITE)
+                    .setTextAlignment(TextAlignment.LEFT);
+            table03.addCell(new Cell().add(new Paragraph(control)))
+                    .setBackgroundColor(Invoice.INVOICEWHITE)
+                    .setTextAlignment(TextAlignment.LEFT);
+            table03.addCell(new Cell().add(new Paragraph(copyright)))
+                    .setBackgroundColor(Invoice.INVOICEWHITE)
+                    .setTextAlignment(TextAlignment.LEFT);
+            table03.addCell(new Cell().add(new Paragraph("{AMOUNT}")))
+                    .setBackgroundColor(Invoice.INVOICEWHITE)
+                    .setTextAlignment(TextAlignment.LEFT);
         }
 
         document.add(table);
         document.add(table02);
         document.add(table03);
-        document.add(table04);
         document.close();
     }
 
