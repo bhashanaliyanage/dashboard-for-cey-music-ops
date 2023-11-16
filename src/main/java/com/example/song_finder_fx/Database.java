@@ -207,6 +207,16 @@ public class Database {
         return path;
     }
 
+    public static ResultSet getSongList() throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+        ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT SONG, CONTROL, COPYRIGHT_OWNER FROM 'list_temp'");
+        rs = ps.executeQuery();
+
+        return rs;
+    }
+
     public static Boolean saveDirectory(String directoryString) throws SQLException, ClassNotFoundException {
         Connection db = Database.getConn();
         int status;
@@ -284,4 +294,6 @@ public class Database {
         int rs = preparedStatement.executeUpdate();
         return rs > 0;
     }
+
+
 }

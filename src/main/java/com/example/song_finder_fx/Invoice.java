@@ -18,14 +18,17 @@ import com.itextpdf.layout.property.VerticalAlignment;
 
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
 public class Invoice {
     private static final Color INVOICEBLUE = new DeviceRgb(136, 193, 232);
     private static final Color INVOICLIGHTEBLUE = new DeviceRgb(232, 243, 251);
+    private static final Color INVOICEWHITE = new DeviceRgb(255, 255, 255);
 
-    public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date, double amountPerItem) throws FileNotFoundException, MalformedURLException {
+    public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date, double amountPerItem) throws FileNotFoundException, MalformedURLException, SQLException, ClassNotFoundException {
         String path = "invoice2.pdf";
         PdfWriter pdfWriter = new PdfWriter(path);
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
@@ -37,8 +40,6 @@ public class Invoice {
         ImageData data = ImageDataFactory.create(ceyMusicLogoPath);
         Image ceyMusicLogo = new Image(data);
         ceyMusicLogo.setAutoScale(true);
-
-        List<String> songList = Main.getSongList();
 
         // Table 01
         float[] columnWidth = {1000f};
@@ -61,6 +62,7 @@ public class Invoice {
         table02.setMarginTop(20f);
         table02.setMarginLeft(30f);
         table02.setMarginRight(30f);
+        // table02.setMarginBottom(20f);
 
         //<editor-fold desc="Sub Header">
         // Table 02 Row 01
@@ -103,16 +105,58 @@ public class Invoice {
         // table02.addCell(new Cell().add(new Paragraph("")));
         //</editor-fold>
 
-        // Songs Table
-        float[] columnWidthTable03 = {300f, 50f, 200f, 50f};
-        Table table03 = new Table(columnWidthTable03);
-        table02.setMarginTop(20f);
-        table02.setMarginLeft(30f);
-        table02.setMarginRight(30f);
+        // Songs Table Header
+        float[] columnWidthTable03and04 = {300f, 50f, 200f, 50f};
+        Table table03 = new Table(columnWidthTable03and04);
+        table03.setMarginTop(20f);
+        table03.setMarginLeft(30f);
+        table03.setMarginRight(30f);
+
+        table03.addCell(new Cell().add(new Paragraph("SONG")))
+                .setBackgroundColor(Invoice.INVOICEBLUE)
+                .setFontSize(12f)
+                .setTextAlignment(TextAlignment.CENTER);
+        table03.addCell(new Cell().add(new Paragraph("CONTROL")))
+                .setBackgroundColor(Invoice.INVOICEBLUE)
+                .setFontSize(12f)
+                .setTextAlignment(TextAlignment.CENTER);
+        table03.addCell(new Cell().add(new Paragraph("COPYRIGHT OWNER")))
+                .setBackgroundColor(Invoice.INVOICEBLUE)
+                .setFontSize(12f)
+                .setTextAlignment(TextAlignment.CENTER);
+        table03.addCell(new Cell().add(new Paragraph("AMOUNT")))
+                .setBackgroundColor(Invoice.INVOICEBLUE)
+                .setFontSize(12f)
+                .setTextAlignment(TextAlignment.CENTER);
+
+        // Songs Table Header
+        Table table04 = new Table(columnWidthTable03and04);
+        table04.setMarginLeft(30f);
+        table04.setMarginRight(30f);
+
+        // Getting Song List to generate Invoice
+        ResultSet songList = Database.getSongList();
+        while (songList.next()) {
+            String song = songList.getString("SONG");
+            // System.out.println("song = " + song);
+            String control = songList.getString("CONTROL");
+            // System.out.println("control = " + control);
+            String copyright = songList.getString("COPYRIGHT_OWNER");
+            // System.out.println("copyright = " + copyright);
+            table04.addCell(new Cell().add(new Paragraph(song)))
+                    .setBackgroundColor(Invoice.INVOICEWHITE);
+            table04.addCell(new Cell().add(new Paragraph(control)))
+                    .setBackgroundColor(Invoice.INVOICEWHITE);
+            table04.addCell(new Cell().add(new Paragraph(copyright)))
+                    .setBackgroundColor(Invoice.INVOICEWHITE);
+            table04.addCell(new Cell().add(new Paragraph("{AMOUNT}")))
+                    .setBackgroundColor(Invoice.INVOICEWHITE);
+        }
 
         document.add(table);
         document.add(table02);
         document.add(table03);
+        document.add(table04);
         document.close();
     }
 

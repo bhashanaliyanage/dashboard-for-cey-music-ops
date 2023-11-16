@@ -132,7 +132,7 @@ public class ControllerInvoice {
         }
     }
 
-    public void onGenerateInvoice() throws MalformedURLException, FileNotFoundException {
+    public void onGenerateInvoice() throws MalformedURLException, FileNotFoundException, SQLException, ClassNotFoundException {
         String invoiceTo = txtInvoiceTo.getText().toUpperCase();
         String invoiceNo = txtInvoiceNo.getText().toUpperCase();
         LocalDate date = dpInvoiceDate.getValue();
