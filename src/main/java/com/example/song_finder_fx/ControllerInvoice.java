@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.w3c.dom.Text;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,12 +25,14 @@ import java.util.Objects;
 public class ControllerInvoice {
     private final UIController mainUIController;
     public TextField txtInvoiceTo;
+    public TextField txtCurrencyFormat;
     public TextField txtInvoiceNo;
     public TextField txtAmountPerItem;
     public DatePicker dpInvoiceDate;
     public HBox hboxInvoiceTo;
     public HBox hboxInvoiceNo;
     public HBox hboxAmountPerItem;
+    public HBox hboxCurrencyFormat;
     public ScrollPane scrlpneSongInvoice;
     public ScrollPane scrlpneMain;
     public VBox vboxSong;
@@ -132,12 +135,13 @@ public class ControllerInvoice {
         }
     }
 
-    public void onGenerateInvoice() throws MalformedURLException, FileNotFoundException, SQLException, ClassNotFoundException {
+    public void onGenerateInvoice() throws IOException, SQLException, ClassNotFoundException {
         String invoiceTo = txtInvoiceTo.getText().toUpperCase();
         String invoiceNo = txtInvoiceNo.getText().toUpperCase();
         LocalDate date = dpInvoiceDate.getValue();
         String amountPerItemString = txtAmountPerItem.getText();
         double amountPerItem = 0;
+        String currencyFormat = txtCurrencyFormat.getText().toUpperCase();
 
         try {
             amountPerItem = Double.parseDouble(amountPerItemString);
@@ -166,7 +170,14 @@ public class ControllerInvoice {
             System.out.println("date = " + date);
 
             if (amountPerItem > 0) {
-                Invoice.generateInvoice(invoiceTo, invoiceNo, date, amountPerItem);
+
+                if (Objects.equals(currencyFormat, "")) {
+                    hboxCurrencyFormat.setStyle("-fx-border-color: '#931621';");
+                    hboxCurrencyFormat.requestFocus();
+                    scrlpneMain.setVvalue(0);
+                } else {
+                    Invoice.generateInvoice(invoiceTo, invoiceNo, date, amountPerItem, currencyFormat);
+                }
             } else {
                 hboxAmountPerItem.setStyle("-fx-border-color: '#931621';");
                 txtAmountPerItem.requestFocus();

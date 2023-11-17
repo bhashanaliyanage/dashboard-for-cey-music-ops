@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -296,4 +297,21 @@ public class Database {
     }
 
 
+    public static String calculateTotalDue(double amountPerItem) throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+        PreparedStatement ps = db.prepareStatement("SELECT CONTROL FROM 'list_temp'");
+        ResultSet rs = ps.executeQuery();
+        double total = 0.00;
+
+        while (rs.next()) {
+            String control = rs.getString("CONTROL");
+            if (Objects.equals(control, "50%")) {
+                total += amountPerItem;
+            } else {
+                total += (amountPerItem * 2);
+            }
+        }
+
+        return Double.toString(total);
+    }
 }
