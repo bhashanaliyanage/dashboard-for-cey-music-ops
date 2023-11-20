@@ -172,12 +172,20 @@ public class Invoice {
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
         //</editor-fold>
 
+        float[] columnWidthTableFooter = {200f, 200f, 200f};
+        Table tableFooter = new Table(columnWidthTableFooter);
+        tableFooter.setFixedPosition(30f, 20f, 535f);
+        tableFooter.setBackgroundColor(Invoice.INVOICE_BLUE);
+        tableFooter.setBorder(Border.NO_BORDER);
+        tableFooter.addCell(new Cell().add(new Paragraph("Cell 01"))).setBorder(Border.NO_BORDER);
+        tableFooter.addCell(new Cell().add(new Paragraph("Cell 02"))).setBorder(Border.NO_BORDER);
+        tableFooter.addCell(new Cell().add(new Paragraph("Cell 03"))).setBorder(Border.NO_BORDER);
+
         document.add(table01); // Header
         document.add(table02); // Invoice Details
-        // document.add(table03); // Song List
+        document.add(tableFooter);
 
         // Getting Song List to generate Invoice
-
         int rowCount = 0;
         ResultSet songList = Database.getSongList();
 
@@ -295,7 +303,6 @@ public class Invoice {
         if (currentTable.getNumberOfRows() > 0) {
             document.add(currentTable);
         }
-
 
         document.close();
     }
