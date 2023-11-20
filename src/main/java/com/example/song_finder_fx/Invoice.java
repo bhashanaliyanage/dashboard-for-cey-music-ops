@@ -15,10 +15,8 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.border.SolidBorder;
-import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Image;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.property.AreaBreakType;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 
@@ -132,9 +130,10 @@ public class Invoice {
         table03.setMarginTop(10f);
         table03.setMarginLeft(30f);
         table03.setMarginRight(30f);
+        table03.setFixedLayout();
         Border grayBorder = new SolidBorder(Invoice.INVOICE_GRAY, 0.5f);
 
-
+        //<editor-fold desc="Table 03 Header">
         table03.addCell(new Cell().add(new Paragraph("SONG").setFont(font_rubik))
                 .setFontColor(Invoice.INVOICE_WHITE)
                 .setHeight(40)
@@ -171,18 +170,60 @@ public class Invoice {
                 .setFontSize(12f)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
+        //</editor-fold>
+
+        document.add(table01); // Header
+        document.add(table02); // Invoice Details
+        // document.add(table03); // Song List
 
         // Getting Song List to generate Invoice
 
-        int songListHeight = table03.getNumberOfRows();
+        int rowCount = 0;
         ResultSet songList = Database.getSongList();
+
+        Table currentTable = createNewTable(); // createNewTable is a method to create a new table like table03
+        currentTable.addCell(new Cell().add(new Paragraph("SONG").setFont(font_rubik))
+                .setFontColor(Invoice.INVOICE_WHITE)
+                .setHeight(40)
+                .setBold()
+                .setBorder(grayBorder)
+                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setFontSize(12f)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE));
+        currentTable.addCell(new Cell().add(new Paragraph("CONTROL").setFont(font_rubik))
+                .setFontColor(Invoice.INVOICE_WHITE)
+                .setHeight(40)
+                .setBold()
+                .setBorder(grayBorder)
+                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setFontSize(12f)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE));
+        currentTable.addCell(new Cell().add(new Paragraph("COPYRIGHT OWNER").setFont(font_rubik))
+                .setFontColor(Invoice.INVOICE_WHITE)
+                .setHeight(40)
+                .setBold()
+                .setBorder(grayBorder)
+                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setFontSize(12f)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE));
+        currentTable.addCell(new Cell().add(new Paragraph("AMOUNT").setFont(font_rubik))
+                .setFontColor(Invoice.INVOICE_WHITE)
+                .setHeight(40)
+                .setBold()
+                .setBorder(grayBorder)
+                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setFontSize(12f)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE));
+
         while (songList.next()) {
-            String song = songList.getString("SONG");
-            // System.out.println("song = " + song);
+            //<editor-fold desc="Old Code">
+            /*String song = songList.getString("SONG");
             String control = songList.getString("CONTROL");
-            // System.out.println("control = " + control);
             String copyright = songList.getString("COPYRIGHT_OWNER");
-            // System.out.println("copyright = " + copyright);
 
             table03.addCell(new Cell().add(new Paragraph(song)
                             .setFont(font_poppins)
@@ -229,15 +270,99 @@ public class Invoice {
                         .setTextAlignment(TextAlignment.CENTER)
                         .setVerticalAlignment(VerticalAlignment.MIDDLE));
             }
+            rowCount++;
+
+            if (rowCount % 8 == 0) {
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            }*/
+            //</editor-fold>
+
+            addRowToTable(currentTable, songList, font_poppins, amountPerItem, currencyFormat, grayBorder); // addRowToTable is a method to add a new row
+            rowCount++;
+
+            if (rowCount % 8 == 0) {
+                // Add the current table to the document
+                document.add(currentTable);
+
+                // Start a new table
+                currentTable = createNewTable();
+
+                // Add a page break
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            }
         }
 
-        document.add(table01); // Header
-        document.add(table02); // Invoice Details
-        document.add(table03); // Song List
+        if (currentTable.getNumberOfRows() > 0) {
+            document.add(currentTable);
+        }
+
+
         document.close();
     }
 
-    public static void main(String[] args) {
-        /*generateInvoice("invoiceTo", "invoiceNo", date, "amountPerItem")''*/
+    private static void addRowToTable(Table currentTable, ResultSet songList, PdfFont fontPoppins, double amountPerItem, String currencyFormat, Border grayBorder) throws SQLException {
+        String song = songList.getString("SONG");
+        String control = songList.getString("CONTROL");
+        String copyright = songList.getString("COPYRIGHT_OWNER");
+
+        currentTable.addCell(new Cell().add(new Paragraph(song)
+                        .setFont(fontPoppins))
+                .setFontSize(11f)
+                .setHeight(50)
+                .setBorder(grayBorder)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE));
+        currentTable.addCell(new Cell().add(new Paragraph(control)
+                        .setFont(fontPoppins))
+                .setFontSize(11f)
+                .setHeight(50)
+                .setBorder(grayBorder)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE));
+        if (copyright.contains(" | ")) {
+            String[] splitString = copyright.split(" \\| ");
+            currentTable.addCell(new Cell().add(new Paragraph(splitString[0] + "\n" + splitString[1])
+                            .setFont(fontPoppins))
+                    .setFontSize(11f)
+                    .setHeight(50)
+                    .setBorder(grayBorder)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE));
+        } else {
+            currentTable.addCell(new Cell().add(new Paragraph(copyright)
+                            .setFont(fontPoppins))
+                    .setFontSize(11f)
+                    .setHeight(50)
+                    .setBorder(grayBorder)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE));
+        }
+        if (Objects.equals(control, "50%")) {
+            currentTable.addCell(new Cell().add(new Paragraph(currencyFormat + " " + amountPerItem)
+                            .setFont(fontPoppins))
+                    .setFontSize(11f)
+                    .setHeight(50)
+                    .setBorder(grayBorder)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE));
+        } else {
+            currentTable.addCell(new Cell().add(new Paragraph(currencyFormat + " " + (amountPerItem * 2))
+                            .setFont(fontPoppins))
+                    .setFontSize(11f)
+                    .setHeight(50)
+                    .setBorder(grayBorder)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE));
+        }
+    }
+
+    private static Table createNewTable() {
+        float[] columnWidth = {260f, 70f, 200f, 70f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(30f);
+        table.setMarginRight(30f);
+        table.setFixedLayout();
+
+        return table;
     }
 }
