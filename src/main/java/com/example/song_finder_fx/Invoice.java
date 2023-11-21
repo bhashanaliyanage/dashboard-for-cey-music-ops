@@ -214,26 +214,6 @@ public class Invoice {
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
 
-        while (songList.next()) {
-            addRowToTable(currentTable, songList, font_poppins, amountPerItem, currencyFormat, grayBorder); // addRowToTable is a method to add a new row
-            rowCount++;
-
-            if (rowCount % 8 == 0) {
-                // Add the current table to the document
-                document.add(currentTable);
-
-                // Start a new table
-                currentTable = createNewTable();
-
-                // Add a page break
-                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-            }
-        }
-
-        if (currentTable.getNumberOfRows() > 0) {
-            document.add(currentTable);
-        }
-
         float[] columnWidthTableTotal = {470f, 130f};
         Table tableTotal = new Table(columnWidthTableTotal);
         tableTotal.setMarginLeft(30f);
@@ -268,7 +248,7 @@ public class Invoice {
 
         tableTotal.addCell(new Cell(1, 2)
                 .setBackgroundColor(Invoice.INVOICE_GRAY)
-                        .setBorder(Border.NO_BORDER)
+                .setBorder(Border.NO_BORDER)
                 .setHeight(1f));
 
         tableTotal.addCell(new Cell()
@@ -284,7 +264,41 @@ public class Invoice {
                 .setBorder(Border.NO_BORDER)
                 .setTextAlignment(TextAlignment.RIGHT));
 
-        document.add(tableTotal);
+        while (songList.next()) {
+            addRowToTable(currentTable, songList, font_poppins, amountPerItem, currencyFormat, grayBorder); // addRowToTable is a method to add a new row
+            rowCount++;
+
+            if (rowCount % 8 == 0) {
+                // Add the current table to the document
+                document.add(currentTable);
+
+                // Start a new table
+                currentTable = createNewTable();
+
+                // Add a page break
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+                document.add(tableFooter);
+            }
+        }
+
+        if (currentTable.getNumberOfRows() > 0) {
+            document.add(currentTable);
+        }
+
+        int currentTableRowCount = currentTable.getNumberOfRows();
+
+        if (currentTableRowCount <= 6) {
+            document.add(tableTotal);
+        } else if (currentTableRowCount == 7) {
+            document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            document.add(tableTotal);
+            document.add(tableFooter);
+        } else if (currentTableRowCount == 8) {
+            document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            document.add(tableTotal);
+            document.add(tableFooter);
+        }
 
         document.close();
     }
@@ -426,6 +440,7 @@ public class Invoice {
     private static Table createNewTable() {
         float[] columnWidth = {260f, 70f, 200f, 70f};
         Table table = new Table(columnWidth);
+        table.setMarginTop(10f);
         table.setMarginLeft(30f);
         table.setMarginRight(30f);
         table.setFixedLayout();
