@@ -35,37 +35,19 @@ public class Invoice {
     private static final Color INVOICE_GRAY = new DeviceRgb(204, 204, 204);
 
     public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date, double amountPerItem, String currencyFormat) throws IOException, SQLException, ClassNotFoundException {
-        String path = "invoice2.pdf";
+        String path = "invoice3.pdf";
         PdfWriter pdfWriter = new PdfWriter(path);
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document document = new Document(pdfDocument);
         document.setMargins(0f, 0f, 0f, 0f);
 
-        //<editor-fold desc="Images">
         // Invoice Heading Image
-        String invoiceHeadingPath = "src/main/resources/com/example/song_finder_fx/images/marketing-head-invoice-heading-cropped.png";
-        ImageData invoiceHeadingImageData = ImageDataFactory.create(invoiceHeadingPath);
-        Image invoiceHeading = new Image(invoiceHeadingImageData);
-        invoiceHeading.setAutoScale(true);
-        //</editor-fold>
+        Image invoiceHeading = loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/marketing-head-invoice-heading-cropped.png");
 
-        //<editor-fold desc="Fonts">
-        // Loading RUBIK Font
-        String RUBIK = "src/main/resources/com/example/song_finder_fx/fonts/Rubik-Regular.ttf";
-        String RUBIK_SEMI_BOLD = "src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf";
-
-        FontProgram fpRubik = FontProgramFactory.createFont(RUBIK);
-        FontProgram fpRubikSemiBold = FontProgramFactory.createFont(RUBIK_SEMI_BOLD);
-
-        PdfFont font_rubik = PdfFontFactory.createFont(fpRubik, PdfEncodings.WINANSI, true);
-        PdfFont font_rubik_semi_bold = PdfFontFactory.createFont(fpRubikSemiBold, PdfEncodings.WINANSI, true);
-
-        // Loading POPPINS Font
-        String POPPINS = "src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf";
-        FontProgram fpPoppins = FontProgramFactory.createFont(POPPINS);
-        PdfFont font_poppins = PdfFontFactory.createFont(fpPoppins, PdfEncodings.WINANSI, true);
-        //</editor-fold>
+        PdfFont font_rubik = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-Regular.ttf");
+        PdfFont font_rubik_semi_bold = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf");
+        PdfFont font_poppins = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf");
 
         // Table 01
         float[] columnWidth = {1000f};
@@ -131,7 +113,7 @@ public class Invoice {
         // table02.addCell(new Cell().add(new Paragraph("")));
         //</editor-fold>
 
-        // Songs Table Header
+        // Songs Table
         float[] columnWidthTable03and04 = {260f, 70f, 200f, 70f};
         Table table03 = new Table(columnWidthTable03and04);
         table03.setMarginTop(10f);
@@ -140,7 +122,7 @@ public class Invoice {
         table03.setFixedLayout();
         Border grayBorder = new SolidBorder(Invoice.INVOICE_GRAY, 0.5f);
 
-        //<editor-fold desc="Table 03 Header">
+        //<editor-fold desc="Songs Table Header">
         table03.addCell(new Cell().add(new Paragraph("SONG").setFont(font_rubik))
                 .setFontColor(Invoice.INVOICE_WHITE)
                 .setHeight(40)
@@ -180,7 +162,7 @@ public class Invoice {
         //</editor-fold>
 
         // Table for Footer
-        Table tableFooter = getTableFooter(font_rubik);
+        Table tableFooter = tableFooter(font_rubik);
 
         document.add(table01); // Header
         document.add(table02); // Invoice Details
@@ -308,19 +290,32 @@ public class Invoice {
         document.close();
     }
 
-    private static Table getTableFooter(PdfFont font) throws MalformedURLException {
+    private static PdfFont loadFont(String location) throws IOException {
+        FontProgram fontProgram = FontProgramFactory.createFont(location);
+        return PdfFontFactory.createFont(fontProgram, PdfEncodings.WINANSI, true);
+    }
+
+    private static Image loadAutoScaledImage(String location) throws MalformedURLException {
+        ImageData invoiceHeadingImageData = ImageDataFactory.create(location);
+        Image invoiceHeading = new Image(invoiceHeadingImageData);
+        invoiceHeading.setAutoScale(true);
+        return invoiceHeading;
+    }
+
+    private static Image loadImage(String location) throws MalformedURLException {
+        ImageData invoiceHeadingImageData = ImageDataFactory.create(location);
+        return new Image(invoiceHeadingImageData);
+    }
+
+    private static Table tableFooter(PdfFont font) throws MalformedURLException {
         //<editor-fold desc="Images">
         // Invoice Footer Map Icon Image
-        String mapIconPath = "src/main/resources/com/example/song_finder_fx/images/icon_alternate_map_marker.png";
-        ImageData mapIconImageData = ImageDataFactory.create(mapIconPath);
-        Image mapIcon = new Image(mapIconImageData);
+        Image mapIcon = loadImage("src/main/resources/com/example/song_finder_fx/images/icon_alternate_map_marker.png");
         mapIcon.setWidth(10f);
         // mapIcon.setAutoScale(true);
 
         // Invoice Footer Globe Icon Image
-        String globeIconPath = "src/main/resources/com/example/song_finder_fx/images/icon_globe.png";
-        ImageData globeIconImageData = ImageDataFactory.create(globeIconPath);
-        Image globeIcon = new Image(globeIconImageData);
+        Image globeIcon = loadImage("src/main/resources/com/example/song_finder_fx/images/icon_globe.png");
         globeIcon.setWidth(10f);
         // globeIcon.setAutoScale(true);
         //</editor-fold>
