@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -33,6 +34,7 @@ public class Invoice {
     private static final Color INVOICE_LIGHT_BLUE = new DeviceRgb(232, 243, 251);
     private static final Color INVOICE_WHITE = new DeviceRgb(255, 255, 255);
     private static final Color INVOICE_GRAY = new DeviceRgb(204, 204, 204);
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date, double amountPerItem, String currencyFormat) throws IOException, SQLException, ClassNotFoundException {
         String path = "invoice3.pdf";
@@ -93,9 +95,11 @@ public class Invoice {
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER));
 
-        String totalDue = Database.calculateTotalDue(amountPerItem);
+        int discountPercentage = 50;
+        double totalDue = Database.calculateTotalDue(amountPerItem);
+        double processedTotalDue = (totalDue + ((totalDue * 10) / 100)) - ((totalDue * discountPercentage) / 100);
 
-        table02.addCell(new Cell(2, 1).add(new Paragraph(currencyFormat + " " + totalDue))
+        table02.addCell(new Cell(2, 1).add(new Paragraph((currencyFormat + " " + df.format(processedTotalDue))))
                 .setTextAlignment(TextAlignment.RIGHT)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .setFontSize(28f)
@@ -211,63 +215,6 @@ public class Invoice {
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
 
         while (songList.next()) {
-            //<editor-fold desc="Old Code">
-            /*String song = songList.getString("SONG");
-            String control = songList.getString("CONTROL");
-            String copyright = songList.getString("COPYRIGHT_OWNER");
-
-            table03.addCell(new Cell().add(new Paragraph(song)
-                            .setFont(font_poppins)
-                            .setMarginLeft(10f))
-                    .setFontSize(11f)
-                    .setBorder(grayBorder)
-                    .setTextAlignment(TextAlignment.LEFT)
-                    .setVerticalAlignment(VerticalAlignment.MIDDLE));
-            table03.addCell(new Cell().add(new Paragraph(control)
-                            .setFont(font_poppins))
-                    .setFontSize(11f)
-                    .setBorder(grayBorder)
-                    .setTextAlignment(TextAlignment.CENTER)
-                    .setVerticalAlignment(VerticalAlignment.MIDDLE));
-
-            if (copyright.contains(" | ")) {
-                String[] splitString = copyright.split(" \\| ");
-                table03.addCell(new Cell().add(new Paragraph(splitString[0] + "\n" + splitString[1])
-                                .setFont(font_poppins))
-                        .setFontSize(11f)
-                        .setBorder(grayBorder)
-                        .setTextAlignment(TextAlignment.CENTER)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE));
-            } else {
-                table03.addCell(new Cell().add(new Paragraph(copyright)
-                                .setFont(font_poppins))
-                        .setFontSize(11f)
-                        .setBorder(grayBorder)
-                        .setTextAlignment(TextAlignment.CENTER)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE));
-            }
-            if (Objects.equals(control, "50%")) {
-                table03.addCell(new Cell().add(new Paragraph(currencyFormat + " " + amountPerItem)
-                                .setFont(font_poppins))
-                        .setFontSize(11f)
-                        .setBorder(grayBorder)
-                        .setTextAlignment(TextAlignment.CENTER)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE));
-            } else {
-                table03.addCell(new Cell().add(new Paragraph(currencyFormat + " " + (amountPerItem * 2))
-                                .setFont(font_poppins))
-                        .setFontSize(11f)
-                        .setBorder(grayBorder)
-                        .setTextAlignment(TextAlignment.CENTER)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE));
-            }
-            rowCount++;
-
-            if (rowCount % 8 == 0) {
-                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-            }*/
-            //</editor-fold>
-
             addRowToTable(currentTable, songList, font_poppins, amountPerItem, currencyFormat, grayBorder); // addRowToTable is a method to add a new row
             rowCount++;
 
@@ -286,6 +233,58 @@ public class Invoice {
         if (currentTable.getNumberOfRows() > 0) {
             document.add(currentTable);
         }
+
+        float[] columnWidthTableTotal = {470f, 130f};
+        Table tableTotal = new Table(columnWidthTableTotal);
+        tableTotal.setMarginLeft(30f);
+        tableTotal.setMarginTop(30f);
+        tableTotal.setMarginRight(30f);
+        tableTotal.setFont(font_poppins);
+
+        double gst = (totalDue * 10) / 100;
+        double deductedDiscount = (processedTotalDue - ((processedTotalDue * discountPercentage) / 100));
+
+        tableTotal.addCell(new Cell()
+                .add(new Paragraph("10% GST"))
+                .setFontSize(11f)
+                .setBorder(Border.NO_BORDER)
+                .setTextAlignment(TextAlignment.RIGHT));
+        tableTotal.addCell(new Cell()
+                .add(new Paragraph(currencyFormat + " " + df.format(gst)))
+                .setFontSize(11f)
+                .setBorder(Border.NO_BORDER)
+                .setTextAlignment(TextAlignment.RIGHT));
+
+        tableTotal.addCell(new Cell()
+                .add(new Paragraph(discountPercentage + "% Discount"))
+                .setFontSize(11f)
+                .setBorder(Border.NO_BORDER)
+                .setTextAlignment(TextAlignment.RIGHT));
+        tableTotal.addCell(new Cell()
+                .add(new Paragraph(currencyFormat + " " + df.format(deductedDiscount)))
+                .setFontSize(11f)
+                .setBorder(Border.NO_BORDER)
+                .setTextAlignment(TextAlignment.RIGHT));
+
+        tableTotal.addCell(new Cell(1, 2)
+                .setBackgroundColor(Invoice.INVOICE_GRAY)
+                        .setBorder(Border.NO_BORDER)
+                .setHeight(1f));
+
+        tableTotal.addCell(new Cell()
+                .add(new Paragraph("Total Due")
+                        .setBold())
+                .setFontSize(18f)
+                .setBorder(Border.NO_BORDER)
+                .setTextAlignment(TextAlignment.RIGHT));
+        tableTotal.addCell(new Cell()
+                .add(new Paragraph(currencyFormat + " " + df.format(processedTotalDue))
+                        .setBold())
+                .setFontSize(18f)
+                .setBorder(Border.NO_BORDER)
+                .setTextAlignment(TextAlignment.RIGHT));
+
+        document.add(tableTotal);
 
         document.close();
     }
@@ -334,8 +333,8 @@ public class Invoice {
         tableForCell1.addCell(new Cell().add(mapIcon).setVerticalAlignment(VerticalAlignment.MIDDLE).setHorizontalAlignment(HorizontalAlignment.RIGHT)
                 .setBorder(Border.NO_BORDER));
         tableForCell1.addCell(new Cell().add(new Paragraph("65/18, Sandun Gardens, Elhena Rd, Maharagama")
-                    .setFont(font)
-                    .setFontColor(Invoice.INVOICE_WHITE))
+                        .setFont(font)
+                        .setFontColor(Invoice.INVOICE_WHITE))
                 .setFontSize(fontSize)
                 .setBorder(Border.NO_BORDER));
 
@@ -343,8 +342,8 @@ public class Invoice {
         tableForCell2.addCell(new Cell().add(mapIcon).setVerticalAlignment(VerticalAlignment.MIDDLE).setHorizontalAlignment(HorizontalAlignment.RIGHT)
                 .setBorder(Border.NO_BORDER));
         tableForCell2.addCell(new Cell().add(new Paragraph("39 Annabelle View, Coombs ACT 2611")
-                    .setFont(font)
-                    .setFontColor(Invoice.INVOICE_WHITE))
+                        .setFont(font)
+                        .setFontColor(Invoice.INVOICE_WHITE))
                 .setFontSize(fontSize)
                 .setBorder(Border.NO_BORDER));
 
@@ -352,8 +351,8 @@ public class Invoice {
         tableForCell3.addCell(new Cell().add(globeIcon).setVerticalAlignment(VerticalAlignment.MIDDLE).setHorizontalAlignment(HorizontalAlignment.RIGHT)
                 .setBorder(Border.NO_BORDER));
         tableForCell3.addCell(new Cell().add(new Paragraph("www.ceymusic.com.au")
-                    .setFont(font)
-                    .setFontColor(Invoice.INVOICE_WHITE))
+                        .setFont(font)
+                        .setFontColor(Invoice.INVOICE_WHITE))
                 .setFontSize(fontSize)
                 .setBorder(Border.NO_BORDER));
 
@@ -406,7 +405,7 @@ public class Invoice {
                     .setVerticalAlignment(VerticalAlignment.MIDDLE));
         }
         if (Objects.equals(control, "50%")) {
-            currentTable.addCell(new Cell().add(new Paragraph(currencyFormat + " " + amountPerItem)
+            currentTable.addCell(new Cell().add(new Paragraph(currencyFormat + " " + df.format(amountPerItem))
                             .setFont(fontPoppins))
                     .setFontSize(11f)
                     .setHeight(50)
@@ -414,7 +413,7 @@ public class Invoice {
                     .setTextAlignment(TextAlignment.CENTER)
                     .setVerticalAlignment(VerticalAlignment.MIDDLE));
         } else {
-            currentTable.addCell(new Cell().add(new Paragraph(currencyFormat + " " + (amountPerItem * 2))
+            currentTable.addCell(new Cell().add(new Paragraph(currencyFormat + " " + df.format(amountPerItem * 2))
                             .setFont(fontPoppins))
                     .setFontSize(11f)
                     .setHeight(50)
@@ -432,5 +431,10 @@ public class Invoice {
         table.setFixedLayout();
 
         return table;
+    }
+
+    public static void main(String[] args) throws SQLException, IOException, ClassNotFoundException {
+        LocalDate date = LocalDate.now();
+        generateInvoice("SAMPLE", "CEY001", date, 100, "LKR");
     }
 }

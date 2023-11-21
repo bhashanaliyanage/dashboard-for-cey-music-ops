@@ -297,7 +297,7 @@ public class Database {
     }
 
 
-    public static String calculateTotalDue(double amountPerItem) throws SQLException, ClassNotFoundException {
+    public static double calculateTotalDue(double amountPerItem) throws SQLException, ClassNotFoundException {
         Connection db = Database.getConn();
         PreparedStatement ps = db.prepareStatement("SELECT CONTROL FROM 'list_temp'");
         ResultSet rs = ps.executeQuery();
@@ -312,6 +312,6 @@ public class Database {
             }
         }
 
-        return Double.toString(total);
+        return total;
     }
 }
