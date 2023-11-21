@@ -17,10 +17,12 @@ import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.border.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.AreaBreakType;
+import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -40,11 +42,15 @@ public class Invoice {
         Document document = new Document(pdfDocument);
         document.setMargins(0f, 0f, 0f, 0f);
 
-        String ceyMusicLogoPath = "src/main/resources/com/example/song_finder_fx/images/marketing-head-invoice-heading-cropped.png";
-        ImageData data = ImageDataFactory.create(ceyMusicLogoPath);
-        Image ceyMusicLogo = new Image(data);
-        ceyMusicLogo.setAutoScale(true);
+        //<editor-fold desc="Images">
+        // Invoice Heading Image
+        String invoiceHeadingPath = "src/main/resources/com/example/song_finder_fx/images/marketing-head-invoice-heading-cropped.png";
+        ImageData invoiceHeadingImageData = ImageDataFactory.create(invoiceHeadingPath);
+        Image invoiceHeading = new Image(invoiceHeadingImageData);
+        invoiceHeading.setAutoScale(true);
+        //</editor-fold>
 
+        //<editor-fold desc="Fonts">
         // Loading RUBIK Font
         String RUBIK = "src/main/resources/com/example/song_finder_fx/fonts/Rubik-Regular.ttf";
         String RUBIK_SEMI_BOLD = "src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf";
@@ -59,6 +65,7 @@ public class Invoice {
         String POPPINS = "src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf";
         FontProgram fpPoppins = FontProgramFactory.createFont(POPPINS);
         PdfFont font_poppins = PdfFontFactory.createFont(fpPoppins, PdfEncodings.WINANSI, true);
+        //</editor-fold>
 
         // Table 01
         float[] columnWidth = {1000f};
@@ -66,7 +73,7 @@ public class Invoice {
 
         //<editor-fold desc="Header">
         // Table 01 Row 01
-        table01.addCell(new Cell().add(ceyMusicLogo).setBorder(Border.NO_BORDER).setMargin(0f));
+        table01.addCell(new Cell().add(invoiceHeading).setBorder(Border.NO_BORDER).setMargin(0f));
         // Table 01 Row 02
         table01.addCell(new Cell()
                 .add(new Paragraph(""))
@@ -172,14 +179,8 @@ public class Invoice {
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
         //</editor-fold>
 
-        float[] columnWidthTableFooter = {200f, 200f, 200f};
-        Table tableFooter = new Table(columnWidthTableFooter);
-        tableFooter.setFixedPosition(30f, 20f, 535f);
-        tableFooter.setBackgroundColor(Invoice.INVOICE_BLUE);
-        tableFooter.setBorder(Border.NO_BORDER);
-        tableFooter.addCell(new Cell().add(new Paragraph("Cell 01"))).setBorder(Border.NO_BORDER);
-        tableFooter.addCell(new Cell().add(new Paragraph("Cell 02"))).setBorder(Border.NO_BORDER);
-        tableFooter.addCell(new Cell().add(new Paragraph("Cell 03"))).setBorder(Border.NO_BORDER);
+        // Table for Footer
+        Table tableFooter = getTableFooter(font_rubik);
 
         document.add(table01); // Header
         document.add(table02); // Invoice Details
@@ -218,12 +219,12 @@ public class Invoice {
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
         currentTable.addCell(new Cell().add(new Paragraph("AMOUNT").setFont(font_rubik))
+                .setFontSize(12f)
                 .setFontColor(Invoice.INVOICE_WHITE)
                 .setHeight(40)
                 .setBold()
                 .setBorder(grayBorder)
                 .setBackgroundColor(Invoice.INVOICE_BLUE)
-                .setFontSize(12f)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
 
@@ -305,6 +306,71 @@ public class Invoice {
         }
 
         document.close();
+    }
+
+    private static Table getTableFooter(PdfFont font) throws MalformedURLException {
+        //<editor-fold desc="Images">
+        // Invoice Footer Map Icon Image
+        String mapIconPath = "src/main/resources/com/example/song_finder_fx/images/icon_alternate_map_marker.png";
+        ImageData mapIconImageData = ImageDataFactory.create(mapIconPath);
+        Image mapIcon = new Image(mapIconImageData);
+        mapIcon.setWidth(10f);
+        // mapIcon.setAutoScale(true);
+
+        // Invoice Footer Globe Icon Image
+        String globeIconPath = "src/main/resources/com/example/song_finder_fx/images/icon_globe.png";
+        ImageData globeIconImageData = ImageDataFactory.create(globeIconPath);
+        Image globeIcon = new Image(globeIconImageData);
+        globeIcon.setWidth(10f);
+        // globeIcon.setAutoScale(true);
+        //</editor-fold>
+
+        // Making Table
+        float[] columnWidthTableFooter = {275f, 200f, 125f};
+        Table tableFooter = new Table(columnWidthTableFooter);
+        tableFooter.setFixedPosition(30f, 20f, 535f);
+        tableFooter.setBackgroundColor(Invoice.INVOICE_BLUE);
+
+        float fontSize = 8f;
+
+        // Making cell tables
+        float[] columnWidthCell = {50f, 550f};
+        Table tableForCell1 = new Table(columnWidthCell);
+        tableForCell1.addCell(new Cell().add(mapIcon).setVerticalAlignment(VerticalAlignment.MIDDLE).setHorizontalAlignment(HorizontalAlignment.RIGHT)
+                .setBorder(Border.NO_BORDER));
+        tableForCell1.addCell(new Cell().add(new Paragraph("65/18, Sandun Gardens, Elhena Rd, Maharagama")
+                    .setFont(font)
+                    .setFontColor(Invoice.INVOICE_WHITE))
+                .setFontSize(fontSize)
+                .setBorder(Border.NO_BORDER));
+
+        Table tableForCell2 = new Table(columnWidthCell);
+        tableForCell2.addCell(new Cell().add(mapIcon).setVerticalAlignment(VerticalAlignment.MIDDLE).setHorizontalAlignment(HorizontalAlignment.RIGHT)
+                .setBorder(Border.NO_BORDER));
+        tableForCell2.addCell(new Cell().add(new Paragraph("39 Annabelle View, Coombs ACT 2611")
+                    .setFont(font)
+                    .setFontColor(Invoice.INVOICE_WHITE))
+                .setFontSize(fontSize)
+                .setBorder(Border.NO_BORDER));
+
+        Table tableForCell3 = new Table(columnWidthCell);
+        tableForCell3.addCell(new Cell().add(globeIcon).setVerticalAlignment(VerticalAlignment.MIDDLE).setHorizontalAlignment(HorizontalAlignment.RIGHT)
+                .setBorder(Border.NO_BORDER));
+        tableForCell3.addCell(new Cell().add(new Paragraph("www.ceymusic.com.au")
+                    .setFont(font)
+                    .setFontColor(Invoice.INVOICE_WHITE))
+                .setFontSize(fontSize)
+                .setBorder(Border.NO_BORDER));
+
+        tableFooter.addCell(new Cell().add(tableForCell1).setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(Border.NO_BORDER)
+                .setPaddingLeft(10f)
+                .setHeight(35f));
+        tableFooter.addCell(new Cell().add(tableForCell2).setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(Border.NO_BORDER));
+        tableFooter.addCell(new Cell().add(tableForCell3).setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(Border.NO_BORDER));
+        return tableFooter;
     }
 
     private static void addRowToTable(Table currentTable, ResultSet songList, PdfFont fontPoppins, double amountPerItem, String currencyFormat, Border grayBorder) throws SQLException {
