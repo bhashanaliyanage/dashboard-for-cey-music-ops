@@ -1042,4 +1042,9 @@ public class UIController {
             }
         }
     }
+
+    public void onAboutButtonClicked() throws SQLException, IOException, ClassNotFoundException {
+        ControllerSettings cs = new ControllerSettings(this);
+        cs.loadAbout();
+    }
 }

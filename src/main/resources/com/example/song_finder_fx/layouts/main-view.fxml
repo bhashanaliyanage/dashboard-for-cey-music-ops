@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="610.0" prefWidth="1030.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<BorderPane prefHeight="610.0" prefWidth="1030.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
     <center>
         <VBox fx:id="mainVBox" alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="650.0" prefHeight="444.0" BorderPane.alignment="CENTER">
             <VBox prefWidth="696.0" styleClass="white-background" stylesheets="@../styles.css" VBox.vgrow="ALWAYS">
@@ -138,7 +138,7 @@
     </center>
     <left>
         <VBox minWidth="246.0" prefHeight="610.0" prefWidth="321.0" spacing="5.0" styleClass="white-pane-background" stylesheets="@../styles.css" BorderPane.alignment="CENTER">
-         <HBox maxWidth="278.0" onMouseClicked="#onSettingsButtonClicked" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
+         <HBox maxWidth="278.0" onMouseClicked="#onAboutButtonClicked" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
             <children>
                <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
                   <HBox.margin>
@@ -200,7 +200,7 @@
                </ImageView>
             </graphic>
             </Button>
-            <VBox alignment="BOTTOM_LEFT" prefHeight="490.0" prefWidth="321.0" VBox.vgrow="ALWAYS">
+            <VBox alignment="BOTTOM_LEFT" prefWidth="321.0" VBox.vgrow="ALWAYS">
                 <HBox layoutX="30.0" layoutY="224.0" onMouseClicked="#onSettingsButtonClicked" styleClass="button-vbox" stylesheets="@../styles.css">
                     <VBox.margin>
                         <Insets bottom="5.0" left="20.0" right="20.0" />

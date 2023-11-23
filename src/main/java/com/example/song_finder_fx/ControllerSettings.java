@@ -1,6 +1,5 @@
 package com.example.song_finder_fx;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -90,5 +89,14 @@ public class ControllerSettings {
                 btnSave.setText("Error Saving!");
             }
         }
+    }
+
+    public void loadAbout() throws IOException, SQLException, ClassNotFoundException {
+        FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/about.fxml"));
+        loader.setController(this);
+        Parent newContent = loader.load();
+
+        mainUIController.mainVBox.getChildren().clear();
+        mainUIController.mainVBox.getChildren().add(newContent);
     }
 }

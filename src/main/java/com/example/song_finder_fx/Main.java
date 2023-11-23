@@ -192,14 +192,11 @@ public class Main extends Application {
     }
 }
 
-// TODO: Adding admin switch
-// TODO: Song list view
-// TODO: Click to copy data
-// TODO: Make about section
 // TODO: Add a separate threads for open file location, copy to, and check database
 // TODO: Add a place to show the featuring artist in song-view.fxml
 // TODO: Implement a column in database to put CeyMusic share
 // TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
+// TODO: Adding admin switch
 // TODO: Keyboard movement handling for search
 // TODO: Code is malfunctioning when pasted UPCs
 // TODO: File copying thread works again and again
@@ -215,3 +212,4 @@ public class Main extends Application {
 // TODO: When I trying to copy some list of songs of Chandralekha, the audio of Kusumata Lanwee is not copied, therefore no error is shown.
 // TODO: 11/14/2023 https://youtu.be/V9nDH2iBJSM?si=oCx3NjivV7nBJl8y&t=1022
 // TODO: 11/17/2023 In song view, make copy to function run in a separate thread to stop application from not responding
+// TODO: 11/23/2023 Add a text box to enter invoice discount percentage and invoice save location
