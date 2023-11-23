@@ -35,6 +35,7 @@ public class Invoice {
     private static final Color INVOICE_WHITE = new DeviceRgb(255, 255, 255);
     private static final Color INVOICE_GRAY = new DeviceRgb(204, 204, 204);
     private static final DecimalFormat df = new DecimalFormat("0.00");
+    private static int pageNumber = 1;
 
     public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date, double amountPerItem, String currencyFormat) throws IOException, SQLException, ClassNotFoundException {
         String path = "invoice3.pdf";
@@ -268,17 +269,36 @@ public class Invoice {
             addRowToTable(currentTable, songList, font_poppins, amountPerItem, currencyFormat, grayBorder); // addRowToTable is a method to add a new row
             rowCount++;
 
-            if (rowCount % 8 == 0) {
-                // Add the current table to the document
-                document.add(currentTable);
+            if (pageNumber == 1) {
+                if (rowCount % 8 == 0) {
+                    // Add the current table to the document
+                    document.add(currentTable);
 
-                // Start a new table
-                currentTable = createNewTable();
+                    // Start a new table
+                    currentTable = createNewTable();
 
-                // Add a page break
-                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                    // Add a page break
+                    document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
-                document.add(tableFooter);
+                    pageNumber++;
+
+                    document.add(tableFooter);
+                }
+            } else {
+                if (currentTable.getNumberOfRows() == 14) {
+                    // Add the current table to the document
+                    document.add(currentTable);
+
+                    // Start a new table
+                    currentTable = createNewTable();
+
+                    // Add a page break
+                    document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+                    pageNumber++;
+
+                    document.add(tableFooter);
+                }
             }
         }
 
@@ -288,16 +308,29 @@ public class Invoice {
 
         int currentTableRowCount = currentTable.getNumberOfRows();
 
-        if (currentTableRowCount <= 6) {
-            document.add(tableTotal);
-        } else if (currentTableRowCount == 7) {
-            document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-            document.add(tableTotal);
-            document.add(tableFooter);
-        } else if (currentTableRowCount == 8) {
-            document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-            document.add(tableTotal);
-            document.add(tableFooter);
+        if (pageNumber == 1) {
+            if (currentTableRowCount <= 6) {
+                document.add(tableTotal);
+            } else if (currentTableRowCount == 7) {
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                pageNumber++;
+                document.add(tableTotal);
+                document.add(tableFooter);
+            } else if (currentTableRowCount == 8) {
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                pageNumber++;
+                document.add(tableTotal);
+                document.add(tableFooter);
+            }
+        } else {
+            if (currentTableRowCount <= 11) {
+                document.add(tableTotal);
+            } else {
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                pageNumber++;
+                document.add(tableTotal);
+                document.add(tableFooter);
+            }
         }
 
         document.close();
