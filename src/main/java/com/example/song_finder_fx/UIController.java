@@ -119,7 +119,7 @@ public class UIController {
         }
     }
 
-    public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException {
+    public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException, InterruptedException {
         boolean directoryStatus = Main.directoryCheckNew();
 
         if (!directoryStatus) {
@@ -139,29 +139,56 @@ public class UIController {
                 if (Main.selectedDirectory.canWrite()) { // check if the directory is writable
                     System.out.println("The directory is accessible and writable.");
                     Path start = Paths.get(Main.selectedDirectory.toURI());
-                    try (Stream<Path> stream = Files.walk(start)) {
-                        // Get file name to search for location from database
-                        String fileName = DatabaseMySQL.searchFileName(isrc);
-                        // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
-                        Path file = stream
-                                .filter(path -> path.toFile().isFile())
-                                .filter(path -> path.getFileName().toString().equals(fileName))
-                                .findFirst()
-                                .orElse(null);
+                    final Path[] file = new Path[1];
+                    Task<Void> task;
+                    task = new Task<>() {
+                        @Override
+                        protected Void call() throws Exception {
+                            try (Stream<Path> stream = Files.walk(start)) {
+                                // Get file name to search for location from database
+                                String fileName = DatabaseMySQL.searchFileName(isrc);
+                                // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
+                                file[0] = stream
+                                        .filter(path -> path.toFile().isFile())
+                                        .filter(path -> path.getFileName().toString().equals(fileName))
+                                        .findFirst()
+                                        .orElse(null);
 
-                        if (file != null) {
-                            Path filePath = file.getParent();
-                            Desktop.getDesktop().open(filePath.toFile());
-                            System.out.println(filePath);
-                        } else {
-                            Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
-                            btnOpenFileLocation.setText("File not found on audio database");
-                            btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
-                            System.out.println("File not found on audio database");
+                                if (file[0] != null) {
+                                    Path filePath = file[0].getParent();
+                                    Desktop.getDesktop().open(filePath.toFile());
+                                    /*Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+                                    btnOpenFileLocation.setText("Open File Location");*/
+                                    System.out.println(filePath);
+                                } else {
+                                    Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+                                    btnOpenFileLocation.setText("File not found on audio database");
+                                    btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
+                                    System.out.println("File not found on audio database");
+                                }
+                            } catch (SQLException | ClassNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                            return null;
                         }
-                    } catch (SQLException | ClassNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
+                    };
+
+                    Thread t = new Thread(task);
+                    t.start();
+
+                    Platform.runLater(() -> {
+                        Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+                        btnOpenFileLocation.setText("Searching...");
+                    });
+
+                    Platform.runLater(() -> {
+                        Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+
+                        if (file[0] != null) {
+                            // Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+                            btnOpenFileLocation.setText("Open File Location");
+                        }
+                    });
                 }
             }
         } else {
