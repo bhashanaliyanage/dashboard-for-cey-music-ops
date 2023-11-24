@@ -91,17 +91,14 @@ public class ControllerSongList {
         }
     }
 
-    public void onCopyToButtonClicked(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
-        // System.out.println("Copy to button clicked!!");
+    public void onCopyToButtonClicked() throws SQLException, ClassNotFoundException {
         Task<Void> task;
         List<String> songList = Main.getSongList();
         if (songList.isEmpty()) {
             btnCopyTo.setText("Please add song(s) to list to proceed");
             btnCopyTo.setStyle("-fx-border-color: '#931621'");
         } else {
-            Connection con = DatabaseMySQL.getConn();
             File selectedDirectory = Main.getSelectedDirectory();
-            // System.out.println("Selected Audio Database Directory: " + directory.getAbsolutePath());
 
             if (selectedDirectory.exists()) { // check if the directory exists
                 if (selectedDirectory.isDirectory()) { // check if the directory is a directory
@@ -116,7 +113,6 @@ public class ControllerSongList {
 
                                 for (int i = 0; i < songListSize; i++) {
                                     String isrc = songList.get(i);
-                                    // System.out.println(isrc);
 
                                     int finalI = i;
                                     Platform.runLater(() -> updateButtonProceed("Copying " + (finalI + 1) + " of " + songListSize));
@@ -167,7 +163,28 @@ public class ControllerSongList {
 
     public void onGenerateInvoiceButtonClicked(ActionEvent actionEvent) throws IOException, SQLException, ClassNotFoundException {
         ControllerInvoice controllerInvoice = new ControllerInvoice(mainUIController);
-        controllerInvoice.loadThings(actionEvent);
+        Node node = (Node) actionEvent.getSource();
+        Scene scene = node.getScene();
+        Button btnGenerateInvoice = (Button) scene.lookup("#btnGenerateInvoice");
+        btnGenerateInvoice.setText("Loading...");
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    try {
+                        controllerInvoice.loadThings(actionEvent);
+                    } catch (IOException | SQLException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                // controllerInvoice.loadThings(actionEvent);
+                return null;
+            }
+        };
+
+        Thread t = new Thread(task);
+        t.start();
+
     }
 
     private void updateButtonProceed(String s) {
