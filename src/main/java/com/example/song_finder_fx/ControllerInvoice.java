@@ -12,11 +12,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.w3c.dom.Text;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,11 +25,13 @@ public class ControllerInvoice {
     public TextField txtCurrencyFormat;
     public TextField txtInvoiceNo;
     public TextField txtAmountPerItem;
+    public TextField txtDiscount;
     public DatePicker dpInvoiceDate;
     public HBox hboxInvoiceTo;
     public HBox hboxInvoiceNo;
     public HBox hboxAmountPerItem;
     public HBox hboxCurrencyFormat;
+    public HBox hboxDiscount;
     public ScrollPane scrlpneSongInvoice;
     public ScrollPane scrlpneMain;
     public VBox vboxSong;
@@ -142,14 +141,27 @@ public class ControllerInvoice {
         String amountPerItemString = txtAmountPerItem.getText();
         double amountPerItem = 0;
         String currencyFormat = txtCurrencyFormat.getText().toUpperCase();
+        String discountString = txtDiscount.getText();
+        double discount = 0;
 
         try {
             amountPerItem = Double.parseDouble(amountPerItemString);
-            System.out.println("amountPerItem = " + amountPerItem);
         } catch (NumberFormatException numberFormatException) {
             hboxAmountPerItem.setStyle("-fx-border-color: '#931621';");
             txtAmountPerItem.requestFocus();
             scrlpneMain.setVvalue(0);
+        }
+
+        if (Objects.equals(discountString, "")) {
+            discount = 0;
+        } else {
+            try {
+                discount = Double.parseDouble(discountString);
+            } catch (NumberFormatException numberFormatException) {
+                hboxDiscount.setStyle("-fx-border-color: '#931621';");
+                txtDiscount.requestFocus();
+                scrlpneMain.setVvalue(0);
+            }
         }
 
         if (Objects.equals(invoiceTo, "")) {
@@ -176,7 +188,7 @@ public class ControllerInvoice {
                     hboxCurrencyFormat.requestFocus();
                     scrlpneMain.setVvalue(0);
                 } else {
-                    Invoice.generateInvoice(invoiceTo, invoiceNo, date, amountPerItem, currencyFormat);
+                    Invoice.generateInvoice(invoiceTo, invoiceNo, date, amountPerItem, currencyFormat, discount, txtInvoiceTo.getScene().getWindow());
                 }
             } else {
                 hboxAmountPerItem.setStyle("-fx-border-color: '#931621';");
@@ -185,6 +197,4 @@ public class ControllerInvoice {
             }
         }
     }
-
-
 }

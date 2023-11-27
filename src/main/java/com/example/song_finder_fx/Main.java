@@ -192,19 +192,6 @@ public class Main extends Application {
     }
 }
 
-// TODO: Add a separate threads check database
-// TODO: Add a place to show the featuring artist in song-view.fxml
-// TODO: Implement a column in database to put CeyMusic share
-// TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
-// TODO: Adding admin switch
-// TODO: Keyboard movement handling for search
-// TODO: Code is malfunctioning when pasted UPCs
-// TODO: File copying thread works again and again
-// TODO: Disable button of the main UI when the proceed button clicked
-// TODO: Offer cancel method after proceed button clicked
-// TODO: Improve search to search by singer, composer, lyricist, and also search by all at once
-// TODO: Most viewed and recently viewed songs
-// TODO: Try to add a waveform for audio
 // TODO: List is not updating when deleting a song
 // TODO: Parent window is showing a not responded situation when browsing for a location
 // TODO: In the search and collect songs if a song is missing, after the completion, no error is showing
@@ -213,3 +200,15 @@ public class Main extends Application {
 // TODO: 11/14/2023 https://youtu.be/V9nDH2iBJSM?si=oCx3NjivV7nBJl8y&t=1022
 // TODO: 11/17/2023 In song view, make copy to function run in a separate thread to stop application from not responding
 // TODO: 11/23/2023 Add a text box to enter invoice discount percentage and invoice save location
+// TODO: 11/27/2023 Report Generator
+// TODO: 11/27/2023 Play button in the search song
+// TODO: 11/27/2023 Add to list in the search song
+// TODO: 11/27/2023 Edit list in the invoice view
+// TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
+// TODO: Add a separate threads check database
+// TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
+// TODO: Disable button of the main UI when the proceed button clicked
+// TODO: Offer cancel method after proceed button clicked
+// TODO: Improve search to search by singer, composer, lyricist, and also search by all at once
+// TODO: Most viewed and recently viewed songs
+// TODO: Try to add a waveform for audio

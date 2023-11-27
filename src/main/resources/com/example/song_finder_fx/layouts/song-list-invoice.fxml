@@ -199,6 +199,40 @@
                <Insets left="30.0" />
             </VBox.margin>
          </HBox>
+         <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="345.0" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+            <padding>
+               <Insets left="20.0" />
+            </padding>
+            <children>
+               <Label prefHeight="40.0" prefWidth="120.0" text="Discount" wrapText="true">
+                  <font>
+                     <Font name="Segoe UI Semilight" size="14.0" />
+                  </font>
+                  <HBox.margin>
+                     <Insets />
+                  </HBox.margin>
+               </Label>
+               <HBox fx:id="hboxDiscount" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0" styleClass="search-container" stylesheets="@../styles.css">
+                  <padding>
+                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  </padding>
+                  <HBox.margin>
+                     <Insets />
+                  </HBox.margin>
+                  <children>
+                     <TextField fx:id="txtDiscount" prefHeight="30.0" prefWidth="440.0" promptText="Leave this field if no discount applies" stylesheets="@../styles.css">
+                        <styleClass>
+                           <String fx:value="text-field" />
+                           <String fx:value="text-field" />
+                        </styleClass>
+                     </TextField>
+                  </children>
+               </HBox>
+            </children>
+            <VBox.margin>
+               <Insets left="30.0" />
+            </VBox.margin>
+         </HBox>
             <VBox fx:id="vBoxInSearchSong" maxWidth="606.0" minWidth="600.0" prefWidth="606.0" styleClass="textarea-bg" stylesheets="@../styles.css">
                 <HBox alignment="CENTER_LEFT" minHeight="40.0" prefHeight="40.0" prefWidth="200.0" styleClass="invoice-table" stylesheets="@../styles.css">
                     <VBox.margin>

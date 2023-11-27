@@ -20,7 +20,11 @@ import com.itextpdf.layout.property.AreaBreakType;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.ResultSet;
@@ -37,8 +41,12 @@ public class Invoice {
     private static final DecimalFormat df = new DecimalFormat("0.00");
     private static int pageNumber = 1;
 
-    public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date, double amountPerItem, String currencyFormat) throws IOException, SQLException, ClassNotFoundException {
-        String path = "invoice3.pdf";
+    public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date, double amountPerItem, String currencyFormat, double discount, Window window) throws IOException, SQLException, ClassNotFoundException {
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files (*.pdf)", "*.pdf"));
+        chooser.setTitle("Save As");
+        File pathTo = chooser.showSaveDialog(window);
+        String path = pathTo.getAbsolutePath();
         PdfWriter pdfWriter = new PdfWriter(path);
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
         pdfDocument.setDefaultPageSize(PageSize.A4);
@@ -96,7 +104,7 @@ public class Invoice {
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER));
 
-        int discountPercentage = 50;
+        int discountPercentage = (int) discount;
         double totalDue = Database.calculateTotalDue(amountPerItem);
         double processedTotalDue = (totalDue + ((totalDue * 10) / 100)) - ((totalDue * discountPercentage) / 100);
 
@@ -223,7 +231,7 @@ public class Invoice {
         tableTotal.setFont(font_poppins);
 
         double gst = (totalDue * 10) / 100;
-        double deductedDiscount = (processedTotalDue - ((processedTotalDue * discountPercentage) / 100));
+        double deductedDiscount = ((processedTotalDue * discountPercentage) / 100);
 
         tableTotal.addCell(new Cell()
                 .add(new Paragraph("10% GST"))
@@ -242,7 +250,7 @@ public class Invoice {
                 .setBorder(Border.NO_BORDER)
                 .setTextAlignment(TextAlignment.RIGHT));
         tableTotal.addCell(new Cell()
-                .add(new Paragraph(currencyFormat + " " + df.format(deductedDiscount)))
+                .add(new Paragraph("- "+currencyFormat + " " + df.format(deductedDiscount)))
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER)
                 .setTextAlignment(TextAlignment.RIGHT));
@@ -483,6 +491,6 @@ public class Invoice {
 
     public static void main(String[] args) throws SQLException, IOException, ClassNotFoundException {
         LocalDate date = LocalDate.now();
-        generateInvoice("SAMPLE", "CEY001", date, 100, "LKR");
+        // generateInvoice("SAMPLE", "CEY001", date, 100, "LKR", 20, txtInvoiceTo.getScene().getWindow());
     }
 }
