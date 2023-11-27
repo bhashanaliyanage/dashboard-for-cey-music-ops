@@ -91,7 +91,7 @@ public class ControllerSongList {
         }
     }
 
-    public void onCopyToButtonClicked() throws SQLException, ClassNotFoundException {
+    public void onCopyToButtonClicked() {
         Task<Void> task;
         List<String> songList = Main.getSongList();
         if (songList.isEmpty()) {
@@ -150,7 +150,6 @@ public class ControllerSongList {
     }
 
     public void onAddMoreButtonClicked(ActionEvent actionEvent) throws IOException {
-        // System.out.println("Add more button clicked");
         Node node = (Node) actionEvent.getSource();
         Scene scene = node.getScene();
         VBox mainVBox = (VBox) scene.lookup("#mainVBox");
@@ -161,12 +160,17 @@ public class ControllerSongList {
         mainVBox.getChildren().add(newContent);
     }
 
-    public void onGenerateInvoiceButtonClicked(ActionEvent actionEvent) throws IOException, SQLException, ClassNotFoundException {
+    public void onGenerateInvoiceButtonClicked(ActionEvent actionEvent) {
         ControllerInvoice controllerInvoice = new ControllerInvoice(mainUIController);
         Node node = (Node) actionEvent.getSource();
         Scene scene = node.getScene();
         Button btnGenerateInvoice = (Button) scene.lookup("#btnGenerateInvoice");
         btnGenerateInvoice.setText("Loading...");
+        Thread t = loadInvoicePageThread(actionEvent, controllerInvoice);
+        t.start();
+    }
+
+    private static Thread loadInvoicePageThread(ActionEvent actionEvent, ControllerInvoice controllerInvoice) {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
@@ -177,14 +181,11 @@ public class ControllerSongList {
                         throw new RuntimeException(e);
                     }
                 });
-                // controllerInvoice.loadThings(actionEvent);
                 return null;
             }
         };
 
-        Thread t = new Thread(task);
-        t.start();
-
+        return new Thread(task);
     }
 
     private void updateButtonProceed(String s) {

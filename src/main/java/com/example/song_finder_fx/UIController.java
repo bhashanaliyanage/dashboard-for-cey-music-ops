@@ -91,6 +91,8 @@ public class UIController {
     public Label searchResultSongName;
     public Label searchResultISRC;
     public VBox vBoxInSearchSong;
+    public Label songFeaturing;
+    public Label songFeaturingCopied;
     private final NotificationBuilder nb = new NotificationBuilder();
 
     //<editor-fold desc="Search">
@@ -364,7 +366,6 @@ public class UIController {
     }
 
     public void onSearchedSongClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, IOException {
-        String name = searchResultSongName.getText();
         String isrc = searchResultISRC.getText();
 
         DatabaseMySQL db = new DatabaseMySQL();
@@ -387,12 +388,6 @@ public class UIController {
             percentage = "0%";
         }
 
-        // System.out.println(songDetails.size());
-
-        // For reference
-        System.out.println("Song name: " + name);
-        System.out.println("ISRC: " + isrc);
-
         // Getting the current parent layout
         FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
         Parent newContent = loader.load();
@@ -410,6 +405,7 @@ public class UIController {
         Label songName = (Label) scene.lookup("#songName");
         Label songISRC = (Label) scene.lookup("#songISRC");
         Label songSinger = (Label) scene.lookup("#songSinger");
+        Label songFeaturing = (Label) scene.lookup("#songFeaturing");
         Label songComposer = (Label) scene.lookup("#songComposer");
         Label songLyricist = (Label) scene.lookup("#songLyricist");
         Label songUPC = (Label) scene.lookup("#songUPC");
@@ -421,6 +417,7 @@ public class UIController {
         songName.setText(songDetails.get(3));
         songNameViewTitle.setText(songDetails.get(3));
         songSinger.setText(songDetails.get(4));
+        songFeaturing.setText(songDetails.get(5));
         songComposer.setText(songDetails.get(6));
         songLyricist.setText(songDetails.get(7));
         songShare.setText(percentage);
@@ -472,6 +469,90 @@ public class UIController {
 
         Thread thread = new Thread(task);
         thread.start();
+    }
+
+    public void copyISRC() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songISRC.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songISRCCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songISRCCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copySinger() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songSinger.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songSingerCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songSingerCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyComposer() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songComposer.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songComposerCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songComposerCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyLyricist() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songLyricist.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songLyricistCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songLyricistCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyFeaturing() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songFeaturing.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songFeaturingCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songFeaturingCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyUPC() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songUPC.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songUPCCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songUPCCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyProductName() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songProductName.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songAlbumNameCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songAlbumNameCopied.setVisible(false)));
+            timeline.play();
+        }
     }
     //</editor-fold>
 
@@ -845,11 +926,6 @@ public class UIController {
     }
     //</editor-fold>
 
-    //<editor-fold desc="Testing">
-    public void onTestButtonClick() throws GeneralSecurityException, IOException {
-        // SheetsForJava.getSheetTest();
-    }
-
     public void onImportToBaseButtonClick() throws SQLException, ClassNotFoundException, IOException {
         DatabaseMySQL dbmsql = new DatabaseMySQL();
         Main main = new Main();
@@ -875,77 +951,6 @@ public class UIController {
         mainVBox.getChildren().add(newContent);
     }
 
-    public void copyISRC(MouseEvent event) {
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        ClipboardContent content = new ClipboardContent();
-        content.putString(songISRC.getText());
-        boolean status = clipboard.setContent(content);
-        if (status) {
-            songISRCCopied.setVisible(true);
-            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songISRCCopied.setVisible(false)));
-            timeline.play();
-        }
-    }
-
-    public void copySinger(MouseEvent event) {
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        ClipboardContent content = new ClipboardContent();
-        content.putString(songSinger.getText());
-        boolean status = clipboard.setContent(content);
-        if (status) {
-            songSingerCopied.setVisible(true);
-            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songSingerCopied.setVisible(false)));
-            timeline.play();
-        }
-    }
-
-    public void copyComposer(MouseEvent event) {
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        ClipboardContent content = new ClipboardContent();
-        content.putString(songComposer.getText());
-        boolean status = clipboard.setContent(content);
-        if (status) {
-            songComposerCopied.setVisible(true);
-            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songComposerCopied.setVisible(false)));
-            timeline.play();
-        }
-    }
-
-    public void copyLyricist(MouseEvent event) {
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        ClipboardContent content = new ClipboardContent();
-        content.putString(songLyricist.getText());
-        boolean status = clipboard.setContent(content);
-        if (status) {
-            songLyricistCopied.setVisible(true);
-            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songLyricistCopied.setVisible(false)));
-            timeline.play();
-        }
-    }
-
-    public void copyUPC(MouseEvent event) {
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        ClipboardContent content = new ClipboardContent();
-        content.putString(songUPC.getText());
-        boolean status = clipboard.setContent(content);
-        if (status) {
-            songUPCCopied.setVisible(true);
-            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songUPCCopied.setVisible(false)));
-            timeline.play();
-        }
-    }
-
-    public void copyProductName(MouseEvent event) {
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        ClipboardContent content = new ClipboardContent();
-        content.putString(songProductName.getText());
-        boolean status = clipboard.setContent(content);
-        if (status) {
-            songAlbumNameCopied.setVisible(true);
-            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songAlbumNameCopied.setVisible(false)));
-            timeline.play();
-        }
-    }
 
     public void onSearchedSongPress(KeyEvent event) throws SQLException, ClassNotFoundException, IOException {
         KeyCode keyCode = event.getCode();
@@ -1036,19 +1041,11 @@ public class UIController {
         }
 
         if (keyCode == KeyCode.ENTER) {
-            Label searchResultSongName = (Label) scene.lookup("#searchResultSongName");
             Label searchResultISRC = (Label) scene.lookup("#searchResultISRC");
-            String name = searchResultSongName.getText();
             String isrc = searchResultISRC.getText();
 
             DatabaseMySQL db = new DatabaseMySQL();
             List<String> songDetails = db.searchSongDetails(isrc);
-
-            // System.out.println(songDetails.size());
-
-            // For reference
-            System.out.println("Song name: " + name);
-            System.out.println("ISRC: " + isrc);
 
             // Getting the current parent layout
             FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
@@ -1065,6 +1062,7 @@ public class UIController {
             Label songName = (Label) scene.lookup("#songName");
             Label songISRC = (Label) scene.lookup("#songISRC");
             Label songSinger = (Label) scene.lookup("#songSinger");
+            Label songFeaturing = (Label) scene.lookup("#songFeaturing");
             Label songComposer = (Label) scene.lookup("#songComposer");
             Label songLyricist = (Label) scene.lookup("#songLyricist");
             Label songUPC = (Label) scene.lookup("#songUPC");
@@ -1076,6 +1074,8 @@ public class UIController {
             songName.setText(songDetails.get(3));
             songNameViewTitle.setText(songDetails.get(3));
             songSinger.setText(songDetails.get(4));
+            songFeaturing.setText(songDetails.get(5));
+            System.out.println("songDetails.get(5) = " + songDetails.get(5));
             songComposer.setText(songDetails.get(6));
             songLyricist.setText(songDetails.get(7));
             songShare.setText("No Detail");
@@ -1108,4 +1108,5 @@ public class UIController {
         ControllerSettings cs = new ControllerSettings(this);
         cs.loadAbout();
     }
+
 }
