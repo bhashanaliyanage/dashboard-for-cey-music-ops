@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.mysql.cj.jdbc.exceptions.CommunicationsException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +10,7 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.sql.SQLException;
 
 public class ControllerRevenueGenerator {
