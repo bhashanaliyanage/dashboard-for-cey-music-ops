@@ -20,7 +20,6 @@ import com.itextpdf.layout.property.AreaBreakType;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -106,9 +105,12 @@ public class Invoice {
 
         int discountPercentage = (int) discount;
         double totalDue = Database.calculateTotalDue(amountPerItem);
-        double processedTotalDue = (totalDue + ((totalDue * 10) / 100)) - ((totalDue * discountPercentage) / 100);
+        double discountAmount = ((totalDue * discountPercentage) / 100);
+        totalDue = totalDue - discountAmount;
+        double gst = (totalDue * 10) / 100;
+        totalDue = totalDue + gst;
 
-        table02.addCell(new Cell(2, 1).add(new Paragraph((currencyFormat + " " + df.format(processedTotalDue))))
+        table02.addCell(new Cell(2, 1).add(new Paragraph((currencyFormat + " " + df.format(totalDue))))
                 .setTextAlignment(TextAlignment.RIGHT)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .setFontSize(28f)
@@ -230,19 +232,6 @@ public class Invoice {
         tableTotal.setMarginRight(30f);
         tableTotal.setFont(font_poppins);
 
-        double gst = (totalDue * 10) / 100;
-        double deductedDiscount = ((processedTotalDue * discountPercentage) / 100);
-
-        tableTotal.addCell(new Cell()
-                .add(new Paragraph("10% GST"))
-                .setFontSize(11f)
-                .setBorder(Border.NO_BORDER)
-                .setTextAlignment(TextAlignment.RIGHT));
-        tableTotal.addCell(new Cell()
-                .add(new Paragraph(currencyFormat + " " + df.format(gst)))
-                .setFontSize(11f)
-                .setBorder(Border.NO_BORDER)
-                .setTextAlignment(TextAlignment.RIGHT));
 
         tableTotal.addCell(new Cell()
                 .add(new Paragraph(discountPercentage + "% Discount"))
@@ -250,7 +239,18 @@ public class Invoice {
                 .setBorder(Border.NO_BORDER)
                 .setTextAlignment(TextAlignment.RIGHT));
         tableTotal.addCell(new Cell()
-                .add(new Paragraph("- "+currencyFormat + " " + df.format(deductedDiscount)))
+                .add(new Paragraph("- " + currencyFormat + " " + df.format(discountAmount)))
+                .setFontSize(11f)
+                .setBorder(Border.NO_BORDER)
+                .setTextAlignment(TextAlignment.RIGHT));
+
+        tableTotal.addCell(new Cell()
+                .add(new Paragraph("10% GST"))
+                .setFontSize(11f)
+                .setBorder(Border.NO_BORDER)
+                .setTextAlignment(TextAlignment.RIGHT));
+        tableTotal.addCell(new Cell()
+                .add(new Paragraph("+ " + currencyFormat + " " + df.format(gst)))
                 .setFontSize(11f)
                 .setBorder(Border.NO_BORDER)
                 .setTextAlignment(TextAlignment.RIGHT));
@@ -267,7 +267,7 @@ public class Invoice {
                 .setBorder(Border.NO_BORDER)
                 .setTextAlignment(TextAlignment.RIGHT));
         tableTotal.addCell(new Cell()
-                .add(new Paragraph(currencyFormat + " " + df.format(processedTotalDue))
+                .add(new Paragraph(currencyFormat + " " + df.format(totalDue))
                         .setBold())
                 .setFontSize(18f)
                 .setBorder(Border.NO_BORDER)
@@ -487,10 +487,5 @@ public class Invoice {
         table.setFixedLayout();
 
         return table;
-    }
-
-    public static void main(String[] args) throws SQLException, IOException, ClassNotFoundException {
-        LocalDate date = LocalDate.now();
-        // generateInvoice("SAMPLE", "CEY001", date, 100, "LKR", 20, txtInvoiceTo.getScene().getWindow());
     }
 }
