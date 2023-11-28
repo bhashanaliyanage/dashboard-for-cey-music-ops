@@ -1,5 +1,7 @@
 package com.example.song_finder_fx;
 
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import javafx.scene.control.Alert;
 import org.sqlite.SQLiteException;
 
@@ -11,6 +13,7 @@ import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -77,6 +80,143 @@ public class DatabaseMySQL {
         reader.close();
     }
 
+    public static boolean loadReport(File report) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
+        Connection db = DatabaseMySQL.getConn();
+        int rs = 0;
+
+        /*String reportPath = report.getAbsolutePath();
+        PreparedStatement psLoadFile = db.prepareStatement("LOAD DATA INFILE ? INTO TABLE report FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;");
+
+        psLoadFile.setString(1, reportPath);
+
+        try {
+            rs = psLoadFile.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }*/
+
+        PreparedStatement ps = db.prepareStatement("INSERT INTO report " +
+                "(Sale_Start_date, Sale_End_date, DSP, Sale_Store_Name, Sale_Type, Sale_User_Type, Territory, " +
+                "Product_UPC, Product_Reference, Product_Catalog_Number, Product_Label, Product_Artist, Product_Title, " +
+                "Asset_Artist, Asset_Title, Asset_Version, Asset_Duration, Asset_ISRC, Asset_Reference, AssetOrProduct, " +
+                "Product_Quantity, Asset_Quantity, Original_Gross_Income, Original_currency, Exchange_Rate, " +
+                "Converted_Gross_Income, Contract_deal_term, Reported_Royalty, Currency, Report_Run_ID, Report_ID, " +
+                "Sale_ID) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        CSVReader reader = new CSVReader(new FileReader(report.getAbsolutePath()));
+        String[] nextLine = reader.readNext(); // Skipping the header
+        while ((nextLine = reader.readNext()) != null) {
+            // nextLine[] is an array of values from the line
+
+            ps.setString(1, nextLine[0]); // Sale_Start_date
+            ps.setString(2, nextLine[1]); // Sale_End_date
+            ps.setString(3, nextLine[2]); // DSP
+            ps.setString(4, nextLine[3]); // Sale_Store_Name
+            ps.setString(5, nextLine[4]); // Sale_Type
+            ps.setString(6, nextLine[5]); // Sale_User_Type
+            ps.setString(7, nextLine[6]); // Territory
+            ps.setLong(8, Long.parseLong(nextLine[7])); // Product_UPC
+            ps.setLong(9, Long.parseLong(nextLine[8])); // Product_Reference
+            ps.setString(10, nextLine[9]); // Product_Catalog_Number
+            ps.setString(11, nextLine[10]); // Product_Label
+            ps.setString(12, nextLine[11]); // Product_Artist
+            ps.setString(13, nextLine[12]); // Product_Title
+            ps.setString(14, nextLine[13]); // Asset_Artist
+            ps.setString(15, nextLine[14]); // Asset_Title
+            ps.setString(16, nextLine[15]); // Asset_Version
+            ps.setInt(17, Integer.parseInt(nextLine[16])); // Asset_Duration
+            ps.setString(18, nextLine[17]); // Asset_ISRC
+            ps.setLong(19, Long.parseLong(nextLine[18])); // Asset_Reference
+            ps.setString(20, nextLine[19]); // AssetOrProduct
+            if (!(Objects.equals(nextLine[20], ""))) {
+                ps.setInt(21, Integer.parseInt(nextLine[20])); // Product_Quantity
+            } else {
+                ps.setInt(21, 0);
+            }
+            ps.setInt(22, Integer.parseInt(nextLine[21])); // Asset_Quantity
+            ps.setDouble(23, Double.parseDouble(nextLine[22])); // Original_Gross_Income
+            ps.setString(24, nextLine[23]); // Original_currency
+            ps.setDouble(25, Double.parseDouble(nextLine[24])); // Exchange_Rate
+            ps.setDouble(26, Double.parseDouble(nextLine[25])); // Converted_Gross_Income
+            ps.setString(27, nextLine[26]); // Contract_deal_term
+            ps.setDouble(28, Double.parseDouble(nextLine[27])); // Reported_Royalty
+            ps.setString(29, nextLine[28]); // Currency
+            ps.setInt(30, Integer.parseInt(nextLine[29])); // Report_Run_ID
+            ps.setInt(31, Integer.parseInt(nextLine[30])); // Report_ID
+            ps.setLong(32, Long.parseLong(nextLine[31])); // Sale_ID
+
+            rs = ps.executeUpdate();
+        }
+
+        /*BufferedReader bufferedReader = new BufferedReader(new FileReader(report));
+        String line;
+        line = bufferedReader.readLine();
+        System.out.println("line = " + line);
+        String[] columnsTEst = line.split(",");
+        System.out.println("columns[16] = " + columnsTEst[16]); // First Column
+
+        while ((line = bufferedReader.readLine()) != null) {
+            String[] columns = line.split(",");
+
+            System.out.println("line = " + line);
+            // Strings
+            ps.setString(1, columns[0]); // Sale_Start_date
+            ps.setString(2, columns[1]); // Sale_End_date
+            ps.setString(3, columns[2]); // DSP
+            ps.setString(4, columns[3]); // Sale_Store_Name
+            ps.setString(5, columns[4]); // Sale_Type
+            ps.setString(6, columns[5]); // Sale_User_Type
+            ps.setString(7, columns[6]); // Territory
+            ps.setLong(8, Long.parseLong(columns[7])); // Product_UPC
+            ps.setLong(9, Long.parseLong(columns[8])); // Product_Reference
+            ps.setString(10, columns[9]); // Product_Catalog_Number
+            ps.setString(11, columns[10]); // Product_Label
+            ps.setString(12, columns[11]); // Product_Artist
+            ps.setString(13, columns[12]); // Product_Title
+            ps.setString(14, columns[13]); // Asset_Artist
+            ps.setString(15, columns[14]); // Asset_Title
+            ps.setString(16, columns[15]); // Asset_Version
+            ps.setInt(17, Integer.parseInt(columns[16])); // Asset_Duration
+            ps.setString(18, columns[17]); // Asset_ISRC
+            ps.setLong(19, Long.parseLong(columns[18])); // Asset_Reference
+            ps.setString(20, columns[19]); // AssetOrProduct
+            ps.setInt(21, Integer.parseInt(columns[20])); // Product_Quantity
+            ps.setInt(22, Integer.parseInt(columns[21])); // Asset_Quantity
+            ps.setDouble(23, Double.parseDouble(columns[22])); // Original_Gross_Income
+            ps.setString(24, columns[23]); // Original_currency
+            ps.setDouble(25, Double.parseDouble(columns[24])); // Exchange_Rate
+            ps.setDouble(26, Double.parseDouble(columns[25])); // Converted_Gross_Income
+            ps.setString(27, columns[26]); // Contract_deal_term
+            ps.setDouble(28, Double.parseDouble(columns[27])); // Reported_Royalty
+            ps.setString(29, columns[28]); // Currency
+            ps.setInt(30, Integer.parseInt(columns[29])); // Report_Run_ID
+            ps.setInt(31, Integer.parseInt(columns[30])); // Report_ID
+            ps.setInt(32, Integer.parseInt(columns[31])); // Sale_ID
+
+            // rs = ps.executeUpdate();
+        }*/
+
+
+        return rs > 0;
+    }
+
+    public static void getReportedRoyalty() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT Asset_ISRC AS ISRC, SUM(Reported_Royalty) AS Total_Royalty " +
+                "FROM report " +
+                "GROUP BY Asset_ISRC " +
+                "ORDER BY `Total_Royalty` DESC");
+
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+            System.out.println("Reported Royalty for ISRC: " + rs.getString(1) + ": " + rs.getString(2));
+        }
+    }
+
     public void CreateTable() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = DatabaseMySQL.getConn();
@@ -103,8 +243,6 @@ public class DatabaseMySQL {
 
     public void ImportToBase(File file) throws SQLException, ClassNotFoundException, IOException {
         Connection db = DatabaseMySQL.getConn();
-        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
-        sc.useDelimiter(",");
 
         PreparedStatement ps = db.prepareStatement("INSERT INTO songs (ISRC," +
                 "ALBUM_TITLE," +
@@ -154,7 +292,6 @@ public class DatabaseMySQL {
                 e.printStackTrace();
             }
         }
-        sc.close();
     }
 
     public static void updateBase(File file) throws SQLException, ClassNotFoundException, IOException {
@@ -279,6 +416,7 @@ public class DatabaseMySQL {
 
         return songs;
     }
+
     public List<Songs> searchSongNamesByISRC(String searchText) throws ClassNotFoundException, SQLException {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;

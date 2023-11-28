@@ -44,7 +44,6 @@ public class Main extends Application {
         // Loading layout file
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("layouts/main-view.fxml"));
         Scene scene = new Scene(loader.load(), 1030, 610);
-        Task<Void> task;
         final String[] audioDatabasePath = {null};
 
         stage.setTitle("CeyMusic Toolkit 2023.2");
@@ -58,6 +57,7 @@ public class Main extends Application {
 
         stage.show();
 
+        Task<Void> task;
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -192,14 +192,6 @@ public class Main extends Application {
     }
 }
 
-// TODO: List is not updating when deleting a song
-// TODO: Parent window is showing a not responded situation when browsing for a location
-// TODO: In the search and collect songs if a song is missing, after the completion, no error is showing
-// TODO: In the list view, copying must be improved by the UI side. The application must be transparent better than it is.
-// TODO: When I trying to copy some list of songs of Chandralekha, the audio of Kusumata Lanwee is not copied, therefore no error is shown.
-// TODO: 11/14/2023 https://youtu.be/V9nDH2iBJSM?si=oCx3NjivV7nBJl8y&t=1022
-// TODO: 11/17/2023 In song view, make copy to function run in a separate thread to stop application from not responding
-// TODO: 11/23/2023 Add a text box to enter invoice discount percentage and invoice save location
 // TODO: 11/27/2023 Report Generator
 // TODO: 11/27/2023 Play button in the search song
 // TODO: 11/27/2023 Add to list in the search song
@@ -212,3 +204,4 @@ public class Main extends Application {
 // TODO: Improve search to search by singer, composer, lyricist, and also search by all at once
 // TODO: Most viewed and recently viewed songs
 // TODO: Try to add a waveform for audio
+// TODO: 11/14/2023 https://youtu.be/V9nDH2iBJSM?si=oCx3NjivV7nBJl8y&t=1022

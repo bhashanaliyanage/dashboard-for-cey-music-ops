@@ -34,7 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -96,6 +95,148 @@ public class UIController {
     private final NotificationBuilder nb = new NotificationBuilder();
 
     //<editor-fold desc="Search">
+    public void onSearchedSongPress(KeyEvent event) throws SQLException, ClassNotFoundException, IOException {
+        KeyCode keyCode = event.getCode();
+        System.out.println("UIController.onSearchedSongPress");
+
+        if (keyCode == KeyCode.DOWN) {
+            ObservableList<Node> children = vboxSong.getChildren();
+            int index = children.size();
+            if (pressCount[0] < index) {
+                pressCount[0]++;
+            }
+        }
+
+        if (keyCode == KeyCode.ENTER) {
+            System.out.println("pressCount = " + pressCount[0]);
+            ObservableList<Node> children = vboxSong.getChildren();
+            int index = children.size();
+            if (pressCount[0] < index) {
+                Node node = children.get(pressCount[0]);
+                node.requestFocus();
+            }
+            /*Node node = (Node) event.getSource();
+            Scene scene = node.getScene();
+            Label searchResultSongName = (Label) scene.lookup("#searchResultSongName");
+            Label searchResultISRC = (Label) scene.lookup("#searchResultISRC");
+            String name = searchResultSongName.getText();
+            String isrc = searchResultISRC.getText();
+
+            DatabaseMySQL db = new DatabaseMySQL();
+            List<String> songDetails = db.searchSongDetails(isrc);
+
+            // System.out.println(songDetails.size());
+
+            // For reference
+            System.out.println("Song name: " + name);
+            System.out.println("ISRC: " + isrc);
+
+            // Getting the current parent layout
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+            Parent newContent = loader.load();
+            VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+            mainVBox.getChildren().clear();
+
+
+            // Setting the new layout
+            mainVBox.getChildren().add(newContent);
+
+            // Setting values for labels
+            Label songNameViewTitle = (Label) scene.lookup("#songNameViewTitle");
+            Label songName = (Label) scene.lookup("#songName");
+            Label songISRC = (Label) scene.lookup("#songISRC");
+            Label songSinger = (Label) scene.lookup("#songSinger");
+            Label songComposer = (Label) scene.lookup("#songComposer");
+            Label songLyricist = (Label) scene.lookup("#songLyricist");
+            Label songUPC = (Label) scene.lookup("#songUPC");
+            Label songProductName = (Label) scene.lookup("#songProductName");
+            Label songShare = (Label) scene.lookup("#songShare");
+            songISRC.setText(songDetails.get(0));
+            songProductName.setText(songDetails.get(1));
+            songUPC.setText(songDetails.get(2));
+            songName.setText(songDetails.get(3));
+            songNameViewTitle.setText(songDetails.get(3));
+            songSinger.setText(songDetails.get(4));
+            songComposer.setText(songDetails.get(6));
+            songLyricist.setText(songDetails.get(7));
+            songShare.setText("No Detail");*/
+        }
+    }
+
+    public void onSearchedSongPress2(KeyEvent event) throws SQLException, ClassNotFoundException, IOException {
+        KeyCode keyCode = event.getCode();
+        System.out.println("UIController.onSearchedSongPress2");
+
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+
+        VBox vboxSong = (VBox) scene.lookup("#vboxSong");
+
+        if (keyCode == KeyCode.DOWN) {
+            ObservableList<Node> children = vboxSong.getChildren();
+            int index = children.size();
+            if (pressCount[0] < index) {
+                Node node2 = children.get(5);
+                System.out.println("pressCount[0] = " + pressCount[0]);
+                pressCount[0]++;
+                node2.requestFocus();
+            }
+        }
+
+        if (keyCode == KeyCode.ENTER) {
+            Label searchResultISRC = (Label) scene.lookup("#searchResultISRC");
+            String isrc = searchResultISRC.getText();
+
+            DatabaseMySQL db = new DatabaseMySQL();
+            List<String> songDetails = db.searchSongDetails(isrc);
+
+            // Getting the current parent layout
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+            Parent newContent = loader.load();
+            VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+            mainVBox.getChildren().clear();
+
+
+            // Setting the new layout
+            mainVBox.getChildren().add(newContent);
+
+            // Setting values for labels
+            Label songNameViewTitle = (Label) scene.lookup("#songNameViewTitle");
+            Label songName = (Label) scene.lookup("#songName");
+            Label songISRC = (Label) scene.lookup("#songISRC");
+            Label songSinger = (Label) scene.lookup("#songSinger");
+            Label songFeaturing = (Label) scene.lookup("#songFeaturing");
+            Label songComposer = (Label) scene.lookup("#songComposer");
+            Label songLyricist = (Label) scene.lookup("#songLyricist");
+            Label songUPC = (Label) scene.lookup("#songUPC");
+            Label songProductName = (Label) scene.lookup("#songProductName");
+            Label songShare = (Label) scene.lookup("#songShare");
+            songISRC.setText(songDetails.get(0));
+            songProductName.setText(songDetails.get(1));
+            songUPC.setText(songDetails.get(2));
+            songName.setText(songDetails.get(3));
+            songNameViewTitle.setText(songDetails.get(3));
+            songSinger.setText(songDetails.get(4));
+            songFeaturing.setText(songDetails.get(5));
+            System.out.println("songDetails.get(5) = " + songDetails.get(5));
+            songComposer.setText(songDetails.get(6));
+            songLyricist.setText(songDetails.get(7));
+            songShare.setText("No Detail");
+        }
+    }
+
+    public void backButtonImplementationForSearchSong(MouseEvent event) throws IOException {
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
+        // loader.setController(this);
+        Parent newContent = loader.load();
+        mainVBox.getChildren().clear();
+        mainVBox.getChildren().add(newContent);
+    }
+
     public void onAddToListButtonClicked(ActionEvent actionEvent) {
         // Getting scene
         Node node = (Node) actionEvent.getSource();
@@ -340,8 +481,6 @@ public class UIController {
 
     @FXML
     protected void onSearchDetailsButtonClick() throws ClassNotFoundException {
-        /*ControllerSearch controllerSearch = new ControllerSearch(this);
-        controllerSearch.loadThingsTempForSongName();*/
         Connection con = checkDatabaseConnection();
 
         if (con != null) {
@@ -619,9 +758,24 @@ public class UIController {
             Node node = (Node) event.getSource();
             Scene scene = node.getScene();
 
-            int listSize = Main.getSongList().size();
+            List<String> songList = Main.getSongList();
+            int listSize = songList.size();
             Label lblListCount = (Label) scene.lookup("#lblListCount");
+            Label songListButtonSubtitle = (Label) scene.lookup("#lblSongListSub");
             lblListCount.setText("Total: " + listSize);
+
+            try {
+                if (listSize > 1) {
+                    String text = songList.get(0) + " + " + (listSize - 1) + " other songs added";
+                    songListButtonSubtitle.setText(text);
+                    System.out.println(text);
+                } else {
+                    songListButtonSubtitle.setText(songList.get(0));
+                    System.out.println(songList.get(0));
+                }
+            } catch (Exception e) {
+                songListButtonSubtitle.setText("Click Here to Add Songs");
+            }
         }
     }
 
@@ -939,150 +1093,6 @@ public class UIController {
         }
     }
 
-    public void backButtonImplementationForSearchSong(MouseEvent event) throws IOException {
-        Node node = (Node) event.getSource();
-        Scene scene = node.getScene();
-        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
-        // loader.setController(this);
-        Parent newContent = loader.load();
-        mainVBox.getChildren().clear();
-        mainVBox.getChildren().add(newContent);
-    }
-
-
-    public void onSearchedSongPress(KeyEvent event) throws SQLException, ClassNotFoundException, IOException {
-        KeyCode keyCode = event.getCode();
-        System.out.println("UIController.onSearchedSongPress");
-
-        if (keyCode == KeyCode.DOWN) {
-            ObservableList<Node> children = vboxSong.getChildren();
-            int index = children.size();
-            if (pressCount[0] < index) {
-                pressCount[0]++;
-            }
-        }
-
-        if (keyCode == KeyCode.ENTER) {
-            System.out.println("pressCount = " + pressCount[0]);
-            ObservableList<Node> children = vboxSong.getChildren();
-            int index = children.size();
-            if (pressCount[0] < index) {
-                Node node = children.get(pressCount[0]);
-                node.requestFocus();
-            }
-            /*Node node = (Node) event.getSource();
-            Scene scene = node.getScene();
-            Label searchResultSongName = (Label) scene.lookup("#searchResultSongName");
-            Label searchResultISRC = (Label) scene.lookup("#searchResultISRC");
-            String name = searchResultSongName.getText();
-            String isrc = searchResultISRC.getText();
-
-            DatabaseMySQL db = new DatabaseMySQL();
-            List<String> songDetails = db.searchSongDetails(isrc);
-
-            // System.out.println(songDetails.size());
-
-            // For reference
-            System.out.println("Song name: " + name);
-            System.out.println("ISRC: " + isrc);
-
-            // Getting the current parent layout
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
-            Parent newContent = loader.load();
-            VBox mainVBox = (VBox) scene.lookup("#mainVBox");
-            mainVBox.getChildren().clear();
-
-
-            // Setting the new layout
-            mainVBox.getChildren().add(newContent);
-
-            // Setting values for labels
-            Label songNameViewTitle = (Label) scene.lookup("#songNameViewTitle");
-            Label songName = (Label) scene.lookup("#songName");
-            Label songISRC = (Label) scene.lookup("#songISRC");
-            Label songSinger = (Label) scene.lookup("#songSinger");
-            Label songComposer = (Label) scene.lookup("#songComposer");
-            Label songLyricist = (Label) scene.lookup("#songLyricist");
-            Label songUPC = (Label) scene.lookup("#songUPC");
-            Label songProductName = (Label) scene.lookup("#songProductName");
-            Label songShare = (Label) scene.lookup("#songShare");
-            songISRC.setText(songDetails.get(0));
-            songProductName.setText(songDetails.get(1));
-            songUPC.setText(songDetails.get(2));
-            songName.setText(songDetails.get(3));
-            songNameViewTitle.setText(songDetails.get(3));
-            songSinger.setText(songDetails.get(4));
-            songComposer.setText(songDetails.get(6));
-            songLyricist.setText(songDetails.get(7));
-            songShare.setText("No Detail");*/
-        }
-    }
-
-    public void onSearchedSongPress2(KeyEvent event) throws SQLException, ClassNotFoundException, IOException {
-        KeyCode keyCode = event.getCode();
-        System.out.println("UIController.onSearchedSongPress2");
-
-        Node node = (Node) event.getSource();
-        Scene scene = node.getScene();
-
-        VBox vboxSong = (VBox) scene.lookup("#vboxSong");
-
-        if (keyCode == KeyCode.DOWN) {
-            ObservableList<Node> children = vboxSong.getChildren();
-            int index = children.size();
-            if (pressCount[0] < index) {
-                Node node2 = children.get(5);
-                System.out.println("pressCount[0] = " + pressCount[0]);
-                pressCount[0]++;
-                node2.requestFocus();
-            }
-        }
-
-        if (keyCode == KeyCode.ENTER) {
-            Label searchResultISRC = (Label) scene.lookup("#searchResultISRC");
-            String isrc = searchResultISRC.getText();
-
-            DatabaseMySQL db = new DatabaseMySQL();
-            List<String> songDetails = db.searchSongDetails(isrc);
-
-            // Getting the current parent layout
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
-            Parent newContent = loader.load();
-            VBox mainVBox = (VBox) scene.lookup("#mainVBox");
-            mainVBox.getChildren().clear();
-
-
-            // Setting the new layout
-            mainVBox.getChildren().add(newContent);
-
-            // Setting values for labels
-            Label songNameViewTitle = (Label) scene.lookup("#songNameViewTitle");
-            Label songName = (Label) scene.lookup("#songName");
-            Label songISRC = (Label) scene.lookup("#songISRC");
-            Label songSinger = (Label) scene.lookup("#songSinger");
-            Label songFeaturing = (Label) scene.lookup("#songFeaturing");
-            Label songComposer = (Label) scene.lookup("#songComposer");
-            Label songLyricist = (Label) scene.lookup("#songLyricist");
-            Label songUPC = (Label) scene.lookup("#songUPC");
-            Label songProductName = (Label) scene.lookup("#songProductName");
-            Label songShare = (Label) scene.lookup("#songShare");
-            songISRC.setText(songDetails.get(0));
-            songProductName.setText(songDetails.get(1));
-            songUPC.setText(songDetails.get(2));
-            songName.setText(songDetails.get(3));
-            songNameViewTitle.setText(songDetails.get(3));
-            songSinger.setText(songDetails.get(4));
-            songFeaturing.setText(songDetails.get(5));
-            System.out.println("songDetails.get(5) = " + songDetails.get(5));
-            songComposer.setText(songDetails.get(6));
-            songLyricist.setText(songDetails.get(7));
-            songShare.setText("No Detail");
-        }
-    }
-
-    //</editor-fold>
     public void onPercentageChangeButtonClicked(MouseEvent event) throws SQLException, ClassNotFoundException {
         String song_share = songShare.getText();
         String song_name = songName.getText();
@@ -1109,4 +1119,8 @@ public class UIController {
         cs.loadAbout();
     }
 
+    public void onRevenueAnalysisBtnClick(ActionEvent event) throws IOException {
+        ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
+        revenueGenerator.loadRevenueGenerator();
+    }
 }
