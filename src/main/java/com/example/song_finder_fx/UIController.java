@@ -1119,7 +1119,7 @@ public class UIController {
         cs.loadAbout();
     }
 
-    public void onRevenueAnalysisBtnClick(ActionEvent event) throws IOException {
+    public void onRevenueAnalysisBtnClick(ActionEvent event) throws IOException, SQLException, ClassNotFoundException {
         ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
         revenueGenerator.loadRevenueGenerator();
     }

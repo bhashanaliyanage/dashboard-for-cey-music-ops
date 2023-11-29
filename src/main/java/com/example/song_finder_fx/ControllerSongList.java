@@ -143,7 +143,7 @@ public class ControllerSongList {
                 }
             } else {
                 System.out.println("The directory does not exist.");
-                btnCopyTo.setText("Error! Please set audio database location in settings");
+                btnCopyTo.setText("Error! Please setCountry audio database location in settings");
                 btnCopyTo.setStyle("-fx-border-color: '#931621'");
             }
         }

@@ -84,16 +84,8 @@ public class DatabaseMySQL {
         Connection db = DatabaseMySQL.getConn();
         int rs = 0;
 
-        /*String reportPath = report.getAbsolutePath();
-        PreparedStatement psLoadFile = db.prepareStatement("LOAD DATA INFILE ? INTO TABLE report FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;");
-
-        psLoadFile.setString(1, reportPath);
-
-        try {
-            rs = psLoadFile.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }*/
+        PreparedStatement emptyTable = db.prepareStatement("DELETE FROM report;");
+        emptyTable.executeUpdate();
 
         PreparedStatement ps = db.prepareStatement("INSERT INTO report " +
                 "(Sale_Start_date, Sale_End_date, DSP, Sale_Store_Name, Sale_Type, Sale_User_Type, Territory, " +
@@ -105,9 +97,22 @@ public class DatabaseMySQL {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         CSVReader reader = new CSVReader(new FileReader(report.getAbsolutePath()));
+        BufferedReader breader = new BufferedReader(new FileReader(report));
+        int rowcount = 0;
+        int rowcount2 = 0;
+
+        System.out.println("Here");
+        while ((breader.readLine()) != null) {
+            rowcount++;
+            System.out.println("rowcount = " + rowcount);
+        }
+
+        System.out.println("Total rowCount = " + rowcount);
+
         String[] nextLine = reader.readNext(); // Skipping the header
         while ((nextLine = reader.readNext()) != null) {
-            // nextLine[] is an array of values from the line
+            rowcount2++;
+            System.out.println("Executing Row " + rowcount2 + " of " + rowcount);
 
             ps.setString(1, nextLine[0]); // Sale_Start_date
             ps.setString(2, nextLine[1]); // Sale_End_date
@@ -149,55 +154,6 @@ public class DatabaseMySQL {
             rs = ps.executeUpdate();
         }
 
-        /*BufferedReader bufferedReader = new BufferedReader(new FileReader(report));
-        String line;
-        line = bufferedReader.readLine();
-        System.out.println("line = " + line);
-        String[] columnsTEst = line.split(",");
-        System.out.println("columns[16] = " + columnsTEst[16]); // First Column
-
-        while ((line = bufferedReader.readLine()) != null) {
-            String[] columns = line.split(",");
-
-            System.out.println("line = " + line);
-            // Strings
-            ps.setString(1, columns[0]); // Sale_Start_date
-            ps.setString(2, columns[1]); // Sale_End_date
-            ps.setString(3, columns[2]); // DSP
-            ps.setString(4, columns[3]); // Sale_Store_Name
-            ps.setString(5, columns[4]); // Sale_Type
-            ps.setString(6, columns[5]); // Sale_User_Type
-            ps.setString(7, columns[6]); // Territory
-            ps.setLong(8, Long.parseLong(columns[7])); // Product_UPC
-            ps.setLong(9, Long.parseLong(columns[8])); // Product_Reference
-            ps.setString(10, columns[9]); // Product_Catalog_Number
-            ps.setString(11, columns[10]); // Product_Label
-            ps.setString(12, columns[11]); // Product_Artist
-            ps.setString(13, columns[12]); // Product_Title
-            ps.setString(14, columns[13]); // Asset_Artist
-            ps.setString(15, columns[14]); // Asset_Title
-            ps.setString(16, columns[15]); // Asset_Version
-            ps.setInt(17, Integer.parseInt(columns[16])); // Asset_Duration
-            ps.setString(18, columns[17]); // Asset_ISRC
-            ps.setLong(19, Long.parseLong(columns[18])); // Asset_Reference
-            ps.setString(20, columns[19]); // AssetOrProduct
-            ps.setInt(21, Integer.parseInt(columns[20])); // Product_Quantity
-            ps.setInt(22, Integer.parseInt(columns[21])); // Asset_Quantity
-            ps.setDouble(23, Double.parseDouble(columns[22])); // Original_Gross_Income
-            ps.setString(24, columns[23]); // Original_currency
-            ps.setDouble(25, Double.parseDouble(columns[24])); // Exchange_Rate
-            ps.setDouble(26, Double.parseDouble(columns[25])); // Converted_Gross_Income
-            ps.setString(27, columns[26]); // Contract_deal_term
-            ps.setDouble(28, Double.parseDouble(columns[27])); // Reported_Royalty
-            ps.setString(29, columns[28]); // Currency
-            ps.setInt(30, Integer.parseInt(columns[29])); // Report_Run_ID
-            ps.setInt(31, Integer.parseInt(columns[30])); // Report_ID
-            ps.setInt(32, Integer.parseInt(columns[31])); // Sale_ID
-
-            // rs = ps.executeUpdate();
-        }*/
-
-
         return rs > 0;
     }
 
@@ -215,6 +171,46 @@ public class DatabaseMySQL {
         while (rs.next()) {
             System.out.println("Reported Royalty for ISRC: " + rs.getString(1) + ": " + rs.getString(2));
         }
+    }
+
+    public static ResultSet getTop5StreamedAssets() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT Asset_ISRC, Asset_Title, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
+                "FROM report GROUP BY Asset_ISRC ORDER BY Total_Royalty DESC LIMIT 5;");
+
+        return ps.executeQuery();
+    }
+
+    public static ResultSet getTop4DSPs() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT DSP, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
+                "FROM report GROUP BY DSP ORDER BY Total_Royalty DESC;");
+
+        return ps.executeQuery();
+    }
+
+    public static ResultSet getTop5Territories() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT Territory, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
+                "FROM report GROUP BY Territory ORDER BY Total_Royalty DESC LIMIT 5;");
+
+        return ps.executeQuery();
+    }
+
+    public static String getTotalAssetCount() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT COUNT(*) FROM ( SELECT Asset_ISRC FROM report GROUP BY Asset_ISRC ) AS subquery;");
+        rs = ps.executeQuery();
+        rs.next();
+        return rs.getString(1);
     }
 
     public void CreateTable() throws SQLException, ClassNotFoundException {
@@ -341,7 +337,7 @@ public class DatabaseMySQL {
         rs = ps.executeQuery();
 
         if (rs != null) {
-            System.out.println("Result set is not null");
+            System.out.println("Result setCountry is not null");
             while (rs.next()) {
                 System.out.println("Inside Result Set");
                 filename = rs.getString("FILE_NAME");

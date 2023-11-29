@@ -48,7 +48,7 @@ public class Main extends Application {
 
         stage.setTitle("CeyMusic Toolkit 2023.2");
         stage.setScene(scene);
-        stage.setMinWidth(995);
+        stage.setMinWidth(1100);
         stage.setMinHeight(700);
 
         Image image = new Image("com/example/song_finder_fx/icons/icon.png");
