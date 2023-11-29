@@ -51,13 +51,13 @@ public class ControllerRevenueGenerator {
     public ImageView imgDSP02;
     public ImageView imgDSP03;
     public ImageView imgDSP04;
-    private UIController mainUIController = null;
+    private final UIController mainUIController;
 
     public ControllerRevenueGenerator(UIController uiController) {
         mainUIController = uiController;
     }
 
-    public void loadRevenueGenerator() throws IOException, SQLException, ClassNotFoundException {
+    public void loadRevenueGenerator() throws IOException {
         FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/revenue-generator.fxml"));
         loader.setController(this);
         Parent newContent = loader.load();
@@ -201,7 +201,7 @@ public class ControllerRevenueGenerator {
         lblAsset05Streams.setText(currency + " " + df.format(revenue));
     }
 
-    public void onLoadReportButtonClick() throws CsvValidationException, SQLException, IOException, ClassNotFoundException {
+    public void onLoadReportButtonClick() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Select FUGA Report");
 
@@ -209,11 +209,11 @@ public class ControllerRevenueGenerator {
 
         btnLoadReport.setText("Working on...");
 
-        boolean status = DatabaseMySQL.loadReport(report);
-        /*Task<Void> task;
+        Task<Void> task;
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {
+                boolean status = DatabaseMySQL.loadReport(report, btnLoadReport);
 
                 Platform.runLater(() -> {
                     if (status) {
@@ -225,7 +225,7 @@ public class ControllerRevenueGenerator {
         };
 
         Thread t = new Thread(task);
-        t.start();*/
+        t.start();
     }
 
     public void onGetReportedRoyaltyPerISRCbtnClick() throws SQLException, ClassNotFoundException {

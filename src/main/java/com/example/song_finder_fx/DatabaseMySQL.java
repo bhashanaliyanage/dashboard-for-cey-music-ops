@@ -2,7 +2,9 @@ package com.example.song_finder_fx;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import org.sqlite.SQLiteException;
 
 import java.io.*;
@@ -11,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -80,9 +83,10 @@ public class DatabaseMySQL {
         reader.close();
     }
 
-    public static boolean loadReport(File report) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
+    public static boolean loadReport(File report, Button btnLoadReport) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
         Connection db = DatabaseMySQL.getConn();
         int rs = 0;
+        DecimalFormat df = new DecimalFormat("0.00");
 
         PreparedStatement emptyTable = db.prepareStatement("DELETE FROM report;");
         emptyTable.executeUpdate();
@@ -98,8 +102,8 @@ public class DatabaseMySQL {
 
         CSVReader reader = new CSVReader(new FileReader(report.getAbsolutePath()));
         BufferedReader breader = new BufferedReader(new FileReader(report));
-        int rowcount = 0;
-        int rowcount2 = 0;
+        int rowcount = 0; // Total RowCount
+        int rowcount2 = 0; // While loop's row count
 
         System.out.println("Here");
         while ((breader.readLine()) != null) {
@@ -113,6 +117,12 @@ public class DatabaseMySQL {
         while ((nextLine = reader.readNext()) != null) {
             rowcount2++;
             System.out.println("Executing Row " + rowcount2 + " of " + rowcount);
+
+            int finalCurrentRow = rowcount2;
+            double percentage = ((double) rowcount2 / rowcount) * 100;
+            Platform.runLater(() -> {
+                btnLoadReport.setText("Processing " + df.format(percentage) + "%");
+            });
 
             ps.setString(1, nextLine[0]); // Sale_Start_date
             ps.setString(2, nextLine[1]); // Sale_End_date
