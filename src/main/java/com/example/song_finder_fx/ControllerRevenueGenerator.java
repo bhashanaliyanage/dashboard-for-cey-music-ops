@@ -65,18 +65,22 @@ public class ControllerRevenueGenerator {
         mainUIController.mainVBox.getChildren().clear();
         mainUIController.mainVBox.getChildren().add(newContent);
 
-
         Task<Void> task;
 
         task = new Task<>() {
             @Override
-            protected Void call() {
+            protected Void call() throws SQLException, ClassNotFoundException {
+                ResultSet top5Territories = DatabaseMySQL.getTop5Territories();
+                ResultSet top4DSPs = DatabaseMySQL.getTop4DSPs();
+                String count = DatabaseMySQL.getTotalAssetCount();
+                ResultSet top5StreamedAssets = DatabaseMySQL.getTop5StreamedAssets();
+
                 Platform.runLater(() -> {
                     try {
-                        loadTopStreamedAssets();
-                        loadTotalAssetCount();
-                        loadTop5Territories();
-                        loadTop4DSPs();
+                        loadTopStreamedAssets(top5StreamedAssets);
+                        lblTotalAssets.setText(count);
+                        loadTop5Territories(top5Territories);
+                        loadTop4DSPs(top4DSPs);
                     } catch (SQLException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }
@@ -89,8 +93,7 @@ public class ControllerRevenueGenerator {
         t.start();
     }
 
-    private void loadTop5Territories() throws SQLException, ClassNotFoundException {
-        ResultSet rs = DatabaseMySQL.getTop5Territories();
+    private void loadTop5Territories(ResultSet rs) throws SQLException, ClassNotFoundException {
         DecimalFormat df = new DecimalFormat("0.00");
         double revenue;
         String currency;
@@ -127,8 +130,7 @@ public class ControllerRevenueGenerator {
         lblCountry05Streams.setText(currency + " " + df.format(revenue));
     }
 
-    private void loadTop4DSPs() throws SQLException, ClassNotFoundException {
-        ResultSet rs = DatabaseMySQL.getTop4DSPs();
+    private void loadTop4DSPs(ResultSet rs) throws SQLException, ClassNotFoundException {
         DecimalFormat df = new DecimalFormat("0.00");
         ItemSwitcher itemSwitcher = new ItemSwitcher();
         double revenue;
@@ -163,13 +165,7 @@ public class ControllerRevenueGenerator {
         imgDSP04.setImage(itemSwitcher.setImage(rs.getString(1)));
     }
 
-    private void loadTotalAssetCount() throws SQLException, ClassNotFoundException {
-        String count = DatabaseMySQL.getTotalAssetCount();
-        lblTotalAssets.setText(count);
-    }
-
-    private void loadTopStreamedAssets() throws SQLException, ClassNotFoundException {
-        ResultSet rs = DatabaseMySQL.getTop5StreamedAssets();
+    private void loadTopStreamedAssets(ResultSet rs) throws SQLException, ClassNotFoundException {
         DecimalFormat df = new DecimalFormat("0.00");
         double revenue;
         String currency;
