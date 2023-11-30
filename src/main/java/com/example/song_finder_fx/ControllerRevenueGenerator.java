@@ -1,6 +1,6 @@
 package com.example.song_finder_fx;
 
-import com.opencsv.exceptions.CsvValidationException;
+import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -11,13 +11,21 @@ import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ControllerRevenueGenerator {
+    //<editor-fold desc="Buttons">
     public Button btnLoadReport;
+    public Button btnGenerateFullBreakdown;
+    //</editor-fold>
+
+    //<editor-fold desc="Labels">
     public Label lblAsset01;
     public Label lblAsset02;
     public Label lblAsset03;
@@ -48,10 +56,14 @@ public class ControllerRevenueGenerator {
     public Label lblAmountDSP03;
     public Label lblAmountDSP04;
     public Label lblTitleMonth;
+    //</editor-fold>
+
+    //<editor-fold desc="ImagesViews">
     public ImageView imgDSP01;
     public ImageView imgDSP02;
     public ImageView imgDSP03;
     public ImageView imgDSP04;
+    //</editor-fold>
     private final UIController mainUIController;
 
     public ControllerRevenueGenerator(UIController uiController) {
@@ -234,20 +246,54 @@ public class ControllerRevenueGenerator {
         t.start();
     }
 
-    public void onGetReportedRoyaltyPerISRCbtnClick() throws SQLException, ClassNotFoundException {
-        btnLoadReport.setText("Generating...");
+    public void onGenerateFullBreakdownBtnClick() {
+        Platform.runLater(() -> {
+            try {
+                ResultSet rs = DatabaseMySQL.getFullBreakdown();
 
-        DatabaseMySQL.getReportedRoyalty();
+                CSVWriter writer = new CSVWriter(new FileWriter("revenue_breakdown_full.csv"));
+                List<String[]> rows = new ArrayList<>();
+                String[] header = new String[] {
+                        "ISRC",
+                        "Reported Royalty Summary",
+                        "AU Earnings",
+                        "After GST Deduction",
+                        "Rest of the world Earnings",
+                        "Reported Royalty After GST",
+                        "Reported Royalty for CeyMusic"
+                };
+                rows.add(header);
+
+                while (rs.next()) {
+                    System.out.println("rs.getString(1) = " + rs.getString(1));
+
+                    String[] row = new String[] {
+                            rs.getString(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            rs.getString(5),
+                            rs.getString(6),
+                            rs.getString(7)
+                    };
+
+                    rows.add(row);
+                }
+
+                writer.writeAll(rows);
+                writer.close();
+            } catch (SQLException | ClassNotFoundException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         /*Task<Void> task;
         task = new Task<>() {
             @Override
-            protected Void call() throws Exception {
-                boolean status = DatabaseMySQL.loadReport(report);
+            protected Void call() {
 
                 Platform.runLater(() -> {
-                    if (status) {
-                        btnLoadReport.setText("CSV Imported to Database");
-                    }
+
                 });
                 return null;
             }

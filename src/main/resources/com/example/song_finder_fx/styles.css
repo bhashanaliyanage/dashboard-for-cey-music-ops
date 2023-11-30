@@ -91,6 +91,21 @@
     -fx-background-radius: 3;
 }
 
+.clickable-pane-bg {
+    -fx-background-color: '#FFFFFF';
+    -fx-border-color: '#e9ebee';
+    -fx-border-width: 1;
+    -fx-background-radius: 3;
+}
+
+.clickable-pane-bg:hover {
+    -fx-background-color: '#F5F3F3';
+}
+
+.clickable-pane-bg:pressed {
+    -fx-background-color: '#D9D9D9';
+}
+
 .text-field {
     -fx-background-color: '#FFFFFF';
 }
