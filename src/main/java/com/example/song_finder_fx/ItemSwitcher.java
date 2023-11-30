@@ -22,13 +22,15 @@ public class ItemSwitcher {
         Image defaultImage = new Image("com/example/song_finder_fx/images/logo_small_200x.png");
 
         Image youtube = new Image("com/example/song_finder_fx/images/yt.png");
+        Image ytmusic = new Image("com/example/song_finder_fx/images/ytmusic.png");
         Image spotify = new Image("com/example/song_finder_fx/images/spotify.png");
         Image itunes = new Image("com/example/song_finder_fx/images/itunes.png");
         Image fb = new Image("com/example/song_finder_fx/images/fb.png");
         Image tiktok = new Image("com/example/song_finder_fx/images/tiktok.png");
 
         return switch (dsp) {
-            case "Youtube Ad Supported", "Youtube Music" -> youtube;
+            case "Youtube Ad Supported" -> youtube;
+            case "Youtube Music" -> ytmusic;
             case "Spotify" -> spotify;
             case "Apple Music" -> itunes;
             case "Facebook", "Facebook Audio Library", "Facebook Fingerprinting" -> fb;
