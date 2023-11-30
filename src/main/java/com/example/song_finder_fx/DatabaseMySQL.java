@@ -223,6 +223,16 @@ public class DatabaseMySQL {
         return rs.getString(1);
     }
 
+    public static String getSalesDate() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT Sale_Start_date FROM report LIMIT 1;");
+        rs = ps.executeQuery();
+        rs.next();
+        return rs.getString(1);
+    }
+
     public void CreateTable() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = DatabaseMySQL.getConn();

@@ -13,6 +13,7 @@ public class ItemSwitcher {
             case "US" -> "United State";
             case "IT" -> "Italy";
             case "GB" -> "United Kingdom";
+            case "AE" -> "United Arab Emirates";
             default -> countryCode;
         };
     }
@@ -24,13 +25,34 @@ public class ItemSwitcher {
         Image spotify = new Image("com/example/song_finder_fx/images/spotify.png");
         Image itunes = new Image("com/example/song_finder_fx/images/itunes.png");
         Image fb = new Image("com/example/song_finder_fx/images/fb.png");
+        Image tiktok = new Image("com/example/song_finder_fx/images/tiktok.png");
 
         return switch (dsp) {
             case "Youtube Ad Supported", "Youtube Music" -> youtube;
             case "Spotify" -> spotify;
             case "Apple Music" -> itunes;
-            case "Facebook" -> fb;
+            case "Facebook", "Facebook Audio Library", "Facebook Fingerprinting" -> fb;
+            case "TikTok" -> tiktok;
+
             default -> defaultImage;
+        };
+    }
+
+    public String setMonth(String month) {
+        return switch (month) {
+            case "01" -> "January";
+            case "02" -> "February";
+            case "03" -> "March";
+            case "04" -> "April";
+            case "05" -> "May";
+            case "06" -> "June";
+            case "07" -> "July";
+            case "08" -> "August";
+            case "09" -> "September";
+            case "10" -> "October";
+            case "11" -> "November";
+            case "12" -> "December";
+            default -> month;
         };
     }
 }

@@ -47,6 +47,7 @@ public class ControllerRevenueGenerator {
     public Label lblAmountDSP02;
     public Label lblAmountDSP03;
     public Label lblAmountDSP04;
+    public Label lblTitleMonth;
     public ImageView imgDSP01;
     public ImageView imgDSP02;
     public ImageView imgDSP03;
@@ -61,6 +62,7 @@ public class ControllerRevenueGenerator {
         FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/revenue-generator.fxml"));
         loader.setController(this);
         Parent newContent = loader.load();
+        ItemSwitcher itemSwitcher = new ItemSwitcher();
 
         mainUIController.mainVBox.getChildren().clear();
         mainUIController.mainVBox.getChildren().add(newContent);
@@ -74,9 +76,13 @@ public class ControllerRevenueGenerator {
                 ResultSet top4DSPs = DatabaseMySQL.getTop4DSPs();
                 String count = DatabaseMySQL.getTotalAssetCount();
                 ResultSet top5StreamedAssets = DatabaseMySQL.getTop5StreamedAssets();
+                String salesDate = DatabaseMySQL.getSalesDate();
+                String[] date = salesDate.split("-");
+                String month = date[1];
 
                 Platform.runLater(() -> {
                     try {
+                        lblTitleMonth.setText(itemSwitcher.setMonth(month));
                         loadTopStreamedAssets(top5StreamedAssets);
                         lblTotalAssets.setText(count);
                         loadTop5Territories(top5Territories);
