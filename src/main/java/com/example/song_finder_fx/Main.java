@@ -197,15 +197,12 @@ public class Main extends Application {
     }
 }
 
-// TODO: 11/27/2023 Play button in the search song
-// TODO: 11/27/2023 Add to list in the search song
 // TODO: 11/27/2023 Edit list in the invoice view
 // TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
 // TODO: Add a separate threads check database
 // TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
 // TODO: Disable button of the main UI when the proceed button clicked
 // TODO: Offer cancel method after proceed button clicked
-// TODO: Improve search to search by singer, composer, lyricist, and also search by all at once
 // TODO: Most viewed and recently viewed songs
-// TODO: Try to add a waveform for audio
 // TODO: 11/14/2023 https://youtu.be/V9nDH2iBJSM?si=oCx3NjivV7nBJl8y&t=1022
+// TODO: 12/1/2023 Handle software updates

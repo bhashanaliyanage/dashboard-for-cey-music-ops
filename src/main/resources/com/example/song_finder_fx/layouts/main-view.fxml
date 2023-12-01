@@ -12,10 +12,10 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="610.0" prefWidth="1030.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<BorderPane prefHeight="610.0" prefWidth="1030.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
     <center>
-        <VBox fx:id="mainVBox" alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="650.0" prefHeight="444.0" BorderPane.alignment="CENTER">
-            <VBox prefWidth="696.0" styleClass="white-background" stylesheets="@../styles.css" VBox.vgrow="ALWAYS">
+        <VBox fx:id="mainVBox" alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="650.0" prefHeight="444.0" styleClass="main-vbox" stylesheets="@../styles.css" BorderPane.alignment="CENTER">
+            <VBox prefWidth="696.0" stylesheets="@../styles.css" VBox.vgrow="ALWAYS">
                 <Label text="Search and Collect Songs">
                     <font>
                         <Font name="Segoe UI Semibold" size="28.0" />
@@ -134,12 +134,15 @@
                     </Button>
                 </HBox>
             </VBox>
+         <BorderPane.margin>
+            <Insets top="20.0" />
+         </BorderPane.margin>
 
-        </VBox>
+           </VBox>
     </center>
     <left>
         <VBox minWidth="246.0" prefHeight="610.0" prefWidth="321.0" spacing="5.0" styleClass="white-pane-background" stylesheets="@../styles.css" BorderPane.alignment="CENTER">
-            <HBox maxWidth="278.0" onMouseClicked="#onAboutButtonClicked" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
+            <HBox onMouseClicked="#onAboutButtonClicked" prefHeight="80.0" prefWidth="296.0" styleClass="button-vbox" stylesheets="@../styles.css">
                 <VBox.margin>
                     <Insets left="20.0" top="20.0" />
                 </VBox.margin>
@@ -164,6 +167,14 @@
                         </font>
                     </Label>
                 </VBox>
+            <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/icon_update_available.png" />
+               </image>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </ImageView>
             </HBox>
             <HBox fx:id="btnSeachSongs" maxWidth="278.0" onMouseClicked="#onSearchDetailsButtonClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
                 <VBox.margin>

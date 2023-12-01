@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainVBox" prefWidth="696.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="mainVBox" prefWidth="696.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <Label text="About">
       <font>
          <Font name="Segoe UI Semibold" size="28.0" />
@@ -18,30 +18,30 @@
    </Label>
    <VBox alignment="CENTER" prefHeight="1080.0" VBox.vgrow="ALWAYS">
       <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-         <Image url="@../images/logo_small_200x.png"/>
+         <Image url="@../images/logo_small_200x.png" />
       </ImageView>
       <Label text="CeyMusic Toolkit">
          <font>
-            <Font size="20.0"/>
+            <Font size="20.0" />
          </font>
          <VBox.margin>
-            <Insets top="40.0"/>
+            <Insets top="40.0" />
          </VBox.margin>
       </Label>
       <Label text="Build 23.3 by Bhashana Liyanage">
          <font>
-            <Font size="13.0"/>
+            <Font size="13.0" />
          </font>
          <VBox.margin>
-            <Insets top="3.0"/>
+            <Insets top="3.0" />
          </VBox.margin>
       </Label>
       <Label layoutX="265.0" layoutY="378.0" text="bhashanaliyanage@gmail.com">
          <font>
-            <Font size="13.0"/>
+            <Font size="13.0" />
          </font>
          <VBox.margin>
-            <Insets top="1.0"/>
+            <Insets top="1.0" />
          </VBox.margin>
       </Label>
    </VBox>

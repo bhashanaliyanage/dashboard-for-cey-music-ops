@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainVBox" prefWidth="696.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="mainVBox" prefWidth="696.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -32,7 +32,7 @@
         <VBox.margin>
             <Insets top="30.0" />
         </VBox.margin>
-        <VBox spacing="10.0" styleClass="white-background" stylesheets="@../styles.css">
+        <VBox spacing="10.0" stylesheets="@../styles.css">
             <Label text="Invoice Details">
                 <font>
                     <Font name="Segoe UI Semibold" size="12.0" />
@@ -122,48 +122,48 @@
                     <Insets left="30.0" />
                 </VBox.margin>
             </HBox>
-            <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="114.0" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+            <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="114.0" maxWidth="606.0" minHeight="67.0"
+                  minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg"
+                  stylesheets="@../styles.css">
                 <padding>
-                    <Insets left="20.0" />
+                    <Insets left="20.0"/>
                 </padding>
-                <children>
-               <VBox alignment="CENTER">
-                  <HBox.margin>
-                     <Insets />
-                  </HBox.margin>
-                  <children>
-                          <Label prefWidth="120.0" text="Amount Per" wrapText="true">
-                              <font>
-                                  <Font name="Segoe UI Semilight" size="14.0" />
-                              </font>
-                          </Label>
-                     <Label layoutX="10.0" layoutY="10.0" prefWidth="120.0" text="Copyright Holder" wrapText="true">
-                        <font>
-                           <Font name="Segoe UI Semilight" size="12.0" />
-                        </font>
-                     </Label>
-                  </children>
-               </VBox>
-                    <HBox fx:id="hboxAmountPerItem" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0" styleClass="search-container" stylesheets="@../styles.css">
-                        <padding>
-                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                        </padding>
-                        <HBox.margin>
-                            <Insets />
-                        </HBox.margin>
-                        <children>
-                            <TextField fx:id="txtAmountPerItem" prefHeight="30.0" prefWidth="440.0" promptText="Amount Per Copyright Holder" stylesheets="@../styles.css">
-                                <styleClass>
-                                    <String fx:value="text-field" />
-                                    <String fx:value="text-field" />
-                                </styleClass>
-                            </TextField>
-                        </children>
-                    </HBox>
-                </children>
                 <VBox.margin>
-                    <Insets left="30.0" />
+                    <Insets left="30.0"/>
                 </VBox.margin>
+                <VBox alignment="CENTER">
+                    <HBox.margin>
+                        <Insets/>
+                    </HBox.margin>
+                    <Label prefWidth="120.0" text="Amount Per" wrapText="true">
+                        <font>
+                            <Font name="Segoe UI Semilight" size="14.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="10.0" layoutY="10.0" prefWidth="120.0" text="Copyright Holder" wrapText="true">
+                        <font>
+                            <Font name="Segoe UI Semilight" size="12.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+                <HBox fx:id="hboxAmountPerItem" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0"
+                      styleClass="search-container" stylesheets="@../styles.css">
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </padding>
+                    <HBox.margin>
+                        <Insets/>
+                    </HBox.margin>
+                    <children>
+                        <TextField fx:id="txtAmountPerItem" prefHeight="30.0" prefWidth="440.0"
+                                   promptText="Amount Per Copyright Holder" stylesheets="@../styles.css">
+                            <styleClass>
+                                <String fx:value="text-field"/>
+                                <String fx:value="text-field"/>
+                            </styleClass>
+                        </TextField>
+                    </children>
+                </HBox>
             </HBox>
          <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="268.0" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
             <padding>

@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="696.0" styleClass="white-background" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<VBox prefWidth="696.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
    <Label text="Search and Collect Songs">
       <font>
          <Font name="Segoe UI Semibold" size="28.0" />
@@ -80,32 +80,27 @@
          </font>
       </TextArea>
    </VBox>
-   <HBox fx:id="searchAndCollect" alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+   <HBox fx:id="searchAndCollect" alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0"
+         prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
       <padding>
-         <Insets left="20.0" />
+         <Insets left="20.0"/>
       </padding>
-      <children>
-         <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@../images/icon%20_document%20download_.png" />
-            </image>
-         </ImageView>
-         <VBox alignment="CENTER_LEFT" prefHeight="74.0" prefWidth="350.0">
-            <children>
-               <Label text="   Search and collect audios">
-                  <font>
-                     <Font name="Segoe UI Semilight" size="14.0" />
-                  </font>
-                  <VBox.margin>
-                     <Insets />
-                  </VBox.margin>
-               </Label>
-            </children>
-         </VBox>
-      </children>
       <VBox.margin>
-         <Insets left="30.0" />
+         <Insets left="30.0"/>
       </VBox.margin>
+      <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+         <Image url="@../images/icon%20_document%20download_.png"/>
+      </ImageView>
+      <VBox alignment="CENTER_LEFT" prefHeight="74.0" prefWidth="350.0">
+         <Label text="   Search and collect audios">
+            <font>
+               <Font name="Segoe UI Semilight" size="14.0"/>
+            </font>
+            <VBox.margin>
+               <Insets/>
+            </VBox.margin>
+         </Label>
+      </VBox>
    </HBox>
    <HBox fx:id="searchAndCollect1" alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
       <padding>
