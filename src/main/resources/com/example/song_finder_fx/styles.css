@@ -58,19 +58,25 @@
 
 .button_inside {
     -fx-background-color: '#FFFFFF';
-    -fx-background-radius: 4;
     -fx-border-color: '#f3f3f3';
     -fx-border-width: 1;
+    -fx-border-radius: 4;
 }
 
 .button_inside:hover {
     -fx-background-color: '#eaeaea';
-    -fx-background-radius: 4;
+    -fx-border-width: 0;
 }
 
 .button_inside:pressed {
     -fx-background-color: '#ededed';
-    -fx-background-radius: 4;
+    -fx-border-width: 0;
+}
+
+.button_inside:selected {
+    -fx-background-color: '#6D676E';
+    -fx-border-width: 0;
+    -fx-text-fill: '#FFFFFF';
 }
 
 .button-big {

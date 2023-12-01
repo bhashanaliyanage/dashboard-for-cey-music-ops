@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -113,12 +114,13 @@ public class Main extends Application {
     }
 
     static boolean playAudio(Path start, String isrc) throws IOException {
+        File file = null;
         try (Stream<Path> stream = Files.walk(start)) {
             Path path = getFileByISRC(isrc, stream);
 
             if (path != null) {
                 // TODO: Play audio, handle audio player UI
-                File file = new File(path.toUri());
+                file = new File(path.toUri());
 
                 AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
                 clip = AudioSystem.getClip();
@@ -135,6 +137,9 @@ public class Main extends Application {
             throw new RuntimeException(e);
         } catch (UnsupportedAudioFileException e) {
             System.out.println("Unsupported audio");
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(file);
+            }
         }
         return false;
     }
@@ -192,7 +197,6 @@ public class Main extends Application {
     }
 }
 
-// TODO: 11/27/2023 Report Generator
 // TODO: 11/27/2023 Play button in the search song
 // TODO: 11/27/2023 Add to list in the search song
 // TODO: 11/27/2023 Edit list in the invoice view

@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 
@@ -63,7 +64,6 @@ public class ControllerRevenueGenerator {
     public ImageView imgDSP02;
     public ImageView imgDSP03;
     public ImageView imgDSP04;
-    //</editor-fold>
     private final UIController mainUIController;
 
     public ControllerRevenueGenerator(UIController uiController) {
@@ -78,6 +78,9 @@ public class ControllerRevenueGenerator {
 
         mainUIController.mainVBox.getChildren().clear();
         mainUIController.mainVBox.getChildren().add(newContent);
+
+        // Scene scene = lblTitleMonth.getScene();
+        // scrlpneMain = (ScrollPane) scene.lookup("#scrlpneMain");
 
         Task<Void> task;
 
@@ -108,6 +111,7 @@ public class ControllerRevenueGenerator {
         };
 
         Thread t = new Thread(task);
+        // scrlpneMain.setVvalue(0);
         t.start();
     }
 
@@ -320,6 +324,58 @@ public class ControllerRevenueGenerator {
                             rs.getString(7),
                             rs.getString(8),
                             rs.getString(9)
+                    };
+
+                    rows.add(row);
+                }
+
+                writer.writeAll(rows);
+                writer.close();
+            } catch (SQLException | ClassNotFoundException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public void onGenerateReportTerritoryBtnClicked() {
+        Platform.runLater(() -> {
+            try {
+                ResultSet rs = DatabaseMySQL.getBreakdownByTerritory();
+
+                CSVWriter writer = new CSVWriter(new FileWriter("revenue_breakdown_territory.csv"));
+                List<String[]> rows = new ArrayList<>();
+                String[] header = new String[] {
+                        "ISRC",
+                        "Reported Royalty Summary",
+                        "AU",
+                        "US",
+                        "GB",
+                        "IT",
+                        "KR",
+                        "LK",
+                        "AE",
+                        "JP",
+                        "CA",
+                        "Rest"
+                };
+                rows.add(header);
+
+                while (rs.next()) {
+                    System.out.println("rs.getString(1) = " + rs.getString(1));
+
+                    String[] row = new String[] {
+                            rs.getString(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            rs.getString(5),
+                            rs.getString(6),
+                            rs.getString(7),
+                            rs.getString(8),
+                            rs.getString(9),
+                            rs.getString(10),
+                            rs.getString(11),
+                            rs.getString(12)
                     };
 
                     rows.add(row);

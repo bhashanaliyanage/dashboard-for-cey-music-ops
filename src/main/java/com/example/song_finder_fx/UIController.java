@@ -44,6 +44,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class UIController {
+    private String searchType = "TRACK_TITLE";
     public TextArea textArea;
     public Button btnDestination;
     @FXML
@@ -89,6 +90,10 @@ public class UIController {
     public Rectangle rctSearchSongs;
     public Rectangle rctCollectSongs;
     public Rectangle rctRevenue;
+    public HBox btnSeachSongs;
+    public HBox btnCollectSongs;
+    public HBox btnRevenueAnalysis;
+    public Label lblSearchType;
     File destination;
     public Button btnAudioDatabase;
     public Label searchResultSongName;
@@ -252,6 +257,30 @@ public class UIController {
 
         // Adding songs to list
         Main.addSongToList(isrc.getText());
+
+        List<String> songList = Main.getSongList();
+        int songListLength = songList.size();
+
+        if (songListLength > 1) {
+            String text = songList.get(0) + " + " + (songListLength - 1) + " other songs added";
+            songListButtonSubtitle.setText(text);
+            System.out.println(text);
+        } else {
+            songListButtonSubtitle.setText(songList.get(0));
+            System.out.println(songList.get(0));
+        }
+    }
+
+    public void onAddToListButtonClickedInSearchSong(MouseEvent mouseEvent) {
+        // Getting scene
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+
+        // Getting label from scene
+        Label songListButtonSubtitle = (Label) scene.lookup("#lblSongListSub");
+
+        // Adding songs to list
+        Main.addSongToList(searchResultISRC.getText());
 
         List<String> songList = Main.getSongList();
         int songListLength = songList.size();
@@ -452,7 +481,12 @@ public class UIController {
         Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
         ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
 
-        String isrc = lblISRC.getText();
+        String isrc;
+        try {
+            isrc = lblISRC.getText();
+        } catch (Exception e) {
+            isrc = searchResultISRC.getText();
+        }
 
         Task<Void> task;
         Path start = Paths.get(Main.selectedDirectory.toURI());
@@ -464,15 +498,16 @@ public class UIController {
         lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
         imgMediaPico.setImage(img);
 
+        String finalIsrc = isrc;
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 Clip clip = Main.getClip();
                 if (clip != null) {
                     clip.stop();
-                    status[0] = Main.playAudio(start, isrc);
+                    status[0] = Main.playAudio(start, finalIsrc);
                 } else {
-                    status[0] = Main.playAudio(start, isrc);
+                    status[0] = Main.playAudio(start, finalIsrc);
                 }
                 return null;
             }
@@ -593,7 +628,7 @@ public class UIController {
         Task<List<Songs>> task = new Task<>() {
             @Override
             protected java.util.List<Songs> call() throws Exception {
-                return db.searchSongDetailsBySongName(text);
+                return db.searchSongDetailsBySearchType(text, searchType);
             }
         };
 
@@ -824,10 +859,8 @@ public class UIController {
                 Clip clip = Main.getClip();
                 if (clip != null) {
                     clip.stop();
-                    status[0] = Main.playAudio(start, isrc);
-                } else {
-                    status[0] = Main.playAudio(start, isrc);
                 }
+                status[0] = Main.playAudio(start, isrc);
                 return null;
             }
         };
@@ -841,7 +874,7 @@ public class UIController {
     //<editor-fold desc="Music Player Stuff">
     public static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico) {
         Image pauseImg = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
-        Image errorImg = new Image("com/example/song_finder_fx/images/icon _error (xrp)_.png");
+        Image imgPlay = new Image("com/example/song_finder_fx/images/icon _play circle_.png");
 
         if (status[0]) {
             imgMediaPico.setImage(pauseImg);
@@ -849,10 +882,9 @@ public class UIController {
             lblPlayerSongName.setText(lblSongName.getText());
             lblPlayerArtist.setText(lblArtist.getText());
         } else {
-            imgMediaPico.setImage(errorImg);
+            imgMediaPico.setImage(imgPlay);
             lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-            lblPlayerSongName.setText("Error Loading Audio");
-            lblPlayerSongName.setStyle("-fx-text-fill: '#931621'");
+            lblPlayerSongName.setText("Playing Externally");
         }
     }
 
@@ -1137,5 +1169,30 @@ public class UIController {
         changeSelectorTo(rctRevenue);
         ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
         revenueGenerator.loadRevenueGenerator();
+    }
+
+    public void btnSetSearchTypeISRC(ActionEvent event) {
+        lblSearchType.setText("ISRC");
+        searchType = "ISRC";
+    }
+
+    public void btnSetSearchTypeSinger(ActionEvent event) {
+        lblSearchType.setText("Singer");
+        searchType = "SINGER";
+    }
+
+    public void btnSetSearchTypeComposer(ActionEvent event) {
+        lblSearchType.setText("Composer");
+        searchType = "COMPOSER";
+    }
+
+    public void btnSetSearchTypeLyricist(ActionEvent event) {
+        lblSearchType.setText("Lyricist");
+        searchType = "LYRICIST";
+    }
+
+    public void btnSetSearchTypeName(ActionEvent event) {
+        lblSearchType.setText("Name");
+        searchType = "TRACK_TITLE";
     }
 }

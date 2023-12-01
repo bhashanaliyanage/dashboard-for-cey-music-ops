@@ -41,7 +41,7 @@
       </Label>
     </HBox>
    <ScrollPane fx:id="scrlpneMain" hbarPolicy="NEVER" prefWidth="750.0" stylesheets="@../styles.css" vbarPolicy="NEVER">
-      <Pane prefHeight="1350.0" prefWidth="744.0">
+      <Pane prefHeight="1252.0" prefWidth="744.0">
          <VBox fx:id="vboxTopStreams" layoutX="30.0" layoutY="30.0" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
             <Group>
                <VBox.margin>
@@ -570,7 +570,7 @@
                </ImageView>
             </graphic>
          </Button>
-         <VBox fx:id="vboxRoyaltyByDSP1" layoutX="30.0" layoutY="990.0" prefWidth="691.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+         <VBox fx:id="vboxGenerateReport" layoutX="30.0" layoutY="990.0" prefWidth="691.0" styleClass="textarea-bg" stylesheets="@../styles.css">
             <children>
                <Group>
                   <children>
@@ -627,7 +627,7 @@
                            <Insets />
                         </HBox.margin>
                      </Separator>
-                     <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="110.0" prefWidth="120.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+                     <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="110.0" onMouseClicked="#onGenerateReportTerritoryBtnClicked" prefWidth="120.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
                         <children>
                            <VBox alignment="CENTER" prefHeight="40.0">
                               <children>
@@ -655,7 +655,7 @@
                            <Insets />
                         </HBox.margin>
                      </Separator>
-                     <VBox alignment="CENTER" layoutX="110.0" layoutY="10.0" maxHeight="110.0" prefWidth="120.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+                     <VBox alignment="CENTER" disable="true" layoutX="110.0" layoutY="10.0" maxHeight="110.0" prefWidth="120.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
                         <children>
                            <VBox alignment="CENTER" prefHeight="40.0">
                               <children>
