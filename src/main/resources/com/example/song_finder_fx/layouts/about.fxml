@@ -17,36 +17,32 @@
       </VBox.margin>
    </Label>
    <VBox alignment="CENTER" prefHeight="1080.0" VBox.vgrow="ALWAYS">
-      <children>
-         <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@../images/logo_small_200x.png" />
-            </image>
-         </ImageView>
-         <Label text="CeyMusic Toolkit">
-            <font>
-               <Font size="20.0" />
-            </font>
-            <VBox.margin>
-               <Insets top="40.0" />
-            </VBox.margin>
-         </Label>
-         <Label text="Build 23.2 by Bhashana Liyanage">
-            <font>
-               <Font size="13.0" />
-            </font>
-            <VBox.margin>
-               <Insets top="3.0" />
-            </VBox.margin>
-         </Label>
-         <Label layoutX="265.0" layoutY="378.0" text="bhashanaliyanage@gmail.com">
-            <font>
-               <Font size="13.0" />
-            </font>
-            <VBox.margin>
-               <Insets top="1.0" />
-            </VBox.margin>
-         </Label>
-      </children>
+      <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+         <Image url="@../images/logo_small_200x.png"/>
+      </ImageView>
+      <Label text="CeyMusic Toolkit">
+         <font>
+            <Font size="20.0"/>
+         </font>
+         <VBox.margin>
+            <Insets top="40.0"/>
+         </VBox.margin>
+      </Label>
+      <Label text="Build 23.3 by Bhashana Liyanage">
+         <font>
+            <Font size="13.0"/>
+         </font>
+         <VBox.margin>
+            <Insets top="3.0"/>
+         </VBox.margin>
+      </Label>
+      <Label layoutX="265.0" layoutY="378.0" text="bhashanaliyanage@gmail.com">
+         <font>
+            <Font size="13.0"/>
+         </font>
+         <VBox.margin>
+            <Insets top="1.0"/>
+         </VBox.margin>
+      </Label>
    </VBox>
 </VBox>

@@ -11,59 +11,54 @@
 
 <VBox fx:id="vboxSongSearch" alignment="CENTER_LEFT" onKeyPressed="#onSearchedSongPress2" prefHeight="80.0" prefWidth="522.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
     <HBox>
-        <HBox alignment="CENTER_LEFT" onMouseClicked="#onSearchedSongClick" prefHeight="70.0" prefWidth="304.0"
-              styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
+        <HBox alignment="CENTER_LEFT" onMouseClicked="#onSearchedSongClick" prefHeight="70.0" prefWidth="304.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
             <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="@../images/logo_small_70x.png"/>
+                <Image url="@../images/logo_small_70x.png" />
                 <HBox.margin>
-                    <Insets/>
+                    <Insets />
                 </HBox.margin>
             </ImageView>
             <VBox alignment="CENTER_LEFT">
                 <HBox.margin>
-                    <Insets left="10.0"/>
+                    <Insets left="10.0" />
                 </HBox.margin>
                 <Label fx:id="searchResultSongName" text="Song Name">
                     <font>
-                        <Font name="Segoe UI Semibold" size="14.0"/>
+                        <Font name="Segoe UI Semibold" size="14.0" />
                     </font>
                 </Label>
                 <HBox>
                     <VBox.margin>
-                        <Insets top="5.0"/>
+                        <Insets top="5.0" />
                     </VBox.margin>
-                    <Label fx:id="searchResultISRC" minWidth="85.0" text="LKA0W2280301"/>
-                    <Label layoutX="10.0" layoutY="10.0" minWidth="10.0" text=" | "/>
-                    <Label fx:id="searchResultArtist" layoutX="10.0" layoutY="10.0" prefWidth="222.0"
-                           text="Damayanthi Jayasuriya | Nuwan Nayanajith">
+                    <Label fx:id="searchResultISRC" minWidth="85.0" text="LKA0W2280301" />
+                    <Label layoutX="10.0" layoutY="10.0" minWidth="10.0" text=" | " />
+                    <Label fx:id="searchResultArtist" layoutX="10.0" layoutY="10.0" prefWidth="222.0" text="Damayanthi Jayasuriya | Nuwan Nayanajith">
                         <font>
-                            <Font name="Segoe UI Semibold" size="12.0"/>
+                            <Font name="Segoe UI Semibold" size="12.0" />
                         </font>
                     </Label>
                 </HBox>
             </VBox>
         </HBox>
         <HBox alignment="CENTER_RIGHT">
-            <ImageView fx:id="btnPlay" fitHeight="30.0" fitWidth="30.0"
-                       onMouseClicked="#onAddToListButtonClickedInSearchSong" opacity="0.8" pickOnBounds="true"
-                       preserveRatio="true">
+            <ImageView fx:id="btnPlay" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#onAddToListButtonClickedInSearchSong" opacity="0.8" pickOnBounds="true" preserveRatio="true">
                 <cursor>
-                    <Cursor fx:constant="HAND"/>
+                    <Cursor fx:constant="HAND" />
                 </cursor>
                 <HBox.margin>
-                    <Insets left="20.0" right="20.0"/>
+                    <Insets left="20.0" right="20.0" />
                 </HBox.margin>
-                <Image url="@../images/icon_plus_circle.png"/>
+                <Image url="@../images/icon_plus_circle.png" />
             </ImageView>
-            <ImageView fx:id="btnPlay1" fitHeight="30.0" fitWidth="30.0" layoutX="10.0" layoutY="30.0"
-                       onMouseClicked="#onBtnPlayClicked" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnPlay1" fitHeight="30.0" fitWidth="30.0" layoutX="10.0" layoutY="30.0" onMouseClicked="#onBtnPlayClicked" opacity="0.8" pickOnBounds="true" preserveRatio="true">
                 <cursor>
-                    <Cursor fx:constant="HAND"/>
+                    <Cursor fx:constant="HAND" />
                 </cursor>
                 <HBox.margin>
-                    <Insets right="20.0"/>
+                    <Insets right="20.0" />
                 </HBox.margin>
-                <Image url="@../images/icon%20_play%20circle_.png"/>
+                <Image url="@../images/icon%20_play%20circle_.png" />
             </ImageView>
         </HBox>
     </HBox>

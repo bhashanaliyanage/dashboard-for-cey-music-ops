@@ -47,7 +47,7 @@ public class Main extends Application {
         Scene scene = new Scene(loader.load(), 1030, 610);
         final String[] audioDatabasePath = {null};
 
-        stage.setTitle("CeyMusic Toolkit 2023.2");
+        stage.setTitle("CeyMusic Toolkit 2023.3");
         stage.setScene(scene);
         stage.setMinWidth(1100);
         stage.setMinHeight(700);
