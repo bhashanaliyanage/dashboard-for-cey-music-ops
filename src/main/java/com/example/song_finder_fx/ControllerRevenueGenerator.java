@@ -286,20 +286,50 @@ public class ControllerRevenueGenerator {
                 throw new RuntimeException(e);
             }
         });
+    }
 
-        /*Task<Void> task;
-        task = new Task<>() {
-            @Override
-            protected Void call() {
+    public void onGenerateReportDSPClicked() {
+        Platform.runLater(() -> {
+            try {
+                ResultSet rs = DatabaseMySQL.getBreakdownByDSP();
+                CSVWriter writer = new CSVWriter(new FileWriter("revenue_breakdown_dsp.csv"));
+                List<String[]> rows = new ArrayList<>();
+                String[] header = new String[] {
+                        "ISRC",
+                        "Reported Royalty Summary",
+                        "Youtube Ad Supported",
+                        "Youtube Music",
+                        "Spotify",
+                        "TikTok",
+                        "Apple Music",
+                        "Facebook",
+                        "Others"
+                };
+                rows.add(header);
 
-                Platform.runLater(() -> {
+                while (rs.next()) {
+                    System.out.println("rs.getString(1) = " + rs.getString(1));
 
-                });
-                return null;
+                    String[] row = new String[] {
+                            rs.getString(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            rs.getString(5),
+                            rs.getString(6),
+                            rs.getString(7),
+                            rs.getString(8),
+                            rs.getString(9)
+                    };
+
+                    rows.add(row);
+                }
+
+                writer.writeAll(rows);
+                writer.close();
+            } catch (SQLException | ClassNotFoundException | IOException e) {
+                throw new RuntimeException(e);
             }
-        };
-
-        Thread t = new Thread(task);
-        t.start();*/
+        });
     }
 }

@@ -22,6 +22,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.util.Duration;
 
@@ -85,6 +86,9 @@ public class UIController {
     public Label songShare;
     public ImageView btnPercentageChange;
     public Label songName;
+    public Rectangle rctSearchSongs;
+    public Rectangle rctCollectSongs;
+    public Rectangle rctRevenue;
     File destination;
     public Button btnAudioDatabase;
     public Label searchResultSongName;
@@ -95,7 +99,7 @@ public class UIController {
     private final NotificationBuilder nb = new NotificationBuilder();
 
     //<editor-fold desc="Search">
-    public void onSearchedSongPress(KeyEvent event) throws SQLException, ClassNotFoundException, IOException {
+    public void onSearchedSongPress(KeyEvent event) {
         KeyCode keyCode = event.getCode();
         System.out.println("UIController.onSearchedSongPress");
 
@@ -481,6 +485,7 @@ public class UIController {
 
     @FXML
     protected void onSearchDetailsButtonClick() throws ClassNotFoundException {
+        changeSelectorTo(rctSearchSongs);
         Connection con = checkDatabaseConnection();
 
         if (con != null) {
@@ -497,6 +502,14 @@ public class UIController {
         } else {
             UIController.showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
         }
+    }
+
+    private void changeSelectorTo(Rectangle selector) {
+        rctSearchSongs.setVisible(false);
+        rctCollectSongs.setVisible(false);
+        rctRevenue.setVisible(false);
+
+        selector.setVisible(true);
     }
 
     public void onSearchByISRCButtonClick() throws ClassNotFoundException {
@@ -881,6 +894,7 @@ public class UIController {
     }
 
     public void onCollectSongsButtonClick(MouseEvent event) throws ClassNotFoundException, SQLException {
+        changeSelectorTo(rctCollectSongs);
         checkDatabaseConnection();
         /*Task<Void> task;*/
 
@@ -1119,7 +1133,8 @@ public class UIController {
         cs.loadAbout();
     }
 
-    public void onRevenueAnalysisBtnClick(ActionEvent event) throws IOException, SQLException, ClassNotFoundException {
+    public void onRevenueAnalysisBtnClick() throws IOException {
+        changeSelectorTo(rctRevenue);
         ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
         revenueGenerator.loadRevenueGenerator();
     }

@@ -63,47 +63,45 @@
             </Group>
             <HBox fx:id="asset01">
                <VBox.margin>
-                  <Insets left="20.0" top="30.0"/>
+                  <Insets left="20.0" top="30.0" />
                </VBox.margin>
                <Label fx:id="lblAsset01" text="Loading">
                   <cursor>
-                     <Cursor fx:constant="DEFAULT"/>
+                     <Cursor fx:constant="DEFAULT" />
                   </cursor>
                </Label>
                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                   <HBox.margin>
-                     <Insets right="30.0"/>
+                     <Insets right="30.0" />
                   </HBox.margin>
                   <Label fx:id="lblAsset01Streams" text="Loading">
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
                </HBox>
             </HBox>
             <HBox fx:id="asset02" layoutX="31.0" layoutY="106.0" prefWidth="529.0">
-               <children>
-                  <Label fx:id="lblAsset02" text="Loading">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                     <padding>
-                        <Insets left="20.0" top="10.0" />
-                     </padding>
-                  </Label>
-                  <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
-                     <children>
-                        <Label fx:id="lblAsset02Streams" text="Loading">
-                           <cursor>
-                              <Cursor fx:constant="DEFAULT" />
-                           </cursor>
-                        </Label>
-                     </children>
-                     <HBox.margin>
-                        <Insets right="30.0" />
-                     </HBox.margin>
-                  </HBox>
-               </children>
+               <Label fx:id="lblAsset02" text="Loading">
+                  <cursor>
+                     <Cursor fx:constant="DEFAULT" />
+                  </cursor>
+                  <padding>
+                     <Insets left="20.0" top="10.0" />
+                  </padding>
+               </Label>
+               <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
+                  <children>
+                     <Label fx:id="lblAsset02Streams" text="Loading">
+                        <cursor>
+                           <Cursor fx:constant="DEFAULT" />
+                        </cursor>
+                     </Label>
+                  </children>
+                  <HBox.margin>
+                     <Insets right="30.0" />
+                  </HBox.margin>
+               </HBox>
             </HBox>
             <HBox fx:id="asset03" layoutX="11.0" layoutY="123.0">
                <children>
@@ -601,7 +599,7 @@
                   </VBox.margin>
                   <children>
                      <Separator layoutX="209.0" layoutY="10.0" opacity="0.5" orientation="VERTICAL" prefHeight="140.0" />
-                     <VBox alignment="CENTER" maxHeight="110.0" prefWidth="120.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+                     <VBox alignment="CENTER" maxHeight="110.0" onMouseClicked="#onGenerateReportDSPClicked" prefWidth="120.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
                         <children>
                            <VBox alignment="CENTER" prefHeight="40.0">
                               <children>
