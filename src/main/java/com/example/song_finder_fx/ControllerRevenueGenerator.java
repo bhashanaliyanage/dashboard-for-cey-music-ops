@@ -87,21 +87,13 @@ public class ControllerRevenueGenerator {
         task = new Task<>() {
             @Override
             protected Void call() throws SQLException, ClassNotFoundException {
-                ResultSet top5Territories = DatabaseMySQL.getTop5Territories();
-                ResultSet top4DSPs = DatabaseMySQL.getTop4DSPs();
-                String count = DatabaseMySQL.getTotalAssetCount();
-                ResultSet top5StreamedAssets = DatabaseMySQL.getTop5StreamedAssets();
-                String salesDate = DatabaseMySQL.getSalesDate();
-                String[] date = salesDate.split("-");
-                String month = date[1];
-
                 Platform.runLater(() -> {
                     try {
-                        lblTitleMonth.setText(itemSwitcher.setMonth(month));
-                        loadTopStreamedAssets(top5StreamedAssets);
-                        lblTotalAssets.setText(count);
-                        loadTop5Territories(top5Territories);
-                        loadTop4DSPs(top4DSPs);
+                        lblTitleMonth.setText(itemSwitcher.setMonth(InitPreloader.month));
+                        loadTopStreamedAssets(InitPreloader.top5StreamedAssets);
+                        lblTotalAssets.setText(InitPreloader.count);
+                        loadTop5Territories(InitPreloader.top5Territories);
+                        loadTop4DSPs(InitPreloader.top4DSPs);
                     } catch (SQLException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }

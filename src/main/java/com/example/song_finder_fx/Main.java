@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -23,40 +24,41 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Main extends Application {
-
+    public static Stage primaryStage = null;
+    public static Scene primaryScene = null;
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
 
     public static void main(String[] args) {
-        new Thread(() -> launch(args)).start();
+        // new Thread(() -> launch(args)).start();
+        LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
     }
 
-    public static boolean deleteSongFromList(String isrc) {
-        boolean status = songList.remove(isrc);
-        if (status) {
-            System.out.println("ISRC: " + isrc + " Removed from Song List");
-        }
-        return status;
+    @Override
+    public void init() throws Exception {
+        InitPreloader init = new InitPreloader();
+        init.checkFunctions();
     }
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
-        // Loading layout file
+        Main.primaryStage = stage;
+        /*// Loading layout file
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("layouts/main-view.fxml"));
         Scene scene = new Scene(loader.load(), 1030, 610);
         final String[] audioDatabasePath = {null};
 
-        stage.setTitle("CeyMusic Toolkit 2023.3");
-        stage.setScene(scene);
-        stage.setMinWidth(1100);
-        stage.setMinHeight(700);
+        primaryStage.setTitle("CeyMusic Toolkit 2023.3");
+        primaryStage.setScene(scene);
+        primaryStage.setMinWidth(1100);
+        primaryStage.setMinHeight(700);
 
         Image image = new Image("com/example/song_finder_fx/icons/icon.png");
 
-        stage.getIcons().add(image);
+        primaryStage.getIcons().add(image);
 
-        stage.show();
+        primaryStage.show();
 
         Task<Void> task;
         task = new Task<>() {
@@ -76,7 +78,15 @@ public class Main extends Application {
             btnAudioDatabase.setText("   Audio Database: " + audioDatabasePath[0]);
         });
 
-        stage.setOnCloseRequest(e -> Platform.exit());
+        primaryStage.setOnCloseRequest(e -> Platform.exit());*/
+    }
+
+    public static boolean deleteSongFromList(String isrc) {
+        boolean status = songList.remove(isrc);
+        if (status) {
+            System.out.println("ISRC: " + isrc + " Removed from Song List");
+        }
+        return status;
     }
 
     public static Clip getClip() {
