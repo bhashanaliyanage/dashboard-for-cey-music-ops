@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class SheetsCOn {
-
     private static Credential authorize() throws IOException, GeneralSecurityException {
         InputStream in = SheetsCOn.class.getResourceAsStream("/sheets_oauth.json");
         assert in != null;
@@ -59,7 +58,6 @@ public class SheetsCOn {
         ValueRange response = sheetsService.spreadsheets().values().get(SPREADSHEET_ID, range).execute();
 
         List<List<Object>> values = response.getValues();
-        // System.out.println(values.get(0).get(0));
 
         return (String) values.get(0).get(0);
     }

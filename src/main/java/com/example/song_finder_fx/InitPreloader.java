@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.google.api.services.sheets.v4.Sheets;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -12,6 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -39,8 +41,30 @@ public class InitPreloader implements Initializable {
     public void checkFunctions() throws InterruptedException {
         final String[] con = new String[1];
         final String[] message = {""};
+        final String[] connection = {null};
         // lblLoading.setText("Test");
-        Thread t1 = new Thread(() -> {
+        Thread connectionCheck = new Thread(() -> {
+            message[0] = "Checking Connection";
+
+            Platform.runLater(() -> lblLoadingg.setText(message[0]));
+
+            try {
+                connection[0] = SheetsCOn.checkAccess();
+                if (Objects.equals(connection[0], "1")) {
+                    System.out.println("Access Granted");
+                } else {
+                    System.out.println("Unable to access");
+                }
+            } catch (GeneralSecurityException | IOException e) {
+                Platform.runLater(() -> lblLoadingg.setText("Check Internet Connection"));
+            }
+
+            if (Objects.equals(connection[0], "0")) {
+                Platform.runLater(() -> lblLoadingg.setText("Unable to validate credentials"));
+            }
+        });
+
+        Thread databaseCheck = new Thread(() -> {
             message[0] = "Checking Database Connection";
 
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
@@ -49,11 +73,11 @@ public class InitPreloader implements Initializable {
             System.out.println("con = " + con[0]);
 
             if (Objects.equals(con[0], "Connection Error")) {
-                Platform.runLater(() -> lblLoadingg.setText("Connection Error"));
+                Platform.runLater(() -> lblLoadingg.setText("Unable to connect to CeyMusic Database"));
             }
         });
 
-        Thread t2 = new Thread(() -> {
+        Thread revenueAnalysisCheck = new Thread(() -> {
             message[0] = "Loading Revenue Analysis";
 
             Platform.runLater(() -> {
@@ -93,12 +117,19 @@ public class InitPreloader implements Initializable {
             }
         }));
 
-        t1.start();
-        t1.join();
+        connectionCheck.start();
+        connectionCheck.join();
+
+        if (connection[0] != null) {
+            if (connection[0].equals("1")) {
+                databaseCheck.start();
+                databaseCheck.join();
+            }
+        }
 
         if (Objects.equals(con[0], "Connection Succeed")) {
-            t2.start();
-            t2.join();
+            revenueAnalysisCheck.start();
+            revenueAnalysisCheck.join();
             mainWindow.start();
             mainWindow.join();
         }
