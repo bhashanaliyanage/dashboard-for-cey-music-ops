@@ -464,14 +464,19 @@ public class DatabaseMySQL {
 
         Connection conn = getConn();
 
-        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER FROM songs WHERE " + searchType + " LIKE ? LIMIT 15");
-        // System.out.println("searchType = " + searchType);
-        // ps.setString(1, searchType);
+        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER, COMPOSER, LYRICIST " +
+                "FROM songs WHERE " + searchType + " LIKE ? LIMIT 15");
         ps.setString(1, searchText + "%");
         rs = ps.executeQuery();
 
         while (rs.next()) {
-            songs.add(new Songs(rs.getString(1), rs.getString(2), rs.getString(3)));
+            songs.add(new Songs(
+                    rs.getString(1),
+                    rs.getString(2),
+                    rs.getString(3),
+                    rs.getString(4),
+                    rs.getString(5)
+            ));
             System.out.println(rs.getString(1));
         }
 

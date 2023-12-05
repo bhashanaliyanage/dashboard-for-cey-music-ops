@@ -9,16 +9,16 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vboxSongSearch" alignment="CENTER_LEFT" onKeyPressed="#onSearchedSongPress2" prefHeight="80.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<VBox fx:id="vboxSongSearch" alignment="CENTER_LEFT" onKeyPressed="#onSearchedSongPress2" prefHeight="100.0" prefWidth="650.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
     <HBox>
-        <HBox alignment="CENTER_LEFT" onMouseClicked="#onSearchedSongClick" prefHeight="70.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
-            <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="@../images/logo_small_70x.png" />
+        <HBox alignment="CENTER_LEFT" onMouseClicked="#onSearchedSongClick" prefWidth="512.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
+            <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@../images/logo_small_70x_2.png" />
                 <HBox.margin>
                     <Insets />
                 </HBox.margin>
             </ImageView>
-            <VBox alignment="CENTER_LEFT" minWidth="400.0">
+            <VBox alignment="CENTER_LEFT" prefWidth="400.0">
                 <HBox.margin>
                     <Insets left="10.0" />
                 </HBox.margin>
@@ -31,14 +31,40 @@
                     <VBox.margin>
                         <Insets top="5.0" />
                     </VBox.margin>
-                    <Label fx:id="searchResultISRC" minWidth="85.0" text="LKA0W2280301" />
-                    <Label layoutX="10.0" layoutY="10.0" minWidth="10.0" text=" | " />
-                    <Label fx:id="searchResultArtist" layoutX="10.0" layoutY="10.0" prefWidth="292.0" text="Damayanthi Jayasuriya | Nuwan Nayanajith">
+                    <Label fx:id="searchResultISRC" minWidth="85.0" text="LKA0W2280301" textFill="#656565" />
+                    <Label layoutX="10.0" layoutY="10.0" minWidth="10.0" text=" | " textFill="#656565" />
+                    <Label fx:id="searchResultArtist" layoutX="10.0" layoutY="10.0" prefWidth="292.0" text="Damayanthi Jayasuriya | Nuwan Nayanajith" textFill="#656565">
                         <font>
                             <Font name="Segoe UI Semibold" size="12.0" />
                         </font>
                     </Label>
                 </HBox>
+            <HBox layoutX="10.0" layoutY="49.0">
+               <children>
+                  <ImageView fitHeight="18.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                     <image>
+                        <Image url="@../images/music-note%201.png" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="searchResultComposer" text="Composer" textFill="#656565" />
+                  <Label layoutX="10.0" layoutY="10.0" minWidth="10.0" text=" | " textFill="#656565" />
+                  <ImageView fitHeight="18.0" fitWidth="16.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/pencil%201.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </ImageView>
+                  <Label fx:id="searchResultLyricist" layoutX="10.0" layoutY="10.0" text="Lyricist" textFill="#656565" />
+               </children>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </HBox>
             </VBox>
         </HBox>
         <HBox alignment="CENTER_RIGHT">

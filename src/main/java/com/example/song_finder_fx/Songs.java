@@ -26,6 +26,14 @@ public class Songs {
         this.singer = singer;
     }
 
+    public Songs(String songName, String isrc, String singer, String composer, String lyricist) {
+        this.songName = songName;
+        this.isrc = isrc;
+        this.singer = singer;
+        this.composer = composer;
+        this.lyricist = lyricist;
+    }
+
     public void songDetails(String isrc, String albumTitle, String upc, String trackTitle, String singer, String featuringArtist, String Composer, String lyricist, String fileName) {
         this.isrc = isrc;
         this.albumTitle = albumTitle;
@@ -64,5 +72,13 @@ public class Songs {
 
     public String getSinger() {
         return singer;
+    }
+
+    public String getComposer() {
+        return composer;
+    }
+
+    public String getLyricist() {
+        return lyricist;
     }
 }

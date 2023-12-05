@@ -21,27 +21,24 @@
         <VBox.margin>
             <Insets bottom="10.0" left="30.0" right="30.0" top="30.0" />
         </VBox.margin>
-      <HBox alignment="CENTER_LEFT">
-         <children>
+        <HBox alignment="CENTER_LEFT">
+            <VBox.margin>
+                <Insets left="30.0" right="30.0" top="20.0"/>
+            </VBox.margin>
             <VBox>
-               <children>
-                  <Label minWidth="60.0" text="Songs">
-                     <font>
-                        <Font name="Segoe UI Semibold" size="19.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="lblListCount" text="Total: 00" />
-               </children>
-               <HBox.margin>
-                  <Insets right="374.0" />
-               </HBox.margin>
+                <HBox.margin>
+                    <Insets right="374.0"/>
+                </HBox.margin>
+                <Label minWidth="60.0" text="Songs">
+                    <font>
+                        <Font name="Segoe UI Semibold" size="19.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="lblListCount" text="Total: 00"/>
             </VBox>
-            <Button fx:id="btnAddMore" minHeight="30.0" minWidth="110.0" onAction="#onAddMoreButtonClicked" styleClass="button_inside" stylesheets="@../styles.css" text="Add More Songs" />
-         </children>
-         <VBox.margin>
-            <Insets left="30.0" right="30.0" top="20.0" />
-         </VBox.margin>
-      </HBox>
+            <Button fx:id="btnAddMore" minHeight="30.0" minWidth="110.0" onAction="#onAddMoreButtonClicked"
+                    styleClass="button_inside_brown" stylesheets="@../styles.css" text="Add More Songs"/>
+        </HBox>
         <ScrollPane fx:id="scrlpneSong" hbarPolicy="NEVER" minViewportHeight="240.0" prefWidth="544.0" styleClass="scroll-pane" stylesheets="@../styles.css" vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">
             <VBox.margin>
                 <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
@@ -56,7 +53,7 @@
         <VBox.margin>
             <Insets bottom="30.0" left="30.0" />
         </VBox.margin>
-        <Button fx:id="btnCopyTo" minHeight="30.0" minWidth="580.0" onAction="#onCopyToButtonClicked" styleClass="button_inside" stylesheets="@../styles.css" text="Copy List to Location">
+        <Button fx:id="btnCopyTo" minHeight="30.0" minWidth="580.0" onAction="#onCopyToButtonClicked" styleClass="button_inside_brown" stylesheets="@../styles.css" text="Copy List to Location">
          <VBox.margin>
             <Insets />
          </VBox.margin>

@@ -643,9 +643,13 @@ public class UIController {
                     Label lblSongName = (Label) nodes[i].lookup("#searchResultSongName");
                     Label lblISRC = (Label) nodes[i].lookup("#searchResultISRC");
                     Label lblArtist = (Label) nodes[i].lookup("#searchResultArtist");
+                    Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
+                    Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
                     lblSongName.setText(songList.get(i).getSongName());
                     lblISRC.setText(songList.get(i).getISRC().trim());
                     lblArtist.setText(songList.get(i).getSinger().trim());
+                    lblComposer.setText(songList.get(i).getComposer().trim());
+                    lblLyricist.setText(songList.get(i).getLyricist().trim());
                     vboxSong.getChildren().add(nodes[i]);
 
                 } catch (NullPointerException | IOException ex) {
