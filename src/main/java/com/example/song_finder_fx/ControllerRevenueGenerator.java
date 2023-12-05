@@ -59,12 +59,12 @@ public class ControllerRevenueGenerator {
     public Label lblTitleMonth;
     //</editor-fold>
 
-    //<editor-fold desc="ImagesViews">
     public ImageView imgDSP01;
     public ImageView imgDSP02;
     public ImageView imgDSP03;
     public ImageView imgDSP04;
     private final UIController mainUIController;
+    public ScrollPane scrlpneMain;
 
     public ControllerRevenueGenerator(UIController uiController) {
         mainUIController = uiController;
@@ -76,17 +76,13 @@ public class ControllerRevenueGenerator {
         Parent newContent = loader.load();
         ItemSwitcher itemSwitcher = new ItemSwitcher();
 
-        mainUIController.mainVBox.getChildren().clear();
-        mainUIController.mainVBox.getChildren().add(newContent);
-
-        // Scene scene = lblTitleMonth.getScene();
-        // scrlpneMain = (ScrollPane) scene.lookup("#scrlpneMain");
+        mainUIController.mainVBox.getChildren().setAll(newContent);
 
         Task<Void> task;
 
         task = new Task<>() {
             @Override
-            protected Void call() throws SQLException, ClassNotFoundException {
+            protected Void call() {
                 Platform.runLater(() -> {
                     try {
                         lblTitleMonth.setText(itemSwitcher.setMonth(InitPreloader.month));
@@ -94,6 +90,7 @@ public class ControllerRevenueGenerator {
                         lblTotalAssets.setText(InitPreloader.count);
                         loadTop5Territories(InitPreloader.top5Territories);
                         loadTop4DSPs(InitPreloader.top4DSPs);
+                        // scrlpneMain.setVvalue(0.0);
                     } catch (SQLException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }
@@ -103,11 +100,11 @@ public class ControllerRevenueGenerator {
         };
 
         Thread t = new Thread(task);
-        // scrlpneMain.setVvalue(0);
         t.start();
     }
 
     private void loadTop5Territories(ResultSet rs) throws SQLException, ClassNotFoundException {
+        rs.beforeFirst();
         DecimalFormat df = new DecimalFormat("0.00");
         double revenue;
         String currency;
@@ -145,6 +142,7 @@ public class ControllerRevenueGenerator {
     }
 
     private void loadTop4DSPs(ResultSet rs) throws SQLException, ClassNotFoundException {
+        rs.beforeFirst();
         DecimalFormat df = new DecimalFormat("0.00");
         ItemSwitcher itemSwitcher = new ItemSwitcher();
         double revenue;
@@ -180,6 +178,7 @@ public class ControllerRevenueGenerator {
     }
 
     private void loadTopStreamedAssets(ResultSet rs) throws SQLException, ClassNotFoundException {
+        rs.beforeFirst();
         DecimalFormat df = new DecimalFormat("0.00");
         double revenue;
         String currency;

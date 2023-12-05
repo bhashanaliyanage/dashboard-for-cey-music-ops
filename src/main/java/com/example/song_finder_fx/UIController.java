@@ -884,7 +884,7 @@ public class UIController {
         } else {
             imgMediaPico.setImage(imgPlay);
             lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-            lblPlayerSongName.setText("Playing Externally");
+            lblPlayerSongName.setText("N/A");
         }
     }
 
@@ -1195,4 +1195,5 @@ public class UIController {
         lblSearchType.setText("Name");
         searchType = "TRACK_TITLE";
     }
+
 }

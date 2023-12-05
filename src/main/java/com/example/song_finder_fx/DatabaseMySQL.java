@@ -188,7 +188,7 @@ public class DatabaseMySQL {
         ResultSet rs;
 
         PreparedStatement ps = db.prepareStatement("SELECT Asset_ISRC, Asset_Title, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
-                "FROM report GROUP BY Asset_ISRC ORDER BY Total_Royalty DESC LIMIT 5;");
+                "FROM report GROUP BY Asset_ISRC ORDER BY Total_Royalty DESC LIMIT 5;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
         return ps.executeQuery();
     }
@@ -198,7 +198,7 @@ public class DatabaseMySQL {
         ResultSet rs;
 
         PreparedStatement ps = db.prepareStatement("SELECT DSP, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
-                "FROM report GROUP BY DSP ORDER BY Total_Royalty DESC;");
+                "FROM report GROUP BY DSP ORDER BY Total_Royalty DESC;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
         return ps.executeQuery();
     }
@@ -208,7 +208,7 @@ public class DatabaseMySQL {
         ResultSet rs;
 
         PreparedStatement ps = db.prepareStatement("SELECT Territory, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
-                "FROM report GROUP BY Territory ORDER BY Total_Royalty DESC LIMIT 5;");
+                "FROM report GROUP BY Territory ORDER BY Total_Royalty DESC LIMIT 5;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
         return ps.executeQuery();
     }
@@ -217,7 +217,7 @@ public class DatabaseMySQL {
         Connection db = DatabaseMySQL.getConn();
         ResultSet rs;
 
-        PreparedStatement ps = db.prepareStatement("SELECT COUNT(*) FROM ( SELECT Asset_ISRC FROM report GROUP BY Asset_ISRC ) AS subquery;");
+        PreparedStatement ps = db.prepareStatement("SELECT COUNT(*) FROM ( SELECT Asset_ISRC FROM report GROUP BY Asset_ISRC ) AS subquery;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         rs = ps.executeQuery();
         rs.next();
         return rs.getString(1);
@@ -227,7 +227,7 @@ public class DatabaseMySQL {
         Connection db = DatabaseMySQL.getConn();
         ResultSet rs;
 
-        PreparedStatement ps = db.prepareStatement("SELECT Sale_Start_date FROM report LIMIT 1;");
+        PreparedStatement ps = db.prepareStatement("SELECT Sale_Start_date FROM report LIMIT 1;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         rs = ps.executeQuery();
         rs.next();
         return rs.getString(1);

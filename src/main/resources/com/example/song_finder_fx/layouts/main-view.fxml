@@ -12,7 +12,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="610.0" prefWidth="1030.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<BorderPane prefHeight="610.0" prefWidth="1030.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
     <center>
         <VBox fx:id="mainVBox" alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="650.0" prefHeight="444.0" styleClass="main-vbox" stylesheets="@../styles.css" BorderPane.alignment="CENTER">
             <VBox prefWidth="696.0" stylesheets="@../styles.css" VBox.vgrow="ALWAYS">

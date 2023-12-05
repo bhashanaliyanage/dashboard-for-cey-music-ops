@@ -2,12 +2,7 @@ package com.example.song_finder_fx;
 
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -31,7 +26,6 @@ public class Main extends Application {
     static Clip clip;
 
     public static void main(String[] args) {
-        // new Thread(() -> launch(args)).start();
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
     }
 
@@ -44,41 +38,6 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
         Main.primaryStage = stage;
-        /*// Loading layout file
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("layouts/main-view.fxml"));
-        Scene scene = new Scene(loader.load(), 1030, 610);
-        final String[] audioDatabasePath = {null};
-
-        primaryStage.setTitle("CeyMusic Toolkit 2023.3");
-        primaryStage.setScene(scene);
-        primaryStage.setMinWidth(1100);
-        primaryStage.setMinHeight(700);
-
-        Image image = new Image("com/example/song_finder_fx/icons/icon.png");
-
-        primaryStage.getIcons().add(image);
-
-        primaryStage.show();
-
-        Task<Void> task;
-        task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                audioDatabasePath[0] = getDirectoryFromDB();
-                return null;
-            }
-        };
-
-        Thread t = new Thread(task);
-        t.start();
-        t.join();
-
-        Platform.runLater(() -> {
-            Button btnAudioDatabase = (Button) scene.lookup("#btnAudioDatabase");
-            btnAudioDatabase.setText("   Audio Database: " + audioDatabasePath[0]);
-        });
-
-        primaryStage.setOnCloseRequest(e -> Platform.exit());*/
     }
 
     public static boolean deleteSongFromList(String isrc) {
@@ -129,7 +88,6 @@ public class Main extends Application {
             Path path = getFileByISRC(isrc, stream);
 
             if (path != null) {
-                // TODO: Play audio, handle audio player UI
                 file = new File(path.toUri());
 
                 AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
@@ -138,12 +96,12 @@ public class Main extends Application {
                 clip.start();
                 return true;
             } else {
-                // TODO: Handle UI showing audio file is missing
                 System.out.println("Cannot load file!");
                 return false;
             }
 
         } catch (SQLException | ClassNotFoundException | LineUnavailableException e) {
+            // return false;
             throw new RuntimeException(e);
         } catch (UnsupportedAudioFileException e) {
             System.out.println("Unsupported audio");

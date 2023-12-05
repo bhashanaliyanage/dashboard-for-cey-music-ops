@@ -1,6 +1,5 @@
 package com.example.song_finder_fx;
 
-import com.google.api.services.sheets.v4.Sheets;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -8,7 +7,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -77,6 +75,18 @@ public class InitPreloader implements Initializable {
             }
         });
 
+        Thread audioDatabaseCheck = new Thread(() -> {
+            message[0] = "Getting Audio Database";
+
+            Platform.runLater(() -> lblLoadingg.setText(message[0]));
+
+            try {
+                Main.getDirectoryFromDB();
+            } catch (SQLException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         Thread revenueAnalysisCheck = new Thread(() -> {
             message[0] = "Loading Revenue Analysis";
 
@@ -124,6 +134,8 @@ public class InitPreloader implements Initializable {
             if (connection[0].equals("1")) {
                 databaseCheck.start();
                 databaseCheck.join();
+                audioDatabaseCheck.start();
+                audioDatabaseCheck.join();
             }
         }
 

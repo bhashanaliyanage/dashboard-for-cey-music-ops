@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="1350.0" prefWidth="750.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="1350.0" prefWidth="750.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -92,11 +92,11 @@
                </Label>
                <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
                   <HBox.margin>
-                     <Insets right="30.0"/>
+                     <Insets right="30.0" />
                   </HBox.margin>
                   <Label fx:id="lblAsset02Streams" text="Loading">
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
                </HBox>
@@ -104,22 +104,22 @@
             <HBox fx:id="asset03" layoutX="11.0" layoutY="123.0">
                <Label fx:id="lblAsset03" text="Loading">
                   <cursor>
-                     <Cursor fx:constant="DEFAULT"/>
+                     <Cursor fx:constant="DEFAULT" />
                   </cursor>
                   <padding>
-                     <Insets left="20.0" top="10.0"/>
+                     <Insets left="20.0" top="10.0" />
                   </padding>
                </Label>
                <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
                   <children>
                      <Label fx:id="lblAsset03Streams" text="Loading">
                         <cursor>
-                           <Cursor fx:constant="DEFAULT"/>
+                           <Cursor fx:constant="DEFAULT" />
                         </cursor>
                      </Label>
                   </children>
                   <HBox.margin>
-                     <Insets right="30.0"/>
+                     <Insets right="30.0" />
                   </HBox.margin>
                </HBox>
             </HBox>
