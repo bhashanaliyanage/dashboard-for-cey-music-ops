@@ -13,8 +13,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainVBox" prefWidth="696.0" spacing="10.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
-   <Label text="Search Song Details">
+<VBox fx:id="mainVBox" prefWidth="750.0" spacing="10.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+   <Label text="Search">
       <font>
          <Font name="Segoe UI Semibold" size="28.0" />
       </font>
@@ -22,7 +22,7 @@
          <Insets left="30.0" top="30.0" />
       </VBox.margin>
    </Label>
-   <VBox fx:id="vBoxInSearchSong" maxWidth="606.0" minWidth="600.0" prefHeight="1080.0" prefWidth="606.0" styleClass="textarea-bg" stylesheets="@../styles.css" VBox.vgrow="ALWAYS">
+   <VBox fx:id="vBoxInSearchSong" maxWidth="690.0" minWidth="600.0" prefHeight="1080.0" prefWidth="690.0" styleClass="textarea-bg" stylesheets="@../styles.css" VBox.vgrow="ALWAYS">
       <VBox.margin>
          <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
       </VBox.margin>
@@ -39,7 +39,7 @@
             <Insets left="30.0" />
          </VBox.margin>
       </Label>
-      <HBox spacing="11.0">
+      <HBox spacing="32.0">
          <VBox.margin>
             <Insets left="30.0" right="30.0" top="20.0" />
          </VBox.margin>
@@ -60,7 +60,7 @@
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
-         <TextField fx:id="searchArea" onKeyPressed="#getText" prefHeight="30.0" prefWidth="500.0" promptText="Enter song name">
+         <TextField fx:id="searchArea" onKeyPressed="#getText" prefHeight="30.0" prefWidth="590.0" promptText="Enter song name">
             <font>
                <Font size="14.0" />
             </font>

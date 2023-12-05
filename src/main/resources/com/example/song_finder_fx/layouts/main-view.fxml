@@ -191,7 +191,7 @@
                     <padding>
                         <Insets left="10.0" right="10.0" />
                     </padding>
-                    <Label fx:id="lblDatabaseStatus112" prefHeight="40.0" text="Search Songs">
+                    <Label fx:id="lblDatabaseStatus112" prefHeight="40.0" text="Search">
                         <font>
                             <Font name="Segoe UI Light" size="14.0" />
                         </font>

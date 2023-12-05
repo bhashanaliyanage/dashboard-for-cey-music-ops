@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 public class Main extends Application {
     public static Stage primaryStage = null;
-    public static Scene primaryScene = null;
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
