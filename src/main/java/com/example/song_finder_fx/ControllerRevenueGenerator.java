@@ -85,9 +85,13 @@ public class ControllerRevenueGenerator {
             protected Void call() {
                 Platform.runLater(() -> {
                     try {
-                        lblTitleMonth.setText(itemSwitcher.setMonth(InitPreloader.month));
+                        if (InitPreloader.month != null) {
+                            lblTitleMonth.setText(itemSwitcher.setMonth(InitPreloader.month));
+                        }
                         loadTopStreamedAssets(InitPreloader.top5StreamedAssets);
-                        lblTotalAssets.setText(InitPreloader.count);
+                        if (InitPreloader.count != null) {
+                            lblTotalAssets.setText(InitPreloader.count);
+                        }
                         loadTop5Territories(InitPreloader.top5Territories);
                         loadTop4DSPs(InitPreloader.top4DSPs);
                         // scrlpneMain.setVvalue(0.0);
@@ -104,114 +108,120 @@ public class ControllerRevenueGenerator {
     }
 
     private void loadTop5Territories(ResultSet rs) throws SQLException, ClassNotFoundException {
-        rs.beforeFirst();
-        DecimalFormat df = new DecimalFormat("0.00");
-        double revenue;
-        String currency;
-        ItemSwitcher itemSwitcher = new ItemSwitcher();
+        if (rs != null) {
+            rs.beforeFirst();
+            DecimalFormat df = new DecimalFormat("0.00");
+            double revenue;
+            String currency;
+            ItemSwitcher itemSwitcher = new ItemSwitcher();
 
-        rs.next();
-        lblCountry01.setText(itemSwitcher.setCountry(rs.getString(1)));
-        revenue = rs.getDouble(2);
-        currency = rs.getString(3);
-        lblCountry01Streams.setText(currency + " " + df.format(revenue));
+            rs.next();
+            lblCountry01.setText(itemSwitcher.setCountry(rs.getString(1)));
+            revenue = rs.getDouble(2);
+            currency = rs.getString(3);
+            lblCountry01Streams.setText(currency + " " + df.format(revenue));
 
-        rs.next();
-        lblCountry02.setText(itemSwitcher.setCountry(rs.getString(1)));
-        revenue = rs.getDouble(2);
-        currency = rs.getString(3);
-        lblCountry02Streams.setText(currency + " " + df.format(revenue));
+            rs.next();
+            lblCountry02.setText(itemSwitcher.setCountry(rs.getString(1)));
+            revenue = rs.getDouble(2);
+            currency = rs.getString(3);
+            lblCountry02Streams.setText(currency + " " + df.format(revenue));
 
-        rs.next();
-        lblCountry03.setText(itemSwitcher.setCountry(rs.getString(1)));
-        revenue = rs.getDouble(2);
-        currency = rs.getString(3);
-        lblCountry03Streams.setText(currency + " " + df.format(revenue));
+            rs.next();
+            lblCountry03.setText(itemSwitcher.setCountry(rs.getString(1)));
+            revenue = rs.getDouble(2);
+            currency = rs.getString(3);
+            lblCountry03Streams.setText(currency + " " + df.format(revenue));
 
-        rs.next();
-        lblCountry04.setText(itemSwitcher.setCountry(rs.getString(1)));
-        revenue = rs.getDouble(2);
-        currency = rs.getString(3);
-        lblCountry04Streams.setText(currency + " " + df.format(revenue));
+            rs.next();
+            lblCountry04.setText(itemSwitcher.setCountry(rs.getString(1)));
+            revenue = rs.getDouble(2);
+            currency = rs.getString(3);
+            lblCountry04Streams.setText(currency + " " + df.format(revenue));
 
-        rs.next();
-        lblCountry05.setText(itemSwitcher.setCountry(rs.getString(1)));
-        revenue = rs.getDouble(2);
-        currency = rs.getString(3);
-        lblCountry05Streams.setText(currency + " " + df.format(revenue));
+            rs.next();
+            lblCountry05.setText(itemSwitcher.setCountry(rs.getString(1)));
+            revenue = rs.getDouble(2);
+            currency = rs.getString(3);
+            lblCountry05Streams.setText(currency + " " + df.format(revenue));
+        }
     }
 
     private void loadTop4DSPs(ResultSet rs) throws SQLException, ClassNotFoundException {
-        rs.beforeFirst();
-        DecimalFormat df = new DecimalFormat("0.00");
-        ItemSwitcher itemSwitcher = new ItemSwitcher();
-        double revenue;
-        String currency;
+        if (rs != null) {
+            rs.beforeFirst();
+            DecimalFormat df = new DecimalFormat("0.00");
+            ItemSwitcher itemSwitcher = new ItemSwitcher();
+            double revenue;
+            String currency;
 
-        rs.next();
-        lblDSP01.setText(rs.getString(1));
-        revenue = rs.getDouble(2);
-        currency = rs.getString(3);
-        lblAmountDSP01.setText(currency + " " + df.format(revenue));
-        imgDSP01.setImage(itemSwitcher.setImage(rs.getString(1)));
+            rs.next();
+            lblDSP01.setText(rs.getString(1));
+            revenue = rs.getDouble(2);
+            currency = rs.getString(3);
+            lblAmountDSP01.setText(currency + " " + df.format(revenue));
+            imgDSP01.setImage(itemSwitcher.setImage(rs.getString(1)));
 
-        rs.next();
-        lblDSP02.setText(rs.getString(1));
-        revenue = rs.getDouble(2);
-        currency = rs.getString(3);
-        lblAmountDSP02.setText(currency + " " + df.format(revenue));
-        imgDSP02.setImage(itemSwitcher.setImage(rs.getString(1)));
+            rs.next();
+            lblDSP02.setText(rs.getString(1));
+            revenue = rs.getDouble(2);
+            currency = rs.getString(3);
+            lblAmountDSP02.setText(currency + " " + df.format(revenue));
+            imgDSP02.setImage(itemSwitcher.setImage(rs.getString(1)));
 
-        rs.next();
-        lblDSP03.setText(rs.getString(1));
-        revenue = rs.getDouble(2);
-        currency = rs.getString(3);
-        lblAmountDSP03.setText(currency + " " + df.format(revenue));
-        imgDSP03.setImage(itemSwitcher.setImage(rs.getString(1)));
+            rs.next();
+            lblDSP03.setText(rs.getString(1));
+            revenue = rs.getDouble(2);
+            currency = rs.getString(3);
+            lblAmountDSP03.setText(currency + " " + df.format(revenue));
+            imgDSP03.setImage(itemSwitcher.setImage(rs.getString(1)));
 
-        rs.next();
-        lblDSP04.setText(rs.getString(1));
-        revenue = rs.getDouble(2);
-        currency = rs.getString(3);
-        lblAmountDSP04.setText(currency + " " + df.format(revenue));
-        imgDSP04.setImage(itemSwitcher.setImage(rs.getString(1)));
+            rs.next();
+            lblDSP04.setText(rs.getString(1));
+            revenue = rs.getDouble(2);
+            currency = rs.getString(3);
+            lblAmountDSP04.setText(currency + " " + df.format(revenue));
+            imgDSP04.setImage(itemSwitcher.setImage(rs.getString(1)));
+        }
     }
 
     private void loadTopStreamedAssets(ResultSet rs) throws SQLException, ClassNotFoundException {
-        rs.beforeFirst();
-        DecimalFormat df = new DecimalFormat("0.00");
-        double revenue;
-        String currency;
+        if (rs != null) {
+            rs.beforeFirst();
+            DecimalFormat df = new DecimalFormat("0.00");
+            double revenue;
+            String currency;
 
-        rs.next();
-        lblAsset01.setText(rs.getString(2));
-        revenue = rs.getDouble(3);
-        currency = rs.getString(4);
-        lblAsset01Streams.setText(currency + " " + df.format(revenue));
+            rs.next();
+            lblAsset01.setText(rs.getString(2));
+            revenue = rs.getDouble(3);
+            currency = rs.getString(4);
+            lblAsset01Streams.setText(currency + " " + df.format(revenue));
 
-        rs.next();
-        lblAsset02.setText(rs.getString(2));
-        revenue = rs.getDouble(3);
-        currency = rs.getString(4);
-        lblAsset02Streams.setText(currency + " " + df.format(revenue));
+            rs.next();
+            lblAsset02.setText(rs.getString(2));
+            revenue = rs.getDouble(3);
+            currency = rs.getString(4);
+            lblAsset02Streams.setText(currency + " " + df.format(revenue));
 
-        rs.next();
-        lblAsset03.setText(rs.getString(2));
-        revenue = rs.getDouble(3);
-        currency = rs.getString(4);
-        lblAsset03Streams.setText(currency + " " + df.format(revenue));
+            rs.next();
+            lblAsset03.setText(rs.getString(2));
+            revenue = rs.getDouble(3);
+            currency = rs.getString(4);
+            lblAsset03Streams.setText(currency + " " + df.format(revenue));
 
-        rs.next();
-        lblAsset04.setText(rs.getString(2));
-        revenue = rs.getDouble(3);
-        currency = rs.getString(4);
-        lblAsset04Streams.setText(currency + " " + df.format(revenue));
+            rs.next();
+            lblAsset04.setText(rs.getString(2));
+            revenue = rs.getDouble(3);
+            currency = rs.getString(4);
+            lblAsset04Streams.setText(currency + " " + df.format(revenue));
 
-        rs.next();
-        lblAsset05.setText(rs.getString(2));
-        revenue = rs.getDouble(3);
-        currency = rs.getString(4);
-        lblAsset05Streams.setText(currency + " " + df.format(revenue));
+            rs.next();
+            lblAsset05.setText(rs.getString(2));
+            revenue = rs.getDouble(3);
+            currency = rs.getString(4);
+            lblAsset05Streams.setText(currency + " " + df.format(revenue));
+        }
     }
 
     public void onLoadReportButtonClick() {
