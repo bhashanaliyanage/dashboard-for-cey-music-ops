@@ -23,21 +23,20 @@
         </VBox.margin>
         <HBox alignment="CENTER_LEFT">
             <VBox.margin>
-                <Insets left="30.0" right="30.0" top="20.0"/>
+                <Insets left="30.0" right="30.0" top="20.0" />
             </VBox.margin>
             <VBox>
                 <HBox.margin>
-                    <Insets right="374.0"/>
+                    <Insets right="374.0" />
                 </HBox.margin>
                 <Label minWidth="60.0" text="Songs">
                     <font>
-                        <Font name="Segoe UI Semibold" size="19.0"/>
+                        <Font name="Segoe UI Semibold" size="19.0" />
                     </font>
                 </Label>
-                <Label fx:id="lblListCount" text="Total: 00"/>
+                <Label fx:id="lblListCount" text="Total: 00" />
             </VBox>
-            <Button fx:id="btnAddMore" minHeight="30.0" minWidth="110.0" onAction="#onAddMoreButtonClicked"
-                    styleClass="button_inside_brown" stylesheets="@../styles.css" text="Add More Songs"/>
+            <Button fx:id="btnAddMore" minHeight="30.0" minWidth="110.0" onAction="#onAddMoreButtonClicked" styleClass="button_inside_brown" stylesheets="@../styles.css" text="Add More Songs" />
         </HBox>
         <ScrollPane fx:id="scrlpneSong" hbarPolicy="NEVER" minViewportHeight="240.0" prefWidth="544.0" styleClass="scroll-pane" stylesheets="@../styles.css" vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">
             <VBox.margin>
