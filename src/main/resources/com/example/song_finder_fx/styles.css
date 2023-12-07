@@ -65,17 +65,17 @@
 
 .button_inside:hover {
     -fx-background-color: '#eaeaea';
-    -fx-border-width: 0;
+    -fx-border-width: 1;
 }
 
 .button_inside:pressed {
     -fx-background-color: '#ededed';
-    -fx-border-width: 0;
+    -fx-border-width: 1;
 }
 
 .button_inside:selected {
     -fx-background-color: '#6D676E';
-    -fx-border-width: 0;
+    -fx-border-width: 1;
     -fx-text-fill: '#FFFFFF';
 }
 

@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -30,6 +31,8 @@ public class InitPreloader implements Initializable {
     public static String salesDate;
     public static String[] date;
     public static String month;
+    public static Double PRODUCT_VERSION;
+    public static String updateLocation;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -107,10 +110,27 @@ public class InitPreloader implements Initializable {
             }
         });
 
+        Thread updatesCheck = new Thread(() -> {
+            message[0] = "Checking for Updates";
+
+            Platform.runLater(() -> {
+                lblLoadingg.setText(message[0]);
+            });
+
+            try {
+                ResultSet versionDetails = DatabaseMySQL.checkUpdates();
+                versionDetails.next();
+                PRODUCT_VERSION = versionDetails.getDouble(1);
+                System.out.println("versionDetails = " + versionDetails.getDouble(1));
+                updateLocation = versionDetails.getString(2);
+            } catch (SQLException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         Thread mainWindow = new Thread(() -> Platform.runLater(() -> {
             try {
                 starting = true;
-                // Thread.sleep(1000);
                 Parent root = FXMLLoader.load(getClass().getResource("layouts/main-view.fxml"));
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
@@ -118,10 +138,18 @@ public class InitPreloader implements Initializable {
                 stage.setTitle("CeyMusic Toolkit 2023.3");
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
-                stage.setMinWidth(1100);
+                stage.setMinWidth(1300);
                 stage.setMinHeight(700);
                 stage.setScene(scene);
                 stage.show();
+
+                if (Main.PRODUCT_VERSION < PRODUCT_VERSION) {
+                    System.out.println("Main.PRODUCT_VERSION = " + Main.PRODUCT_VERSION);
+                    System.out.println("PRODUCT_VERSION = " + PRODUCT_VERSION);
+                    ImageView updateNotify = (ImageView) scene.lookup("#imgUpdateNotify");
+                    updateNotify.setVisible(true);
+                }
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -142,6 +170,8 @@ public class InitPreloader implements Initializable {
         if (Objects.equals(con[0], "Connection Succeed")) {
             revenueAnalysisCheck.start();
             revenueAnalysisCheck.join();
+            updatesCheck.start();
+            updatesCheck.join();
             mainWindow.start();
             mainWindow.join();
         }

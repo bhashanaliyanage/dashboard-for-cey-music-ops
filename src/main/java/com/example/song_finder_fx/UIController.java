@@ -44,6 +44,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class UIController {
+    public VBox sideVBox;
     private String searchType = "TRACK_TITLE";
     public TextArea textArea;
     public Button btnDestination;

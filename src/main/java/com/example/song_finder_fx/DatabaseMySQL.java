@@ -288,6 +288,16 @@ public class DatabaseMySQL {
         return ps.executeQuery();
     }
 
+    public static ResultSet checkUpdates() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT value, location FROM settings WHERE setting = 'version';");
+        rs = ps.executeQuery();
+
+        return rs;
+    }
+
     public void CreateTable() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = DatabaseMySQL.getConn();

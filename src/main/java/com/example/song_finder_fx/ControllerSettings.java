@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
@@ -15,6 +16,7 @@ public class ControllerSettings {
     public Button btnAudioDatabase;
     public Button btnSave;
     public Button btnImportArtists;
+    public Label lblVersion;
 
     public ControllerSettings() {}
 
@@ -98,5 +100,23 @@ public class ControllerSettings {
 
         mainUIController.mainVBox.getChildren().clear();
         mainUIController.mainVBox.getChildren().add(newContent);
+
+        if (Main.PRODUCT_VERSION < InitPreloader.PRODUCT_VERSION) {
+            loadUpdate();
+        }
+    }
+
+    private void loadUpdate() throws IOException {
+        FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-update.fxml"));
+        loader.setController(this);
+        Parent sidepanelContent = loader.load();
+
+        mainUIController.sideVBox.getChildren().clear();
+        mainUIController.sideVBox.getChildren().add(sidepanelContent);
+
+        lblVersion.setText("Version " + InitPreloader.PRODUCT_VERSION);
+    }
+
+    public void onUpdateBtnClick() {
     }
 }

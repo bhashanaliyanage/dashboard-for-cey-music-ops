@@ -2,7 +2,6 @@ package com.example.song_finder_fx;
 
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Main extends Application {
+    public static Double PRODUCT_VERSION = 23.02;
     public static Stage primaryStage = null;
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
@@ -166,10 +166,9 @@ public class Main extends Application {
 
 // TODO: 11/27/2023 Edit list in the invoice view
 // TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
-// TODO: Add a separate threads check database
 // TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
+// TODO: Most viewed and recently viewed songs
 // TODO: Disable button of the main UI when the proceed button clicked
 // TODO: Offer cancel method after proceed button clicked
-// TODO: Most viewed and recently viewed songs
 // TODO: 11/14/2023 https://youtu.be/V9nDH2iBJSM?si=oCx3NjivV7nBJl8y&t=1022
 // TODO: 12/1/2023 Handle software updates
