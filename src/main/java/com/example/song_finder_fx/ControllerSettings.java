@@ -23,8 +23,7 @@ public class ControllerSettings {
     public Button btnSave;
     public Button btnImportArtists;
     public Label lblVersion;
-
-    public ControllerSettings() {}
+    public Label lblVersionInfoAboutPage;
 
     public ControllerSettings(UIController MainUIController) {
         this.mainUIController = MainUIController;
@@ -106,6 +105,9 @@ public class ControllerSettings {
 
         mainUIController.mainVBox.getChildren().clear();
         mainUIController.mainVBox.getChildren().add(newContent);
+
+        String versionInfo = "Build " + Main.PRODUCT_VERSION + " by Bhashana Liyanage";
+        lblVersionInfoAboutPage.setText(versionInfo);
 
         if ((InitPreloader.PRODUCT_VERSION != null) && (Main.PRODUCT_VERSION < InitPreloader.PRODUCT_VERSION)) {
             loadUpdate();

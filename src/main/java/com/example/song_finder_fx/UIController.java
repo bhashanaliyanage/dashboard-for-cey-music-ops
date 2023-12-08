@@ -578,11 +578,6 @@ public class UIController {
         selector.setVisible(true);
     }
 
-    public void onSearchByISRCButtonClick() throws ClassNotFoundException {
-        ControllerSearch controllerSearch = new ControllerSearch(this);
-        controllerSearch.loadThingsTempForISRC();
-    }
-
     public void onSearchedSongClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, IOException {
         String isrc = searchResultISRC.getText();
 
@@ -801,14 +796,14 @@ public class UIController {
             String password = "ceymusic";
             con = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
-            lblDatabaseStatus.setText("Database offline");
+            lblDatabaseStatus.setText("Offline");
             lblDatabaseStatus.setStyle("-fx-text-fill: '#931621'");
             return con;
         }
 
         if (con != null) {
-            lblDatabaseStatus.setText("Database online");
-            lblDatabaseStatus.setStyle("-fx-text-fill: '#32746D'");
+            lblDatabaseStatus.setText("Online");
+            lblDatabaseStatus.setStyle("-fx-text-fill: '#00864E'");
         }
 
         return con;
@@ -1174,7 +1169,7 @@ public class UIController {
         }
     }
 
-    public void onPercentageChangeButtonClicked(MouseEvent event) throws SQLException, ClassNotFoundException {
+    public void onPercentageChangeButtonClicked() throws SQLException, ClassNotFoundException {
         String song_share = songShare.getText();
         String song_name = songName.getText();
         Image plusImg = new Image("com/example/song_finder_fx/images/icon_plus.png");
@@ -1195,7 +1190,7 @@ public class UIController {
         }
     }
 
-    public void onAboutButtonClicked() throws SQLException, IOException, ClassNotFoundException {
+    public void onAboutButtonClicked() throws IOException {
         ControllerSettings cs = new ControllerSettings(this);
         cs.loadAbout();
     }

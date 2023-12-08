@@ -7,7 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -135,7 +135,12 @@ public class InitPreloader implements Initializable {
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
 
-                stage.setTitle("CeyMusic Toolkit 2023.3");
+                VBox main = (VBox) scene.lookup("#mainVBox");
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
+                Parent newContent = loader.load();
+                main.getChildren().add(newContent);
+
+                stage.setTitle("CeyMusic Toolkit v" + Main.PRODUCT_VERSION);
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
                 stage.setMinWidth(1300);
@@ -146,8 +151,9 @@ public class InitPreloader implements Initializable {
                 if ((PRODUCT_VERSION != null) && (Main.PRODUCT_VERSION < PRODUCT_VERSION)) {
                     System.out.println("Main.PRODUCT_VERSION = " + Main.PRODUCT_VERSION);
                     System.out.println("PRODUCT_VERSION = " + PRODUCT_VERSION);
-                    ImageView updateNotify = (ImageView) scene.lookup("#imgUpdateNotify");
-                    updateNotify.setVisible(true);
+                    Label updateNotify = (Label) scene.lookup("#lblUserEmailAndUpdate");
+                    updateNotify.setText("Update Available");
+                    updateNotify.setStyle("-fx-text-fill: '#FEA82F'");
                 }
 
             } catch (IOException e) {

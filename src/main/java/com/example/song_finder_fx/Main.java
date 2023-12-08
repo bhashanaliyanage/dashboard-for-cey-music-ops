@@ -164,11 +164,12 @@ public class Main extends Application {
     }
 }
 
+// TODO: 12/9/2023 Design a main view to home screen
+// TODO: 12/9/2023 Side-Panel design for all pages
+// TODO: 12/9/2023 Update the design to show new updates
+// TODO: 12/9/2023 Sub views of revenue analysis UI
 // TODO: 11/27/2023 Edit list in the invoice view
 // TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
-// TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
-// TODO: Most viewed and recently viewed songs
-// TODO: Disable button of the main UI when the proceed button clicked
 // TODO: Offer cancel method after proceed button clicked
-// TODO: 11/14/2023 https://youtu.be/V9nDH2iBJSM?si=oCx3NjivV7nBJl8y&t=1022
-// TODO: 12/1/2023 Handle software updates
+// TODO: 12/9/2023 Revenue analysis UI Size
+
