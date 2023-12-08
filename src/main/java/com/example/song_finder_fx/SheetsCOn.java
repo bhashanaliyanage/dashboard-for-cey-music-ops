@@ -11,13 +11,14 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import javafx.application.Platform;
+import javafx.scene.control.Label;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.List;
-import java.util.Objects;
 
 public class SheetsCOn {
     private static Credential authorize() throws IOException, GeneralSecurityException {
@@ -43,22 +44,39 @@ public class SheetsCOn {
     }
 
     public static void main(String[] args) throws GeneralSecurityException, IOException {
-        String access = checkAccess();
+        /*String access = checkAccess(lblLoadingg);
         if (Objects.equals(access, "1")) {
             System.out.println("Access Granted");
         } else {
             System.out.println("Unable to access");
-        }
+        }*/
     }
 
-    public static String checkAccess() throws GeneralSecurityException, IOException {
+    public static String checkAccess(Label lblLoadingg) throws GeneralSecurityException, IOException {
+//        Platform.runLater(() -> {
+//            lblLoadingg.setText("Before Sheets Service");
+//        });
         Sheets sheetsService = getSheetsService();
+
+//        Platform.runLater(() -> {
+//            lblLoadingg.setText("Before Range");
+//        });
         String range = "ApplicationSwitcher!A2:A2";
         String SPREADSHEET_ID = "1mdJ6eUzMsxojuwASWWlpTCThm3Fl7opPe3AQqbTFHho";
+
+//        Platform.runLater(() -> {
+//            lblLoadingg.setText("Before Response");
+//        });
         ValueRange response = sheetsService.spreadsheets().values().get(SPREADSHEET_ID, range).execute();
 
+//        Platform.runLater(() -> {
+//            lblLoadingg.setText("Before Get Values");
+//        });
         List<List<Object>> values = response.getValues();
 
+//        Platform.runLater(() -> {
+//            lblLoadingg.setText("Before Return");
+//        });
         return (String) values.get(0).get(0);
     }
 }

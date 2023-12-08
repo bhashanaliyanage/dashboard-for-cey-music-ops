@@ -7,8 +7,14 @@ import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 
 public class ControllerSettings {
@@ -93,7 +99,7 @@ public class ControllerSettings {
         }
     }
 
-    public void loadAbout() throws IOException, SQLException, ClassNotFoundException {
+    public void loadAbout() throws IOException {
         FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/about.fxml"));
         loader.setController(this);
         Parent newContent = loader.load();
@@ -117,6 +123,30 @@ public class ControllerSettings {
         lblVersion.setText("Version " + InitPreloader.PRODUCT_VERSION);
     }
 
-    public void onUpdateBtnClick() {
+    /*public void onUpdateBtnClick() throws IOException {
+        File setup = new File("http:\\192.168.1.200:8080\\ceymusic-dahsboard-software-updates\\CrystalDiskInfo8_17_13.exe");
+        if (Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().open(setup);
+        }
+    }*/
+
+    public void onUpdateBtnClick() throws IOException {
+        /*String location = InitPreloader.updateLocation;
+        Path path = Paths.get(location);
+        try (BufferedInputStream in = new BufferedInputStream(new URL(location).openStream());
+             FileOutputStream fileOutputStream = new FileOutputStream("CrystalDiskInfo8_17_13.exe")) {
+            byte[] dataBuffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                fileOutputStream.write(dataBuffer, 0, 1024);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+        Path tempDir = Files.createTempDirectory("CeyMusic_Dashboard_UpdateTemp");
+        InputStream in = new URL(InitPreloader.updateLocation).openStream();
+        Path tempFile = Files.createTempFile(tempDir, "update_cey_dash", ".exe");
+        Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        Desktop.getDesktop().open(new File(tempFile.toUri()));
     }
 }

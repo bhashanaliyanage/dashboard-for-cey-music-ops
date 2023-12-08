@@ -16,7 +16,6 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 
@@ -44,11 +43,11 @@ public class GDrive {
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES =
-            Collections.singletonList(DriveScopes.DRIVE_READONLY);
+            Collections.singletonList(DriveScopes.DRIVE);
     private static final String CREDENTIALS_FILE_PATH = "/sheets_oauth.json";
 
     public static void main(String... args) throws IOException, GeneralSecurityException {
-        ByteArrayOutputStream file = downloadFile("1I5pXm5RNnwOQc0-7A5BQBKuvcHs7IyfB");
+        ByteArrayOutputStream file = downloadFile("1liPstDKPSTeRLN-iCJr2yTyBr_VCLwOt");
     }
 
     /**
@@ -103,15 +102,14 @@ public class GDrive {
            TODO(developer) - See https://developers.google.com/identity for
           guides on implementing OAuth2 for your application.*/
         GoogleCredentials credentials = GoogleCredentials.getApplicationDefault()
-                .createScoped(List.of(DriveScopes.DRIVE_FILE));
-        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(
-                credentials);
+                .createScoped(SCOPES);
+        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
 
         // Build a new authorized API client service.
         Drive service = new Drive.Builder(new NetHttpTransport(),
                 GsonFactory.getDefaultInstance(),
                 requestInitializer)
-                .setApplicationName("Drive samples")
+                .setApplicationName(APPLICATION_NAME)
                 .build();
 
         try {

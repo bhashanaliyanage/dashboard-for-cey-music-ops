@@ -50,11 +50,13 @@ public class InitPreloader implements Initializable {
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
-                connection[0] = SheetsCOn.checkAccess();
+                connection[0] = SheetsCOn.checkAccess(lblLoadingg);
                 if (Objects.equals(connection[0], "1")) {
                     System.out.println("Access Granted");
+                    Platform.runLater(() -> lblLoadingg.setText("Access Granted"));
                 } else {
                     System.out.println("Unable to access");
+                    Platform.runLater(() -> lblLoadingg.setText("Unable to access"));
                 }
             } catch (GeneralSecurityException | IOException e) {
                 Platform.runLater(() -> lblLoadingg.setText("Check Internet Connection"));
