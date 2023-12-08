@@ -96,6 +96,22 @@
     -fx-border-width: 0;
 }
 
+.button_brown_invoice {
+    -fx-background-color: '#6D676E';
+    -fx-text-fill: '#FFFFFF';
+    -fx-background-radius: 0 0 3 0;
+}
+
+.button_brown_invoice:hover {
+    -fx-background-color: '#928a94';
+    -fx-background-radius: 0 0 3 0;
+}
+
+.button_brown_invoice:pressed {
+    -fx-background-color: '#3a373b';
+    -fx-background-radius: 0 0 3 0;
+}
+
 /*3a373b*/
 
 .button-big {

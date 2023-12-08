@@ -46,31 +46,57 @@ import java.util.stream.Stream;
 public class UIController {
     public VBox sideVBox;
     private String searchType = "TRACK_TITLE";
+    private final NotificationBuilder nb = new NotificationBuilder();
+
+    //<editor-fold desc="Variables">
+    //<editor-fold desc="TextArea">
     public TextArea textArea;
+    //</editor-fold>
+
+    //<editor-fold desc="Button">
     public Button btnDestination;
     @FXML
     public Button btnProceed;
+    public Button btnOpenLocation;
+    public Button btnCopyTo;
+    public Button btnAudioDatabase;
+    //</editor-fold>
+
+    //<editor-fold desc="ImageView">
+    public ImageView btnPercentageChange;
     public ImageView ProgressView;
+    public ImageView imgMediaPico;
+    public ImageView imgDeleteSong;
+    public ImageView imgPlaySong;
+    //</editor-fold>
+
+    //<editor-fold desc="HBox">
+    public HBox hboxInvoiceSong;
+    public HBox btnSeachSongs;
+    public HBox btnCollectSongs;
+    public HBox btnRevenueAnalysis;
     public HBox searchAndCollect;
     public HBox searchAndCollect1;
+    //</editor-fold>
+
+    //<editor-fold desc="VBox">
     public VBox textAreaVbox;
     public VBox mainVBox;
     @FXML
     public VBox vboxSong;
     public VBox btnDatabaseCheck;
+    public VBox vBoxInSearchSong;
+    //</editor-fold>
+
+    //<editor-fold desc="Label">
+    public Label songShare;
     public Label lblDatabaseStatus;
-    static File directory;
-    public TextField searchArea;
-    public ScrollPane scrlpneSong;
     public Label srchRsArtist;
     public Label lblPlayerSongName;
-    public ImageView imgMediaPico;
     public Label lblPlayerSongArtst;
     public Label lblSongListSub;
     public Label srchRsSongName;
     public Label srchRsISRC;
-    public ImageView imgDeleteSong;
-    public ImageView imgPlaySong;
     public Label songProductName;
     public Label songUPC;
     public Label songLyricist;
@@ -83,26 +109,30 @@ public class UIController {
     public Label songLyricistCopied;
     public Label songUPCCopied;
     public Label songAlbumNameCopied;
-    public Button btnOpenLocation;
-    public Button btnCopyTo;
-    public Label songShare;
-    public ImageView btnPercentageChange;
     public Label songName;
+    public Label lblSearchType;
+    public Label searchResultSongName;
+    public Label searchResultISRC;
+    public Label songFeaturing;
+    public Label songFeaturingCopied;
+    //</editor-fold>
+
+    //<editor-fold desc="ScrollPane">
+    public ScrollPane scrlpneSong;
+    //</editor-fold>
+
+    //<editor-fold desc="TextField">
+    public TextField searchArea;
+    //</editor-fold>
+
+    //<editor-fold desc="Rectangle">
+    static File directory;
+    File destination;
     public Rectangle rctSearchSongs;
     public Rectangle rctCollectSongs;
     public Rectangle rctRevenue;
-    public HBox btnSeachSongs;
-    public HBox btnCollectSongs;
-    public HBox btnRevenueAnalysis;
-    public Label lblSearchType;
-    File destination;
-    public Button btnAudioDatabase;
-    public Label searchResultSongName;
-    public Label searchResultISRC;
-    public VBox vBoxInSearchSong;
-    public Label songFeaturing;
-    public Label songFeaturingCopied;
-    private final NotificationBuilder nb = new NotificationBuilder();
+    //</editor-fold>
+    //</editor-fold>
 
     //<editor-fold desc="Search">
     public void onSearchedSongPress(KeyEvent event) {
@@ -1176,29 +1206,32 @@ public class UIController {
         revenueGenerator.loadRevenueGenerator();
     }
 
-    public void btnSetSearchTypeISRC(ActionEvent event) {
+    public void btnSetSearchTypeISRC() {
         lblSearchType.setText("ISRC");
         searchType = "ISRC";
     }
 
-    public void btnSetSearchTypeSinger(ActionEvent event) {
+    public void btnSetSearchTypeSinger() {
         lblSearchType.setText("Singer");
         searchType = "SINGER";
     }
 
-    public void btnSetSearchTypeComposer(ActionEvent event) {
+    public void btnSetSearchTypeComposer() {
         lblSearchType.setText("Composer");
         searchType = "COMPOSER";
     }
 
-    public void btnSetSearchTypeLyricist(ActionEvent event) {
+    public void btnSetSearchTypeLyricist() {
         lblSearchType.setText("Lyricist");
         searchType = "LYRICIST";
     }
 
-    public void btnSetSearchTypeName(ActionEvent event) {
+    public void btnSetSearchTypeName() {
         lblSearchType.setText("Name");
         searchType = "TRACK_TITLE";
     }
 
+    public void onDeleteBtnClicked() {
+        System.out.println("UIController.onDeleteBtnClicked");
+    }
 }
