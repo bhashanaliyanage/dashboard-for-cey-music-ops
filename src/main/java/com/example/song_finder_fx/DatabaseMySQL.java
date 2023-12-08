@@ -118,11 +118,8 @@ public class DatabaseMySQL {
             rowcount2++;
             System.out.println("Executing Row " + rowcount2 + " of " + rowcount);
 
-            int finalCurrentRow = rowcount2;
             double percentage = ((double) rowcount2 / rowcount) * 100;
-            Platform.runLater(() -> {
-                btnLoadReport.setText("Processing " + df.format(percentage) + "%");
-            });
+            Platform.runLater(() -> btnLoadReport.setText("Processing " + df.format(percentage) + "%"));
 
             ps.setString(1, nextLine[0]); // Sale_Start_date
             ps.setString(2, nextLine[1]); // Sale_End_date
@@ -185,7 +182,6 @@ public class DatabaseMySQL {
 
     public static ResultSet getTop5StreamedAssets() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
-        ResultSet rs;
 
         PreparedStatement ps = db.prepareStatement("SELECT Asset_ISRC, Asset_Title, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
                 "FROM report GROUP BY Asset_ISRC ORDER BY Total_Royalty DESC LIMIT 5;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -195,7 +191,6 @@ public class DatabaseMySQL {
 
     public static ResultSet getTop4DSPs() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
-        ResultSet rs;
 
         PreparedStatement ps = db.prepareStatement("SELECT DSP, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
                 "FROM report GROUP BY DSP ORDER BY Total_Royalty DESC;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -205,7 +200,6 @@ public class DatabaseMySQL {
 
     public static ResultSet getTop5Territories() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
-        ResultSet rs;
 
         PreparedStatement ps = db.prepareStatement("SELECT Territory, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
                 "FROM report GROUP BY Territory ORDER BY Total_Royalty DESC LIMIT 5;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -290,10 +284,15 @@ public class DatabaseMySQL {
 
     public static ResultSet checkUpdates() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
-        ResultSet rs;
+        ResultSet rs = null;
 
         PreparedStatement ps = db.prepareStatement("SELECT value, location FROM settings WHERE setting = 'version';");
-        rs = ps.executeQuery();
+        try {
+            rs = ps.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Check Settings Table");
+            e.printStackTrace();
+        }
 
         return rs;
     }

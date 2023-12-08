@@ -95,9 +95,7 @@ public class InitPreloader implements Initializable {
         Thread revenueAnalysisCheck = new Thread(() -> {
             message[0] = "Loading Revenue Analysis";
 
-            Platform.runLater(() -> {
-                lblLoadingg.setText(message[0]);
-            });
+            Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
                 top5Territories = DatabaseMySQL.getTop5Territories();
@@ -115,16 +113,16 @@ public class InitPreloader implements Initializable {
         Thread updatesCheck = new Thread(() -> {
             message[0] = "Checking for Updates";
 
-            Platform.runLater(() -> {
-                lblLoadingg.setText(message[0]);
-            });
+            Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
                 ResultSet versionDetails = DatabaseMySQL.checkUpdates();
-                versionDetails.next();
-                PRODUCT_VERSION = versionDetails.getDouble(1);
-                System.out.println("versionDetails = " + versionDetails.getDouble(1));
-                updateLocation = versionDetails.getString(2);
+                if (versionDetails != null) {
+                    versionDetails.next();
+                    PRODUCT_VERSION = versionDetails.getDouble(1);
+                    System.out.println("versionDetails = " + versionDetails.getDouble(1));
+                    updateLocation = versionDetails.getString(2);
+                }
             } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -145,7 +143,7 @@ public class InitPreloader implements Initializable {
                 stage.setScene(scene);
                 stage.show();
 
-                if (Main.PRODUCT_VERSION < PRODUCT_VERSION) {
+                if ((PRODUCT_VERSION != null) && (Main.PRODUCT_VERSION < PRODUCT_VERSION)) {
                     System.out.println("Main.PRODUCT_VERSION = " + Main.PRODUCT_VERSION);
                     System.out.println("PRODUCT_VERSION = " + PRODUCT_VERSION);
                     ImageView updateNotify = (ImageView) scene.lookup("#imgUpdateNotify");

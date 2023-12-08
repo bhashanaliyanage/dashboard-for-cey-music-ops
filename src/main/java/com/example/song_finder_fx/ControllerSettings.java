@@ -107,7 +107,7 @@ public class ControllerSettings {
         mainUIController.mainVBox.getChildren().clear();
         mainUIController.mainVBox.getChildren().add(newContent);
 
-        if (Main.PRODUCT_VERSION < InitPreloader.PRODUCT_VERSION) {
+        if ((InitPreloader.PRODUCT_VERSION != null) && (Main.PRODUCT_VERSION < InitPreloader.PRODUCT_VERSION)) {
             loadUpdate();
         }
     }
