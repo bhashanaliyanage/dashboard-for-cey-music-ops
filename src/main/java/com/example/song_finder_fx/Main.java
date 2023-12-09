@@ -164,7 +164,6 @@ public class Main extends Application {
     }
 }
 
-// TODO: 12/9/2023 Design a main view to home screen
 // TODO: 12/9/2023 Side-Panel design for all pages
 // TODO: 12/9/2023 Update the design to show new updates
 // TODO: 12/9/2023 Sub views of revenue analysis UI
