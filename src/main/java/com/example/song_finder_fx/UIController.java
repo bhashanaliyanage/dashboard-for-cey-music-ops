@@ -557,10 +557,13 @@ public class UIController {
         if (con != null) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
-                // loader.setController(this);
+                FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-recent-songs.fxml"));
                 Parent newContent = loader.load();
+                Parent sidepanelNewContent = sidepanelLoader.load();
                 mainVBox.getChildren().clear();
                 mainVBox.getChildren().add(newContent);
+                sideVBox.getChildren().clear();
+                sideVBox.getChildren().add(sidepanelNewContent);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

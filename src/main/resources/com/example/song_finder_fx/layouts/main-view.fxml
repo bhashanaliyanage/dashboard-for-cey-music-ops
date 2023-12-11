@@ -10,7 +10,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="610.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<BorderPane prefHeight="610.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
     <center>
         <VBox fx:id="mainVBox" alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="650.0" prefHeight="444.0" styleClass="main-vbox" stylesheets="@../styles.css" BorderPane.alignment="CENTER">
             <VBox prefWidth="750.0" stylesheets="@../styles.css" VBox.vgrow="ALWAYS" />
@@ -225,108 +225,99 @@
                   <Font name="Segoe UI Semibold" size="19.0" />
                </font>
                <VBox.margin>
-                  <Insets left="30.0" top="20.0" />
+                  <Insets left="20.0" top="20.0" />
                </VBox.margin>
             </Label>
             <Label fx:id="lblSearchType" text="Viewed" textFill="#656565">
                <VBox.margin>
-                  <Insets left="30.0" />
+                  <Insets left="20.0" />
                </VBox.margin>
             </Label>
                <VBox prefWidth="250.0" spacing="10.0">
                    <VBox.margin>
-                       <Insets top="30.0"/>
+                       <Insets top="30.0" />
                    </VBox.margin>
                    <padding>
-                       <Insets left="30.0" right="30.0"/>
+                       <Insets left="20.0" right="20.0" />
                    </padding>
-                   <HBox alignment="CENTER_LEFT" maxWidth="200.0" prefHeight="60.0" styleClass="clickable-pane-bg">
-                       <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true"
-                                  preserveRatio="true">
+                   <HBox alignment="CENTER_LEFT" prefHeight="60.0" styleClass="clickable-pane-bg">
+                       <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
                            <HBox.margin>
-                               <Insets left="15.0" right="15.0"/>
+                               <Insets left="15.0" right="15.0" />
                            </HBox.margin>
-                           <Image url="@../images/logo_small_70x_2.png"/>
+                           <Image url="@../images/logo_small_70x_2.png" />
                        </ImageView>
                        <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
                            <Label text="Song Name">
                                <font>
-                                   <Font name="Segoe UI Semibold" size="12.0"/>
+                                   <Font name="Segoe UI Semibold" size="12.0" />
                                </font>
                            </Label>
-                           <Label text="Artist" textFill="#656565"/>
+                           <Label text="Artist" textFill="#656565" />
                        </VBox>
                    </HBox>
-                   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="10.0" maxWidth="200.0" prefHeight="60.0"
-                         styleClass="clickable-pane-bg">
-                       <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true"
-                                  preserveRatio="true">
+                   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="10.0" prefHeight="60.0" styleClass="clickable-pane-bg">
+                       <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
                            <HBox.margin>
-                               <Insets left="15.0" right="15.0"/>
+                               <Insets left="15.0" right="15.0" />
                            </HBox.margin>
-                           <Image url="@../images/logo_small_70x_2.png"/>
+                           <Image url="@../images/logo_small_70x_2.png" />
                        </ImageView>
                        <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
                            <Label text="Song Name">
                                <font>
-                                   <Font name="Segoe UI Semibold" size="12.0"/>
+                                   <Font name="Segoe UI Semibold" size="12.0" />
                                </font>
                            </Label>
-                           <Label text="Artist" textFill="#656565"/>
+                           <Label text="Artist" textFill="#656565" />
                        </VBox>
                    </HBox>
-                   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="80.0" maxWidth="200.0" prefHeight="60.0"
-                         styleClass="clickable-pane-bg">
-                       <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true"
-                                  preserveRatio="true">
+                   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="80.0" prefHeight="60.0" styleClass="clickable-pane-bg">
+                       <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
                            <HBox.margin>
-                               <Insets left="15.0" right="15.0"/>
+                               <Insets left="15.0" right="15.0" />
                            </HBox.margin>
-                           <Image url="@../images/logo_small_70x_2.png"/>
+                           <Image url="@../images/logo_small_70x_2.png" />
                        </ImageView>
                        <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
                            <Label text="Song Name">
                                <font>
-                                   <Font name="Segoe UI Semibold" size="12.0"/>
+                                   <Font name="Segoe UI Semibold" size="12.0" />
                                </font>
                            </Label>
-                           <Label text="Artist" textFill="#656565"/>
+                           <Label text="Artist" textFill="#656565" />
                        </VBox>
                    </HBox>
-                   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="150.0" maxWidth="200.0" prefHeight="60.0"
-                         styleClass="clickable-pane-bg">
-                       <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true"
-                                  preserveRatio="true">
+                   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="150.0" prefHeight="60.0" styleClass="clickable-pane-bg">
+                       <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
                            <HBox.margin>
-                               <Insets left="15.0" right="15.0"/>
+                               <Insets left="15.0" right="15.0" />
                            </HBox.margin>
-                           <Image url="@../images/logo_small_70x_2.png"/>
+                           <Image url="@../images/logo_small_70x_2.png" />
                        </ImageView>
                        <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
                            <Label text="Song Name">
                                <font>
-                                   <Font name="Segoe UI Semibold" size="12.0"/>
+                                   <Font name="Segoe UI Semibold" size="12.0" />
                                </font>
                            </Label>
-                           <Label text="Artist" textFill="#656565"/>
+                           <Label text="Artist" textFill="#656565" />
                        </VBox>
                    </HBox>
-                   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="220.0" maxWidth="200.0" prefHeight="60.0"
-                         styleClass="clickable-pane-bg">
-                       <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true"
-                                  preserveRatio="true">
+                   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="220.0" prefHeight="60.0" styleClass="clickable-pane-bg">
+                       <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
                            <HBox.margin>
-                               <Insets left="15.0" right="15.0"/>
+                               <Insets left="15.0" right="15.0" />
                            </HBox.margin>
-                           <Image url="@../images/logo_small_70x_2.png"/>
+                           <Image url="@../images/logo_small_70x_2.png" />
                        </ImageView>
                        <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
                            <Label text="Song Name">
                                <font>
-                                   <Font name="Segoe UI Semibold" size="12.0"/>
+                                   <Font name="Segoe UI Semibold" size="12.0" />
                                </font>
                            </Label>
-                           <Label text="Artist" textFill="#656565"/>
+                           <Label text="Artist" textFill="#656565" />
                        </VBox>
                    </HBox>
                </VBox>

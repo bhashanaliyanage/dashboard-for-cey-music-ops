@@ -59,6 +59,7 @@ public class InitPreloader implements Initializable {
                     Platform.runLater(() -> lblLoadingg.setText("Unable to access"));
                 }
             } catch (GeneralSecurityException | IOException e) {
+                e.printStackTrace();
                 Platform.runLater(() -> lblLoadingg.setText("Check Internet Connection"));
             }
 
@@ -161,17 +162,18 @@ public class InitPreloader implements Initializable {
             }
         }));
 
-        connectionCheck.start();
-        connectionCheck.join();
+        // connectionCheck.start();
+        // connectionCheck.join();
 
-        if (connection[0] != null) {
+        databaseCheck.start();
+        databaseCheck.join();
+        audioDatabaseCheck.start();
+        audioDatabaseCheck.join();
+
+        /*if (connection[0] != null) {
             if (connection[0].equals("1")) {
-                databaseCheck.start();
-                databaseCheck.join();
-                audioDatabaseCheck.start();
-                audioDatabaseCheck.join();
             }
-        }
+        }*/
 
         if (Objects.equals(con[0], "Connection Succeed")) {
             revenueAnalysisCheck.start();

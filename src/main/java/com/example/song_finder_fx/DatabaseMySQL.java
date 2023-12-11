@@ -582,7 +582,6 @@ public class DatabaseMySQL {
         return songDetails;
     }
 
-
     public Boolean searchArtistTable(String artist) throws SQLException, ClassNotFoundException {
         ResultSet rs;
         Connection conn = getConn();
@@ -597,5 +596,75 @@ public class DatabaseMySQL {
         }
 
         return artistName != null;
+    }
+
+    public static void testThing() throws SQLException, ClassNotFoundException {
+        Connection conn = getConn();
+        ResultSet rs;
+        ResultSet rs2;
+        ResultSet rs3;
+        String assetTitle;
+        String assetISRC;
+        String composer;
+        String lyricist;
+        List<String> artists = new ArrayList<>();
+        int percentage = 0;
+
+        PreparedStatement ps = conn.prepareStatement("SELECT report.Asset_ISRC, " +
+                "report.Asset_Title, " +
+                "report.Product_Title, " +
+                "report.Product_UPC, " +
+                "(((SUM(CASE WHEN report.Territory = 'AU' THEN report.Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN report.Territory != 'AU' THEN report.Reported_Royalty ELSE 0 END))) * 0.85 AS Reported_Royalty_For_CEYMUSIC, " +
+                "((((SUM(CASE WHEN report.Territory = 'AU' THEN report.Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN report.Territory != 'AU' THEN report.Reported_Royalty ELSE 0 END))) * 0.85) * 350 AS LKR \n" +
+                "FROM report \n" +
+                "GROUP BY report.Asset_ISRC  \n" +
+                "ORDER BY `Reported_Royalty_For_CEYMUSIC` DESC;");
+        rs = ps.executeQuery();
+
+        PreparedStatement ps2 = conn.prepareStatement("SELECT COMPOSER, LYRICIST FROM `songs` WHERE ISRC = ?;");
+
+        PreparedStatement ps3 = conn.prepareStatement("SELECT * FROM artists");
+        rs3 = ps3.executeQuery();
+        while (rs3.next()) {
+            artists.add(rs3.getString(1));
+        }
+
+        while (rs.next()) {
+            assetISRC = rs.getString(1);
+            assetTitle = rs.getString(2);
+            ps2.setString(1, assetISRC);
+            rs2 = ps2.executeQuery();
+            rs2.next();
+            try {
+                composer = rs2.getString(1);
+                lyricist = rs2.getString(2);
+            } catch (SQLException e) {
+                composer = "Null";
+                lyricist = "Null";
+            }
+
+            percentage = 0;
+
+            if (artists.contains(composer)) {
+                percentage+= 50;
+            } if (artists.contains(lyricist)) {
+                percentage+= 50;
+            }
+
+            System.out.println("assetTitle = " + assetTitle);
+            System.out.println("assetISRC = " + assetISRC);
+            System.out.println("composer = " + composer);
+            System.out.println("lyricist = " + lyricist);
+            System.out.println("percentage = " + percentage);
+            System.out.println("========");
+
+            if (percentage == 100) {
+                break;
+            }
+        }
+    }
+
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        testThing();
     }
 }
