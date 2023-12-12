@@ -145,7 +145,7 @@ public class InitPreloader implements Initializable {
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
                 stage.setMinWidth(1300);
-                stage.setMinHeight(700);
+                stage.setMinHeight(750);
                 stage.setScene(scene);
                 stage.show();
 

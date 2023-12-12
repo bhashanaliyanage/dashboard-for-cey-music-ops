@@ -2,6 +2,7 @@ package com.example.song_finder_fx;
 
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -144,6 +145,13 @@ public class Main extends Application {
             System.out.println("Selected audio database directory: " + selectedDirectory.getAbsolutePath());
         }
         return selectedDirectory;
+    }
+
+    public static File browseLocationNew(javafx.stage.Window ownerWindow) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Save As");
+
+        return chooser.showDialog(ownerWindow);
     }
 
     public static void copyAudio(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {

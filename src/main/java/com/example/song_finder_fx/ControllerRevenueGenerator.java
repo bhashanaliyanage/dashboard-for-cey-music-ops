@@ -4,10 +4,15 @@ import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -68,6 +73,8 @@ public class ControllerRevenueGenerator {
     public ImageView imgDSP04;
     private final UIController mainUIController;
     public ScrollPane scrlpneMain;
+
+    public HBox btnCheckMissingISRCs;
 
     public ControllerRevenueGenerator(UIController uiController) {
         mainUIController = uiController;
@@ -397,11 +404,13 @@ public class ControllerRevenueGenerator {
         });
     }
 
-    public void onCheckMissingISRCsBtnClick() throws SQLException, ClassNotFoundException, IOException {
+    public void onCheckMissingISRCsBtnClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, IOException {
         System.out.println("ControllerRevenueGenerator.onCheckMissingISRCsBtnClick");
         ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
         CSVWriter csvWriter = new CSVWriter(new FileWriter("missing_isrcs.csv"));
         List<String[]> rows = new ArrayList<>();
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
 
         while (resultSet.next() && ((resultSet.getString(2) == null) && (resultSet.getString(3) == null))) {
             String[] row = new String[] {
@@ -413,10 +422,10 @@ public class ControllerRevenueGenerator {
         csvWriter.writeAll(rows);
         csvWriter.close();
 
-        showErrorDialogWithLog("Missing ISRCs", rows.size() + " Missing ISRCs", "Click OK to Save List of Missing ISRCs");
+        showErrorDialogWithLog("Missing ISRCs", rows.size() + " Missing ISRCs", "Click OK to Save List of Missing ISRCs", scene.getWindow());
     }
 
-    private static void showErrorDialogWithLog(String title, String headerText, String contentText) throws IOException {
+    private static void showErrorDialogWithLog(String title, String headerText, String contentText, Window window) throws IOException {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
@@ -427,7 +436,7 @@ public class ControllerRevenueGenerator {
         if (result.isPresent()) {
             if (result.get() == ButtonType.OK) {
                 Path sourcePath = Paths.get("missing_isrcs.csv");
-                File destination = Main.browseLocation();
+                File destination = Main.browseLocationNew(window);
                 Path destinationPath = destination.toPath().resolve(sourcePath.getFileName());
                 Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
                 System.out.println("File copied successfully to " + destinationPath);
