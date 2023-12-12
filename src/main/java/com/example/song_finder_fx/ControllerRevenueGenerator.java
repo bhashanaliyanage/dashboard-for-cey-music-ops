@@ -5,20 +5,23 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ControllerRevenueGenerator {
     //<editor-fold desc="Buttons">
@@ -71,12 +74,16 @@ public class ControllerRevenueGenerator {
     }
 
     public void loadRevenueGenerator() throws IOException {
-        FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/revenue-generator.fxml"));
-        loader.setController(this);
-        Parent newContent = loader.load();
+        FXMLLoader loaderMain = new FXMLLoader(ControllerSettings.class.getResource("layouts/revenue-generator.fxml"));
+        FXMLLoader loaderSide = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-revenue-analysis.fxml"));
+        loaderMain.setController(this);
+        loaderSide.setController(this);
+        Parent newContentMain = loaderMain.load();
+        Parent newContentSide = loaderSide.load();
         ItemSwitcher itemSwitcher = new ItemSwitcher();
 
-        mainUIController.mainVBox.getChildren().setAll(newContent);
+        mainUIController.mainVBox.getChildren().setAll(newContentMain);
+        mainUIController.sideVBox.getChildren().setAll(newContentSide);
 
         Task<Void> task;
 
@@ -388,5 +395,43 @@ public class ControllerRevenueGenerator {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    public void onCheckMissingISRCsBtnClick() throws SQLException, ClassNotFoundException, IOException {
+        System.out.println("ControllerRevenueGenerator.onCheckMissingISRCsBtnClick");
+        ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+        CSVWriter csvWriter = new CSVWriter(new FileWriter("missing_isrcs.csv"));
+        List<String[]> rows = new ArrayList<>();
+
+        while (resultSet.next() && ((resultSet.getString(2) == null) && (resultSet.getString(3) == null))) {
+            String[] row = new String[] {
+              resultSet.getString(1)
+            };
+            rows.add(row);
+        }
+
+        csvWriter.writeAll(rows);
+        csvWriter.close();
+
+        showErrorDialogWithLog("Missing ISRCs", rows.size() + " Missing ISRCs", "Click OK to Save List of Missing ISRCs");
+    }
+
+    private static void showErrorDialogWithLog(String title, String headerText, String contentText) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent()) {
+            if (result.get() == ButtonType.OK) {
+                Path sourcePath = Paths.get("missing_isrcs.csv");
+                File destination = Main.browseLocation();
+                Path destinationPath = destination.toPath().resolve(sourcePath.getFileName());
+                Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("File copied successfully to " + destinationPath);
+            }
+        }
     }
 }

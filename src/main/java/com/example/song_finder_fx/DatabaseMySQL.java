@@ -297,6 +297,22 @@ public class DatabaseMySQL {
         return rs;
     }
 
+    public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+
+        PreparedStatement ps = db.prepareStatement("""
+                SELECT report.Asset_ISRC,\s
+                (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.COMPOSER END) AS Composer,\s
+                (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.LYRICIST END) AS Lyricist\s
+                FROM report\s
+                LEFT OUTER JOIN songs ON report.Asset_ISRC = songs.ISRC\s
+                GROUP BY Asset_ISRC \s
+                ORDER BY `Composer` ASC"""
+        );
+
+        return ps.executeQuery();
+    }
+
     public void CreateTable() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = DatabaseMySQL.getConn();
@@ -372,36 +388,6 @@ public class DatabaseMySQL {
                 e.printStackTrace();
             }
         }
-    }
-
-    public static void updateBase(File file) throws SQLException, ClassNotFoundException, IOException {
-        Connection db = Database.getConn();
-        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
-        sc.useDelimiter(",");
-
-        PreparedStatement ps = db.prepareStatement("UPDATE 'songData'" +
-                "SET FILE_NAME = ?" +
-                "WHERE ISRC = ?");
-
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line; // Test
-
-        while ((line = reader.readLine()) != null) {
-            String[] columnNames = line.split(",");
-
-            try {
-                if (columnNames.length > 0) {
-                    ps.setString(1, columnNames[12]);
-                    System.out.println(columnNames[12]);
-                    ps.setString(2, columnNames[0]);
-
-                    ps.executeUpdate();
-                }
-            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
-                e.printStackTrace();
-            }
-        }
-        sc.close();
     }
 
     public static void searchAndCopySongs(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
@@ -608,17 +594,13 @@ public class DatabaseMySQL {
         String composer;
         String lyricist;
         List<String> artists = new ArrayList<>();
-        int percentage = 0;
+        int percentage;
 
-        PreparedStatement ps = conn.prepareStatement("SELECT report.Asset_ISRC, " +
-                "report.Asset_Title, " +
-                "report.Product_Title, " +
-                "report.Product_UPC, " +
-                "(((SUM(CASE WHEN report.Territory = 'AU' THEN report.Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN report.Territory != 'AU' THEN report.Reported_Royalty ELSE 0 END))) * 0.85 AS Reported_Royalty_For_CEYMUSIC, " +
-                "((((SUM(CASE WHEN report.Territory = 'AU' THEN report.Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN report.Territory != 'AU' THEN report.Reported_Royalty ELSE 0 END))) * 0.85) * 350 AS LKR \n" +
-                "FROM report \n" +
-                "GROUP BY report.Asset_ISRC  \n" +
-                "ORDER BY `Reported_Royalty_For_CEYMUSIC` DESC;");
+        PreparedStatement ps = conn.prepareStatement("""
+                SELECT report.Asset_ISRC, report.Asset_Title, report.Product_Title, report.Product_UPC, (((SUM(CASE WHEN report.Territory = 'AU' THEN report.Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN report.Territory != 'AU' THEN report.Reported_Royalty ELSE 0 END))) * 0.85 AS Reported_Royalty_For_CEYMUSIC, ((((SUM(CASE WHEN report.Territory = 'AU' THEN report.Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN report.Territory != 'AU' THEN report.Reported_Royalty ELSE 0 END))) * 0.85) * 350 AS LKR\s
+                FROM report\s
+                GROUP BY report.Asset_ISRC \s
+                ORDER BY `Reported_Royalty_For_CEYMUSIC` DESC;""");
         rs = ps.executeQuery();
 
         PreparedStatement ps2 = conn.prepareStatement("SELECT COMPOSER, LYRICIST FROM `songs` WHERE ISRC = ?;");
