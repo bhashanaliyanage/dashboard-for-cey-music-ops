@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <Label text="Reported Royalty">
+      <font>
+         <Font name="Segoe UI Semibold" size="19.0"/>
+      </font>
+      <VBox.margin>
+         <Insets left="20.0" top="20.0"/>
+      </VBox.margin>
+   </Label>
+   <Label fx:id="lblSearchType" text="N/A" textFill="#656565">
+      <VBox.margin>
+         <Insets left="20.0"/>
+      </VBox.margin>
+   </Label>
+   <VBox prefWidth="250.0" spacing="10.0">
+      <VBox.margin>
+         <Insets top="30.0"/>
+      </VBox.margin>
+      <padding>
+         <Insets left="20.0" right="20.0"/>
+      </padding>
+      <HBox alignment="CENTER_LEFT" prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+         <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+            <HBox.margin>
+               <Insets left="15.0" right="15.0"/>
+            </HBox.margin>
+            <Image url="@../images/icon_csv.png"/>
+         </ImageView>
+         <VBox alignment="CENTER_LEFT" prefHeight="200.0">
+            <Label text="Add New Report">
+               <font>
+                  <Font name="Segoe UI Semibold" size="12.0"/>
+               </font>
+            </Label>
+            <Label text="Click to Add new Report" textFill="#656565"/>
+         </VBox>
+      </HBox>
+   </VBox>
+   <Label layoutX="30.0" layoutY="30.0" text="Generate Reports">
+      <font>
+         <Font name="Segoe UI Semibold" size="19.0"/>
+      </font>
+      <VBox.margin>
+         <Insets left="20.0" top="20.0"/>
+      </VBox.margin>
+   </Label>
+   <Label fx:id="lblSearchType1" layoutX="30.0" layoutY="58.0" text="by Revenue Groups" textFill="#656565">
+      <VBox.margin>
+         <Insets left="20.0"/>
+      </VBox.margin>
+   </Label>
+   <HBox alignment="CENTER_LEFT" prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="30.0"/>
+      </VBox.margin>
+      <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+         <HBox.margin>
+            <Insets left="15.0" right="15.0"/>
+         </HBox.margin>
+         <Image url="@../images/icon_csv.png"/>
+      </ImageView>
+      <VBox alignment="CENTER_LEFT" prefHeight="200.0">
+         <Label text="Generate">
+            <font>
+               <Font name="Segoe UI Semibold" size="12.0"/>
+            </font>
+         </Label>
+         <Label text="Full Breakdown" textFill="#656565"/>
+      </VBox>
+   </HBox>
+   <HBox alignment="CENTER_LEFT" layoutX="30.0" layoutY="260.0" prefHeight="60.0" styleClass="clickable-pane-bg"
+         stylesheets="@../styles.css">
+      <children>
+         <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+            <HBox.margin>
+               <Insets left="15.0" right="15.0"/>
+            </HBox.margin>
+            <image>
+               <Image url="@../images/icon_csv.png"/>
+            </image>
+         </ImageView>
+         <VBox alignment="CENTER_LEFT" prefHeight="200.0">
+            <children>
+               <Label text="Generate Report">
+                  <font>
+                     <Font name="Segoe UI Semibold" size="12.0"/>
+                  </font>
+               </Label>
+               <Label text="by Payee" textFill="#656565"/>
+            </children>
+         </VBox>
+      </children>
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="10.0"/>
+      </VBox.margin>
+   </HBox>
+   <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="320.0" prefHeight="60.0" styleClass="clickable-pane-bg"
+         stylesheets="@../styles.css">
+      <children>
+         <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+            <HBox.margin>
+               <Insets left="15.0" right="15.0"/>
+            </HBox.margin>
+            <image>
+               <Image url="@../images/icon_csv.png"/>
+            </image>
+         </ImageView>
+         <VBox alignment="CENTER_LEFT" prefHeight="200.0">
+            <children>
+               <Label text="Generate Report">
+                  <font>
+                     <Font name="Segoe UI Semibold" size="12.0"/>
+                  </font>
+               </Label>
+               <Label text="by Territory" textFill="#656565"/>
+            </children>
+         </VBox>
+      </children>
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="10.0"/>
+      </VBox.margin>
+   </HBox>
+   <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="380.0" prefHeight="60.0" styleClass="clickable-pane-bg"
+         stylesheets="@../styles.css">
+      <children>
+         <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+            <HBox.margin>
+               <Insets left="15.0" right="15.0"/>
+            </HBox.margin>
+            <image>
+               <Image url="@../images/icon_csv.png"/>
+            </image>
+         </ImageView>
+         <VBox alignment="CENTER_LEFT" prefHeight="200.0">
+            <children>
+               <Label text="Generate Report">
+                  <font>
+                     <Font name="Segoe UI Semibold" size="12.0"/>
+                  </font>
+               </Label>
+               <Label text="by DSP" textFill="#656565"/>
+            </children>
+         </VBox>
+      </children>
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="10.0"/>
+      </VBox.margin>
+   </HBox>
+   <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="440.0" onMouseClicked="#onCheckMissingISRCsBtnClick"
+         prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+      <children>
+         <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+            <HBox.margin>
+               <Insets left="15.0" right="15.0"/>
+            </HBox.margin>
+            <image>
+               <Image url="@../images/icon_csv.png"/>
+            </image>
+         </ImageView>
+         <VBox alignment="CENTER_LEFT" prefHeight="200.0">
+            <children>
+               <Label text="Check Missing ISRCs">
+                  <font>
+                     <Font name="Segoe UI Semibold" size="12.0"/>
+                  </font>
+               </Label>
+               <Label text="N/A" textFill="#656565"/>
+            </children>
+         </VBox>
+      </children>
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="10.0"/>
+      </VBox.margin>
+   </HBox>
+</VBox>
