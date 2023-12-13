@@ -43,7 +43,6 @@ public class InitPreloader implements Initializable {
         final String[] con = new String[1];
         final String[] message = {""};
         final String[] connection = {null};
-        // lblLoading.setText("Test");
         Thread connectionCheck = new Thread(() -> {
             message[0] = "Checking Connection";
 
@@ -145,7 +144,7 @@ public class InitPreloader implements Initializable {
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
                 stage.setMinWidth(1300);
-                stage.setMinHeight(750);
+                stage.setMinHeight(800);
                 stage.setScene(scene);
                 stage.show();
 

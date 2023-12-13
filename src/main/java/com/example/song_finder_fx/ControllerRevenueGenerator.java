@@ -1,6 +1,7 @@
 package com.example.song_finder_fx;
 
 import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -35,6 +36,8 @@ public class ControllerRevenueGenerator {
     //</editor-fold>
 
     //<editor-fold desc="Labels">
+    public Label lblUpdatePayee;
+    public Label lblUpdateSongsDatabase;
     public Label lblAsset01;
     public Label lblAsset02;
     public Label lblAsset03;
@@ -73,7 +76,6 @@ public class ControllerRevenueGenerator {
     public ImageView imgDSP04;
     private final UIController mainUIController;
     public ScrollPane scrlpneMain;
-
     public HBox btnCheckMissingISRCs;
 
     public ControllerRevenueGenerator(UIController uiController) {
@@ -423,6 +425,34 @@ public class ControllerRevenueGenerator {
         csvWriter.close();
 
         showErrorDialogWithLog("Missing ISRCs", rows.size() + " Missing ISRCs", "Click OK to Save List of Missing ISRCs", scene.getWindow());
+    }
+
+    public void onUpdateSongsDatabaseBtnClick(MouseEvent mouseEvent) throws CsvValidationException, IOException, SQLException, ClassNotFoundException {
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Window window = scene.getWindow();
+        File file = Main.browseForFile(window);
+        boolean status = DatabaseMySQL.updateSongsTable(file);
+
+        if (status) {
+            lblUpdateSongsDatabase.setText("Database Updated");
+        } else {
+            lblUpdateSongsDatabase.setText("Error");
+        }
+    }
+
+    public void onUpdatePayeeDetailsBtnClick(MouseEvent mouseEvent) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Window window = scene.getWindow();
+        File file = Main.browseForFile(window);
+        boolean status = DatabaseMySQL.updatePayeeDetails(file);
+
+        if (status) {
+            lblUpdatePayee.setText("Payee List Updated");
+        } else {
+            lblUpdatePayee.setText("Error");
+        }
     }
 
     private static void showErrorDialogWithLog(String title, String headerText, String contentText, Window window) throws IOException {

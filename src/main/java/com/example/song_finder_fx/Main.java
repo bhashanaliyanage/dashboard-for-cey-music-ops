@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
@@ -27,6 +28,14 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
+    }
+
+    public static File browseForFile(Window window) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select CSV");
+        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("TXT files (*.csv)", "*.csv"));
+
+        return fileChooser.showOpenDialog(window);
     }
 
     @Override

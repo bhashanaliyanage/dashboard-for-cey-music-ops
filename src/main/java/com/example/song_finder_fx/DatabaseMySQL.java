@@ -17,7 +17,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class DatabaseMySQL {
@@ -313,6 +312,132 @@ public class DatabaseMySQL {
         return ps.executeQuery();
     }
 
+    public static boolean updateSongsTable(File file) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+        CSVReader reader = new CSVReader(new FileReader(file));
+        reader.readNext(); // Skipping the first line
+        String[] row;
+        PreparedStatement ps = getInsertSongPreparedStatement();
+        PreparedStatement checkISRC_Availability = getCheckISRC_PreparedStatement();
+        boolean status = false;
+
+        while ((row = reader.readNext()) != null) {
+            String isrc = row[0];
+
+            checkISRC_Availability.setString(1, isrc);
+            ResultSet rs = checkISRC_Availability.executeQuery();
+            rs.next();
+
+            if (rs.getInt(1) == 0) {
+                String albumTitle = row[1];
+                String upc = row[2];
+                String catalogNumber = row[3];
+                String primaryArtists = row[4];
+                String albumFormat = row[5];
+                String trackTitle = row[6];
+                String trackVersion = row[7];
+                String singer = row[8];
+                String featuringArtists = row[9];
+                String composer = row[10];
+                String lyricist = row[11];
+                String originalFileName = row[12];
+                String type = row[14];
+
+                ps.setString(1, isrc);
+                ps.setString(2, albumTitle);
+                ps.setString(3, upc);
+                ps.setString(4, catalogNumber);
+                ps.setString(5, primaryArtists);
+                ps.setString(6, albumFormat);
+                ps.setString(7, trackTitle);
+                ps.setString(8, trackVersion);
+                ps.setString(9, singer);
+                ps.setString(10, featuringArtists);
+                ps.setString(11, composer);
+                ps.setString(12, lyricist);
+                ps.setString(13, originalFileName);
+                ps.setString(14, type);
+
+                try {
+                    ps.executeUpdate();
+                    System.out.println(isrc + " Added to database");
+                    status = true;
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return status;
+    }
+
+    private static PreparedStatement getCheckISRC_PreparedStatement() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        return db.prepareStatement("SELECT COUNT(*) AS Count FROM songs WHERE ISRC = ?");
+    }
+
+    private static PreparedStatement getInsertSongPreparedStatement() throws ClassNotFoundException, SQLException {
+        Connection db = DatabaseMySQL.getConn();
+        return db.prepareStatement("INSERT INTO songs (ISRC," +
+                "ALBUM_TITLE," +
+                "UPC," +
+                "CAT_NO," +
+                "PRODUCT_PRIMARY," +
+                "ALBUM_FORMAT," +
+                "TRACK_TITLE," +
+                "TRACK_VERSION," +
+                "SINGER," +
+                "FEATURING," +
+                "COMPOSER," +
+                "LYRICIST," +
+                "FILE_NAME," +
+                "TYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        );
+    }
+
+    public static boolean updatePayeeDetails(File file) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+        CSVReader reader = new CSVReader(new FileReader(file));
+        reader.readNext(); // Skipping the first line
+        String[] row;
+        PreparedStatement psCheckISRCs = getCheckISRC_FromPayeesPreparedStatement();
+        PreparedStatement psInsert = getInsertPayeeDetailsPreparedStatement();
+        boolean status = false;
+
+        while ((row = reader.readNext()) != null) {
+            String isrc = row[0];
+
+            psCheckISRCs.setString(1, isrc);
+            ResultSet rs = psCheckISRCs.executeQuery();
+            rs.next();
+
+            if (rs.getInt(1) == 0) {
+                String payee = row[1];
+                String contributor = row[2];
+
+                psInsert.setString(1, isrc);
+                psInsert.setString(2, payee);
+                psInsert.setString(3, contributor);
+
+                try {
+                    psInsert.executeUpdate();
+                    System.out.println("Payee: " + payee + " Added for ISRC: " + isrc);
+                    status = true;
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return status;
+    }
+
+    private static PreparedStatement getInsertPayeeDetailsPreparedStatement() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        return db.prepareStatement("INSERT INTO isrc_payees (ISRC, PAYEE, CONTRIBUTOR) VALUES (?, ?, ?)");
+    }
+
+    private static PreparedStatement getCheckISRC_FromPayeesPreparedStatement() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        return db.prepareStatement("SELECT COUNT(*) AS Count FROM isrc_payees WHERE ISRC = ?");
+    }
+
     public void CreateTable() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = DatabaseMySQL.getConn();
@@ -352,7 +477,8 @@ public class DatabaseMySQL {
                 "FEATURING," +
                 "COMPOSER," +
                 "LYRICIST," +
-                "FILE_NAME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "FILE_NAME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        );
 
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String line; // Test
@@ -640,7 +766,7 @@ public class DatabaseMySQL {
             System.out.println("percentage = " + percentage);
             System.out.println("========");
 
-            if (percentage == 100) {
+            if (percentage == 0) {
                 break;
             }
         }
