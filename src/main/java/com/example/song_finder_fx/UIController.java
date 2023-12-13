@@ -131,10 +131,35 @@ public class UIController {
     public Rectangle rctSearchSongs;
     public Rectangle rctCollectSongs;
     public Rectangle rctRevenue;
+    public Rectangle rctArtistReports;
     //</editor-fold>
     //</editor-fold>
 
     //<editor-fold desc="Search">
+    public void btnSetSearchTypeISRC() {
+        lblSearchType.setText("ISRC");
+        searchType = "ISRC";
+    }
+
+    public void btnSetSearchTypeSinger() {
+        lblSearchType.setText("Singer");
+        searchType = "SINGER";
+    }
+
+    public void btnSetSearchTypeComposer() {
+        lblSearchType.setText("Composer");
+        searchType = "COMPOSER";
+    }
+
+    public void btnSetSearchTypeLyricist() {
+        lblSearchType.setText("Lyricist");
+        searchType = "LYRICIST";
+    }
+
+    public void btnSetSearchTypeName() {
+        lblSearchType.setText("Name");
+        searchType = "TRACK_TITLE";
+    }
     public void onSearchedSongPress(KeyEvent event) {
         KeyCode keyCode = event.getCode();
         System.out.println("UIController.onSearchedSongPress");
@@ -577,6 +602,7 @@ public class UIController {
         rctSearchSongs.setVisible(false);
         rctCollectSongs.setVisible(false);
         rctRevenue.setVisible(false);
+        rctArtistReports.setVisible(false);
 
         selector.setVisible(true);
     }
@@ -1204,32 +1230,11 @@ public class UIController {
         revenueGenerator.loadRevenueGenerator();
     }
 
-    public void btnSetSearchTypeISRC() {
-        lblSearchType.setText("ISRC");
-        searchType = "ISRC";
-    }
-
-    public void btnSetSearchTypeSinger() {
-        lblSearchType.setText("Singer");
-        searchType = "SINGER";
-    }
-
-    public void btnSetSearchTypeComposer() {
-        lblSearchType.setText("Composer");
-        searchType = "COMPOSER";
-    }
-
-    public void btnSetSearchTypeLyricist() {
-        lblSearchType.setText("Lyricist");
-        searchType = "LYRICIST";
-    }
-
-    public void btnSetSearchTypeName() {
-        lblSearchType.setText("Name");
-        searchType = "TRACK_TITLE";
-    }
-
     public void onDeleteBtnClicked() {
         System.out.println("UIController.onDeleteBtnClicked");
+    }
+
+    public void onArtistReportsBtnClick(MouseEvent mouseEvent) {
+        changeSelectorTo(rctArtistReports);
     }
 }
