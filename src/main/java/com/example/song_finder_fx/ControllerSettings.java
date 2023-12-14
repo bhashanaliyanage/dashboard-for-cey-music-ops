@@ -53,6 +53,7 @@ public class ControllerSettings {
         // File selectedDirectory = chooser.showDialog(btnAudioDatabase.getScene().getWindow());
 
         UIController.directory = chooser.showDialog(btnAudioDatabase.getScene().getWindow());
+        Main.selectedDirectory = UIController.directory;
 
         if (UIController.directory != null) {
             String shortenedString = UIController.directory.getAbsolutePath().substring(0, Math.min(UIController.directory.getAbsolutePath().length(), 73));
@@ -92,9 +93,13 @@ public class ControllerSettings {
 
             if (status) {
                 btnSave.setText("Saved");
+                System.out.println("Saved");
             } else {
                 btnSave.setText("Error Saving!");
+                System.out.println("Error Saving");
             }
+        } else {
+            System.out.println("Selected Directory is Null");
         }
     }
 

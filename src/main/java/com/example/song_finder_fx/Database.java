@@ -17,14 +17,13 @@ import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class Database {
-    private static Connection conn = null;
+    private static final Connection conn = null;
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
-        if (conn == null) {
-            Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:songs.db");
-        }
-        return conn;
+        Connection connection;
+        Class.forName("org.sqlite.JDBC");
+        connection = DriverManager.getConnection("jdbc:sqlite:songs.db");
+        return connection;
     }
 
     public static void CreateBase() throws SQLException, ClassNotFoundException {
