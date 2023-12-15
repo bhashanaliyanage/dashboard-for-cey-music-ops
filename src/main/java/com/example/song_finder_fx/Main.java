@@ -181,13 +181,10 @@ public class Main extends Application {
     }
 }
 
-// TODO: 12/14/2023 SQLite Database not working after building the program
 // TODO: 12/9/2023 Side-Panel design for all pages
-// TODO: 12/9/2023 Update the design to show new updates
 // TODO: 12/9/2023 Sub views of revenue analysis UI
 // TODO: 11/27/2023 Edit list in the invoice view
 // TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
 // TODO: Offer cancel method after proceed button clicked
-// TODO: 12/9/2023 Revenue analysis UI Size
-// TODO: 12/14/2023 In the check missing ISRC button, it doesn't show results 
+// TODO: 12/14/2023 In the check missing ISRC button, it doesn't show results after the program is built
 // TODO: 12/14/2023 It needs to be run as administrator to show alert dialogs
