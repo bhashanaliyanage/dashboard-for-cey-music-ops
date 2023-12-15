@@ -22,7 +22,7 @@ public class Database {
     public static Connection getConn() throws ClassNotFoundException, SQLException {
         Connection connection;
         Class.forName("org.sqlite.JDBC");
-        connection = DriverManager.getConnection("jdbc:sqlite:songs.db");
+        connection = DriverManager.getConnection("jdbc:sqlite::resource:songs.db");
         return connection;
     }
 
@@ -57,86 +57,6 @@ public class Database {
                 "PATH TEXT)");
 
         ps.executeUpdate();
-    }
-
-    public static void updateBase(File file) throws SQLException, ClassNotFoundException, IOException {
-        Connection db = Database.getConn();
-        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
-        sc.useDelimiter(",");
-
-        PreparedStatement ps = db.prepareStatement("UPDATE 'songData'" +
-                "SET FILE_NAME = ?" +
-                "WHERE ISRC = ?");
-
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line; // Test
-
-        while ((line = reader.readLine()) != null) {
-            String[] columnNames = line.split(",");
-
-            try {
-                if (columnNames.length > 0) {
-                    ps.setString(1, columnNames[12]);
-                    System.out.println(columnNames[12]);
-                    ps.setString(2, columnNames[0]);
-
-                    ps.executeUpdate();
-                }
-            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
-                e.printStackTrace();
-            }
-        }
-        sc.close();
-    }
-
-    public static void ImportToBase(File file) throws SQLException, ClassNotFoundException, IOException {
-        Connection db = Database.getConn();
-        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
-        sc.useDelimiter(",");
-
-        PreparedStatement ps = db.prepareStatement("INSERT INTO 'songData' (ISRC," +
-                "ALBUM_TITLE," +
-                "UPC," +
-                "CAT_NO," +
-                "PRODUCT_PRIMARY," +
-                "ALBUM_FORMAT," +
-                "TRACK_TITLE," +
-                "TRACK_VERSION," +
-                "SINGER," +
-                "FEATURING," +
-                "COMPOSER," +
-                "LYRICIST," +
-                "FILE_NAME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line; // Test
-
-        while ((line = reader.readLine()) != null) {
-            String[] columnNames = line.split(",");
-
-            try {
-                if (columnNames.length > 0) {
-                    ps.setString(1, columnNames[0]);
-                    ps.setString(2, columnNames[1]);
-                    ps.setString(3, columnNames[2]);
-                    ps.setString(4, columnNames[3]);
-                    ps.setString(5, columnNames[4]);
-                    ps.setString(6, columnNames[5]);
-                    ps.setString(7, columnNames[6]);
-                    ps.setString(8, columnNames[7]);
-                    ps.setString(9, columnNames[8]);
-                    ps.setString(10, columnNames[9]);
-                    ps.setString(11, columnNames[10]);
-                    ps.setString(12, columnNames[11]);
-                    ps.setString(13, columnNames[12]);
-
-                    ps.executeUpdate();
-                }
-            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
-                e.printStackTrace();
-            }
-        }
-        sc.close();
     }
 
     public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException {
@@ -174,7 +94,7 @@ public class Database {
                         System.out.println("File not found.");
                     }
                 } catch (Exception e) {
-                    showErrorDialog("Error", "An error occurred during file copy.", e.getMessage().toString() + "\n Please consider using an accessible location");
+                    showErrorDialog("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
                     throw new RuntimeException(e);
                 }
             }
@@ -182,6 +102,7 @@ public class Database {
     }
 
     private static void showErrorDialog(String title, String headerText, String contentText) {
+        // TODO: 12/15/2023 Change this to a dialog (See check missing ISRC function)
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(headerText);

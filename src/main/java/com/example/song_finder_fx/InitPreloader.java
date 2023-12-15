@@ -88,7 +88,7 @@ public class InitPreloader implements Initializable {
             try {
                 Main.getDirectoryFromDB();
             } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                System.out.println("Cannot get audio database directory");
             }
         });
 

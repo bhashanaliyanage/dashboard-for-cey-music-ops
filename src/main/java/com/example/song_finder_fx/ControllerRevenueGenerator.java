@@ -407,10 +407,14 @@ public class ControllerRevenueGenerator {
     }
 
     public void onCheckMissingISRCsBtnClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, IOException {
-        System.out.println("ControllerRevenueGenerator.onCheckMissingISRCsBtnClick");
         ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
-        CSVWriter csvWriter = new CSVWriter(new FileWriter("missing_isrcs.csv"));
+
+        Path tempDir = Files.createTempDirectory("missing_isrcs");
+        Path csvFile = tempDir.resolve("missing_isrcs.csv");
+        CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
+
         List<String[]> rows = new ArrayList<>();
+
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
 
