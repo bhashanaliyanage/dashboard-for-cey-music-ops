@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Main extends Application {
-    public static Double PRODUCT_VERSION = 23.03;
+    public static Double PRODUCT_VERSION = 23.04;
     public static Stage primaryStage = null;
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
