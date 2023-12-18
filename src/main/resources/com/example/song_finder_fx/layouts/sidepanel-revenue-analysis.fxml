@@ -22,14 +22,14 @@
          <Insets left="20.0" />
       </VBox.margin>
    </Label>
-   <VBox disable="true" prefWidth="250.0" spacing="10.0">
+   <VBox prefWidth="250.0" spacing="10.0">
       <VBox.margin>
          <Insets top="30.0" />
       </VBox.margin>
       <padding>
          <Insets left="20.0" right="20.0" />
       </padding>
-      <HBox alignment="CENTER_LEFT" prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+      <HBox alignment="CENTER_LEFT" onMouseClicked="#onLoadReportButtonClick" prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
          <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
             <HBox.margin>
                <Insets left="15.0" right="15.0" />
@@ -59,7 +59,7 @@
          <Insets left="20.0" />
       </VBox.margin>
    </Label>
-   <HBox alignment="CENTER_LEFT" disable="true" prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+   <HBox alignment="CENTER_LEFT" onMouseClicked="#onGenerateFullBreakdownBtnClick" prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
       <VBox.margin>
          <Insets left="20.0" right="20.0" top="30.0" />
       </VBox.margin>
@@ -97,7 +97,7 @@
          <Label text="by Payee" textFill="#656565" />
       </VBox>
    </HBox>
-   <HBox alignment="CENTER_LEFT" disable="true" layoutX="10.0" layoutY="320.0" prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+   <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="320.0" onMouseClicked="#onGenerateReportTerritoryBtnClicked" prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
       <VBox.margin>
          <Insets left="20.0" right="20.0" top="10.0" />
       </VBox.margin>
@@ -116,7 +116,7 @@
          <Label text="by Territory" textFill="#656565" />
       </VBox>
    </HBox>
-   <HBox alignment="CENTER_LEFT" disable="true" layoutX="10.0" layoutY="380.0" prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+   <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="380.0" onMouseClicked="#onGenerateReportDSPClicked" prefHeight="60.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
       <VBox.margin>
          <Insets left="20.0" right="20.0" top="10.0" />
       </VBox.margin>

@@ -4,6 +4,7 @@ import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -248,8 +249,19 @@ public class ControllerRevenueGenerator {
 
         File report = chooser.showOpenDialog(mainUIController.mainVBox.getScene().getWindow());
 
-        btnLoadReport.setText("Working on...");
+        if (report != null) {
+            btnLoadReport.setText("Working on...");
 
+            Task<Void> task = loadReport(report);
+
+            Thread t = new Thread(task);
+            t.start();
+        } else {
+            System.out.println("No Report Imported");
+        }
+    }
+
+    private Task<Void> loadReport(File report) {
         Task<Void> task;
         task = new Task<>() {
             @Override
@@ -264,17 +276,17 @@ public class ControllerRevenueGenerator {
                 return null;
             }
         };
-
-        Thread t = new Thread(task);
-        t.start();
+        return task;
     }
 
-    public void onGenerateFullBreakdownBtnClick() {
+    public void onGenerateFullBreakdownBtnClick(MouseEvent mouseEvent) {
         Platform.runLater(() -> {
             try {
                 ResultSet rs = DatabaseMySQL.getFullBreakdown();
+                Path tempDir = Files.createTempDirectory("ceymusic_dashboard");
+                Path csvFile = tempDir.resolve("revenue_breakdown_full.csv");
 
-                CSVWriter writer = new CSVWriter(new FileWriter("revenue_breakdown_full.csv"));
+                CSVWriter writer = new CSVWriter(new FileWriter(csvFile.toFile()));
                 List<String[]> rows = new ArrayList<>();
                 String[] header = new String[]{
                         "ISRC",
@@ -305,17 +317,26 @@ public class ControllerRevenueGenerator {
 
                 writer.writeAll(rows);
                 writer.close();
+
+                Node node = (Node) mouseEvent.getSource();
+                Scene scene = node.getScene();
+                File destination = Main.browseLocationNew(scene.getWindow());
+                Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
+                Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("File copied successfully to " + destinationPath);
             } catch (SQLException | ClassNotFoundException | IOException e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
-    public void onGenerateReportDSPClicked() {
+    public void onGenerateReportDSPClicked(MouseEvent mouseEvent) {
         Platform.runLater(() -> {
             try {
                 ResultSet rs = DatabaseMySQL.getBreakdownByDSP();
-                CSVWriter writer = new CSVWriter(new FileWriter("revenue_breakdown_dsp.csv"));
+                Path tempDir = Files.createTempDirectory("ceymusic_dashboard");
+                Path csvFile = tempDir.resolve("revenue_breakdown_dsp.csv");
+                CSVWriter writer = new CSVWriter(new FileWriter(csvFile.toFile()));
                 List<String[]> rows = new ArrayList<>();
                 String[] header = new String[]{
                         "ISRC",
@@ -350,18 +371,27 @@ public class ControllerRevenueGenerator {
 
                 writer.writeAll(rows);
                 writer.close();
+
+                Node node = (Node) mouseEvent.getSource();
+                Scene scene = node.getScene();
+                File destination = Main.browseLocationNew(scene.getWindow());
+                Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
+                Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("File copied successfully to " + destinationPath);
             } catch (SQLException | ClassNotFoundException | IOException e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
-    public void onGenerateReportTerritoryBtnClicked() {
+    public void onGenerateReportTerritoryBtnClicked(MouseEvent mouseEvent) {
         Platform.runLater(() -> {
             try {
                 ResultSet rs = DatabaseMySQL.getBreakdownByTerritory();
 
-                CSVWriter writer = new CSVWriter(new FileWriter("revenue_breakdown_territory.csv"));
+                Path tempDir = Files.createTempDirectory("ceymusic_dashboard");
+                Path csvFile = tempDir.resolve("revenue_breakdown_territory.csv");
+                CSVWriter writer = new CSVWriter(new FileWriter(csvFile.toFile()));
                 List<String[]> rows = new ArrayList<>();
                 String[] header = new String[]{
                         "ISRC",
@@ -402,6 +432,13 @@ public class ControllerRevenueGenerator {
 
                 writer.writeAll(rows);
                 writer.close();
+
+                Node node = (Node) mouseEvent.getSource();
+                Scene scene = node.getScene();
+                File destination = Main.browseLocationNew(scene.getWindow());
+                Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
+                Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("File copied successfully to " + destinationPath);
             } catch (SQLException | ClassNotFoundException | IOException e) {
                 throw new RuntimeException(e);
             }

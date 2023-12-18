@@ -4,7 +4,6 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.chart.PieChart?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
@@ -15,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="1350.0" prefWidth="750.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="890.0" prefWidth="750.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -41,7 +40,7 @@
       </Label>
     </HBox>
    <ScrollPane fx:id="scrlpneMain" hbarPolicy="NEVER" prefWidth="750.0" stylesheets="@../styles.css" vbarPolicy="NEVER">
-      <Pane prefHeight="1252.0" prefWidth="744.0">
+      <Pane prefHeight="820.0" prefWidth="744.0">
          <VBox fx:id="vboxTopStreams" layoutX="30.0" layoutY="30.0" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
             <Group>
                <VBox.margin>
@@ -488,193 +487,6 @@
                            </Label>
                         </children>
                      </VBox>
-                  </children>
-               </HBox>
-            </children>
-         </VBox>
-         <HBox layoutX="30.0" layoutY="830.0">
-            <children>
-               <Label text="Revenue Analysis &gt;" textFill="#656565">
-                  <font>
-                     <Font name="Segoe UI Semibold" size="28.0" />
-                  </font>
-               </Label>
-               <Label layoutX="10.0" layoutY="10.0" text="Reports">
-                  <font>
-                     <Font name="Segoe UI Semibold" size="28.0" />
-                  </font>
-                  <HBox.margin>
-                     <Insets left="5.0" />
-                  </HBox.margin>
-               </Label>
-            </children>
-         </HBox>
-         <HBox fx:id="hboxReportedRoyalty" layoutX="30.0" layoutY="900.0" prefHeight="70.0" prefWidth="270.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-            <children>
-               <VBox alignment="CENTER_LEFT">
-                  <HBox.margin>
-                     <Insets left="20.0" />
-                  </HBox.margin>
-                  <children>
-                     <Label text="CeyMusic">
-                        <cursor>
-                           <Cursor fx:constant="DEFAULT" />
-                        </cursor>
-                     </Label>
-                     <Label layoutX="10.0" layoutY="10.0" prefHeight="28.0" prefWidth="200.0" text="Reported Royalty">
-                        <font>
-                           <Font name="Segoe UI Semibold" size="19.0" />
-                        </font>
-                        <cursor>
-                           <Cursor fx:constant="DEFAULT" />
-                        </cursor>
-                     </Label>
-                  </children>
-               </VBox>
-               <VBox alignment="CENTER_RIGHT">
-                  <HBox.margin>
-                     <Insets left="20.0" right="20.0" />
-                  </HBox.margin>
-                  <children>
-                     <Label fx:id="lblTotalAssets1" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="105.0" text="Loading" textAlignment="RIGHT">
-                        <cursor>
-                           <Cursor fx:constant="DEFAULT" />
-                        </cursor>
-                        <font>
-                           <Font name="Segoe UI Semibold" size="12.0" />
-                        </font>
-                     </Label>
-                     <Label fx:id="lblTotalAssets11" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="10.0" layoutY="10.0" prefHeight="28.0" prefWidth="105.0" text="Loading" textAlignment="RIGHT">
-                        <cursor>
-                           <Cursor fx:constant="DEFAULT" />
-                        </cursor>
-                     </Label>
-                  </children>
-               </VBox>
-            </children>
-         </HBox>
-         <Button fx:id="btnLoadReport" alignment="BASELINE_LEFT" graphicTextGap="17.0" layoutX="320.0" layoutY="900.0" onAction="#onLoadReportButtonClick" prefHeight="70.0" prefWidth="401.0" styleClass="button-big" stylesheets="@../styles.css" text="Add New Report">
-            <padding>
-               <Insets left="20.0" />
-            </padding>
-            <font>
-               <Font name="Segoe UI Semibold" size="19.0" />
-            </font>
-            <graphic>
-               <ImageView fitHeight="90.0" fitWidth="23.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-                  <Image url="@../images/icon_csv.png" />
-               </ImageView>
-            </graphic>
-         </Button>
-         <VBox fx:id="vboxGenerateReport" layoutX="30.0" layoutY="990.0" prefWidth="691.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-            <children>
-               <Group>
-                  <children>
-                     <Label text="Generate Reports">
-                        <font>
-                           <Font name="Segoe UI Semibold" size="19.0" />
-                        </font>
-                        <cursor>
-                           <Cursor fx:constant="DEFAULT" />
-                        </cursor>
-                     </Label>
-                     <Label layoutY="28.0" text="by Revenue Groups">
-                        <cursor>
-                           <Cursor fx:constant="DEFAULT" />
-                        </cursor>
-                     </Label>
-                     <Button fx:id="btnGenerateFullBreakdown" layoutX="475.0" layoutY="5.0" mnemonicParsing="false" onAction="#onGenerateFullBreakdownBtnClick" prefHeight="30.0" prefWidth="170.0" styleClass="button_inside" stylesheets="@../styles.css" text="Generate Full Breakdown" />
-                  </children>
-                  <VBox.margin>
-                     <Insets left="20.0" top="20.0" />
-                  </VBox.margin>
-               </Group>
-               <HBox alignment="CENTER" spacing="45.0">
-                  <VBox.margin>
-                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                  </VBox.margin>
-                  <children>
-                     <Separator layoutX="209.0" layoutY="10.0" opacity="0.5" orientation="VERTICAL" prefHeight="140.0" />
-                     <VBox alignment="CENTER" maxHeight="110.0" onMouseClicked="#onGenerateReportDSPClicked" prefWidth="120.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
-                        <children>
-                           <VBox alignment="CENTER" prefHeight="40.0">
-                              <children>
-                                 <ImageView fx:id="imgDSP011" fitHeight="30.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../images/icon_csv.png" />
-                                    </image>
-                                 </ImageView>
-                              </children>
-                           </VBox>
-                           <Label fx:id="lblDSP011" text="Generate Report">
-                              <VBox.margin>
-                                 <Insets top="5.0" />
-                              </VBox.margin>
-                           </Label>
-                           <Label fx:id="lblAmountDSP011" layoutX="10.0" layoutY="160.0" text="by DSP" textFill="#656565">
-                              <VBox.margin>
-                                 <Insets top="3.0" />
-                              </VBox.margin>
-                           </Label>
-                        </children>
-                     </VBox>
-                     <Separator opacity="0.5" orientation="VERTICAL" prefHeight="140.0">
-                        <HBox.margin>
-                           <Insets />
-                        </HBox.margin>
-                     </Separator>
-                     <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="110.0" onMouseClicked="#onGenerateReportTerritoryBtnClicked" prefWidth="120.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
-                        <children>
-                           <VBox alignment="CENTER" prefHeight="40.0">
-                              <children>
-                                 <ImageView fx:id="imgDSP021" fitHeight="30.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../images/icon_csv.png" />
-                                    </image>
-                                 </ImageView>
-                              </children>
-                           </VBox>
-                           <Label fx:id="lblDSP021" text="Generate Report">
-                              <VBox.margin>
-                                 <Insets top="5.0" />
-                              </VBox.margin>
-                           </Label>
-                           <Label fx:id="lblAmountDSP021" layoutX="10.0" layoutY="160.0" text="by Territory" textFill="#656565">
-                              <VBox.margin>
-                                 <Insets top="3.0" />
-                              </VBox.margin>
-                           </Label>
-                        </children>
-                     </VBox>
-                     <Separator opacity="0.5" orientation="VERTICAL" prefHeight="140.0">
-                        <HBox.margin>
-                           <Insets />
-                        </HBox.margin>
-                     </Separator>
-                     <VBox alignment="CENTER" disable="true" layoutX="110.0" layoutY="10.0" maxHeight="110.0" prefWidth="120.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
-                        <children>
-                           <VBox alignment="CENTER" prefHeight="40.0">
-                              <children>
-                                 <ImageView fx:id="imgDSP031" fitHeight="30.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../images/icon_csv.png" />
-                                    </image>
-                                 </ImageView>
-                              </children>
-                           </VBox>
-                           <Label fx:id="lblDSP031" text="Generate Report">
-                              <VBox.margin>
-                                 <Insets top="5.0" />
-                              </VBox.margin>
-                           </Label>
-                           <Label fx:id="lblAmountDSP031" layoutX="10.0" layoutY="160.0" text="by ISWC" textFill="#656565">
-                              <VBox.margin>
-                                 <Insets top="3.0" />
-                              </VBox.margin>
-                           </Label>
-                        </children>
-                     </VBox>
-                     <Separator layoutX="653.0" layoutY="10.0" opacity="0.5" orientation="VERTICAL" prefHeight="140.0" />
                   </children>
                </HBox>
             </children>
