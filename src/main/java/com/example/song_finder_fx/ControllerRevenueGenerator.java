@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
@@ -74,9 +75,10 @@ public class ControllerRevenueGenerator {
     public ImageView imgDSP02;
     public ImageView imgDSP03;
     public ImageView imgDSP04;
-    private final UIController mainUIController;
     public ScrollPane scrlpneMain;
     public HBox btnCheckMissingISRCs;
+    public ComboBox<String> comboPayees;
+    private final UIController mainUIController;
 
     public ControllerRevenueGenerator(UIController uiController) {
         mainUIController = uiController;
@@ -472,5 +474,75 @@ public class ControllerRevenueGenerator {
                 System.out.println("File copied successfully to " + destinationPath);
             }
         }
+    }
+
+    public void loadArtistReports() throws IOException {
+        FXMLLoader loaderMain = new FXMLLoader(ControllerSettings.class.getResource("layouts/artist-reports.fxml"));
+        // FXMLLoader loaderSide = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-revenue-analysis.fxml"));
+        loaderMain.setController(this);
+        // loaderSide.setController(this);
+        Parent newContentMain = loaderMain.load();
+        // Parent newContentSide = loaderSide.load();
+        ItemSwitcher itemSwitcher = new ItemSwitcher();
+
+        mainUIController.mainVBox.getChildren().setAll(newContentMain);
+        // mainUIController.sideVBox.getChildren().setAll(newContentSide);
+
+        Task<Void> task;
+
+        task = new Task<>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    try {
+                        ResultSet rsPayees = DatabaseMySQL.getPayees();
+                        while (rsPayees.next()) {
+                            comboPayees.getItems().add(rsPayees.getString(1));
+                        }
+                    } catch (SQLException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                return null;
+            }
+        };
+
+        Thread t = new Thread(task);
+        t.start();
+    }
+
+    public void OnComboPayeeKeyPress(KeyEvent event) {
+        String s = jumpTo(event.getText(), comboPayees.getValue(), comboPayees.getItems());
+        if (s != null) {
+            comboPayees.setValue(s);
+        }
+    }
+
+    static String jumpTo(String keyPressed, String currentlySelected, List<String> items) {
+        String key = keyPressed.toUpperCase();
+        if (key.matches("^[A-Z]$")) {
+            // Only act on letters so that navigating with cursor keys does not
+            // try to jump somewhere.
+            boolean letterFound = false;
+            boolean foundCurrent = currentlySelected == null;
+            for (String s : items) {
+                if (s.toUpperCase().startsWith(key)) {
+                    letterFound = true;
+                    if (foundCurrent) {
+                        return s;
+                    }
+                    foundCurrent = s.equals(currentlySelected);
+                }
+            }
+            if (letterFound) {
+                return jumpTo(keyPressed, null, items);
+            }
+        }
+        return null;
+    }
+
+    public void comboPayeeOnAction() {
+        String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
+        System.out.println("Selected item: " + selectedItem);
     }
 }

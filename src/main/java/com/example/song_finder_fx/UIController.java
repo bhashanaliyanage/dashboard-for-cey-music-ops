@@ -160,6 +160,7 @@ public class UIController {
         lblSearchType.setText("Name");
         searchType = "TRACK_TITLE";
     }
+
     public void onSearchedSongPress(KeyEvent event) {
         KeyCode keyCode = event.getCode();
         System.out.println("UIController.onSearchedSongPress");
@@ -1185,19 +1186,18 @@ public class UIController {
     }
     //</editor-fold>
 
-    public void onImportToBaseButtonClick() throws SQLException, ClassNotFoundException, IOException {
-        DatabaseMySQL dbmsql = new DatabaseMySQL();
-        Main main = new Main();
-
-        dbmsql.CreateTable();
-        File file = main.browseFile();
-        if (file != null) {
-            dbmsql.ImportToBase(file);
-        } else {
-            System.out.println("Error! No file selected to import into Database");
-        }
+    public void onAboutButtonClicked() throws IOException {
+        ControllerSettings cs = new ControllerSettings(this);
+        cs.loadAbout();
     }
 
+    public void onRevenueAnalysisBtnClick() throws IOException {
+        changeSelectorTo(rctRevenue);
+        ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
+        revenueGenerator.loadRevenueGenerator();
+    }
+
+    //<editor-fold desc="Invoice">
     public void onPercentageChangeButtonClicked() throws SQLException, ClassNotFoundException {
         String song_share = songShare.getText();
         String song_name = songName.getText();
@@ -1219,22 +1219,14 @@ public class UIController {
         }
     }
 
-    public void onAboutButtonClicked() throws IOException {
-        ControllerSettings cs = new ControllerSettings(this);
-        cs.loadAbout();
-    }
-
-    public void onRevenueAnalysisBtnClick() throws IOException {
-        changeSelectorTo(rctRevenue);
-        ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
-        revenueGenerator.loadRevenueGenerator();
-    }
-
     public void onDeleteBtnClicked() {
         System.out.println("UIController.onDeleteBtnClicked");
     }
+    //</editor-fold>
 
-    public void onArtistReportsBtnClick(MouseEvent mouseEvent) {
+    public void onArtistReportsBtnClick(MouseEvent mouseEvent) throws IOException {
         changeSelectorTo(rctArtistReports);
+        ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
+        revenueGenerator.loadArtistReports();
     }
 }

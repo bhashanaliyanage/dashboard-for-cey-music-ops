@@ -438,6 +438,13 @@ public class DatabaseMySQL {
         return db.prepareStatement("SELECT COUNT(*) AS Count FROM isrc_payees WHERE ISRC = ?");
     }
 
+    public static ResultSet getPayees() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+        PreparedStatement preparedStatement = db.prepareStatement("SELECT PAYEE FROM `isrc_payees` GROUP BY PAYEE ORDER BY PAYEE ASC;");
+
+        return preparedStatement.executeQuery();
+    }
+
     public void CreateTable() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = DatabaseMySQL.getConn();
