@@ -276,7 +276,7 @@ public class ControllerRevenueGenerator {
 
                 CSVWriter writer = new CSVWriter(new FileWriter("revenue_breakdown_full.csv"));
                 List<String[]> rows = new ArrayList<>();
-                String[] header = new String[] {
+                String[] header = new String[]{
                         "ISRC",
                         "Reported Royalty Summary",
                         "AU Earnings",
@@ -290,7 +290,7 @@ public class ControllerRevenueGenerator {
                 while (rs.next()) {
                     System.out.println("rs.getString(1) = " + rs.getString(1));
 
-                    String[] row = new String[] {
+                    String[] row = new String[]{
                             rs.getString(1),
                             rs.getString(2),
                             rs.getString(3),
@@ -317,7 +317,7 @@ public class ControllerRevenueGenerator {
                 ResultSet rs = DatabaseMySQL.getBreakdownByDSP();
                 CSVWriter writer = new CSVWriter(new FileWriter("revenue_breakdown_dsp.csv"));
                 List<String[]> rows = new ArrayList<>();
-                String[] header = new String[] {
+                String[] header = new String[]{
                         "ISRC",
                         "Reported Royalty Summary",
                         "Youtube Ad Supported",
@@ -333,7 +333,7 @@ public class ControllerRevenueGenerator {
                 while (rs.next()) {
                     System.out.println("rs.getString(1) = " + rs.getString(1));
 
-                    String[] row = new String[] {
+                    String[] row = new String[]{
                             rs.getString(1),
                             rs.getString(2),
                             rs.getString(3),
@@ -363,7 +363,7 @@ public class ControllerRevenueGenerator {
 
                 CSVWriter writer = new CSVWriter(new FileWriter("revenue_breakdown_territory.csv"));
                 List<String[]> rows = new ArrayList<>();
-                String[] header = new String[] {
+                String[] header = new String[]{
                         "ISRC",
                         "Reported Royalty Summary",
                         "AU",
@@ -382,7 +382,7 @@ public class ControllerRevenueGenerator {
                 while (rs.next()) {
                     System.out.println("rs.getString(1) = " + rs.getString(1));
 
-                    String[] row = new String[] {
+                    String[] row = new String[]{
                             rs.getString(1),
                             rs.getString(2),
                             rs.getString(3),
@@ -409,16 +409,20 @@ public class ControllerRevenueGenerator {
     }
 
     public void onCheckMissingISRCsBtnClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, IOException {
-        System.out.println("ControllerRevenueGenerator.onCheckMissingISRCsBtnClick");
         ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
-        CSVWriter csvWriter = new CSVWriter(new FileWriter("missing_isrcs.csv"));
+
+        Path tempDir = Files.createTempDirectory("missing_isrcs");
+        Path csvFile = tempDir.resolve("missing_isrcs.csv");
+        CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
+
         List<String[]> rows = new ArrayList<>();
+
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
 
         while (resultSet.next() && ((resultSet.getString(2) == null) && (resultSet.getString(3) == null))) {
-            String[] row = new String[] {
-              resultSet.getString(1)
+            String[] row = new String[]{
+                    resultSet.getString(1)
             };
             rows.add(row);
         }
@@ -458,21 +462,31 @@ public class ControllerRevenueGenerator {
     }
 
     private static void showErrorDialogWithLog(String title, String headerText, String contentText, Window window) throws IOException {
+        // Alert
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
 
-        Optional<ButtonType> result = alert.showAndWait();
+        // Dialog
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle(title);
+        dialog.setHeaderText(headerText);
+        dialog.setContentText(contentText);
 
-        if (result.isPresent()) {
-            if (result.get() == ButtonType.OK) {
-                Path sourcePath = Paths.get("missing_isrcs.csv");
-                File destination = Main.browseLocationNew(window);
-                Path destinationPath = destination.toPath().resolve(sourcePath.getFileName());
-                Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("File copied successfully to " + destinationPath);
-            }
+        ButtonType okButton = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().add(okButton);
+
+        Optional<String> dialogResult = dialog.showAndWait();
+
+        // Optional<ButtonType> result = alert.showAndWait();
+
+        if (dialogResult.isPresent()) {
+            Path sourcePath = Paths.get("missing_isrcs.csv");
+            File destination = Main.browseLocationNew(window);
+            Path destinationPath = destination.toPath().resolve(sourcePath.getFileName());
+            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("File copied successfully to " + destinationPath);
         }
     }
 
