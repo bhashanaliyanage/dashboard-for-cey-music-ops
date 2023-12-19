@@ -4,7 +4,6 @@ import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -33,7 +32,7 @@ import java.util.Optional;
 
 public class ControllerRevenueGenerator {
     //<editor-fold desc="Buttons">
-    public Button btnLoadReport;
+    public Label btnLoadReport;
     public Button btnGenerateFullBreakdown;
     //</editor-fold>
 
@@ -534,7 +533,6 @@ public class ControllerRevenueGenerator {
         // loaderSide.setController(this);
         Parent newContentMain = loaderMain.load();
         // Parent newContentSide = loaderSide.load();
-        ItemSwitcher itemSwitcher = new ItemSwitcher();
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
         // mainUIController.sideVBox.getChildren().setAll(newContentSide);

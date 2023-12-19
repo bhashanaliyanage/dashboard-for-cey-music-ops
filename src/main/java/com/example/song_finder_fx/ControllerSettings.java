@@ -152,7 +152,7 @@ public class ControllerSettings {
         }*/
         Path tempDir = Files.createTempDirectory("CeyMusic_Dashboard_UpdateTemp");
         InputStream in = new URL(InitPreloader.updateLocation).openStream();
-        Path tempFile = Files.createTempFile(tempDir, "update_cey_dash", ".exe");
+        Path tempFile = Files.createTempFile(tempDir, "update_cey_dash", ".msi");
         Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
         Desktop.getDesktop().open(new File(tempFile.toUri()));
     }

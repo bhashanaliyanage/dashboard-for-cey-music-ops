@@ -4,10 +4,13 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import org.sqlite.SQLiteException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,7 +85,7 @@ public class DatabaseMySQL {
         reader.close();
     }
 
-    public static boolean loadReport(File report, Button btnLoadReport) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
+    public static boolean loadReport(File report, Label btnLoadReport) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
         Connection db = DatabaseMySQL.getConn();
         int rs = 0;
         DecimalFormat df = new DecimalFormat("0.00");
