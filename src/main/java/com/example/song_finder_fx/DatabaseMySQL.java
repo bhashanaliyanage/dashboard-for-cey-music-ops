@@ -123,47 +123,153 @@ public class DatabaseMySQL {
             double percentage = ((double) rowcount2 / rowcount) * 100;
             Platform.runLater(() -> btnLoadReport.setText("Processing " + df.format(percentage) + "%"));
 
-            ps.setString(1, nextLine[0]); // Sale_Start_date
-            ps.setString(2, nextLine[1]); // Sale_End_date
-            ps.setString(3, nextLine[2]); // DSP
-            ps.setString(4, nextLine[3]); // Sale_Store_Name
-            ps.setString(5, nextLine[4]); // Sale_Type
-            ps.setString(6, nextLine[5]); // Sale_User_Type
-            ps.setString(7, nextLine[6]); // Territory
-            ps.setLong(8, Long.parseLong(nextLine[7])); // Product_UPC
-            ps.setLong(9, Long.parseLong(nextLine[8])); // Product_Reference
-            ps.setString(10, nextLine[9]); // Product_Catalog_Number
-            ps.setString(11, nextLine[10]); // Product_Label
-            ps.setString(12, nextLine[11]); // Product_Artist
-            ps.setString(13, nextLine[12]); // Product_Title
-            ps.setString(14, nextLine[13]); // Asset_Artist
-            ps.setString(15, nextLine[14]); // Asset_Title
-            ps.setString(16, nextLine[15]); // Asset_Version
-            ps.setInt(17, Integer.parseInt(nextLine[16])); // Asset_Duration
-            ps.setString(18, nextLine[17]); // Asset_ISRC
-            ps.setLong(19, Long.parseLong(nextLine[18])); // Asset_Reference
-            ps.setString(20, nextLine[19]); // AssetOrProduct
-            if (!(Objects.equals(nextLine[20], ""))) {
-                ps.setInt(21, Integer.parseInt(nextLine[20])); // Product_Quantity
-            } else {
-                ps.setInt(21, 0);
-            }
-            ps.setInt(22, Integer.parseInt(nextLine[21])); // Asset_Quantity
-            ps.setDouble(23, Double.parseDouble(nextLine[22])); // Original_Gross_Income
-            ps.setString(24, nextLine[23]); // Original_currency
-            ps.setDouble(25, Double.parseDouble(nextLine[24])); // Exchange_Rate
-            ps.setDouble(26, Double.parseDouble(nextLine[25])); // Converted_Gross_Income
-            ps.setString(27, nextLine[26]); // Contract_deal_term
-            ps.setDouble(28, Double.parseDouble(nextLine[27])); // Reported_Royalty
-            ps.setString(29, nextLine[28]); // Currency
-            ps.setInt(30, Integer.parseInt(nextLine[29])); // Report_Run_ID
-            ps.setInt(31, Integer.parseInt(nextLine[30])); // Report_ID
-            ps.setLong(32, Long.parseLong(nextLine[31])); // Sale_ID
+            try {
+                ps.setString(1, nextLine[0]); // Sale_Start_date
+                ps.setString(2, nextLine[1]); // Sale_End_date
+                ps.setString(3, nextLine[2]); // DSP
+                ps.setString(4, nextLine[3]); // Sale_Store_Name
+                ps.setString(5, nextLine[4]); // Sale_Type
+                ps.setString(6, nextLine[5]); // Sale_User_Type
+                ps.setString(7, nextLine[6]); // Territory
+                try {
+                    ps.setLong(8, Long.parseLong(nextLine[7])); // Product_UPC
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setLong(8, 0); // Product_UPC
+                }
+                try {
+                    ps.setLong(9, Long.parseLong(nextLine[8])); // Product_Reference
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setLong(9, 0);
+                }
+                ps.setString(10, nextLine[9]); // Product_Catalog_Number
+                ps.setString(11, nextLine[10]); // Product_Label
+                ps.setString(12, nextLine[11]); // Product_Artist
+                ps.setString(13, nextLine[12]); // Product_Title
+                ps.setString(14, nextLine[13]); // Asset_Artist
+                ps.setString(15, nextLine[14]); // Asset_Title
+                ps.setString(16, nextLine[15]); // Asset_Version
+                try {
+                    ps.setInt(17, Integer.parseInt(nextLine[16])); // Asset_Duration
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setInt(17, 0); // Asset_Duration
+                }
+                ps.setString(18, nextLine[17]); // Asset_ISRC
+                try {
+                    ps.setLong(19, Long.parseLong(nextLine[18])); // Asset_Reference
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setLong(19, 0); // Asset_Reference
+                }
+                ps.setString(20, nextLine[19]); // AssetOrProduct
+                if (!(Objects.equals(nextLine[20], ""))) {
+                    ps.setInt(21, Integer.parseInt(nextLine[20])); // Product_Quantity
+                } else {
+                    ps.setInt(21, 0);
+                }
+                try {
+                    ps.setInt(22, Integer.parseInt(nextLine[21])); // Asset_Quantity
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setInt(22, 0); // Asset_Quantity
+                }
+                try {
+                    ps.setDouble(23, Double.parseDouble(nextLine[22])); // Original_Gross_Income
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setDouble(23, 0); // Original_Gross_Income
+                }
+                ps.setString(24, nextLine[23]); // Original_currency
+                try {
+                    ps.setDouble(25, Double.parseDouble(nextLine[24])); // Exchange_Rate
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setDouble(25, 0); // Exchange_Rate
+                }
+                try {
+                    ps.setDouble(26, Double.parseDouble(nextLine[25])); // Converted_Gross_Income
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setDouble(26, 0); // Converted_Gross_Income
+                }
+                ps.setString(27, nextLine[26]); // Contract_deal_term
+                try {
+                    ps.setDouble(28, Double.parseDouble(nextLine[27])); // Reported_Royalty
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setDouble(28, 0); // Reported_Royalty
+                }
+                ps.setString(29, nextLine[28]); // Currency
+                try {
+                    ps.setInt(30, Integer.parseInt(nextLine[29])); // Report_Run_ID
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setInt(30, 0); // Report_Run_ID
+                }
+                try {
+                    ps.setInt(31, Integer.parseInt(nextLine[30])); // Report_ID
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setInt(31, 0); // Report_ID
+                }
+                try {
+                    ps.setLong(32, Long.parseLong(nextLine[31])); // Sale_ID
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (NumberFormatException e) {
+                    ps.setLong(32, 0); // Sale_ID
+                }
 
-            rs = ps.executeUpdate();
+                rs = ps.executeUpdate();
+            } catch (SQLException | NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         return rs > 0;
+    }
+
+    public static void loadReportTemp(File report) throws IOException, CsvValidationException {
+        CSVReader reader = new CSVReader(new FileReader(report.getAbsolutePath()));
+        BufferedReader breader = new BufferedReader(new FileReader(report));
+        int rowcount = 0; // Total RowCount
+        int rowcount2 = 0; // While loop's row count
+
+        System.out.println("Here");
+        while ((breader.readLine()) != null) {
+            rowcount++;
+            System.out.println("rowcount = " + rowcount);
+        }
+
+        System.out.println("Total rowCount = " + rowcount);
+
+        String[] nextLine = reader.readNext(); // Skipping the header
+        while ((nextLine = reader.readNext()) != null) {
+            rowcount2++;
+            System.out.println("Executing Row " + rowcount2 + " of " + rowcount);
+            System.out.println("ISRC: " + nextLine[17]);
+            try {
+                System.out.println("Asset Duration: " + Integer.parseInt(nextLine[16]));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+            if (rowcount2 == 1526175) {
+                break;
+            }
+        }
     }
 
     public static void getReportedRoyalty() throws SQLException, ClassNotFoundException {
@@ -782,7 +888,8 @@ public class DatabaseMySQL {
         }
     }
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        testThing();
+    public static void main(String[] args) throws SQLException, ClassNotFoundException, CsvValidationException, IOException {
+        File file = new File("D:\\CeyMusic\\CeyMusic Software Dev\\CeyMusic Toolkit\\September2023StatementRun_IslandDreamRecords-royalty_product_and_asset.csv");
+        loadReportTemp(file);
     }
 }

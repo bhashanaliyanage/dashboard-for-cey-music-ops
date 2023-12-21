@@ -251,6 +251,14 @@ public class ControllerRevenueGenerator {
         if (report != null) {
             btnLoadReport.setText("Working on...");
 
+            /*boolean status = DatabaseMySQL.loadReport(report, btnLoadReport);
+
+            Platform.runLater(() -> {
+                if (status) {
+                    btnLoadReport.setText("CSV Imported to Database");
+                }
+            });*/
+
             Task<Void> task = loadReport(report);
 
             Thread t = new Thread(task);
