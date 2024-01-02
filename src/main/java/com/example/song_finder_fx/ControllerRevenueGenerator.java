@@ -19,6 +19,7 @@ import javafx.stage.Window;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,7 @@ public class ControllerRevenueGenerator {
     //</editor-fold>
 
     //<editor-fold desc="Labels">
+    public Label lblGross;
     public Label lblUpdatePayee;
     public Label lblUpdateSongsDatabase;
     public Label lblAsset01;
@@ -474,7 +476,7 @@ public class ControllerRevenueGenerator {
         csvWriter.writeAll(rows);
         csvWriter.close();
 
-        showErrorDialogWithLog("Missing ISRCs", rows.size() + " Missing ISRCs", "Click OK to Save List of Missing ISRCs", scene.getWindow());
+        showErrorDialogWithLog("Missing ISRCs", rows.size() + " Missing ISRCs", "Click OK to Save List of Missing ISRCs", scene.getWindow(), csvFile);
     }
 
     public void onUpdateSongsDatabaseBtnClick(MouseEvent mouseEvent) throws CsvValidationException, IOException, SQLException, ClassNotFoundException {
@@ -496,16 +498,21 @@ public class ControllerRevenueGenerator {
         Scene scene = node.getScene();
         Window window = scene.getWindow();
         File file = Main.browseForFile(window);
-        boolean status = DatabaseMySQL.updatePayeeDetails(file);
 
-        if (status) {
-            lblUpdatePayee.setText("Payee List Updated");
-        } else {
-            lblUpdatePayee.setText("Error");
+        if (file != null) {
+            boolean status = DatabaseMySQL.updatePayeeDetails(file);
+
+            if (status) {
+                lblUpdatePayee.setText("Payee List Updated");
+            } else {
+                lblUpdatePayee.setText("Error");
+            }
         }
+
+        System.out.println("No file selected");
     }
 
-    private static void showErrorDialogWithLog(String title, String headerText, String contentText, Window window) throws IOException {
+    private static void showErrorDialogWithLog(String title, String headerText, String contentText, Window window, Path csvFile) throws IOException {
         // Alert
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -526,10 +533,9 @@ public class ControllerRevenueGenerator {
         // Optional<ButtonType> result = alert.showAndWait();
 
         if (dialogResult.isPresent()) {
-            Path sourcePath = Paths.get("missing_isrcs.csv");
             File destination = Main.browseLocationNew(window);
-            Path destinationPath = destination.toPath().resolve(sourcePath.getFileName());
-            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
+            Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
             System.out.println("File copied successfully to " + destinationPath);
         }
     }
@@ -598,8 +604,31 @@ public class ControllerRevenueGenerator {
         return null;
     }
 
-    public void comboPayeeOnAction() {
+    public void comboPayeeOnAction() throws SQLException, ClassNotFoundException {
         String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
         System.out.println("Selected item: " + selectedItem);
+        DecimalFormat df = new DecimalFormat("0.00");
+        final double[] grossRevenue = {0};
+
+        // Get the gross revenue for the selected artist
+        comboPayees.setDisable(true);
+        lblGross.setText("Loading...");
+
+        Thread tGrossRevenue = new Thread(() -> {
+            try {
+                grossRevenue[0] = DatabaseMySQL.getRevenue(selectedItem);
+                // System.out.println("value = " + value);
+            } catch (SQLException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            String formattedGrossRevenue = df.format(grossRevenue[0]);
+
+            Platform.runLater(() -> {
+                lblGross.setText("EUR " + formattedGrossRevenue);
+                comboPayees.setDisable(false);
+            });
+        });
+
+        tGrossRevenue.start();
     }
 }

@@ -554,6 +554,27 @@ public class DatabaseMySQL {
         return preparedStatement.executeQuery();
     }
 
+    public static double getRevenue(String selectedItem) throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+
+        PreparedStatement preparedStatement = db.prepareStatement("# Returns Reported Royalties for individual ISRCs\n" +
+                "SELECT \n" +
+                "    (((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY\n" +
+                "FROM `report` \n" +
+                "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ?;");
+        preparedStatement.setString(1, selectedItem);
+
+        ResultSet rs = preparedStatement.executeQuery();
+
+        double value = 0;
+
+        while (rs.next()) {
+            value = rs.getDouble(1);
+        }
+
+        return value;
+    }
+
     public void CreateTable() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = DatabaseMySQL.getConn();
@@ -870,9 +891,10 @@ public class DatabaseMySQL {
             percentage = 0;
 
             if (artists.contains(composer)) {
-                percentage+= 50;
-            } if (artists.contains(lyricist)) {
-                percentage+= 50;
+                percentage += 50;
+            }
+            if (artists.contains(lyricist)) {
+                percentage += 50;
             }
 
             System.out.println("assetTitle = " + assetTitle);
@@ -889,7 +911,53 @@ public class DatabaseMySQL {
     }
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException, CsvValidationException, IOException {
-        File file = new File("D:\\CeyMusic\\CeyMusic Software Dev\\CeyMusic Toolkit\\September2023StatementRun_IslandDreamRecords-royalty_product_and_asset.csv");
-        loadReportTemp(file);
+        Connection conn = getConn();
+
+        PreparedStatement psGet = conn.prepareStatement("SELECT ISRC, PAYEE, CONTRIBUTOR FROM isrc_payees;");
+        ResultSet rs = psGet.executeQuery();
+
+        while (rs.next()) {
+            String isrc = rs.getString("ISRC");
+            String payee = rs.getString("PAYEE");
+            String contributor = rs.getString("CONTRIBUTOR");
+
+            if (checkContributor(conn, contributor)) { // If Contributor ours
+                /*System.out.println("isrc = " + isrc);
+                System.out.println("payee = " + payee);
+                System.out.println("contributor = " + contributor);*/
+
+                PreparedStatement psSet = conn.prepareStatement("UPDATE isrc_payees SET SHARE = ? WHERE ISRC = ? AND PAYEE = ?");
+                psSet.setInt(1, 50);
+                psSet.setString(2, isrc);
+                psSet.setString(3, payee);
+
+                try {
+                    psSet.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                PreparedStatement psSet = conn.prepareStatement("UPDATE isrc_payees SET SHARE = 100 WHERE ISRC = ?");
+                psSet.setString(1, isrc);
+
+                // psSet.executeUpdate();
+                System.out.println("Contributor not ours for ISRC = " + isrc);
+            }
+        }
+    }
+
+    private static boolean checkContributor(Connection conn, String contributor) throws SQLException {
+        PreparedStatement ps = conn.prepareStatement("SELECT PAYEE FROM isrc_payees GROUP BY PAYEE;");
+        ResultSet rs = ps.executeQuery();
+        boolean status = false;
+
+        while (rs.next()) {
+            String payee = rs.getString(1);
+            if (Objects.equals(payee, contributor)) {
+                status = true;
+            }
+        }
+
+        return status;
     }
 }

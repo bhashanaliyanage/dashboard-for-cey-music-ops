@@ -3,24 +3,18 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.Group?>
-<?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="890.0" prefWidth="750.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="534.0" prefWidth="750.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox>
          <VBox.margin>
-            <Insets left="30.0" top="30.0" />
+            <Insets left="30.0" right="30.0" top="30.0" />
          </VBox.margin>
          <children>
             <Label layoutX="10.0" layoutY="10.0" text="Artist Reports" textFill="#656565">
@@ -43,477 +37,353 @@
             </Button>
          </children>
       </HBox>
-      <ScrollPane fx:id="scrlpneMain" hbarPolicy="NEVER" prefWidth="750.0" stylesheets="@../styles.css" vbarPolicy="NEVER">
-         <content>
-            <Pane prefHeight="820.0" prefWidth="744.0">
+      <HBox alignment="CENTER" layoutX="40.0" layoutY="110.0" prefHeight="70.0" prefWidth="200.0" spacing="70.0">
+         <VBox.margin>
+            <Insets left="30.0" right="30.0" top="30.0" />
+         </VBox.margin>
+         <children>
+            <VBox alignment="CENTER_LEFT">
                <children>
-                  <VBox fx:id="vboxTopStreams" layoutX="30.0" layoutY="30.0" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+                  <Label text="Amount Payable" />
+                  <Label fx:id="lblAmtPayable" layoutX="10.0" layoutY="10.0" text="N/A" textFill="#23ce6b">
+                     <font>
+                        <Font name="Segoe UI Semibold" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0">
+               <children>
+                  <Label text="Gorss Revenue Produced" />
+                  <Label fx:id="lblGross" layoutX="10.0" layoutY="10.0" text="N/A" textFill="#007ea7">
+                     <font>
+                        <Font name="Segoe UI Semibold" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER_LEFT" layoutX="38.0" layoutY="10.0">
+               <children>
+                  <Label text="Partner Share" />
+                  <Label fx:id="lblP_Share" layoutX="10.0" layoutY="10.0" text="N/A" textFill="#007ea7">
+                     <font>
+                        <Font name="Segoe UI Semibold" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER_LEFT" layoutX="66.0" layoutY="10.0">
+               <children>
+                  <Label text="14% TAX (If Applicable)" />
+                  <Label fx:id="lblTax" layoutX="10.0" layoutY="10.0" text="N/A" textFill="#9c6615">
+                     <font>
+                        <Font name="Segoe UI Semibold" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="40.0" layoutY="170.0" prefHeight="70.0" prefWidth="200.0" spacing="10.0">
+         <children>
+            <VBox fx:id="vboxTopStreams" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+               <children>
+                  <Group>
+                     <VBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </VBox.margin>
                      <children>
-                        <Group>
-                           <VBox.margin>
-                              <Insets left="20.0" top="20.0" />
-                           </VBox.margin>
-                           <children>
-                              <Label text="Reported Royalty">
-                                 <font>
-                                    <Font name="Segoe UI Semibold" size="19.0" />
-                                 </font>
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                              </Label>
-                              <Label layoutY="28.0" text="for Top Streamed Assets">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                              </Label>
-                           </children>
-                        </Group>
-                        <HBox fx:id="asset01">
-                           <VBox.margin>
-                              <Insets left="20.0" top="30.0" />
-                           </VBox.margin>
-                           <children>
-                              <Label fx:id="lblAsset01" text="Loading">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                              </Label>
-                              <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets right="30.0" />
-                                 </HBox.margin>
-                                 <children>
-                                    <Label fx:id="lblAsset01Streams" text="Loading">
-                                       <cursor>
-                                          <Cursor fx:constant="DEFAULT" />
-                                       </cursor>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                           </children>
-                        </HBox>
-                        <HBox fx:id="asset02" layoutX="31.0" layoutY="106.0" prefWidth="529.0">
-                           <children>
-                              <Label fx:id="lblAsset02" text="Loading">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                                 <padding>
-                                    <Insets left="20.0" top="10.0" />
-                                 </padding>
-                              </Label>
-                              <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets right="30.0" />
-                                 </HBox.margin>
-                                 <children>
-                                    <Label fx:id="lblAsset02Streams" text="Loading">
-                                       <cursor>
-                                          <Cursor fx:constant="DEFAULT" />
-                                       </cursor>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                           </children>
-                        </HBox>
-                        <HBox fx:id="asset03" layoutX="11.0" layoutY="123.0">
-                           <children>
-                              <Label fx:id="lblAsset03" text="Loading">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                                 <padding>
-                                    <Insets left="20.0" top="10.0" />
-                                 </padding>
-                              </Label>
-                              <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Label fx:id="lblAsset03Streams" text="Loading">
-                                       <cursor>
-                                          <Cursor fx:constant="DEFAULT" />
-                                       </cursor>
-                                    </Label>
-                                 </children>
-                                 <HBox.margin>
-                                    <Insets right="30.0" />
-                                 </HBox.margin>
-                              </HBox>
-                           </children>
-                        </HBox>
-                        <HBox fx:id="asset04" layoutX="11.0" layoutY="140.0">
-                           <children>
-                              <Label fx:id="lblAsset04" text="Loading">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                                 <padding>
-                                    <Insets left="20.0" top="10.0" />
-                                 </padding>
-                              </Label>
-                              <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Label fx:id="lblAsset04Streams" text="Loading">
-                                       <cursor>
-                                          <Cursor fx:constant="DEFAULT" />
-                                       </cursor>
-                                    </Label>
-                                 </children>
-                                 <HBox.margin>
-                                    <Insets right="30.0" />
-                                 </HBox.margin>
-                              </HBox>
-                           </children>
-                        </HBox>
-                        <HBox fx:id="asset05" layoutX="11.0" layoutY="157.0">
-                           <children>
-                              <Label fx:id="lblAsset05" text="Loading">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                              </Label>
-                              <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Label fx:id="lblAsset05Streams" text="Loading">
-                                       <cursor>
-                                          <Cursor fx:constant="DEFAULT" />
-                                       </cursor>
-                                    </Label>
-                                 </children>
-                                 <HBox.margin>
-                                    <Insets right="30.0" />
-                                 </HBox.margin>
-                              </HBox>
-                           </children>
-                           <padding>
-                              <Insets left="20.0" top="10.0" />
-                           </padding>
-                           <VBox.margin>
-                              <Insets bottom="20.0" />
-                           </VBox.margin>
-                        </HBox>
-                     </children>
-                  </VBox>
-                  <HBox fx:id="vboxTotalAssets" layoutX="451.0" layoutY="31.0" prefWidth="270.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-                     <children>
-                        <Label prefHeight="50.0" prefWidth="110.0" text="Total Assets">
+                        <Label text="Co-Writer Payment Summary">
                            <font>
                               <Font name="Segoe UI Semibold" size="19.0" />
                            </font>
                            <cursor>
                               <Cursor fx:constant="DEFAULT" />
                            </cursor>
-                           <HBox.margin>
-                              <Insets left="20.0" />
-                           </HBox.margin>
                         </Label>
-                        <Label fx:id="lblTotalAssets" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="50.0" prefWidth="105.0" text="Loading" textAlignment="RIGHT">
+                        <Label layoutY="28.0" text="for Top Streamed Assets">
                            <cursor>
                               <Cursor fx:constant="DEFAULT" />
                            </cursor>
-                           <HBox.margin>
-                              <Insets left="20.0" right="20.0" />
-                           </HBox.margin>
                         </Label>
                      </children>
-                  </HBox>
-                  <VBox fx:id="vboxTopStreamsChart" layoutX="451.0" layoutY="100.0" prefHeight="432.0" prefWidth="270.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+                  </Group>
+                  <HBox fx:id="asset01">
+                     <VBox.margin>
+                        <Insets left="20.0" top="30.0" />
+                     </VBox.margin>
                      <children>
-                        <PieChart fx:id="topStreamsChart" title="Top Streams by Asset">
-                           <VBox.margin>
-                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                           </VBox.margin>
-                        </PieChart>
+                        <Label fx:id="lblWriter01" text="N/A">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </Label>
+                        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                           <children>
+                              <Label fx:id="lblWriter01Streams" text="N/A">
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                              </Label>
+                           </children>
+                        </HBox>
                      </children>
-                  </VBox>
-                  <VBox fx:id="vboxRoyaltyByTerritory" layoutX="30.0" layoutY="290.0" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+                  </HBox>
+                  <HBox fx:id="asset02" layoutX="31.0" layoutY="106.0" prefWidth="529.0">
                      <children>
-                        <Group>
-                           <children>
-                              <Label text="Reported Royalty">
-                                 <font>
-                                    <Font name="Segoe UI Semibold" size="19.0" />
-                                 </font>
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                              </Label>
-                              <Label layoutY="28.0" text="by Territory">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                              </Label>
-                           </children>
-                           <VBox.margin>
-                              <Insets left="20.0" top="20.0" />
-                           </VBox.margin>
-                        </Group>
-                        <HBox fx:id="asset011">
-                           <children>
-                              <Label fx:id="lblCountry01" text="Loading">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                              </Label>
-                              <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Label fx:id="lblCountry01Streams" text="Loading">
-                                       <cursor>
-                                          <Cursor fx:constant="DEFAULT" />
-                                       </cursor>
-                                    </Label>
-                                 </children>
-                                 <HBox.margin>
-                                    <Insets right="30.0" />
-                                 </HBox.margin>
-                              </HBox>
-                           </children>
-                           <VBox.margin>
-                              <Insets left="20.0" top="30.0" />
-                           </VBox.margin>
-                        </HBox>
-                        <HBox fx:id="asset021" layoutX="31.0" layoutY="106.0" prefWidth="529.0">
-                           <children>
-                              <Label fx:id="lblCountry02" text="Loading">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                                 <padding>
-                                    <Insets left="20.0" top="10.0" />
-                                 </padding>
-                              </Label>
-                              <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Label fx:id="lblCountry02Streams" text="Loading">
-                                       <cursor>
-                                          <Cursor fx:constant="DEFAULT" />
-                                       </cursor>
-                                    </Label>
-                                 </children>
-                                 <HBox.margin>
-                                    <Insets right="30.0" />
-                                 </HBox.margin>
-                              </HBox>
-                           </children>
-                        </HBox>
-                        <HBox fx:id="asset031" layoutX="11.0" layoutY="123.0">
-                           <children>
-                              <Label fx:id="lblCountry03" text="Loading">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                                 <padding>
-                                    <Insets left="20.0" top="10.0" />
-                                 </padding>
-                              </Label>
-                              <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Label fx:id="lblCountry03Streams" text="Loading">
-                                       <cursor>
-                                          <Cursor fx:constant="DEFAULT" />
-                                       </cursor>
-                                    </Label>
-                                 </children>
-                                 <HBox.margin>
-                                    <Insets right="30.0" />
-                                 </HBox.margin>
-                              </HBox>
-                           </children>
-                        </HBox>
-                        <HBox fx:id="asset041" layoutX="11.0" layoutY="140.0">
-                           <children>
-                              <Label fx:id="lblCountry04" text="Loading">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                                 <padding>
-                                    <Insets left="20.0" top="10.0" />
-                                 </padding>
-                              </Label>
-                              <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Label fx:id="lblCountry04Streams" text="Loading">
-                                       <cursor>
-                                          <Cursor fx:constant="DEFAULT" />
-                                       </cursor>
-                                    </Label>
-                                 </children>
-                                 <HBox.margin>
-                                    <Insets right="30.0" />
-                                 </HBox.margin>
-                              </HBox>
-                           </children>
-                        </HBox>
-                        <HBox fx:id="asset051" layoutX="11.0" layoutY="157.0">
-                           <children>
-                              <Label fx:id="lblCountry05" text="Loading">
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                              </Label>
-                              <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Label fx:id="lblCountry05Streams" text="Loading">
-                                       <cursor>
-                                          <Cursor fx:constant="DEFAULT" />
-                                       </cursor>
-                                    </Label>
-                                 </children>
-                                 <HBox.margin>
-                                    <Insets right="30.0" />
-                                 </HBox.margin>
-                              </HBox>
-                           </children>
+                        <Label fx:id="lblWriter02" text="N/A">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
                            <padding>
                               <Insets left="20.0" top="10.0" />
                            </padding>
-                           <VBox.margin>
-                              <Insets bottom="20.0" />
-                           </VBox.margin>
+                        </Label>
+                        <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                           <children>
+                              <Label fx:id="lblWriter02Streams" text="N/A">
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                              </Label>
+                           </children>
                         </HBox>
                      </children>
-                  </VBox>
-                  <VBox fx:id="vboxRoyaltyByDSP" layoutX="30.0" layoutY="550.0" prefWidth="691.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+                  </HBox>
+                  <HBox fx:id="asset03" layoutX="11.0" layoutY="123.0">
                      <children>
-                        <Group>
+                        <Label fx:id="lblWriter03" text="N/A">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                           <padding>
+                              <Insets left="20.0" top="10.0" />
+                           </padding>
+                        </Label>
+                        <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label text="Reported Royalty">
-                                 <font>
-                                    <Font name="Segoe UI Semibold" size="19.0" />
-                                 </font>
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                              </Label>
-                              <Label layoutY="28.0" text="by DSP">
+                              <Label fx:id="lblWriter03Streams" text="N/A">
                                  <cursor>
                                     <Cursor fx:constant="DEFAULT" />
                                  </cursor>
                               </Label>
                            </children>
-                           <VBox.margin>
-                              <Insets left="20.0" top="20.0" />
-                           </VBox.margin>
-                        </Group>
-                        <HBox alignment="CENTER" spacing="30.0">
-                           <VBox.margin>
-                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                           </VBox.margin>
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <HBox fx:id="asset04" layoutX="11.0" layoutY="140.0">
+                     <children>
+                        <Label fx:id="lblWriter04" text="N/A">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                           <padding>
+                              <Insets left="20.0" top="10.0" />
+                           </padding>
+                        </Label>
+                        <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
                            <children>
-                              <VBox alignment="CENTER" prefWidth="100.0">
-                                 <children>
-                                    <VBox alignment="CENTER" prefHeight="57.0">
-                                       <children>
-                                          <ImageView fx:id="imgDSP01" fitHeight="57.0" fitWidth="57.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../images/logo_small_200x.png" />
-                                             </image>
-                                          </ImageView>
-                                       </children>
-                                    </VBox>
-                                    <Label fx:id="lblDSP01" text="Loading" textFill="#656565">
-                                       <VBox.margin>
-                                          <Insets top="5.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                    <Label fx:id="lblAmountDSP01" layoutX="10.0" layoutY="160.0" text="Loading">
-                                       <VBox.margin>
-                                          <Insets top="3.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                 </children>
-                              </VBox>
-                              <Separator opacity="0.5" orientation="VERTICAL" prefHeight="140.0">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Separator>
-                              <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="100.0">
-                                 <children>
-                                    <VBox alignment="CENTER" prefHeight="57.0">
-                                       <children>
-                                          <ImageView fx:id="imgDSP02" fitHeight="57.0" fitWidth="57.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../images/logo_small_200x.png" />
-                                             </image>
-                                          </ImageView>
-                                       </children>
-                                    </VBox>
-                                    <Label fx:id="lblDSP02" text="Loading" textFill="#656565">
-                                       <VBox.margin>
-                                          <Insets top="5.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                    <Label fx:id="lblAmountDSP02" layoutX="10.0" layoutY="160.0" text="Loading">
-                                       <VBox.margin>
-                                          <Insets top="3.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                 </children>
-                              </VBox>
-                              <Separator opacity="0.5" orientation="VERTICAL" prefHeight="140.0">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Separator>
-                              <VBox alignment="CENTER" layoutX="110.0" layoutY="10.0" prefWidth="100.0">
-                                 <children>
-                                    <VBox alignment="CENTER" prefHeight="57.0">
-                                       <children>
-                                          <ImageView fx:id="imgDSP03" fitHeight="57.0" fitWidth="57.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../images/logo_small_200x.png" />
-                                             </image>
-                                          </ImageView>
-                                       </children>
-                                    </VBox>
-                                    <Label fx:id="lblDSP03" text="Loading" textFill="#656565">
-                                       <VBox.margin>
-                                          <Insets top="5.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                    <Label fx:id="lblAmountDSP03" layoutX="10.0" layoutY="160.0" text="Loading">
-                                       <VBox.margin>
-                                          <Insets top="3.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                 </children>
-                              </VBox>
-                              <Separator opacity="0.5" orientation="VERTICAL" prefHeight="140.0">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Separator>
-                              <VBox alignment="CENTER" layoutX="210.0" layoutY="10.0" prefWidth="100.0">
-                                 <children>
-                                    <VBox alignment="CENTER" prefHeight="57.0">
-                                       <children>
-                                          <ImageView fx:id="imgDSP04" fitHeight="57.0" fitWidth="57.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../images/logo_small_200x.png" />
-                                             </image>
-                                          </ImageView>
-                                       </children>
-                                    </VBox>
-                                    <Label fx:id="lblDSP04" text="Loading" textFill="#656565">
-                                       <VBox.margin>
-                                          <Insets top="5.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                    <Label fx:id="lblAmountDSP04" layoutX="10.0" layoutY="160.0" text="Loading">
-                                       <VBox.margin>
-                                          <Insets top="3.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                 </children>
-                              </VBox>
+                              <Label fx:id="lblWriter04Streams" text="N/A">
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                              </Label>
+                           </children>
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <HBox fx:id="asset05" layoutX="11.0" layoutY="157.0">
+                     <children>
+                        <Label fx:id="lblWriter05" text="N/A">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </Label>
+                        <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label fx:id="lblWriter05Streams" text="N/A">
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                              </Label>
+                           </children>
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets left="20.0" top="10.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets bottom="20.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox fx:id="vboxTopStreams1" layoutX="185.0" layoutY="10.0" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+               <children>
+                  <Group>
+                     <VBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </VBox.margin>
+                     <children>
+                        <Label text="Top Performing Songs">
+                           <font>
+                              <Font name="Segoe UI Semibold" size="19.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </Label>
+                        <Label layoutY="28.0" text="for Top Streamed Assets">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </Label>
+                     </children>
+                  </Group>
+                  <HBox fx:id="asset011">
+                     <VBox.margin>
+                        <Insets left="20.0" top="30.0" />
+                     </VBox.margin>
+                     <children>
+                        <Label fx:id="lblAsset01" text="N/A">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </Label>
+                        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                           <children>
+                              <Label fx:id="lblAsset01Streams" text="N/A">
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                              </Label>
                            </children>
                         </HBox>
                      </children>
-                  </VBox>
+                  </HBox>
+                  <HBox fx:id="asset021" layoutX="31.0" layoutY="106.0" prefWidth="529.0">
+                     <children>
+                        <Label fx:id="lblAsset02" text="N/A">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                           <padding>
+                              <Insets left="20.0" top="10.0" />
+                           </padding>
+                        </Label>
+                        <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                           <children>
+                              <Label fx:id="lblAsset02Streams" text="N/A">
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                              </Label>
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <HBox fx:id="asset031" layoutX="11.0" layoutY="123.0">
+                     <children>
+                        <Label fx:id="lblAsset03" text="N/A">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                           <padding>
+                              <Insets left="20.0" top="10.0" />
+                           </padding>
+                        </Label>
+                        <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label fx:id="lblAsset03Streams" text="N/A">
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                              </Label>
+                           </children>
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <HBox fx:id="asset041" layoutX="11.0" layoutY="140.0">
+                     <children>
+                        <Label fx:id="lblAsset04" text="N/A">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                           <padding>
+                              <Insets left="20.0" top="10.0" />
+                           </padding>
+                        </Label>
+                        <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label fx:id="lblAsset04Streams" text="N/A">
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                              </Label>
+                           </children>
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <HBox fx:id="asset051" layoutX="11.0" layoutY="157.0">
+                     <children>
+                        <Label fx:id="lblAsset05" text="N/A">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </Label>
+                        <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label fx:id="lblAsset05Streams" text="N/A">
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                              </Label>
+                           </children>
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets left="20.0" top="10.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets bottom="20.0" />
+                     </VBox.margin>
+                  </HBox>
                </children>
-            </Pane>
-         </content>
-      </ScrollPane>
+            </VBox>
+         </children>
+         <VBox.margin>
+            <Insets left="30.0" right="30.0" top="30.0" />
+         </VBox.margin>
+      </HBox>
    </children>
 </VBox>
