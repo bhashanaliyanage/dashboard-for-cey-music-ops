@@ -189,3 +189,9 @@ public class Main extends Application {
 // TODO: 12/14/2023 In the check missing ISRC button, it doesn't show results after the program is built
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
 // TODO: 12/15/2023 Set not to show alert dialog when there's no missing ISRCs in check missing ISRC function
+
+// TODO: Import Report
+// TODO: Missing ISRC > Song Database Update
+// TODO: Search Song Database and Assign Payees
+// TODO: Give a list of Missing Payees
+// TODO: Update Payees (Manual Process)
