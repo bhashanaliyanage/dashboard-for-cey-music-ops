@@ -37,6 +37,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -1224,7 +1225,7 @@ public class UIController {
     }
     //</editor-fold>
 
-    public void onArtistReportsBtnClick(MouseEvent mouseEvent) throws IOException {
+    public void onArtistReportsBtnClick(MouseEvent mouseEvent) throws IOException, SQLException, ClassNotFoundException {
         changeSelectorTo(rctArtistReports);
         ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
         revenueGenerator.loadArtistReports();

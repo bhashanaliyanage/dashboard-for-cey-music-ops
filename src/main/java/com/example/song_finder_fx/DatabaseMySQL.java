@@ -118,7 +118,7 @@ public class DatabaseMySQL {
         String[] nextLine = reader.readNext(); // Skipping the header
         while ((nextLine = reader.readNext()) != null) {
             rowcount2++;
-            System.out.println("Executing Row " + rowcount2 + " of " + rowcount);
+            // System.out.println("Executing Row " + rowcount2 + " of " + rowcount);
 
             double percentage = ((double) rowcount2 / rowcount) * 100;
             Platform.runLater(() -> btnLoadReport.setText("Processing " + df.format(percentage) + "%"));
@@ -405,21 +405,21 @@ public class DatabaseMySQL {
         return rs;
     }
 
-    public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
+public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundException {
+    Connection db = DatabaseMySQL.getConn();
 
-        PreparedStatement ps = db.prepareStatement("""
-                SELECT report.Asset_ISRC,\s
-                (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.COMPOSER END) AS Composer,\s
-                (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.LYRICIST END) AS Lyricist\s
-                FROM report\s
-                LEFT OUTER JOIN songs ON report.Asset_ISRC = songs.ISRC\s
-                GROUP BY Asset_ISRC \s
-                ORDER BY `Composer` ASC"""
-        );
+    PreparedStatement ps = db.prepareStatement("""
+            SELECT report.Asset_ISRC,\s
+            (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.COMPOSER END) AS Composer,\s
+            (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.LYRICIST END) AS Lyricist\s
+            FROM report\s
+            LEFT OUTER JOIN songs ON report.Asset_ISRC = songs.ISRC\s
+            GROUP BY Asset_ISRC \s
+            ORDER BY `Composer` ASC""", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY
+    );
 
-        return ps.executeQuery();
-    }
+    return ps.executeQuery();
+}
 
     public static boolean updateSongsTable(File file) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
         CSVReader reader = new CSVReader(new FileReader(file));

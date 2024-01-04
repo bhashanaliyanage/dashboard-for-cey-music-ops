@@ -9,20 +9,24 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,11 +37,13 @@ import java.util.Optional;
 
 public class ControllerRevenueGenerator {
     //<editor-fold desc="Buttons">
-    public Label btnLoadReport;
+    public Label lblReportProgress;
     public Button btnGenerateFullBreakdown;
     //</editor-fold>
 
     //<editor-fold desc="Labels">
+    public Label lblIC_Save;
+    public Label lblISRC_Check;
     public Label lblGross;
     public Label lblUpdatePayee;
     public Label lblUpdateSongsDatabase;
@@ -77,12 +83,16 @@ public class ControllerRevenueGenerator {
     public ImageView imgDSP02;
     public ImageView imgDSP03;
     public ImageView imgDSP04;
+    public ImageView lblIC_Caution;
     public ScrollPane scrlpneMain;
     public HBox btnCheckMissingISRCs;
+    public VBox vbArtistReports;
     public ComboBox<String> comboPayees;
     private final UIController mainUIController;
+    private final Path tempDir = Files.createTempDirectory("missing_isrcs");
+    private final Path csvFile = tempDir.resolve("missing_isrcs.csv");
 
-    public ControllerRevenueGenerator(UIController uiController) {
+    public ControllerRevenueGenerator(UIController uiController) throws IOException {
         mainUIController = uiController;
     }
 
@@ -244,29 +254,72 @@ public class ControllerRevenueGenerator {
         }
     }
 
-    public void onLoadReportButtonClick() {
+    public void onLoadReportButtonClick() throws SQLException, ClassNotFoundException, InterruptedException {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Select FUGA Report");
 
         File report = chooser.showOpenDialog(mainUIController.mainVBox.getScene().getWindow());
 
         if (report != null) {
-            btnLoadReport.setText("Working on...");
+            lblReportProgress.setText("Working on...");
 
-            /*boolean status = DatabaseMySQL.loadReport(report, btnLoadReport);
+            Task<Void> taskLoadReport = loadReport(report);
+            Task<Void> taskCheckMissingISRCs = checkMissingISRCs();
+            taskLoadReport.setOnSucceeded(event -> {
+                Thread threadCheckMissingISRCs = new Thread(taskCheckMissingISRCs);
+                threadCheckMissingISRCs.start();
+            });
 
-            Platform.runLater(() -> {
-                if (status) {
-                    btnLoadReport.setText("CSV Imported to Database");
-                }
-            });*/
+            Thread threadLoadReport = new Thread(taskLoadReport);
+            threadLoadReport.start();
 
-            Task<Void> task = loadReport(report);
-
-            Thread t = new Thread(task);
-            t.start();
         } else {
             System.out.println("No Report Imported");
+        }
+    }
+
+    private Task<Void> checkMissingISRCs() throws SQLException, ClassNotFoundException {
+        Task<Void> task;
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Platform.runLater(() -> {
+                    lblISRC_Check.setVisible(true);
+                    lblISRC_Check.setText("Checking Missing ISRCs...");
+                });
+
+                ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+
+                CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
+
+                List<String[]> rows = new ArrayList<>();
+
+                extracted(resultSet, rows);
+
+                csvWriter.writeAll(rows);
+                csvWriter.close();
+
+                Platform.runLater(() -> {
+                    int size = rows.size();
+                    if (size > 0) {
+                        lblISRC_Check.setText("Found " + size + "Missing ISRCs. Please sync song database to update payee list");
+                        lblIC_Caution.setVisible(true);
+                        lblIC_Save.setVisible(true);
+                    }
+                });
+
+                return null;
+            }
+        };
+        return task;
+    }
+
+    private static void extracted(ResultSet resultSet, List<String[]> rows) throws SQLException {
+        while (resultSet.next() && ((resultSet.getString(2) == null) && (resultSet.getString(3) == null))) {
+            String[] row = new String[]{
+                    resultSet.getString(1)
+            };
+            rows.add(row);
         }
     }
 
@@ -275,11 +328,11 @@ public class ControllerRevenueGenerator {
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                boolean status = DatabaseMySQL.loadReport(report, btnLoadReport);
+                boolean status = DatabaseMySQL.loadReport(report, lblReportProgress);
 
                 Platform.runLater(() -> {
                     if (status) {
-                        btnLoadReport.setText("CSV Imported to Database");
+                        lblReportProgress.setText("CSV Imported to Database");
                     }
                 });
                 return null;
@@ -288,6 +341,15 @@ public class ControllerRevenueGenerator {
         return task;
     }
 
+    public void onSaveListLblClick(MouseEvent event) throws IOException {
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+
+        File destination = Main.browseLocationNew(scene.getWindow());
+        Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
+
+        Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+    }
     public void onGenerateFullBreakdownBtnClick(MouseEvent mouseEvent) {
         Platform.runLater(() -> {
             try {
@@ -542,36 +604,69 @@ public class ControllerRevenueGenerator {
 
     public void loadArtistReports() throws IOException {
         FXMLLoader loaderMain = new FXMLLoader(ControllerSettings.class.getResource("layouts/artist-reports.fxml"));
-        // FXMLLoader loaderSide = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-revenue-analysis.fxml"));
         loaderMain.setController(this);
-        // loaderSide.setController(this);
         Parent newContentMain = loaderMain.load();
-        // Parent newContentSide = loaderSide.load();
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
-        // mainUIController.sideVBox.getChildren().setAll(newContentSide);
+        System.out.println("Here!");
+
+        /*Scene scene = mainUIController.mainVBox.getScene();
+        vbArtistReports = (VBox) scene.lookup("#vbArtistReports");*/
 
         Task<Void> task;
 
         task = new Task<>() {
             @Override
-            protected Void call() {
-                Platform.runLater(() -> {
-                    try {
-                        ResultSet rsPayees = DatabaseMySQL.getPayees();
-                        while (rsPayees.next()) {
-                            comboPayees.getItems().add(rsPayees.getString(1));
+            protected Void call() throws SQLException, ClassNotFoundException {
+                ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+                int rowCount = 0;
+
+                while (resultSet.next() && ((resultSet.getString(2) == null) && (resultSet.getString(3) == null))) {
+                    rowCount++;
+                }
+
+                System.out.println("rowCount = " + rowCount);
+
+                if (rowCount > 0) {
+                    Platform.runLater(() -> {
+                        vbArtistReports.setDisable(true);
+                        try {
+                            NotificationBuilder.displayTrayError("ISRC Sync Error", "Please Update Missing ISRCs in Song Database to Sync Payee List");
+                        } catch (AWTException e) {
+                            throw new RuntimeException(e);
                         }
-                    } catch (SQLException | ClassNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        try {
+                            ResultSet rsPayees = DatabaseMySQL.getPayees();
+                            while (rsPayees.next()) {
+                                comboPayees.getItems().add(rsPayees.getString(1));
+                            }
+                        } catch (SQLException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+
                 return null;
             }
         };
 
         Thread t = new Thread(task);
         t.start();
+    }
+
+    public void onSidePanelAddNewReportBtnClick() throws IOException, SQLException, ClassNotFoundException {
+        FXMLLoader loaderMain = new FXMLLoader(ControllerSettings.class.getResource("layouts/revenue-report-processing.fxml"));
+        loaderMain.setController(this);
+        Parent newContentMain = loaderMain.load();
+
+        mainUIController.mainVBox.getChildren().setAll(newContentMain);
+
+        Task<Void> taskCheckMissingISRCs = checkMissingISRCs();
+        Thread threadCheckMissingISRCs = new Thread(taskCheckMissingISRCs);
+        threadCheckMissingISRCs.start();
     }
 
     public void OnComboPayeeKeyPress(KeyEvent event) {
