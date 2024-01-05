@@ -5,6 +5,8 @@ import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.sqlite.SQLiteException;
 
 import java.io.BufferedReader;
@@ -85,7 +87,7 @@ public class DatabaseMySQL {
         reader.close();
     }
 
-    public static boolean loadReport(File report, Label btnLoadReport) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
+    public static boolean loadReport(File report, Label btnLoadReport, Label lbl_import, ImageView imgImportCaution) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
         Connection db = DatabaseMySQL.getConn();
         int rs = 0;
         DecimalFormat df = new DecimalFormat("0.00");
@@ -235,7 +237,12 @@ public class DatabaseMySQL {
 
                 rs = ps.executeUpdate();
             } catch (SQLException | NumberFormatException e) {
-                throw new RuntimeException(e);
+                Platform.runLater(() -> {
+                    lbl_import.setText("Import Error");
+                    Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
+                    imgImportCaution.setImage(imgCaution);
+                    imgImportCaution.setVisible(true);
+                });
             }
         }
 
@@ -421,7 +428,11 @@ public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundEx
     return ps.executeQuery();
 }
 
-    public static boolean updateSongsTable(File file) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+    public static boolean updateSongsTable(File file, Label lblSongDB_Update, Label lblSongDB_Progress, ImageView imgSongDB_Status) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+        Platform.runLater(() -> {
+            lblSongDB_Update.setText("Updating Song Database");
+            lblSongDB_Update.setStyle("-fx-text-fill: '#000000'");
+        });
         CSVReader reader = new CSVReader(new FileReader(file));
         reader.readNext(); // Skipping the first line
         String[] row;
@@ -468,7 +479,10 @@ public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundEx
 
                 try {
                     ps.executeUpdate();
-                    System.out.println(isrc + " Added to database");
+                    Platform.runLater(() -> {
+                        lblSongDB_Progress.setVisible(true);
+                        lblSongDB_Progress.setText("Added: " + isrc);
+                    });
                     status = true;
                 } catch (SQLException e) {
                     throw new RuntimeException(e);

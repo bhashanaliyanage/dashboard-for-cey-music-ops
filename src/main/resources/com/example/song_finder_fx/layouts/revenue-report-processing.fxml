@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="890.0" prefWidth="750.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="890.0" prefWidth="750.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -23,26 +23,243 @@
            </font>
         </Label>
     </HBox>
-   <ScrollPane fx:id="scrlpneMain" hbarPolicy="NEVER" prefWidth="750.0" stylesheets="@../styles.css" vbarPolicy="NEVER">
+   <ScrollPane fx:id="scrlpneMain" hbarPolicy="NEVER" prefWidth="460.0" stylesheets="@../styles.css" vbarPolicy="NEVER">
       <Pane prefHeight="820.0" prefWidth="744.0">
-         <VBox fx:id="vboxTopStreams" layoutX="30.0" layoutY="30.0" maxWidth="688.0" prefHeight="242.0" prefWidth="688.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+         <VBox layoutX="30.0" layoutY="30.0" maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../styles.css">
             <children>
-               <Button mnemonicParsing="false" onAction="#onLoadReportButtonClick" text="Add New Report" />
-               <Label fx:id="lblReportProgress" text="labelImportPrograss" />
                <HBox>
                   <children>
-                     <Label fx:id="lblISRC_Check" text="labelMissingISRC_Check" visible="false" />
-                     <ImageView fx:id="lblIC_Caution" fitHeight="23.0" fitWidth="53.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                        <image>
-                           <Image url="@../images/icon_report_.png" />
-                        </image>
-                     </ImageView>
-                     <Label fx:id="lblIC_Save" onMouseClicked="#onSaveListLblClick" text="Save List" underline="true" visible="false">
-                        <cursor>
-                           <Cursor fx:constant="HAND" />
-                        </cursor>
-                     </Label>
+                     <VBox HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label text="Import Report">
+                              <font>
+                                 <Font name="Segoe UI Semibold" size="19.0" />
+                              </font>
+                              <cursor>
+                                 <Cursor fx:constant="DEFAULT" />
+                              </cursor>
+                           </Label>
+                           <Label text="(*.csv)">
+                              <cursor>
+                                 <Cursor fx:constant="DEFAULT" />
+                              </cursor>
+                           </Label>
+                        </children>
+                     </VBox>
+                     <Button mnemonicParsing="false" onAction="#onLoadReportButtonClick" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside_brown" text="Browse">
+                        <HBox.margin>
+                           <Insets />
+                        </HBox.margin>
+                     </Button>
                   </children>
+                  <VBox.margin>
+                     <Insets left="20.0" right="20.0" top="20.0" />
+                  </VBox.margin>
+               </HBox>
+               <HBox alignment="CENTER_LEFT">
+                  <children>
+                     <Label fx:id="lbl_import" text="Click Browse Button to Begin Import Process" textFill="#656565" />
+                     <ImageView fx:id="imgImportCaution" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                        <image>
+                           <Image url="@../images/done.png" />
+                        </image>
+                        <HBox.margin>
+                           <Insets left="10.0" />
+                        </HBox.margin>
+                     </ImageView>
+                     <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label fx:id="lblReportProgress" text="Import Progress" visible="false" />
+                        </children>
+                     </HBox>
+                  </children>
+                  <VBox.margin>
+                     <Insets left="20.0" right="20.0" top="30.0" />
+                  </VBox.margin>
+               </HBox>
+               <HBox alignment="CENTER_LEFT">
+                  <children>
+                     <Label fx:id="lblISRC_Check" text="Searching Missing ISRCs" />
+                     <ImageView fx:id="lblIC_Caution" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                        <image>
+                           <Image url="@../images/caution.png" />
+                        </image>
+                        <HBox.margin>
+                           <Insets left="10.0" />
+                        </HBox.margin>
+                     </ImageView>
+                     <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label fx:id="lblIC_Save" onMouseClicked="#onSaveListLblClick" text="Save List" underline="true" visible="false">
+                              <cursor>
+                                 <Cursor fx:constant="HAND" />
+                              </cursor>
+                           </Label>
+                        </children>
+                     </HBox>
+                  </children>
+                  <VBox.margin>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+                  </VBox.margin>
+               </HBox>
+            </children>
+         </VBox>
+         <Label fx:id="lblUpdateNote" alignment="CENTER" layoutX="30.0" layoutY="210.0" prefHeight="17.0" prefWidth="688.0" text="Please Update/ Sync Song Database with Report in order to Generate Artist Reports" textFill="#656565" />
+         <VBox fx:id="vboxUpdateSongDB" layoutX="30.0" layoutY="244.0" maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+            <children>
+               <HBox>
+                  <children>
+                     <VBox HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label text="Update Song Database">
+                              <font>
+                                 <Font name="Segoe UI Semibold" size="19.0" />
+                              </font>
+                              <cursor>
+                                 <Cursor fx:constant="DEFAULT" />
+                              </cursor>
+                           </Label>
+                           <Label fx:id="lblCountMissingISRCs" text="Count: Missing ISRCs">
+                              <cursor>
+                                 <Cursor fx:constant="DEFAULT" />
+                              </cursor>
+                           </Label>
+                        </children>
+                     </VBox>
+                     <Button mnemonicParsing="false" onMouseClicked="#onUpdateSongsDatabaseBtnClick" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside_brown" text="Browse">
+                        <HBox.margin>
+                           <Insets />
+                        </HBox.margin>
+                     </Button>
+                  </children>
+                  <VBox.margin>
+                     <Insets left="20.0" right="20.0" top="20.0" />
+                  </VBox.margin>
+               </HBox>
+               <HBox alignment="CENTER_LEFT">
+                  <children>
+                     <Label fx:id="lblSongDB_Update" text="Click Browse Button to Begin Update Process" textFill="#656565" />
+                     <ImageView fx:id="imgSongDB_Status" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                        <image>
+                           <Image url="@../images/done.png" />
+                        </image>
+                        <HBox.margin>
+                           <Insets left="10.0" />
+                        </HBox.margin>
+                     </ImageView>
+                     <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label fx:id="lblSongDB_Progress" text="Import Progress" visible="false" />
+                        </children>
+                     </HBox>
+                  </children>
+                  <VBox.margin>
+                     <Insets left="20.0" right="20.0" top="30.0" />
+                  </VBox.margin>
+               </HBox>
+               <HBox alignment="CENTER_LEFT">
+                  <children>
+                     <Label fx:id="lblPayeeUpdate" text="Updating Payee List" />
+                     <ImageView fx:id="imgPayeeUpdate" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                        <image>
+                           <Image url="@../images/caution.png" />
+                        </image>
+                        <HBox.margin>
+                           <Insets left="10.0" />
+                        </HBox.margin>
+                     </ImageView>
+                     <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label fx:id="lblPayeeProgress" onMouseClicked="#onSaveListLblClick" text="Save List" underline="true" visible="false">
+                              <cursor>
+                                 <Cursor fx:constant="HAND" />
+                              </cursor>
+                           </Label>
+                        </children>
+                     </HBox>
+                  </children>
+                  <VBox.margin>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+                  </VBox.margin>
+               </HBox>
+            </children>
+         </VBox>
+         <VBox fx:id="vboxUpdateSongDB1" layoutX="30.0" layoutY="426.0" maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+            <children>
+               <HBox>
+                  <children>
+                     <VBox HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label text="Update Song Database">
+                              <font>
+                                 <Font name="Segoe UI Semibold" size="19.0" />
+                              </font>
+                              <cursor>
+                                 <Cursor fx:constant="DEFAULT" />
+                              </cursor>
+                           </Label>
+                           <Label fx:id="lblCountMissingISRCs1" text="Count: Missing ISRCs">
+                              <cursor>
+                                 <Cursor fx:constant="DEFAULT" />
+                              </cursor>
+                           </Label>
+                        </children>
+                     </VBox>
+                     <Button mnemonicParsing="false" onMouseClicked="#onUpdateSongsDatabaseBtnClick" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside_brown" text="Browse">
+                        <HBox.margin>
+                           <Insets />
+                        </HBox.margin>
+                     </Button>
+                  </children>
+                  <VBox.margin>
+                     <Insets left="20.0" right="20.0" top="20.0" />
+                  </VBox.margin>
+               </HBox>
+               <HBox alignment="CENTER_LEFT">
+                  <children>
+                     <Label fx:id="lblSongDB_Update1" text="Click Browse Button to Begin Update Process" textFill="#656565" />
+                     <ImageView fx:id="imgSongDB_Status1" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                        <image>
+                           <Image url="@../images/done.png" />
+                        </image>
+                        <HBox.margin>
+                           <Insets left="10.0" />
+                        </HBox.margin>
+                     </ImageView>
+                     <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label fx:id="lblSongDB_Progress1" text="Import Progress" visible="false" />
+                        </children>
+                     </HBox>
+                  </children>
+                  <VBox.margin>
+                     <Insets left="20.0" right="20.0" top="30.0" />
+                  </VBox.margin>
+               </HBox>
+               <HBox alignment="CENTER_LEFT">
+                  <children>
+                     <Label fx:id="lblPayeeUpdate1" text="Updating Payee List" />
+                     <ImageView fx:id="imgPayeeUpdate1" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                        <image>
+                           <Image url="@../images/caution.png" />
+                        </image>
+                        <HBox.margin>
+                           <Insets left="10.0" />
+                        </HBox.margin>
+                     </ImageView>
+                     <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label fx:id="lblPayeeProgress1" onMouseClicked="#onSaveListLblClick" text="Save List" underline="true" visible="false">
+                              <cursor>
+                                 <Cursor fx:constant="HAND" />
+                              </cursor>
+                           </Label>
+                        </children>
+                     </HBox>
+                  </children>
+                  <VBox.margin>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+                  </VBox.margin>
                </HBox>
             </children>
          </VBox>

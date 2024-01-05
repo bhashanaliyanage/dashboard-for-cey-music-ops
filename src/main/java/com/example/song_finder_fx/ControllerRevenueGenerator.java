@@ -8,11 +8,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -33,15 +34,21 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class ControllerRevenueGenerator {
     //<editor-fold desc="Buttons">
     public Label lblReportProgress;
+    public Label lbl_import;
     public Button btnGenerateFullBreakdown;
     //</editor-fold>
 
     //<editor-fold desc="Labels">
+    public Label lblSongDB_Update;
+    public Label lblSongDB_Progress;
+    public Label lblCountMissingISRCs;
+    public Label lblUpdateNote;
     public Label lblIC_Save;
     public Label lblISRC_Check;
     public Label lblGross;
@@ -84,9 +91,12 @@ public class ControllerRevenueGenerator {
     public ImageView imgDSP03;
     public ImageView imgDSP04;
     public ImageView lblIC_Caution;
+    public ImageView imgImportCaution;
+    public ImageView imgSongDB_Status;
     public ScrollPane scrlpneMain;
     public HBox btnCheckMissingISRCs;
     public VBox vbArtistReports;
+    public VBox vboxUpdateSongDB;
     public ComboBox<String> comboPayees;
     private final UIController mainUIController;
     private final Path tempDir = Files.createTempDirectory("missing_isrcs");
@@ -262,6 +272,10 @@ public class ControllerRevenueGenerator {
 
         if (report != null) {
             lblReportProgress.setText("Working on...");
+            lbl_import.setText("Importing");
+            lbl_import.setStyle("-fx-text-fill: '#000000'");
+            lblReportProgress.setVisible(true);
+            imgImportCaution.setVisible(false);
 
             Task<Void> taskLoadReport = loadReport(report);
             Task<Void> taskCheckMissingISRCs = checkMissingISRCs();
@@ -285,7 +299,8 @@ public class ControllerRevenueGenerator {
             protected Void call() throws Exception {
                 Platform.runLater(() -> {
                     lblISRC_Check.setVisible(true);
-                    lblISRC_Check.setText("Checking Missing ISRCs...");
+                    lblISRC_Check.setText("Searching Missing ISRCs");
+                    lblIC_Caution.setVisible(false);
                 });
 
                 ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
@@ -294,7 +309,14 @@ public class ControllerRevenueGenerator {
 
                 List<String[]> rows = new ArrayList<>();
 
-                extracted(resultSet, rows);
+                while (resultSet.next()) {
+                    if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
+                        String[] row = new String[]{
+                                resultSet.getString(1)
+                        };
+                        rows.add(row);
+                    }
+                }
 
                 csvWriter.writeAll(rows);
                 csvWriter.close();
@@ -302,9 +324,19 @@ public class ControllerRevenueGenerator {
                 Platform.runLater(() -> {
                     int size = rows.size();
                     if (size > 0) {
-                        lblISRC_Check.setText("Found " + size + "Missing ISRCs. Please sync song database to update payee list");
+                        lblIC_Save.setText(size + " Missing ISRCs. Click Here to Save List");
+                        lblCountMissingISRCs.setText(size + " Missing ISRCs");
+                        Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
+                        lblIC_Caution.setImage(imgCaution);
                         lblIC_Caution.setVisible(true);
                         lblIC_Save.setVisible(true);
+                        lblUpdateNote.setVisible(true);
+                        vboxUpdateSongDB.setVisible(true);
+                    } else {
+                        lblIC_Save.setText("Report and Song Databases Synced");
+                        Image imgDone = new Image("com/example/song_finder_fx/images/done.png");
+                        lblIC_Caution.setImage(imgDone);
+                        lblIC_Caution.setVisible(true);
                     }
                 });
 
@@ -314,25 +346,17 @@ public class ControllerRevenueGenerator {
         return task;
     }
 
-    private static void extracted(ResultSet resultSet, List<String[]> rows) throws SQLException {
-        while (resultSet.next() && ((resultSet.getString(2) == null) && (resultSet.getString(3) == null))) {
-            String[] row = new String[]{
-                    resultSet.getString(1)
-            };
-            rows.add(row);
-        }
-    }
-
     private Task<Void> loadReport(File report) {
         Task<Void> task;
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                boolean status = DatabaseMySQL.loadReport(report, lblReportProgress);
+                boolean status = DatabaseMySQL.loadReport(report, lblReportProgress, lbl_import, imgImportCaution);
 
                 Platform.runLater(() -> {
                     if (status) {
                         lblReportProgress.setText("CSV Imported to Database");
+                        imgImportCaution.setVisible(true);
                     }
                 });
                 return null;
@@ -346,9 +370,11 @@ public class ControllerRevenueGenerator {
         Scene scene = node.getScene();
 
         File destination = Main.browseLocationNew(scene.getWindow());
-        Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
 
-        Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+        if (destination != null) {
+            Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
+            Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+        }
     }
     public void onGenerateFullBreakdownBtnClick(MouseEvent mouseEvent) {
         Platform.runLater(() -> {
@@ -546,12 +572,30 @@ public class ControllerRevenueGenerator {
         Scene scene = node.getScene();
         Window window = scene.getWindow();
         File file = Main.browseForFile(window);
-        boolean status = DatabaseMySQL.updateSongsTable(file);
 
-        if (status) {
-            lblUpdateSongsDatabase.setText("Database Updated");
-        } else {
-            lblUpdateSongsDatabase.setText("Error");
+        if (file != null) {
+            System.out.println("Check");
+            Task<Void> task;
+            task = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    boolean status = DatabaseMySQL.updateSongsTable(file, lblSongDB_Update, lblSongDB_Progress, imgSongDB_Status);
+
+                    if (status) {
+                        Platform.runLater(() -> {
+                            imgSongDB_Status.setVisible(true);
+                            lblSongDB_Progress.setText("Done");
+                        });
+                    } else {
+                        Platform.runLater(() -> lblSongDB_Progress.setText("Error"));
+                    }
+
+                    return null;
+                }
+            };
+
+            Thread thread = new Thread(task);
+            thread.start();
         }
     }
 
@@ -699,7 +743,7 @@ public class ControllerRevenueGenerator {
         return null;
     }
 
-    public void comboPayeeOnAction() throws SQLException, ClassNotFoundException {
+    public void comboPayeeOnAction() {
         String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
         System.out.println("Selected item: " + selectedItem);
         DecimalFormat df = new DecimalFormat("0.00");

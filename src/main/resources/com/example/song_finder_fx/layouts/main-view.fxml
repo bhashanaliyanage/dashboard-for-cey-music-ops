@@ -123,7 +123,7 @@
                     </Label>
                 </VBox>
             </HBox>
-            <HBox fx:id="btnArtistReports" layoutX="35.0" layoutY="215.0" maxWidth="278.0" onMouseClicked="#onArtistReportsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
+            <HBox fx:id="btnArtistReports" disable="true" layoutX="35.0" layoutY="215.0" maxWidth="278.0" onMouseClicked="#onArtistReportsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
                 <VBox.margin>
                     <Insets left="25.0" />
                 </VBox.margin>
