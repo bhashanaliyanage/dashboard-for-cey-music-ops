@@ -37,7 +37,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -320,12 +319,12 @@ public class UIController {
         int songListLength = songList.size();
 
         if (songListLength > 1) {
-            String text = songList.get(0) + " + " + (songListLength - 1) + " other songs added";
+            String text = songList.getFirst() + " + " + (songListLength - 1) + " other songs added";
             songListButtonSubtitle.setText(text);
             System.out.println(text);
         } else {
-            songListButtonSubtitle.setText(songList.get(0));
-            System.out.println(songList.get(0));
+            songListButtonSubtitle.setText(songList.getFirst());
+            System.out.println(songList.getFirst());
         }
     }
 
@@ -344,12 +343,12 @@ public class UIController {
         int songListLength = songList.size();
 
         if (songListLength > 1) {
-            String text = songList.get(0) + " + " + (songListLength - 1) + " other songs added";
+            String text = songList.getFirst() + " + " + (songListLength - 1) + " other songs added";
             songListButtonSubtitle.setText(text);
             System.out.println(text);
         } else {
-            songListButtonSubtitle.setText(songList.get(0));
-            System.out.println(songList.get(0));
+            songListButtonSubtitle.setText(songList.getFirst());
+            System.out.println(songList.getFirst());
         }
     }
 
@@ -620,8 +619,8 @@ public class UIController {
         String lyricist = songDetails.get(7);
 
         // Search Composer and Lyricist from Artists Table
-        Boolean composerCeyMusic = db.searchArtistTable(composer);
-        Boolean lyricistCeyMusic = db.searchArtistTable(lyricist);
+        Boolean composerCeyMusic = DatabaseMySQL.searchArtistTable(composer);
+        Boolean lyricistCeyMusic = DatabaseMySQL.searchArtistTable(lyricist);
 
         String percentage;
         if (composerCeyMusic && lyricistCeyMusic) {

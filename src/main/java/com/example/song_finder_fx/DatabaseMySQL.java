@@ -9,10 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.sqlite.SQLiteException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -589,6 +586,65 @@ public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundEx
         return value;
     }
 
+    public static boolean updatePayeeDetails2(File file) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+        CSVReader reader = new CSVReader(new FileReader(file));
+        reader.readNext(); // Skipping the first line
+
+        String[] row;
+        while ((row = reader.readNext()) != null) {
+            String isrc = row[0];
+            String composer = row[10];
+            String lyricist = row[11];
+
+            updatePayeeDetails2(isrc, composer, lyricist);
+        }
+
+        return true;
+    }
+
+    private static boolean updatePayeeDetails2(String isrc, String composer, String lyricist) throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+
+        Boolean composerCeyMusic = searchArtistTable(composer);
+        Boolean lyricistCeyMusic = searchArtistTable(lyricist);
+
+        PreparedStatement ps = db.prepareStatement("INSERT INTO isrc_payees (ISRC, PAYEE, CONTRIBUTOR) " +
+                "VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE PAYEE=?, CONTRIBUTOR=?;");
+
+        boolean status = false;
+
+        if (composerCeyMusic) {
+            ps.setString(1, isrc);
+            ps.setString(2, composer);
+            ps.setString(3, lyricist);
+            ps.setString(4, composer);
+            ps.setString(5, lyricist);
+
+            ps.executeUpdate();
+
+            status = true;
+        }
+
+        if (lyricistCeyMusic) {
+            ps.setString(1, isrc);
+            ps.setString(2, lyricist);
+            ps.setString(3, composer);
+            ps.setString(4, lyricist);
+            ps.setString(5, composer);
+
+            ps.executeUpdate();
+
+            status = true;
+        }
+
+        return status;
+    }
+
+    public static void main(String[] args) throws SQLException, ClassNotFoundException, CsvValidationException, IOException {
+        boolean status = updatePayeeDetails2("ATR981202544", "Rohana Weerasinghe", "");
+        System.out.println("status = " + status);
+    }
+
     public void CreateTable() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = DatabaseMySQL.getConn();
@@ -845,7 +901,7 @@ public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundEx
         return songDetails;
     }
 
-    public Boolean searchArtistTable(String artist) throws SQLException, ClassNotFoundException {
+    public static Boolean searchArtistTable(String artist) throws SQLException, ClassNotFoundException {
         ResultSet rs;
         Connection conn = getConn();
         String artistName = null;
@@ -924,41 +980,7 @@ public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundEx
         }
     }
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException, CsvValidationException, IOException {
-        Connection conn = getConn();
 
-        PreparedStatement psGet = conn.prepareStatement("SELECT ISRC, PAYEE, CONTRIBUTOR FROM isrc_payees;");
-        ResultSet rs = psGet.executeQuery();
-
-        while (rs.next()) {
-            String isrc = rs.getString("ISRC");
-            String payee = rs.getString("PAYEE");
-            String contributor = rs.getString("CONTRIBUTOR");
-
-            if (checkContributor(conn, contributor)) { // If Contributor ours
-                /*System.out.println("isrc = " + isrc);
-                System.out.println("payee = " + payee);
-                System.out.println("contributor = " + contributor);*/
-
-                PreparedStatement psSet = conn.prepareStatement("UPDATE isrc_payees SET SHARE = ? WHERE ISRC = ? AND PAYEE = ?");
-                psSet.setInt(1, 50);
-                psSet.setString(2, isrc);
-                psSet.setString(3, payee);
-
-                try {
-                    psSet.executeUpdate();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                PreparedStatement psSet = conn.prepareStatement("UPDATE isrc_payees SET SHARE = 100 WHERE ISRC = ?");
-                psSet.setString(1, isrc);
-
-                // psSet.executeUpdate();
-                System.out.println("Contributor not ours for ISRC = " + isrc);
-            }
-        }
-    }
 
     private static boolean checkContributor(Connection conn, String contributor) throws SQLException {
         PreparedStatement ps = conn.prepareStatement("SELECT PAYEE FROM isrc_payees GROUP BY PAYEE;");

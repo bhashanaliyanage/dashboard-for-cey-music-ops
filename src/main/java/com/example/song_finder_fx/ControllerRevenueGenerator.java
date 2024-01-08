@@ -324,7 +324,7 @@ public class ControllerRevenueGenerator {
                 Platform.runLater(() -> {
                     int size = rows.size();
                     if (size > 0) {
-                        lblIC_Save.setText(size + " Missing ISRCs. Click Here to Save List");
+                        lblIC_Save.setText(size + " Missing ISRCs. (Click Here to Save List)");
                         lblCountMissingISRCs.setText(size + " Missing ISRCs");
                         Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
                         lblIC_Caution.setImage(imgCaution);
@@ -565,18 +565,23 @@ public class ControllerRevenueGenerator {
         csvWriter.close();
 
         showErrorDialogWithLog("Missing ISRCs", rows.size() + " Missing ISRCs", "Click OK to Save List of Missing ISRCs", scene.getWindow(), csvFile);
+
+        System.out.println(rows);
     }
 
-    public void onUpdateSongsDatabaseBtnClick(MouseEvent mouseEvent) throws CsvValidationException, IOException, SQLException, ClassNotFoundException {
+    public void onUpdateSongsDatabaseBtnClick(MouseEvent mouseEvent) {
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
         Window window = scene.getWindow();
         File file = Main.browseForFile(window);
 
         if (file != null) {
-            System.out.println("Check");
-            Task<Void> task;
-            task = new Task<>() {
+            // System.out.println("Check");
+
+            Task<Void> taskUpdateSongDatabase;
+            Task<Void> taskUpdatePayees;
+
+            taskUpdateSongDatabase = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
                     boolean status = DatabaseMySQL.updateSongsTable(file, lblSongDB_Update, lblSongDB_Progress, imgSongDB_Status);
@@ -594,8 +599,17 @@ public class ControllerRevenueGenerator {
                 }
             };
 
-            Thread thread = new Thread(task);
-            thread.start();
+            taskUpdatePayees = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    boolean status = DatabaseMySQL.updatePayeeDetails2(file);
+
+                    return null;
+                }
+            };
+
+            Thread threadUpdateSongDatabase = new Thread(taskUpdateSongDatabase);
+            threadUpdateSongDatabase.start();
         }
     }
 

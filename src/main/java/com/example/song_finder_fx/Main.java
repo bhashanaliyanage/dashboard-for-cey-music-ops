@@ -189,6 +189,7 @@ public class Main extends Application {
 // TODO: 12/14/2023 In the check missing ISRC button, it doesn't show results after the program is built
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
 // TODO: 12/15/2023 Set not to show alert dialog when there's no missing ISRCs in check missing ISRC function
+// TODO: If copy to button clicked and user not chose any location the application starts to search
 
 // TODO: Import Report
 // TODO: Missing ISRC > Song Database Update
