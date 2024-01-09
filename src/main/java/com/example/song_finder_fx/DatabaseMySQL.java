@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 public class DatabaseMySQL {
     private static Connection conn = null;
     static StringBuilder errorBuffer = new StringBuilder();
+    private static final ArrayList<String> conflictISRCs = new ArrayList<>();
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
 
@@ -102,22 +103,22 @@ public class DatabaseMySQL {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         CSVReader reader = new CSVReader(new FileReader(report.getAbsolutePath()));
-        BufferedReader breader = new BufferedReader(new FileReader(report));
+        BufferedReader bReader = new BufferedReader(new FileReader(report));
         int rowcount = 0; // Total RowCount
         int rowcount2 = 0; // While loop's row count
 
         System.out.println("Here");
-        while ((breader.readLine()) != null) {
+        while ((bReader.readLine()) != null) {
             rowcount++;
             System.out.println("rowcount = " + rowcount);
         }
 
         System.out.println("Total rowCount = " + rowcount);
 
-        String[] nextLine = reader.readNext(); // Skipping the header
+        reader.readNext(); // Skipping the header
+        String[] nextLine;
         while ((nextLine = reader.readNext()) != null) {
             rowcount2++;
-            // System.out.println("Executing Row " + rowcount2 + " of " + rowcount);
 
             double percentage = ((double) rowcount2 / rowcount) * 100;
             Platform.runLater(() -> btnLoadReport.setText("Processing " + df.format(percentage) + "%"));
@@ -246,52 +247,6 @@ public class DatabaseMySQL {
         return rs > 0;
     }
 
-    public static void loadReportTemp(File report) throws IOException, CsvValidationException {
-        CSVReader reader = new CSVReader(new FileReader(report.getAbsolutePath()));
-        BufferedReader breader = new BufferedReader(new FileReader(report));
-        int rowcount = 0; // Total RowCount
-        int rowcount2 = 0; // While loop's row count
-
-        System.out.println("Here");
-        while ((breader.readLine()) != null) {
-            rowcount++;
-            System.out.println("rowcount = " + rowcount);
-        }
-
-        System.out.println("Total rowCount = " + rowcount);
-
-        String[] nextLine = reader.readNext(); // Skipping the header
-        while ((nextLine = reader.readNext()) != null) {
-            rowcount2++;
-            System.out.println("Executing Row " + rowcount2 + " of " + rowcount);
-            System.out.println("ISRC: " + nextLine[17]);
-            try {
-                System.out.println("Asset Duration: " + Integer.parseInt(nextLine[16]));
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-            if (rowcount2 == 1526175) {
-                break;
-            }
-        }
-    }
-
-    public static void getReportedRoyalty() throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
-        ResultSet rs;
-
-        PreparedStatement ps = db.prepareStatement("SELECT Asset_ISRC AS ISRC, SUM(Reported_Royalty) AS Total_Royalty " +
-                "FROM report " +
-                "GROUP BY Asset_ISRC " +
-                "ORDER BY `Total_Royalty` DESC");
-
-        rs = ps.executeQuery();
-
-        while (rs.next()) {
-            System.out.println("Reported Royalty for ISRC: " + rs.getString(1) + ": " + rs.getString(2));
-        }
-    }
-
     public static ResultSet getTop5StreamedAssets() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
 
@@ -409,23 +364,23 @@ public class DatabaseMySQL {
         return rs;
     }
 
-public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundException {
-    Connection db = DatabaseMySQL.getConn();
+    public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
 
-    PreparedStatement ps = db.prepareStatement("""
-            SELECT report.Asset_ISRC,\s
-            (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.COMPOSER END) AS Composer,\s
-            (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.LYRICIST END) AS Lyricist\s
-            FROM report\s
-            LEFT OUTER JOIN songs ON report.Asset_ISRC = songs.ISRC\s
-            GROUP BY Asset_ISRC \s
-            ORDER BY `Composer` ASC""", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY
-    );
+        PreparedStatement ps = db.prepareStatement("""
+                SELECT report.Asset_ISRC,\s
+                (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.COMPOSER END) AS Composer,\s
+                (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.LYRICIST END) AS Lyricist\s
+                FROM report\s
+                LEFT OUTER JOIN songs ON report.Asset_ISRC = songs.ISRC\s
+                GROUP BY Asset_ISRC \s
+                ORDER BY `Composer` ASC""", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY
+        );
 
-    return ps.executeQuery();
-}
+        return ps.executeQuery();
+    }
 
-    public static boolean updateSongsTable(File file, Label lblSongDB_Update, Label lblSongDB_Progress, ImageView imgSongDB_Status) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+    public static boolean updateSongsTable(File file, Label lblSongDB_Update, Label lblSongDB_Progress) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
         Platform.runLater(() -> {
             lblSongDB_Update.setText("Updating Song Database");
             lblSongDB_Update.setStyle("-fx-text-fill: '#000000'");
@@ -513,51 +468,6 @@ public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundEx
         );
     }
 
-    public static boolean updatePayeeDetails(File file) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
-        CSVReader reader = new CSVReader(new FileReader(file));
-        reader.readNext(); // Skipping the first line
-        String[] row;
-        PreparedStatement psCheckISRCs = getCheckISRC_FromPayeesPreparedStatement();
-        PreparedStatement psInsert = getInsertPayeeDetailsPreparedStatement();
-        boolean status = false;
-
-        while ((row = reader.readNext()) != null) {
-            String isrc = row[0];
-
-            psCheckISRCs.setString(1, isrc);
-            ResultSet rs = psCheckISRCs.executeQuery();
-            rs.next();
-
-            if (rs.getInt(1) == 0) {
-                String payee = row[1];
-                String contributor = row[2];
-
-                psInsert.setString(1, isrc);
-                psInsert.setString(2, payee);
-                psInsert.setString(3, contributor);
-
-                try {
-                    psInsert.executeUpdate();
-                    System.out.println("Payee: " + payee + " Added for ISRC: " + isrc);
-                    status = true;
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        return status;
-    }
-
-    private static PreparedStatement getInsertPayeeDetailsPreparedStatement() throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
-        return db.prepareStatement("INSERT INTO isrc_payees (ISRC, PAYEE, CONTRIBUTOR) VALUES (?, ?, ?)");
-    }
-
-    private static PreparedStatement getCheckISRC_FromPayeesPreparedStatement() throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
-        return db.prepareStatement("SELECT COUNT(*) AS Count FROM isrc_payees WHERE ISRC = ?");
-    }
-
     public static ResultSet getPayees() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
         PreparedStatement preparedStatement = db.prepareStatement("SELECT PAYEE FROM `isrc_payees` GROUP BY PAYEE ORDER BY PAYEE ASC;");
@@ -565,28 +475,7 @@ public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundEx
         return preparedStatement.executeQuery();
     }
 
-    public static double getRevenue(String selectedItem) throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
-
-        PreparedStatement preparedStatement = db.prepareStatement("# Returns Reported Royalties for individual ISRCs\n" +
-                "SELECT \n" +
-                "    (((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY\n" +
-                "FROM `report` \n" +
-                "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ?;");
-        preparedStatement.setString(1, selectedItem);
-
-        ResultSet rs = preparedStatement.executeQuery();
-
-        double value = 0;
-
-        while (rs.next()) {
-            value = rs.getDouble(1);
-        }
-
-        return value;
-    }
-
-    public static boolean updatePayeeDetails2(File file) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+    public static ArrayList<String> processPayeeDetails(File file) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
         CSVReader reader = new CSVReader(new FileReader(file));
         reader.readNext(); // Skipping the first line
 
@@ -596,13 +485,13 @@ public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundEx
             String composer = row[10];
             String lyricist = row[11];
 
-            updatePayeeDetails2(isrc, composer, lyricist);
+            updatePayeeDetails(isrc, composer, lyricist);
         }
 
-        return true;
+        return conflictISRCs;
     }
 
-    private static boolean updatePayeeDetails2(String isrc, String composer, String lyricist) throws SQLException, ClassNotFoundException {
+    private static void updatePayeeDetails(String isrc, String composer, String lyricist) throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
 
         Boolean composerCeyMusic = searchArtistTable(composer);
@@ -637,90 +526,51 @@ public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundEx
             status = true;
         }
 
-        return status;
+        if (!composerCeyMusic && !lyricistCeyMusic) {
+            conflictISRCs.add(isrc);
+        }
+
     }
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException, CsvValidationException, IOException {
-        boolean status = updatePayeeDetails2("ATR981202544", "Rohana Weerasinghe", "");
-        System.out.println("status = " + status);
+        double gross = getPayeeGrossRev("Ajantha Ranasinghe");
+        System.out.println("gross = " + gross);
     }
 
-    public void CreateTable() throws SQLException, ClassNotFoundException {
-        // Load the JDBC driver
-        Connection db = DatabaseMySQL.getConn();
-        int rs;
+    static double getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
+        double total = 0;
+        double contributorShare = 0;
+        Connection connection = DatabaseMySQL.getConn();
 
-        PreparedStatement ps = db.prepareStatement("CREATE TABLE IF NOT EXISTS songs (" +
-                "ISRC VARCHAR(255) PRIMARY KEY," +
-                "ALBUM_TITLE VARCHAR(255)," +
-                "UPC BIGINT," +
-                "CAT_NO VARCHAR(255)," +
-                "PRODUCT_PRIMARY VARCHAR(255)," +
-                "ALBUM_FORMAT VARCHAR(255)," +
-                "TRACK_TITLE VARCHAR(255)," +
-                "TRACK_VERSION VARCHAR(255)," +
-                "SINGER VARCHAR(255)," +
-                "FEATURING VARCHAR(255)," +
-                "COMPOSER VARCHAR(255)," +
-                "LYRICIST VARCHAR(255)," +
-                "FILE_NAME VARCHAR(255))");
+        PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, (((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY " +
+                "FROM `report` " +
+                "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
+                "GROUP BY Asset_ISRC " +
+                "ORDER BY `REPORTED_ROYALTY` DESC");
+        psGetGross.setString(1, artistName);
+        ResultSet rsGross = psGetGross.executeQuery();
+        while (rsGross.next()) {
+            String isrc = rsGross.getString(1);
+            PreparedStatement psCheckISRC_Share = connection.prepareStatement("SELECT * FROM `isrc_payees` WHERE ISRC = ?");
+            psCheckISRC_Share.setString(1, isrc);
+            ResultSet rsISRC_Share = psCheckISRC_Share.executeQuery();
+            int rowCount = 0;
 
-        rs = ps.executeUpdate();
-        System.out.println(rs);
-    }
+            while (rsISRC_Share.next()) {
+                rowCount++;
+            }
 
-    public void ImportToBase(File file) throws SQLException, ClassNotFoundException, IOException {
-        Connection db = DatabaseMySQL.getConn();
-
-        PreparedStatement ps = db.prepareStatement("INSERT INTO songs (ISRC," +
-                "ALBUM_TITLE," +
-                "UPC," +
-                "CAT_NO," +
-                "PRODUCT_PRIMARY," +
-                "ALBUM_FORMAT," +
-                "TRACK_TITLE," +
-                "TRACK_VERSION," +
-                "SINGER," +
-                "FEATURING," +
-                "COMPOSER," +
-                "LYRICIST," +
-                "FILE_NAME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        );
-
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line; // Test
-
-        while ((line = reader.readLine()) != null) {
-            String[] columnNames = line.split(",");
-
-            try {
-                if (columnNames.length > 0) {
-                    ps.setString(1, columnNames[0]);
-                    ps.setString(2, columnNames[1]);
-                    ps.setString(3, columnNames[2]);
-                    ps.setString(4, columnNames[3]);
-                    ps.setString(5, columnNames[4]);
-                    ps.setString(6, columnNames[5]);
-                    ps.setString(7, columnNames[6]);
-                    ps.setString(8, columnNames[7]);
-                    ps.setString(9, columnNames[8]);
-                    ps.setString(10, columnNames[9]);
-                    ps.setString(11, columnNames[10]);
-                    ps.setString(12, columnNames[11]);
-                    ps.setString(13, columnNames[12]);
-
-                    try {
-                        ps.executeUpdate();
-                        System.out.println("Executed: " + columnNames[2]);
-                    } catch (DataTruncation | SQLIntegrityConstraintViolationException |
-                             ArrayIndexOutOfBoundsException e) {
-                        System.out.println("Invalid: " + columnNames[2]);
-                    }
-                }
-            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
-                e.printStackTrace();
+            if (rowCount == 2) {
+                double revenue = (rsGross.getDouble(2) / 2);
+                total = total + revenue;
+                contributorShare = contributorShare + revenue;
+            } else if (rowCount == 1) {
+                double revenue = (rsGross.getDouble(2));
+                total = total + revenue;
             }
         }
+
+        return total;
     }
 
     public static void searchAndCopySongs(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
@@ -915,85 +765,5 @@ public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundEx
         }
 
         return artistName != null;
-    }
-
-    public static void testThing() throws SQLException, ClassNotFoundException {
-        Connection conn = getConn();
-        ResultSet rs;
-        ResultSet rs2;
-        ResultSet rs3;
-        String assetTitle;
-        String assetISRC;
-        String composer;
-        String lyricist;
-        List<String> artists = new ArrayList<>();
-        int percentage;
-
-        PreparedStatement ps = conn.prepareStatement("""
-                SELECT report.Asset_ISRC, report.Asset_Title, report.Product_Title, report.Product_UPC, (((SUM(CASE WHEN report.Territory = 'AU' THEN report.Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN report.Territory != 'AU' THEN report.Reported_Royalty ELSE 0 END))) * 0.85 AS Reported_Royalty_For_CEYMUSIC, ((((SUM(CASE WHEN report.Territory = 'AU' THEN report.Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN report.Territory != 'AU' THEN report.Reported_Royalty ELSE 0 END))) * 0.85) * 350 AS LKR\s
-                FROM report\s
-                GROUP BY report.Asset_ISRC \s
-                ORDER BY `Reported_Royalty_For_CEYMUSIC` DESC;""");
-        rs = ps.executeQuery();
-
-        PreparedStatement ps2 = conn.prepareStatement("SELECT COMPOSER, LYRICIST FROM `songs` WHERE ISRC = ?;");
-
-        PreparedStatement ps3 = conn.prepareStatement("SELECT * FROM artists");
-        rs3 = ps3.executeQuery();
-        while (rs3.next()) {
-            artists.add(rs3.getString(1));
-        }
-
-        while (rs.next()) {
-            assetISRC = rs.getString(1);
-            assetTitle = rs.getString(2);
-            ps2.setString(1, assetISRC);
-            rs2 = ps2.executeQuery();
-            rs2.next();
-            try {
-                composer = rs2.getString(1);
-                lyricist = rs2.getString(2);
-            } catch (SQLException e) {
-                composer = "Null";
-                lyricist = "Null";
-            }
-
-            percentage = 0;
-
-            if (artists.contains(composer)) {
-                percentage += 50;
-            }
-            if (artists.contains(lyricist)) {
-                percentage += 50;
-            }
-
-            System.out.println("assetTitle = " + assetTitle);
-            System.out.println("assetISRC = " + assetISRC);
-            System.out.println("composer = " + composer);
-            System.out.println("lyricist = " + lyricist);
-            System.out.println("percentage = " + percentage);
-            System.out.println("========");
-
-            if (percentage == 0) {
-                break;
-            }
-        }
-    }
-
-
-
-    private static boolean checkContributor(Connection conn, String contributor) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("SELECT PAYEE FROM isrc_payees GROUP BY PAYEE;");
-        ResultSet rs = ps.executeQuery();
-        boolean status = false;
-
-        while (rs.next()) {
-            String payee = rs.getString(1);
-            if (Objects.equals(payee, contributor)) {
-                status = true;
-            }
-        }
-
-        return status;
     }
 }

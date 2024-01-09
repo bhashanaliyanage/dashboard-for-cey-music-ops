@@ -1,7 +1,6 @@
 package com.example.song_finder_fx;
 
 import com.opencsv.CSVWriter;
-import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -84,6 +83,7 @@ public class ControllerRevenueGenerator {
     public Label lblAmountDSP03;
     public Label lblAmountDSP04;
     public Label lblTitleMonth;
+    public Label lblPayeeProgress;
     //</editor-fold>
 
     public ImageView imgDSP01;
@@ -93,6 +93,7 @@ public class ControllerRevenueGenerator {
     public ImageView lblIC_Caution;
     public ImageView imgImportCaution;
     public ImageView imgSongDB_Status;
+    public ImageView imgPayeeUpdate;
     public ScrollPane scrlpneMain;
     public HBox btnCheckMissingISRCs;
     public VBox vbArtistReports;
@@ -584,7 +585,7 @@ public class ControllerRevenueGenerator {
             taskUpdateSongDatabase = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
-                    boolean status = DatabaseMySQL.updateSongsTable(file, lblSongDB_Update, lblSongDB_Progress, imgSongDB_Status);
+                    boolean status = DatabaseMySQL.updateSongsTable(file, lblSongDB_Update, lblSongDB_Progress);
 
                     if (status) {
                         Platform.runLater(() -> {
@@ -602,34 +603,35 @@ public class ControllerRevenueGenerator {
             taskUpdatePayees = new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
-                    boolean status = DatabaseMySQL.updatePayeeDetails2(file);
+                    ArrayList<String> conflictISRCs = DatabaseMySQL.processPayeeDetails(file);
+                    if (!conflictISRCs.isEmpty()) {
+                        Platform.runLater(() -> {
+                            Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
+                            imgPayeeUpdate.setImage(imgCaution);
+                            imgPayeeUpdate.setVisible(true);
+                            lblPayeeProgress.setVisible(true);
+                            lblPayeeProgress.setText(conflictISRCs.size() + " Conflicts (Click Here to View)");
+                        });
+                    } else {
+                        Platform.runLater(() -> {
+                            Image imgDone = new Image("com/example/song_finder_fx/images/done.png");
+                            imgPayeeUpdate.setImage(imgDone);
+                            imgPayeeUpdate.setVisible(true);
+                        });
+                    }
 
                     return null;
                 }
             };
 
+            taskUpdateSongDatabase.setOnSucceeded(event -> {
+                Thread updatePayees = new Thread(taskUpdatePayees);
+                updatePayees.start();
+            });
+
             Thread threadUpdateSongDatabase = new Thread(taskUpdateSongDatabase);
             threadUpdateSongDatabase.start();
         }
-    }
-
-    public void onUpdatePayeeDetailsBtnClick(MouseEvent mouseEvent) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
-        Node node = (Node) mouseEvent.getSource();
-        Scene scene = node.getScene();
-        Window window = scene.getWindow();
-        File file = Main.browseForFile(window);
-
-        if (file != null) {
-            boolean status = DatabaseMySQL.updatePayeeDetails(file);
-
-            if (status) {
-                lblUpdatePayee.setText("Payee List Updated");
-            } else {
-                lblUpdatePayee.setText("Error");
-            }
-        }
-
-        System.out.println("No file selected");
     }
 
     private static void showErrorDialogWithLog(String title, String headerText, String contentText, Window window, Path csvFile) throws IOException {
@@ -769,11 +771,11 @@ public class ControllerRevenueGenerator {
 
         Thread tGrossRevenue = new Thread(() -> {
             try {
-                grossRevenue[0] = DatabaseMySQL.getRevenue(selectedItem);
-                // System.out.println("value = " + value);
+                grossRevenue[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
             } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
+            // System.out.println("value = " + value);
             String formattedGrossRevenue = df.format(grossRevenue[0]);
 
             Platform.runLater(() -> {
