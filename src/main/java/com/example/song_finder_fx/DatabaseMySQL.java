@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 public class DatabaseMySQL {
     private static Connection conn = null;
     static StringBuilder errorBuffer = new StringBuilder();
-    private static final ArrayList<String> conflictISRCs = new ArrayList<>();
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
 
@@ -480,8 +479,6 @@ public class DatabaseMySQL {
     }
 
     static double getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
-        double total = 0;
-        double contributorShare = 0;
         Connection connection = DatabaseMySQL.getConn();
 
         PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, (((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY " +
@@ -491,28 +488,9 @@ public class DatabaseMySQL {
                 "ORDER BY `REPORTED_ROYALTY` DESC");
         psGetGross.setString(1, artistName);
         ResultSet rsGross = psGetGross.executeQuery();
-        while (rsGross.next()) {
-            String isrc = rsGross.getString(1);
-            PreparedStatement psCheckISRC_Share = connection.prepareStatement("SELECT * FROM `isrc_payees` WHERE ISRC = ?");
-            psCheckISRC_Share.setString(1, isrc);
-            ResultSet rsISRC_Share = psCheckISRC_Share.executeQuery();
-            int rowCount = 0;
+        rsGross.next();
 
-            while (rsISRC_Share.next()) {
-                rowCount++;
-            }
-
-            if (rowCount == 2) {
-                double revenue = (rsGross.getDouble(2) / 2);
-                total = total + revenue;
-                contributorShare = contributorShare + revenue;
-            } else if (rowCount == 1) {
-                double revenue = (rsGross.getDouble(2));
-                total = total + revenue;
-            }
-        }
-
-        return total;
+        return rsGross.getDouble(2);
     }
 
     public static void searchAndCopySongs(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {

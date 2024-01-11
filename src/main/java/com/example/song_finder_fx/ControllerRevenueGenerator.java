@@ -9,21 +9,21 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -523,7 +523,6 @@ public class ControllerRevenueGenerator {
             // System.out.println("Check");
 
             Task<Void> taskUpdateSongDatabase;
-            Task<Void> taskUpdatePayees;
 
             taskUpdateSongDatabase = new Task<>() {
                 @Override
@@ -603,7 +602,7 @@ public class ControllerRevenueGenerator {
         t.start();
     }
 
-    public void onSidePanelAddNewReportBtnClick() throws IOException, SQLException, ClassNotFoundException {
+    public void onSidePanelAddNewReportBtnClick() throws IOException {
         FXMLLoader loaderMain = new FXMLLoader(ControllerSettings.class.getResource("layouts/revenue-report-processing.fxml"));
         loaderMain.setController(this);
         Parent newContentMain = loaderMain.load();
@@ -646,10 +645,11 @@ public class ControllerRevenueGenerator {
     }
 
     public void comboPayeeOnAction() {
-        String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
-        System.out.println("Selected item: " + selectedItem);
         DecimalFormat df = new DecimalFormat("0.00");
         final double[] grossRevenue = {0};
+
+        // Getting Selected Item
+        String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
 
         // Get the gross revenue for the selected artist
         comboPayees.setDisable(true);
@@ -693,7 +693,7 @@ public class ControllerRevenueGenerator {
         }
     }
 
-    public void onLoadReportButtonClick() throws SQLException, ClassNotFoundException {
+    public void onLoadReportButtonClick() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Select FUGA Report");
 
