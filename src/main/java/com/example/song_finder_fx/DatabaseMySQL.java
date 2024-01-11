@@ -7,7 +7,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.sqlite.SQLiteException;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -475,63 +474,6 @@ public class DatabaseMySQL {
         return preparedStatement.executeQuery();
     }
 
-    public static ArrayList<String> processPayeeDetails(File file) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
-        CSVReader reader = new CSVReader(new FileReader(file));
-        reader.readNext(); // Skipping the first line
-
-        String[] row;
-        while ((row = reader.readNext()) != null) {
-            String isrc = row[0];
-            String composer = row[10];
-            String lyricist = row[11];
-
-            updatePayeeDetails(isrc, composer, lyricist);
-        }
-
-        return conflictISRCs;
-    }
-
-    private static void updatePayeeDetails(String isrc, String composer, String lyricist) throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
-
-        Boolean composerCeyMusic = searchArtistTable(composer);
-        Boolean lyricistCeyMusic = searchArtistTable(lyricist);
-
-        PreparedStatement ps = db.prepareStatement("INSERT INTO isrc_payees (ISRC, PAYEE, CONTRIBUTOR) " +
-                "VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE PAYEE=?, CONTRIBUTOR=?;");
-
-        boolean status = false;
-
-        if (composerCeyMusic) {
-            ps.setString(1, isrc);
-            ps.setString(2, composer);
-            ps.setString(3, lyricist);
-            ps.setString(4, composer);
-            ps.setString(5, lyricist);
-
-            ps.executeUpdate();
-
-            status = true;
-        }
-
-        if (lyricistCeyMusic) {
-            ps.setString(1, isrc);
-            ps.setString(2, lyricist);
-            ps.setString(3, composer);
-            ps.setString(4, lyricist);
-            ps.setString(5, composer);
-
-            ps.executeUpdate();
-
-            status = true;
-        }
-
-        if (!composerCeyMusic && !lyricistCeyMusic) {
-            conflictISRCs.add(isrc);
-        }
-
-    }
-
     public static void main(String[] args) throws SQLException, ClassNotFoundException, CsvValidationException, IOException {
         double gross = getPayeeGrossRev("Ajantha Ranasinghe");
         System.out.println("gross = " + gross);
@@ -634,6 +576,73 @@ public class DatabaseMySQL {
         alert.setContentText(contentText);
 
         alert.showAndWait();
+    }
+
+    public static void updatePayees(CSVReader reader) throws CsvValidationException, IOException, SQLException, ClassNotFoundException {
+        // Getting Connection
+        Connection conn = getConn();
+        // Skipping the first line
+        reader.readNext();
+        PreparedStatement ps = conn.prepareStatement("INSERT INTO isrc_payees (ISRC, PAYEE, SHARE) " +
+                "VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE PAYEE=?, SHARE=?;");
+
+        String[] row;
+        while ((row = reader.readNext()) != null) {
+            // Assigning Variables
+            String isrc = row[0];
+            String payee01 = row[1];
+            String payee02 = row[3];
+            String payee03 = row[5];
+            int payee01Share;
+            int payee02Share;
+            int payee03Share;
+
+            if (!Objects.equals(row[2], "")) {
+                payee01Share = Integer.parseInt(row[2]);
+            } else {
+                payee01Share = 0;
+            }
+
+            if (!Objects.equals(row[4], "")) {
+                payee02Share = Integer.parseInt(row[4]);
+            } else {
+                payee02Share = 0;
+            }
+
+            if (!Objects.equals(row[6], "")) {
+                payee03Share = Integer.parseInt(row[6]);
+            } else {
+                payee03Share = 0;
+            }
+
+            // Update Payee 01
+            ps.setString(1, isrc);
+            ps.setString(2, payee01);
+            ps.setInt(3, payee01Share);
+            ps.setString(4, payee01);
+            ps.setInt(5, payee01Share);
+            ps.executeUpdate();
+
+            // If Payee 02 is available
+            if (!Objects.equals(payee02, "")) {
+                ps.setString(1, isrc);
+                ps.setString(2, payee02);
+                ps.setInt(3, payee02Share);
+                ps.setString(4, payee02);
+                ps.setInt(5, payee02Share);
+                ps.executeUpdate();
+            }
+
+            // If Payee 03 is available
+            if (!Objects.equals(payee03, "")) {
+                ps.setString(1, isrc);
+                ps.setString(2, payee03);
+                ps.setInt(3, payee03Share);
+                ps.setString(4, payee03);
+                ps.setInt(5, payee03Share);
+                ps.executeUpdate();
+            }
+        }
     }
 
     public List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException, ClassNotFoundException {

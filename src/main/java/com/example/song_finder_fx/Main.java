@@ -30,10 +30,10 @@ public class Main extends Application {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
     }
 
-    public static File browseForFile(Window window) {
+    public static File browseForCSV(Window window) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select CSV");
-        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("TXT files (*.csv)", "*.csv"));
+        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
 
         return fileChooser.showOpenDialog(window);
     }
@@ -135,12 +135,6 @@ public class Main extends Application {
         String directoryTemp = Database.searchForAudioDB();
         selectedDirectory = new File(directoryTemp);
         return directoryTemp;
-    }
-
-    public File browseFile() {
-        FileChooser fileChooser = new FileChooser();
-
-        return fileChooser.showOpenDialog(null);
     }
 
     public static File browseLocation() {

@@ -1,6 +1,8 @@
 package com.example.song_finder_fx;
 
+import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -8,7 +10,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.*;
@@ -22,9 +23,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -34,13 +33,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class ControllerRevenueGenerator {
     //<editor-fold desc="Buttons">
     public Label lblReportProgress;
     public Label lbl_import;
-    public Button btnGenerateFullBreakdown;
     //</editor-fold>
 
     //<editor-fold desc="Labels">
@@ -51,8 +48,6 @@ public class ControllerRevenueGenerator {
     public Label lblIC_Save;
     public Label lblISRC_Check;
     public Label lblGross;
-    public Label lblUpdatePayee;
-    public Label lblUpdateSongsDatabase;
     public Label lblAsset01;
     public Label lblAsset02;
     public Label lblAsset03;
@@ -83,7 +78,6 @@ public class ControllerRevenueGenerator {
     public Label lblAmountDSP03;
     public Label lblAmountDSP04;
     public Label lblTitleMonth;
-    public Label lblPayeeProgress;
     //</editor-fold>
 
     public ImageView imgDSP01;
@@ -93,9 +87,6 @@ public class ControllerRevenueGenerator {
     public ImageView lblIC_Caution;
     public ImageView imgImportCaution;
     public ImageView imgSongDB_Status;
-    public ImageView imgPayeeUpdate;
-    public ScrollPane scrlpneMain;
-    public HBox btnCheckMissingISRCs;
     public VBox vbArtistReports;
     public VBox vboxUpdateSongDB;
     public ComboBox<String> comboPayees;
@@ -119,23 +110,29 @@ public class ControllerRevenueGenerator {
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
         mainUIController.sideVBox.getChildren().setAll(newContentSide);
 
-        Task<Void> task;
+        Thread threadLoadAssets = getThreadLoadAssets(itemSwitcher);
+        threadLoadAssets.start();
+    }
 
-        task = new Task<>() {
+    private Thread getThreadLoadAssets(ItemSwitcher itemSwitcher) {
+        Task<Void> taskLoadAssets;
+
+        taskLoadAssets = new Task<>() {
             @Override
             protected Void call() {
                 Platform.runLater(() -> {
+                    if (InitPreloader.month != null) {
+                        lblTitleMonth.setText(itemSwitcher.setMonth(InitPreloader.month));
+                    }
+
+                    if (InitPreloader.count != null) {
+                        lblTotalAssets.setText(InitPreloader.count);
+                    }
+
                     try {
-                        if (InitPreloader.month != null) {
-                            lblTitleMonth.setText(itemSwitcher.setMonth(InitPreloader.month));
-                        }
                         loadTopStreamedAssets(InitPreloader.top5StreamedAssets);
-                        if (InitPreloader.count != null) {
-                            lblTotalAssets.setText(InitPreloader.count);
-                        }
                         loadTop5Territories(InitPreloader.top5Territories);
                         loadTop4DSPs(InitPreloader.top4DSPs);
-                        // scrlpneMain.setVvalue(0.0);
                     } catch (SQLException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }
@@ -144,8 +141,7 @@ public class ControllerRevenueGenerator {
             }
         };
 
-        Thread t = new Thread(task);
-        t.start();
+        return new Thread(taskLoadAssets);
     }
 
     private void loadTop5Territories(ResultSet rs) throws SQLException, ClassNotFoundException {
@@ -265,35 +261,8 @@ public class ControllerRevenueGenerator {
         }
     }
 
-    public void onLoadReportButtonClick() throws SQLException, ClassNotFoundException, InterruptedException {
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Select FUGA Report");
 
-        File report = chooser.showOpenDialog(mainUIController.mainVBox.getScene().getWindow());
-
-        if (report != null) {
-            lblReportProgress.setText("Working on...");
-            lbl_import.setText("Importing");
-            lbl_import.setStyle("-fx-text-fill: '#000000'");
-            lblReportProgress.setVisible(true);
-            imgImportCaution.setVisible(false);
-
-            Task<Void> taskLoadReport = loadReport(report);
-            Task<Void> taskCheckMissingISRCs = checkMissingISRCs();
-            taskLoadReport.setOnSucceeded(event -> {
-                Thread threadCheckMissingISRCs = new Thread(taskCheckMissingISRCs);
-                threadCheckMissingISRCs.start();
-            });
-
-            Thread threadLoadReport = new Thread(taskLoadReport);
-            threadLoadReport.start();
-
-        } else {
-            System.out.println("No Report Imported");
-        }
-    }
-
-    private Task<Void> checkMissingISRCs() throws SQLException, ClassNotFoundException {
+    private Task<Void> checkMissingISRCs() {
         Task<Void> task;
         task = new Task<>() {
             @Override
@@ -377,6 +346,7 @@ public class ControllerRevenueGenerator {
             Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
         }
     }
+
     public void onGenerateFullBreakdownBtnClick(MouseEvent mouseEvent) {
         Platform.runLater(() -> {
             try {
@@ -543,38 +513,11 @@ public class ControllerRevenueGenerator {
         });
     }
 
-    public void onCheckMissingISRCsBtnClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, IOException {
-        ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
-
-        Path tempDir = Files.createTempDirectory("missing_isrcs");
-        Path csvFile = tempDir.resolve("missing_isrcs.csv");
-        CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
-
-        List<String[]> rows = new ArrayList<>();
-
-        Node node = (Node) mouseEvent.getSource();
-        Scene scene = node.getScene();
-
-        while (resultSet.next() && ((resultSet.getString(2) == null) && (resultSet.getString(3) == null))) {
-            String[] row = new String[]{
-                    resultSet.getString(1)
-            };
-            rows.add(row);
-        }
-
-        csvWriter.writeAll(rows);
-        csvWriter.close();
-
-        showErrorDialogWithLog("Missing ISRCs", rows.size() + " Missing ISRCs", "Click OK to Save List of Missing ISRCs", scene.getWindow(), csvFile);
-
-        System.out.println(rows);
-    }
-
     public void onUpdateSongsDatabaseBtnClick(MouseEvent mouseEvent) {
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
         Window window = scene.getWindow();
-        File file = Main.browseForFile(window);
+        File file = Main.browseForCSV(window);
 
         if (file != null) {
             // System.out.println("Check");
@@ -600,65 +543,8 @@ public class ControllerRevenueGenerator {
                 }
             };
 
-            taskUpdatePayees = new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    ArrayList<String> conflictISRCs = DatabaseMySQL.processPayeeDetails(file);
-                    if (!conflictISRCs.isEmpty()) {
-                        Platform.runLater(() -> {
-                            Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
-                            imgPayeeUpdate.setImage(imgCaution);
-                            imgPayeeUpdate.setVisible(true);
-                            lblPayeeProgress.setVisible(true);
-                            lblPayeeProgress.setText(conflictISRCs.size() + " Conflicts (Click Here to View)");
-                        });
-                    } else {
-                        Platform.runLater(() -> {
-                            Image imgDone = new Image("com/example/song_finder_fx/images/done.png");
-                            imgPayeeUpdate.setImage(imgDone);
-                            imgPayeeUpdate.setVisible(true);
-                        });
-                    }
-
-                    return null;
-                }
-            };
-
-            taskUpdateSongDatabase.setOnSucceeded(event -> {
-                Thread updatePayees = new Thread(taskUpdatePayees);
-                updatePayees.start();
-            });
-
             Thread threadUpdateSongDatabase = new Thread(taskUpdateSongDatabase);
             threadUpdateSongDatabase.start();
-        }
-    }
-
-    private static void showErrorDialogWithLog(String title, String headerText, String contentText, Window window, Path csvFile) throws IOException {
-        // Alert
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-
-        // Dialog
-        Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle(title);
-        dialog.setHeaderText(headerText);
-        dialog.setContentText(contentText);
-
-        ButtonType okButton = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().add(okButton);
-
-        Optional<String> dialogResult = dialog.showAndWait();
-
-        // Optional<ButtonType> result = alert.showAndWait();
-
-        if (dialogResult.isPresent()) {
-            File destination = Main.browseLocationNew(window);
-            Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
-            Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("File copied successfully to " + destinationPath);
         }
     }
 
@@ -785,5 +671,53 @@ public class ControllerRevenueGenerator {
         });
 
         tGrossRevenue.start();
+    }
+
+    public void onUpdatePayeeDetailsBtnClick() {
+        // Browsing for CSV
+        File file = Main.browseForCSV(mainUIController.mainVBox.getScene().getWindow());
+
+        if (file != null) {
+            Task<Void> taskUpdatePayeeList = new Task<>() {
+                @Override
+                protected Void call() throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+                    CSVReader reader = new CSVReader(new FileReader(file.getAbsolutePath()));
+
+                    DatabaseMySQL.updatePayees(reader);
+                    return null;
+                }
+            };
+
+            Thread threadUpdatePayeeList = new Thread(taskUpdatePayeeList);
+            threadUpdatePayeeList.start();
+        }
+    }
+
+    public void onLoadReportButtonClick() throws SQLException, ClassNotFoundException {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select FUGA Report");
+
+        File report = chooser.showOpenDialog(mainUIController.mainVBox.getScene().getWindow());
+
+        if (report != null) {
+            lblReportProgress.setText("Working on...");
+            lbl_import.setText("Importing");
+            lbl_import.setStyle("-fx-text-fill: '#000000'");
+            lblReportProgress.setVisible(true);
+            imgImportCaution.setVisible(false);
+
+            Task<Void> taskLoadReport = loadReport(report);
+            Task<Void> taskCheckMissingISRCs = checkMissingISRCs();
+            taskLoadReport.setOnSucceeded(event -> {
+                Thread threadCheckMissingISRCs = new Thread(taskCheckMissingISRCs);
+                threadCheckMissingISRCs.start();
+            });
+
+            Thread threadLoadReport = new Thread(taskLoadReport);
+            threadLoadReport.start();
+
+        } else {
+            System.out.println("No Report Imported");
+        }
     }
 }

@@ -452,25 +452,27 @@ public class UIController {
         chooser.setTitle("Select a directory");
         destination = chooser.showDialog(btnCopyTo.getScene().getWindow());
 
-        if (Main.selectedDirectory.exists()) { // check if the directory exists
-            if (Main.selectedDirectory.isDirectory()) { // check if the directory is a directory
-                if (Main.selectedDirectory.canWrite()) { // check if the directory is writable
-                    System.out.println("The directory is accessible and writable.");
-                    Task<Void> task = threadToCopyFile(start, isrc, scene);
+        if (destination != null) {
+            if (Main.selectedDirectory.exists()) { // check if the directory exists
+                if (Main.selectedDirectory.isDirectory()) { // check if the directory is a directory
+                    if (Main.selectedDirectory.canWrite()) { // check if the directory is writable
+                        System.out.println("The directory is accessible and writable.");
+                        Task<Void> task = threadToCopyFile(start, isrc, scene);
 
-                    Thread t = new Thread(task);
-                    t.start();
+                        Thread t = new Thread(task);
+                        t.start();
 
-                    Platform.runLater(() -> {
+                        Platform.runLater(() -> {
+                            Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
+                            btnCopyTo.setDisable(true);
+                            btnCopyTo.setText("Searching");
+                        });
+                    } else {
+                        System.out.println("The directory is accessible but not writable.");
                         Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
-                        btnCopyTo.setDisable(true);
-                        btnCopyTo.setText("Searching");
-                    });
-                } else {
-                    System.out.println("The directory is accessible but not writable.");
-                    Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
-                    btnCopyTo.setText("Cannot copy to selected destination");
-                    btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
+                        btnCopyTo.setText("Cannot copy to selected destination");
+                        btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
+                    }
                 }
             }
         }
@@ -810,7 +812,7 @@ public class UIController {
         if (con != null) {
             nb.displayTrayInfo("Database Connected", "Database Connection Success");
         } else {
-            nb.displayTrayError("Error", "Error connecting database");
+            NotificationBuilder.displayTrayError("Error", "Error connecting database");
         }
     }
 
@@ -874,12 +876,12 @@ public class UIController {
 
             try {
                 if (listSize > 1) {
-                    String text = songList.get(0) + " + " + (listSize - 1) + " other songs added";
+                    String text = songList.getFirst() + " + " + (listSize - 1) + " other songs added";
                     songListButtonSubtitle.setText(text);
                     System.out.println(text);
                 } else {
-                    songListButtonSubtitle.setText(songList.get(0));
-                    System.out.println(songList.get(0));
+                    songListButtonSubtitle.setText(songList.getFirst());
+                    System.out.println(songList.getFirst());
                 }
             } catch (Exception e) {
                 songListButtonSubtitle.setText("Click Here to Add Songs");
@@ -1224,7 +1226,7 @@ public class UIController {
     }
     //</editor-fold>
 
-    public void onArtistReportsBtnClick(MouseEvent mouseEvent) throws IOException, SQLException, ClassNotFoundException {
+    public void onArtistReportsBtnClick() throws IOException {
         changeSelectorTo(rctArtistReports);
         ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
         revenueGenerator.loadArtistReports();
