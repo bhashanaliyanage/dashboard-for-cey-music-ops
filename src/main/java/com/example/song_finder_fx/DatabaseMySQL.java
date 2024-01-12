@@ -474,23 +474,28 @@ public class DatabaseMySQL {
     }
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException, CsvValidationException, IOException {
-        double gross = getPayeeGrossRev("Ajantha Ranasinghe");
+        ArrayList<Double> gross = getPayeeGrossRev("Ajantha Ranasinghe");
         System.out.println("gross = " + gross);
     }
 
-    static double getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
+    static ArrayList<Double> getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
         Connection connection = DatabaseMySQL.getConn();
+        ArrayList<Double> royalty = new ArrayList<>();
 
-        PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, (((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY " +
+        PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +
+                "(((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY, " +
+                "((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1 AS PARTNER_SHARE " +
                 "FROM `report` " +
                 "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
-                "GROUP BY Asset_ISRC " +
-                "ORDER BY `REPORTED_ROYALTY` DESC");
+                "ORDER BY `REPORTED_ROYALTY` DESC;");
         psGetGross.setString(1, artistName);
         ResultSet rsGross = psGetGross.executeQuery();
         rsGross.next();
 
-        return rsGross.getDouble(2);
+        royalty.add(rsGross.getDouble(2));
+        royalty.add(rsGross.getDouble(3));
+
+        return royalty;
     }
 
     public static void searchAndCopySongs(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {

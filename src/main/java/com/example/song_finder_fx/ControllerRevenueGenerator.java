@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -48,6 +49,9 @@ public class ControllerRevenueGenerator {
     public Label lblIC_Save;
     public Label lblISRC_Check;
     public Label lblGross;
+    public Label lblP_Share;
+    public Label lblTax;
+    public Label lblAmtPayable;
     public Label lblAsset01;
     public Label lblAsset02;
     public Label lblAsset03;
@@ -90,6 +94,7 @@ public class ControllerRevenueGenerator {
     public VBox vbArtistReports;
     public VBox vboxUpdateSongDB;
     public ComboBox<String> comboPayees;
+    public TextField txtRate;
     private final UIController mainUIController;
     private final Path tempDir = Files.createTempDirectory("missing_isrcs");
     private final Path csvFile = tempDir.resolve("missing_isrcs.csv");
@@ -645,8 +650,8 @@ public class ControllerRevenueGenerator {
     }
 
     public void comboPayeeOnAction() {
-        DecimalFormat df = new DecimalFormat("0.00");
-        final double[] grossRevenue = {0};
+        /*DecimalFormat df = new DecimalFormat("0.00");
+        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
 
         // Getting Selected Item
         String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
@@ -654,23 +659,99 @@ public class ControllerRevenueGenerator {
         // Get the gross revenue for the selected artist
         comboPayees.setDisable(true);
         lblGross.setText("Loading...");
+        lblP_Share.setText("Loading...");
 
         Thread tGrossRevenue = new Thread(() -> {
             try {
-                grossRevenue[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
+                royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
+
             } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            // System.out.println("value = " + value);
-            String formattedGrossRevenue = df.format(grossRevenue[0]);
+
+            String formattedGrossRevenue = df.format(royalty[0].getFirst());
+            String formattedPartnerShare = df.format(royalty[0].get(1));
 
             Platform.runLater(() -> {
                 lblGross.setText("EUR " + formattedGrossRevenue);
+                lblP_Share.setText("EUR " + formattedPartnerShare);
                 comboPayees.setDisable(false);
             });
         });
 
-        tGrossRevenue.start();
+        tGrossRevenue.start();*/
+    }
+
+    public void onLoadReportBtnClick() {
+        String userInputRate = txtRate.getText();
+        double doubleConvertedRate;
+        String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
+
+        if (!Objects.equals(selectedItem, null)) {
+            comboPayees.setStyle("-fx-border-color: '#e9ebee';");
+
+            if (userInputRate.matches("\\d+(\\.\\d+)?")) {
+                // When user input is only numbers
+                txtRate.setStyle("-fx-border-color: '#e9ebee';");
+                lblGross.setText("Loading...");
+                lblP_Share.setText("Loading...");
+                lblTax.setText("Loading...");
+                lblAmtPayable.setText("Loading...");
+
+                doubleConvertedRate = Double.parseDouble(userInputRate);
+                Thread threadGrossRevenue = getThreadGrossRevenue(selectedItem, doubleConvertedRate);
+                threadGrossRevenue.start();
+            } else {
+                // When User Input Contains Texts
+                txtRate.setStyle("-fx-border-color: red;");
+            }
+        } else {
+            // If no Payee Selected
+            comboPayees.setStyle("-fx-border-color: red;");
+        }
+    }
+
+    private Thread getThreadGrossRevenue(String selectedItem, double rate) {
+        DecimalFormat df = new DecimalFormat("0.00");
+        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
+        final double[] tax = {0};
+        final double[] amountPayable = new double[1];
+
+        return new Thread(() -> {
+            try {
+                royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
+
+            } catch (SQLException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
+            double grossRevenueInLKR = royalty[0].getFirst() * rate;
+            double partnerShareInLKR = royalty[0].get(1) * rate;
+
+            /*{
+                // This is a temporary block
+                grossRevenueInLKR = 120000.00;
+            }*/
+
+            if (grossRevenueInLKR > 100000.00) {
+                tax[0] = grossRevenueInLKR * 0.14;
+            }
+
+            amountPayable[0] = grossRevenueInLKR - tax[0];
+
+            String formattedGrossRevenue = df.format(grossRevenueInLKR);
+            String formattedPartnerShare = df.format(partnerShareInLKR);
+            String formattedTax = df.format(tax[0]);
+            String formattedAmountPayable = df.format(amountPayable[0]);
+
+
+            Platform.runLater(() -> {
+                lblGross.setText("LKR " + formattedGrossRevenue);
+                lblP_Share.setText("LKR " + formattedPartnerShare);
+                lblTax.setText("LKR " + formattedTax);
+                lblAmtPayable.setText("LKR " + formattedAmountPayable);
+            });
+        });
     }
 
     public void onUpdatePayeeDetailsBtnClick() {
