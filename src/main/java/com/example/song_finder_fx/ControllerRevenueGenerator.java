@@ -42,6 +42,16 @@ public class ControllerRevenueGenerator {
     //</editor-fold>
 
     //<editor-fold desc="Labels">
+    public Label lblWriter01;
+    public Label lblWriter02;
+    public Label lblWriter03;
+    public Label lblWriter04;
+    public Label lblWriter05;
+    public Label lblWriter01Streams;
+    public Label lblWriter02Streams;
+    public Label lblWriter03Streams;
+    public Label lblWriter04Streams;
+    public Label lblWriter05Streams;
     public Label lblSongDB_Update;
     public Label lblSongDB_Progress;
     public Label lblCountMissingISRCs;
@@ -743,17 +753,66 @@ public class ControllerRevenueGenerator {
                     }
                 };
 
-                Task<Void> taskCoWriterShare;
-                /*SELECT `isrc_payees`.`PAYEE`,
-                ((((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY
-                FROM `isrc_payees`
-                JOIN `report` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC`
-                WHERE `isrc_payees`.`ISRC` IN (
-                        SELECT ISRC
-                        FROM isrc_payees
-                        WHERE PAYEE = 'Sarath De Alwis'
-                ) AND `isrc_payees`.`PAYEE` != 'Sarath De Alwis'
-                GROUP BY `report`.`Asset_ISRC`;*/
+                Task<Void> taskCoWriterShare = new Task<>() {
+                    @Override
+                    protected Void call() throws SQLException, ClassNotFoundException {
+                        Platform.runLater(() -> {
+                            lblWriter01.setText("-");
+                            lblWriter02.setText("-");
+                            lblWriter03.setText("-");
+                            lblWriter04.setText("-");
+                            lblWriter05.setText("-");
+                            lblWriter01Streams.setText("-");
+                            lblWriter02Streams.setText("-");
+                            lblWriter03Streams.setText("-");
+                            lblWriter04Streams.setText("-");
+                            lblWriter05Streams.setText("-");
+                        });
+
+                        ResultSet rsCoWriterShares = DatabaseMySQL.getCoWriterShares(selectedItem);
+                        int count = 0;
+
+                        while (rsCoWriterShares.next()) {
+                            count++;
+                            String artist = rsCoWriterShares.getString(1);
+                            double share = rsCoWriterShares.getDouble(2) * doubleConvertedRate;
+
+                            if (count == 1) {
+                                Platform.runLater(() -> {
+                                    lblWriter01.setText(artist);
+                                    lblWriter01Streams.setText(df.format(share));
+                                });
+                            } else if (count == 2) {
+                                Platform.runLater(() -> {
+                                    lblWriter02.setText(artist);
+                                    lblWriter02Streams.setText(df.format(share));
+                                });
+                            } else if (count == 3) {
+                                Platform.runLater(() -> {
+                                    lblWriter03.setText(artist);
+                                    lblWriter03Streams.setText(df.format(share));
+                                });
+                            } else if (count == 4) {
+                                Platform.runLater(() -> {
+                                    lblWriter04.setText(artist);
+                                    lblWriter04Streams.setText(df.format(share));
+                                });
+                            } else if (count == 5) {
+                                Platform.runLater(() -> {
+                                    lblWriter05.setText(artist);
+                                    lblWriter05Streams.setText(df.format(share));
+                                });
+                            }
+                        }
+
+                        return null;
+                    }
+                };
+
+                taskGrossRevenue.setOnSucceeded(event -> {
+                    Thread threadCoWriterShare = new Thread(taskCoWriterShare);
+                    threadCoWriterShare.start();
+                });
 
                 Thread threadGrossRevenue = new Thread(taskGrossRevenue);
                 threadGrossRevenue.start();

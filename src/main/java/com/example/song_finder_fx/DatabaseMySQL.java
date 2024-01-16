@@ -498,6 +498,23 @@ public class DatabaseMySQL {
         return royalty;
     }
 
+    public static ResultSet getCoWriterShares(String artistName) throws SQLException, ClassNotFoundException {
+        Connection connection = DatabaseMySQL.getConn();
+
+        PreparedStatement psGetCoWriterShare = connection.prepareStatement("SELECT `isrc_payees`.`PAYEE`, " +
+                "((((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY " +
+                "FROM `isrc_payees` " +
+                "JOIN `report` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC` " +
+                "WHERE `isrc_payees`.`ISRC` IN (SELECT ISRC FROM isrc_payees WHERE PAYEE = ?) AND `isrc_payees`.`PAYEE` != ? " +
+                "GROUP BY `report`.`Asset_ISRC`" +
+                "LIMIT 5;");
+
+        psGetCoWriterShare.setString(1, artistName);
+        psGetCoWriterShare.setString(2, artistName);
+
+        return psGetCoWriterShare.executeQuery();
+    }
+
     public static void searchAndCopySongs(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
         ResultSet rs;
