@@ -686,6 +686,10 @@ public class ControllerRevenueGenerator {
         String userInputRate = txtRate.getText();
         double doubleConvertedRate;
         String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
+        DecimalFormat df = new DecimalFormat("0.00");
+        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
+        final double[] tax = {0};
+        final double[] amountPayable = new double[1];
 
         if (!Objects.equals(selectedItem, null)) {
             comboPayees.setStyle("-fx-border-color: '#e9ebee';");
@@ -699,7 +703,59 @@ public class ControllerRevenueGenerator {
                 lblAmtPayable.setText("Loading...");
 
                 doubleConvertedRate = Double.parseDouble(userInputRate);
-                Thread threadGrossRevenue = getThreadGrossRevenue(selectedItem, doubleConvertedRate);
+                Task<Void> taskGrossRevenue = new Task<>() {
+                    @Override
+                    protected Void call() {
+                        try {
+                            royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
+
+                        } catch (SQLException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        double grossRevenueInLKR = royalty[0].getFirst() * doubleConvertedRate;
+                        double partnerShareInLKR = royalty[0].get(1) * doubleConvertedRate;
+
+                        /*{
+                            // This is a temporary block
+                            grossRevenueInLKR = 120000.00;
+                        }*/
+
+                        if (grossRevenueInLKR > 100000.00) {
+                            tax[0] = grossRevenueInLKR * 0.14;
+                        }
+
+                        amountPayable[0] = grossRevenueInLKR - tax[0];
+
+                        String formattedGrossRevenue = df.format(grossRevenueInLKR);
+                        String formattedPartnerShare = df.format(partnerShareInLKR);
+                        String formattedTax = df.format(tax[0]);
+                        String formattedAmountPayable = df.format(amountPayable[0]);
+
+
+                        Platform.runLater(() -> {
+                            lblGross.setText("LKR " + formattedGrossRevenue);
+                            lblP_Share.setText("LKR " + formattedPartnerShare);
+                            lblTax.setText("LKR " + formattedTax);
+                            lblAmtPayable.setText("LKR " + formattedAmountPayable);
+                        });
+                        return null;
+                    }
+                };
+
+                Task<Void> taskCoWriterShare;
+                /*SELECT `isrc_payees`.`PAYEE`,
+                ((((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY
+                FROM `isrc_payees`
+                JOIN `report` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC`
+                WHERE `isrc_payees`.`ISRC` IN (
+                        SELECT ISRC
+                        FROM isrc_payees
+                        WHERE PAYEE = 'Sarath De Alwis'
+                ) AND `isrc_payees`.`PAYEE` != 'Sarath De Alwis'
+                GROUP BY `report`.`Asset_ISRC`;*/
+
+                Thread threadGrossRevenue = new Thread(taskGrossRevenue);
                 threadGrossRevenue.start();
             } else {
                 // When User Input Contains Texts
@@ -709,49 +765,6 @@ public class ControllerRevenueGenerator {
             // If no Payee Selected
             comboPayees.setStyle("-fx-border-color: red;");
         }
-    }
-
-    private Thread getThreadGrossRevenue(String selectedItem, double rate) {
-        DecimalFormat df = new DecimalFormat("0.00");
-        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
-        final double[] tax = {0};
-        final double[] amountPayable = new double[1];
-
-        return new Thread(() -> {
-            try {
-                royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
-
-            } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-
-            double grossRevenueInLKR = royalty[0].getFirst() * rate;
-            double partnerShareInLKR = royalty[0].get(1) * rate;
-
-            /*{
-                // This is a temporary block
-                grossRevenueInLKR = 120000.00;
-            }*/
-
-            if (grossRevenueInLKR > 100000.00) {
-                tax[0] = grossRevenueInLKR * 0.14;
-            }
-
-            amountPayable[0] = grossRevenueInLKR - tax[0];
-
-            String formattedGrossRevenue = df.format(grossRevenueInLKR);
-            String formattedPartnerShare = df.format(partnerShareInLKR);
-            String formattedTax = df.format(tax[0]);
-            String formattedAmountPayable = df.format(amountPayable[0]);
-
-
-            Platform.runLater(() -> {
-                lblGross.setText("LKR " + formattedGrossRevenue);
-                lblP_Share.setText("LKR " + formattedPartnerShare);
-                lblTax.setText("LKR " + formattedTax);
-                lblAmtPayable.setText("LKR " + formattedAmountPayable);
-            });
-        });
     }
 
     public void onUpdatePayeeDetailsBtnClick() {
