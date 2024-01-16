@@ -706,11 +706,7 @@ public class ControllerRevenueGenerator {
 
             if (userInputRate.matches("\\d+(\\.\\d+)?")) {
                 // When user input is only numbers
-                txtRate.setStyle("-fx-border-color: '#e9ebee';");
-                lblGross.setText("Loading...");
-                lblP_Share.setText("Loading...");
-                lblTax.setText("Loading...");
-                lblAmtPayable.setText("Loading...");
+                initializeArtistReportUILabels();
 
                 doubleConvertedRate = Double.parseDouble(userInputRate);
                 Task<Void> taskGrossRevenue = new Task<>() {
@@ -824,6 +820,14 @@ public class ControllerRevenueGenerator {
             // If no Payee Selected
             comboPayees.setStyle("-fx-border-color: red;");
         }
+    }
+
+    private void initializeArtistReportUILabels() {
+        txtRate.setStyle("-fx-border-color: '#e9ebee';");
+        lblGross.setText("Loading...");
+        lblP_Share.setText("Loading...");
+        lblTax.setText("Loading...");
+        lblAmtPayable.setText("Loading...");
     }
 
     public void onUpdatePayeeDetailsBtnClick() {
