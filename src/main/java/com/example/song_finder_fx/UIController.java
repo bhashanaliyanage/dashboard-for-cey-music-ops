@@ -529,13 +529,18 @@ public class UIController {
         Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
 
         Main.directoryCheck();
+        Songs sng = new Songs();
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
 
         Label lblISRC = (Label) scene.lookup("#songISRC");
+
         Label lblSongName = (Label) scene.lookup("#songName");
+
         Label lblArtist = (Label) scene.lookup("#songSinger");
+        sng.setSongName(lblSongName.getText());
+        sng.setSinger(lblArtist.getText());
         Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
         Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
         ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
@@ -572,7 +577,7 @@ public class UIController {
             }
         };
 
-        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist, imgMediaPico));
+        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist, imgMediaPico,sng));
 
         new Thread(task).start();
     }
@@ -698,9 +703,9 @@ public class UIController {
             for (int i = 0; i < nodes.length; i++) {
                 try {
                     nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
-                    Label lblSongName = (Label) nodes[i].lookup("#searchResultSongName");
+                    Label lblSongName = (Label) nodes[i].lookup("#songName");
                     Label lblISRC = (Label) nodes[i].lookup("#searchResultISRC");
-                    Label lblArtist = (Label) nodes[i].lookup("#searchResultArtist");
+                    Label lblArtist = (Label) nodes[i].lookup("#songSinger");
                     Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
                     Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
                     lblSongName.setText(songList.get(i).getSongName());
@@ -890,6 +895,7 @@ public class UIController {
     }
 
     public void onPlaySongClicked(MouseEvent mouseEvent) {
+        System.out.println("Test");
         Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
 
         Main.directoryCheck();
@@ -903,9 +909,11 @@ public class UIController {
 
         String isrc = srchRsISRC.getText();
 
-        System.out.println("Song Name: " + srchRsSongName.getText());
-        System.out.println("ISRC: " + isrc);
-        System.out.println("Artist: " + srchRsArtist.getText());
+        Platform.runLater(() -> {
+            System.out.println("Song Name: " + srchRsSongName.getText());
+            System.out.println("ISRC: " + isrc);
+            System.out.println("Artist: " + srchRsArtist.getText());
+        });
 
         Task<Void> task;
         Path start = Paths.get(Main.selectedDirectory.toURI());
@@ -927,22 +935,28 @@ public class UIController {
             }
         };
 
-        task.setOnSucceeded(event -> UIController.setPlayerInfo(status, lblPlayerSongName, srchRsSongName, lblPlayerArtist, srchRsArtist, imgMediaPico));
+        Songs song = new Songs();
+
+        task.setOnSucceeded(event -> UIController.setPlayerInfo(status, lblPlayerSongName, srchRsSongName, lblPlayerArtist, srchRsArtist, imgMediaPico, song));
 
         new Thread(task).start();
     }
     //</editor-fold>
 
     //<editor-fold desc="Music Player Stuff">
-    public static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico) {
+    public static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico, Songs sng) {
         Image pauseImg = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
         Image imgPlay = new Image("com/example/song_finder_fx/images/icon _play circle_.png");
 
         if (status[0]) {
             imgMediaPico.setImage(pauseImg);
             lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-            lblPlayerSongName.setText(lblSongName.getText());
-            lblPlayerArtist.setText(lblArtist.getText());
+            Platform.runLater(() -> {
+                System.out.println("lblSongName = " + lblSongName.getText());
+            });
+            // lblPlayerSongName.setText(lblSongName.getText());
+            lblPlayerSongName.setText(sng.getSongName());
+            lblPlayerArtist.setText(sng.getSinger());
         } else {
             imgMediaPico.setImage(imgPlay);
             lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");

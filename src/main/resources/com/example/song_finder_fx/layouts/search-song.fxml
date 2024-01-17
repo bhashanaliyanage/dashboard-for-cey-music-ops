@@ -22,7 +22,7 @@
                 <HBox.margin>
                     <Insets left="10.0" />
                 </HBox.margin>
-                <Label fx:id="searchResultSongName" text="Song Name">
+                <Label fx:id="songName" text="Song Name">
                     <font>
                         <Font name="Segoe UI Semibold" size="14.0" />
                     </font>
@@ -33,38 +33,34 @@
                     </VBox.margin>
                     <Label fx:id="searchResultISRC" minWidth="85.0" text="LKA0W2280301" textFill="#656565" />
                     <Label layoutX="10.0" layoutY="10.0" minWidth="10.0" text=" | " textFill="#656565" />
-                    <Label fx:id="searchResultArtist" layoutX="10.0" layoutY="10.0" prefWidth="292.0" text="Damayanthi Jayasuriya | Nuwan Nayanajith" textFill="#656565">
+                    <Label fx:id="songSinger" layoutX="10.0" layoutY="10.0" prefWidth="292.0" text="Damayanthi Jayasuriya | Nuwan Nayanajith" textFill="#656565">
                         <font>
                             <Font name="Segoe UI Semibold" size="12.0" />
                         </font>
                     </Label>
                 </HBox>
-            <HBox layoutX="10.0" layoutY="49.0">
-               <children>
-                  <ImageView fitHeight="18.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                     <HBox.margin>
-                        <Insets right="5.0" />
-                     </HBox.margin>
-                     <image>
-                        <Image url="@../images/music-note%201.png" />
-                     </image>
-                  </ImageView>
-                  <Label fx:id="searchResultComposer" text="Composer" textFill="#656565" />
-                  <Label layoutX="10.0" layoutY="10.0" minWidth="10.0" text=" | " textFill="#656565" />
-                  <ImageView fitHeight="18.0" fitWidth="16.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/pencil%201.png" />
-                     </image>
-                     <HBox.margin>
-                        <Insets right="5.0" />
-                     </HBox.margin>
-                  </ImageView>
-                  <Label fx:id="searchResultLyricist" layoutX="10.0" layoutY="10.0" text="Lyricist" textFill="#656565" />
-               </children>
-               <VBox.margin>
-                  <Insets top="5.0" />
-               </VBox.margin>
-            </HBox>
+                <HBox layoutX="10.0" layoutY="49.0">
+                    <VBox.margin>
+                        <Insets top="5.0"/>
+                    </VBox.margin>
+                    <ImageView fitHeight="18.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets right="5.0"/>
+                        </HBox.margin>
+                        <Image url="@../images/music-note%201.png"/>
+                    </ImageView>
+                    <Label fx:id="searchResultComposer" text="Composer" textFill="#656565"/>
+                    <Label layoutX="10.0" layoutY="10.0" minWidth="10.0" text=" | " textFill="#656565"/>
+                    <ImageView fitHeight="18.0" fitWidth="16.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true"
+                               preserveRatio="true">
+                        <HBox.margin>
+                            <Insets right="5.0"/>
+                        </HBox.margin>
+                        <Image url="@../images/pencil%201.png"/>
+                    </ImageView>
+                    <Label fx:id="searchResultLyricist" layoutX="10.0" layoutY="10.0" text="Lyricist"
+                           textFill="#656565"/>
+                </HBox>
             </VBox>
         </HBox>
         <HBox alignment="CENTER_RIGHT">

@@ -13,9 +13,10 @@ public class Songs {
     private String composer;
     private String lyricist;
     private String fileName;
-    private String primaryArtist;
-    private String albumFormat;
-    private String trackVersion;
+
+    public void setSongName(String songName) {
+        this.songName = songName;
+    }
 
     public Songs() {
     }
@@ -44,6 +45,10 @@ public class Songs {
         this.composer = Composer;
         this.lyricist = lyricist;
         this.fileName = fileName;
+    }
+
+    public void setIsrc(String isrc) {
+        this.isrc = isrc;
     }
 
     public List<String> getSongDetails() {
@@ -80,5 +85,9 @@ public class Songs {
 
     public String getLyricist() {
         return lyricist;
+    }
+
+    public void setSinger(String text) {
+        this.singer = text;
     }
 }

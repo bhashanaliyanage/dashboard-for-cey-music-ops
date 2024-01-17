@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -714,23 +715,23 @@ public class ControllerRevenueGenerator {
                     protected Void call() {
                         try {
                             royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
-
                         } catch (SQLException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setHeaderText("An error occurred");
+                            alert.setContentText(String.valueOf(e));
+                            Platform.runLater(alert::showAndWait);
                         }
 
+                        // Converting to LKR
                         double grossRevenueInLKR = royalty[0].getFirst() * doubleConvertedRate;
                         double partnerShareInLKR = royalty[0].get(1) * doubleConvertedRate;
-
-                        /*{
-                            // This is a temporary block
-                            grossRevenueInLKR = 120000.00;
-                        }*/
 
                         if (grossRevenueInLKR > 100000.00) {
                             tax[0] = grossRevenueInLKR * 0.14;
                         }
 
+                        // Calculating amount payable
                         amountPayable[0] = grossRevenueInLKR - tax[0];
 
                         String formattedGrossRevenue = df.format(grossRevenueInLKR);
@@ -738,7 +739,7 @@ public class ControllerRevenueGenerator {
                         String formattedTax = df.format(tax[0]);
                         String formattedAmountPayable = df.format(amountPayable[0]);
 
-
+                        // Update UI
                         Platform.runLater(() -> {
                             lblGross.setText("LKR " + formattedGrossRevenue);
                             lblP_Share.setText("LKR " + formattedPartnerShare);
@@ -752,23 +753,14 @@ public class ControllerRevenueGenerator {
                 Task<Void> taskCoWriterShare = new Task<>() {
                     @Override
                     protected Void call() throws SQLException, ClassNotFoundException {
-                        Platform.runLater(() -> {
-                            lblWriter01.setText("-");
-                            lblWriter02.setText("-");
-                            lblWriter03.setText("-");
-                            lblWriter04.setText("-");
-                            lblWriter05.setText("-");
-                            lblWriter01Streams.setText("-");
-                            lblWriter02Streams.setText("-");
-                            lblWriter03Streams.setText("-");
-                            lblWriter04Streams.setText("-");
-                            lblWriter05Streams.setText("-");
-                        });
+                        // Initialize UI Labels
+                        Platform.runLater(this::initializeArtistReportUI_Labels);
 
+                        // Get the co-writer name and share in EUR from the database
                         ResultSet rsCoWriterShares = DatabaseMySQL.getCoWriterShares(selectedItem);
                         int count = 0;
 
-                        while (rsCoWriterShares.next()) {
+                        while (rsCoWriterShares.next()) { // Looping through writer 01 - 05
                             count++;
                             String artist = rsCoWriterShares.getString(1);
                             double share = rsCoWriterShares.getDouble(2) * doubleConvertedRate;
@@ -801,6 +793,27 @@ public class ControllerRevenueGenerator {
                             }
                         }
 
+                        return null;
+                    }
+
+                    private void initializeArtistReportUI_Labels() {
+                        lblWriter01.setText("-");
+                        lblWriter02.setText("-");
+                        lblWriter03.setText("-");
+                        lblWriter04.setText("-");
+                        lblWriter05.setText("-");
+                        lblWriter01Streams.setText("-");
+                        lblWriter02Streams.setText("-");
+                        lblWriter03Streams.setText("-");
+                        lblWriter04Streams.setText("-");
+                        lblWriter05Streams.setText("-");
+                    }
+                };
+
+                Task<Void> taskTopPerformingSongs = new Task<>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        ResultSet rsTopPerformingSongs = DatabaseMySQL.getTopPerformingSongs(selectedItem);
                         return null;
                     }
                 };
