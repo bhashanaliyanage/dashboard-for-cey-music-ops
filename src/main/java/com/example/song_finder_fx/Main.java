@@ -45,7 +45,7 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws IOException, InterruptedException {
+    public void start(Stage stage) {
         Main.primaryStage = stage;
     }
 
@@ -189,4 +189,4 @@ public class Main extends Application {
 // TODO: Missing ISRC > Song Database Update
 // TODO: Search Song Database and Assign Payees
 // TODO: Give a list of Missing Payees
-//  TODO: Update Payees (Manual Process)
+// TODO: Update Payees (Manual Process)

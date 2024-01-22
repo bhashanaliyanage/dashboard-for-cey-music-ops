@@ -111,7 +111,6 @@ public class UIController {
     public Label songAlbumNameCopied;
     public Label songName;
     public Label lblSearchType;
-    public Label searchResultSongName;
     public Label searchResultISRC;
     public Label songFeaturing;
     public Label songFeaturingCopied;
@@ -577,7 +576,7 @@ public class UIController {
             }
         };
 
-        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist, imgMediaPico,sng));
+        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, imgMediaPico, sng));
 
         new Thread(task).start();
     }
@@ -937,26 +936,23 @@ public class UIController {
 
         Songs song = new Songs();
 
-        task.setOnSucceeded(event -> UIController.setPlayerInfo(status, lblPlayerSongName, srchRsSongName, lblPlayerArtist, srchRsArtist, imgMediaPico, song));
+        task.setOnSucceeded(event -> UIController.setPlayerInfo(status, lblPlayerSongName, srchRsSongName, lblPlayerArtist, imgMediaPico, song));
 
         new Thread(task).start();
     }
     //</editor-fold>
 
     //<editor-fold desc="Music Player Stuff">
-    public static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico, Songs sng) {
+    public static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, ImageView imgMediaPico, Songs sng) {
         Image pauseImg = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
         Image imgPlay = new Image("com/example/song_finder_fx/images/icon _play circle_.png");
 
         if (status[0]) {
             imgMediaPico.setImage(pauseImg);
             lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-            Platform.runLater(() -> {
-                System.out.println("lblSongName = " + lblSongName.getText());
-            });
-            // lblPlayerSongName.setText(lblSongName.getText());
             lblPlayerSongName.setText(sng.getSongName());
             lblPlayerArtist.setText(sng.getSinger());
+            // Platform.runLater(() -> System.out.println("lblSongName = " + lblSongName.getText()));
         } else {
             imgMediaPico.setImage(imgPlay);
             lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
