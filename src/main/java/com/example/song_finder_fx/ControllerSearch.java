@@ -6,12 +6,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -21,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
@@ -124,7 +121,7 @@ public class ControllerSearch {
         thread.start();
     }
 
-    public void getText(KeyEvent keyEvent) {
+    /*public void getText(KeyEvent keyEvent) {
         // Getting search keywords
         String text = searchArea.getText();
 
@@ -137,7 +134,7 @@ public class ControllerSearch {
         Task<java.util.List<Songs>> task = new Task<>() {
             @Override
             protected java.util.List<Songs> call() throws Exception {
-                return db.searchSongDetailsBySongName(text);
+                return db.searchSongDetailsBySearchType(text, searchType);
             }
         };
 
@@ -163,7 +160,7 @@ public class ControllerSearch {
 
         Thread thread = new Thread(task);
         thread.start();
-    }
+    }*/
 
     public void onBtnPlayClicked(MouseEvent mouseEvent) {
         Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");

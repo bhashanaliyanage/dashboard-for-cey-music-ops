@@ -1,6 +1,9 @@
 package com.example.song_finder_fx;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,10 +19,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.DirectoryChooser;
+import javafx.util.Duration;
 
 import javax.sound.sampled.Clip;
 import java.awt.*;
@@ -30,7 +35,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -40,39 +44,265 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class UIController {
+    public VBox sideVBox;
+    private String searchType = "TRACK_TITLE";
+    private final NotificationBuilder nb = new NotificationBuilder();
+
+    //<editor-fold desc="Variables">
+    //<editor-fold desc="TextArea">
     public TextArea textArea;
+    //</editor-fold>
+
+    //<editor-fold desc="Button">
     public Button btnDestination;
     @FXML
     public Button btnProceed;
+    public Button btnOpenLocation;
+    public Button btnCopyTo;
+    public Button btnAudioDatabase;
+    //</editor-fold>
+
+    //<editor-fold desc="ImageView">
+    public ImageView btnPercentageChange;
     public ImageView ProgressView;
+    public ImageView imgMediaPico;
+    public ImageView imgDeleteSong;
+    public ImageView imgPlaySong;
+    //</editor-fold>
+
+    //<editor-fold desc="HBox">
+    public HBox hboxInvoiceSong;
+    public HBox btnSeachSongs;
+    public HBox btnCollectSongs;
+    public HBox btnRevenueAnalysis;
     public HBox searchAndCollect;
     public HBox searchAndCollect1;
+    //</editor-fold>
+
+    //<editor-fold desc="VBox">
     public VBox textAreaVbox;
     public VBox mainVBox;
     @FXML
     public VBox vboxSong;
     public VBox btnDatabaseCheck;
+    public VBox vBoxInSearchSong;
+    //</editor-fold>
+
+    //<editor-fold desc="Label">
+    public Label songShare;
     public Label lblDatabaseStatus;
-    static File directory;
-    public TextField searchArea;
-    public ScrollPane scrlpneSong;
     public Label srchRsArtist;
     public Label lblPlayerSongName;
-    public ImageView imgMediaPico;
     public Label lblPlayerSongArtst;
     public Label lblSongListSub;
     public Label srchRsSongName;
     public Label srchRsISRC;
-    public ImageView imgDeleteSong;
-    public ImageView imgPlaySong;
-    File destination;
-    public Button btnAudioDatabase;
+    public Label songProductName;
+    public Label songUPC;
+    public Label songLyricist;
+    public Label songComposer;
+    public Label songSinger;
+    public Label songISRC;
+    public Label songISRCCopied;
+    public Label songSingerCopied;
+    public Label songComposerCopied;
+    public Label songLyricistCopied;
+    public Label songUPCCopied;
+    public Label songAlbumNameCopied;
+    public Label songName;
+    public Label lblSearchType;
     public Label searchResultSongName;
     public Label searchResultISRC;
-    public VBox vBoxInSearchSong;
-    private final NotificationBuilder nb = new NotificationBuilder();
+    public Label songFeaturing;
+    public Label songFeaturingCopied;
+    //</editor-fold>
+
+    //<editor-fold desc="ScrollPane">
+    public ScrollPane scrlpneSong;
+    //</editor-fold>
+
+    //<editor-fold desc="TextField">
+    public TextField searchArea;
+    //</editor-fold>
+
+    //<editor-fold desc="Rectangle">
+    static File directory;
+    File destination;
+    public Rectangle rctSearchSongs;
+    public Rectangle rctCollectSongs;
+    public Rectangle rctRevenue;
+    public Rectangle rctArtistReports;
+    //</editor-fold>
+    //</editor-fold>
 
     //<editor-fold desc="Search">
+    public void btnSetSearchTypeISRC() {
+        lblSearchType.setText("ISRC");
+        searchType = "ISRC";
+    }
+
+    public void btnSetSearchTypeSinger() {
+        lblSearchType.setText("Singer");
+        searchType = "SINGER";
+    }
+
+    public void btnSetSearchTypeComposer() {
+        lblSearchType.setText("Composer");
+        searchType = "COMPOSER";
+    }
+
+    public void btnSetSearchTypeLyricist() {
+        lblSearchType.setText("Lyricist");
+        searchType = "LYRICIST";
+    }
+
+    public void btnSetSearchTypeName() {
+        lblSearchType.setText("Name");
+        searchType = "TRACK_TITLE";
+    }
+
+    public void onSearchedSongPress(KeyEvent event) {
+        KeyCode keyCode = event.getCode();
+        System.out.println("UIController.onSearchedSongPress");
+
+        if (keyCode == KeyCode.DOWN) {
+            ObservableList<Node> children = vboxSong.getChildren();
+            int index = children.size();
+            if (pressCount[0] < index) {
+                pressCount[0]++;
+            }
+        }
+
+        if (keyCode == KeyCode.ENTER) {
+            System.out.println("pressCount = " + pressCount[0]);
+            ObservableList<Node> children = vboxSong.getChildren();
+            int index = children.size();
+            if (pressCount[0] < index) {
+                Node node = children.get(pressCount[0]);
+                node.requestFocus();
+            }
+            /*Node node = (Node) event.getSource();
+            Scene scene = node.getScene();
+            Label searchResultSongName = (Label) scene.lookup("#searchResultSongName");
+            Label searchResultISRC = (Label) scene.lookup("#searchResultISRC");
+            String name = searchResultSongName.getText();
+            String isrc = searchResultISRC.getText();
+
+            DatabaseMySQL db = new DatabaseMySQL();
+            List<String> songDetails = db.searchSongDetails(isrc);
+
+            // System.out.println(songDetails.size());
+
+            // For reference
+            System.out.println("Song name: " + name);
+            System.out.println("ISRC: " + isrc);
+
+            // Getting the current parent layout
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+            Parent newContent = loader.load();
+            VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+            mainVBox.getChildren().clear();
+
+
+            // Setting the new layout
+            mainVBox.getChildren().add(newContent);
+
+            // Setting values for labels
+            Label songNameViewTitle = (Label) scene.lookup("#songNameViewTitle");
+            Label songName = (Label) scene.lookup("#songName");
+            Label songISRC = (Label) scene.lookup("#songISRC");
+            Label songSinger = (Label) scene.lookup("#songSinger");
+            Label songComposer = (Label) scene.lookup("#songComposer");
+            Label songLyricist = (Label) scene.lookup("#songLyricist");
+            Label songUPC = (Label) scene.lookup("#songUPC");
+            Label songProductName = (Label) scene.lookup("#songProductName");
+            Label songShare = (Label) scene.lookup("#songShare");
+            songISRC.setText(songDetails.get(0));
+            songProductName.setText(songDetails.get(1));
+            songUPC.setText(songDetails.get(2));
+            songName.setText(songDetails.get(3));
+            songNameViewTitle.setText(songDetails.get(3));
+            songSinger.setText(songDetails.get(4));
+            songComposer.setText(songDetails.get(6));
+            songLyricist.setText(songDetails.get(7));
+            songShare.setText("No Detail");*/
+        }
+    }
+
+    public void onSearchedSongPress2(KeyEvent event) throws SQLException, ClassNotFoundException, IOException {
+        KeyCode keyCode = event.getCode();
+        System.out.println("UIController.onSearchedSongPress2");
+
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+
+        VBox vboxSong = (VBox) scene.lookup("#vboxSong");
+
+        if (keyCode == KeyCode.DOWN) {
+            ObservableList<Node> children = vboxSong.getChildren();
+            int index = children.size();
+            if (pressCount[0] < index) {
+                Node node2 = children.get(5);
+                System.out.println("pressCount[0] = " + pressCount[0]);
+                pressCount[0]++;
+                node2.requestFocus();
+            }
+        }
+
+        if (keyCode == KeyCode.ENTER) {
+            Label searchResultISRC = (Label) scene.lookup("#searchResultISRC");
+            String isrc = searchResultISRC.getText();
+
+            DatabaseMySQL db = new DatabaseMySQL();
+            List<String> songDetails = db.searchSongDetails(isrc);
+
+            // Getting the current parent layout
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
+            Parent newContent = loader.load();
+            VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+            mainVBox.getChildren().clear();
+
+
+            // Setting the new layout
+            mainVBox.getChildren().add(newContent);
+
+            // Setting values for labels
+            Label songNameViewTitle = (Label) scene.lookup("#songNameViewTitle");
+            Label songName = (Label) scene.lookup("#songName");
+            Label songISRC = (Label) scene.lookup("#songISRC");
+            Label songSinger = (Label) scene.lookup("#songSinger");
+            Label songFeaturing = (Label) scene.lookup("#songFeaturing");
+            Label songComposer = (Label) scene.lookup("#songComposer");
+            Label songLyricist = (Label) scene.lookup("#songLyricist");
+            Label songUPC = (Label) scene.lookup("#songUPC");
+            Label songProductName = (Label) scene.lookup("#songProductName");
+            Label songShare = (Label) scene.lookup("#songShare");
+            songISRC.setText(songDetails.get(0));
+            songProductName.setText(songDetails.get(1));
+            songUPC.setText(songDetails.get(2));
+            songName.setText(songDetails.get(3));
+            songNameViewTitle.setText(songDetails.get(3));
+            songSinger.setText(songDetails.get(4));
+            songFeaturing.setText(songDetails.get(5));
+            System.out.println("songDetails.get(5) = " + songDetails.get(5));
+            songComposer.setText(songDetails.get(6));
+            songLyricist.setText(songDetails.get(7));
+            songShare.setText("No Detail");
+        }
+    }
+
+    public void backButtonImplementationForSearchSong(MouseEvent event) throws IOException {
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
+        // loader.setController(this);
+        Parent newContent = loader.load();
+        mainVBox.getChildren().clear();
+        mainVBox.getChildren().add(newContent);
+    }
+
     public void onAddToListButtonClicked(ActionEvent actionEvent) {
         // Getting scene
         Node node = (Node) actionEvent.getSource();
@@ -89,17 +319,47 @@ public class UIController {
         int songListLength = songList.size();
 
         if (songListLength > 1) {
-            String text = songList.get(0) + " + " + (songListLength - 1) + " other songs added";
+            String text = songList.getFirst() + " + " + (songListLength - 1) + " other songs added";
             songListButtonSubtitle.setText(text);
             System.out.println(text);
         } else {
-            songListButtonSubtitle.setText(songList.get(0));
-            System.out.println(songList.get(0));
+            songListButtonSubtitle.setText(songList.getFirst());
+            System.out.println(songList.getFirst());
         }
     }
 
-    public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) throws IOException {
-        Main.directoryCheck();
+    public void onAddToListButtonClickedInSearchSong(MouseEvent mouseEvent) {
+        // Getting scene
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+
+        // Getting label from scene
+        Label songListButtonSubtitle = (Label) scene.lookup("#lblSongListSub");
+
+        // Adding songs to list
+        Main.addSongToList(searchResultISRC.getText());
+
+        List<String> songList = Main.getSongList();
+        int songListLength = songList.size();
+
+        if (songListLength > 1) {
+            String text = songList.getFirst() + " + " + (songListLength - 1) + " other songs added";
+            songListButtonSubtitle.setText(text);
+            System.out.println(text);
+        } else {
+            songListButtonSubtitle.setText(songList.getFirst());
+            System.out.println(songList.getFirst());
+        }
+    }
+
+    public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) {
+        boolean directoryStatus = Main.directoryCheckNew();
+
+        if (!directoryStatus) {
+            DirectoryChooser chooser = new DirectoryChooser();
+            chooser.setTitle("Audio Database Location");
+            Main.selectedDirectory = chooser.showDialog(btnOpenLocation.getScene().getWindow());
+        }
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
@@ -107,34 +367,81 @@ public class UIController {
 
         String isrc = lblISRC.getText();
 
-        Path start = Paths.get(Main.selectedDirectory.toURI());
-        try (Stream<Path> stream = Files.walk(start)) {
-            // Get file name to search for location from database
-            String fileName = DatabaseMySQL.searchFileName(isrc);
-            // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
-            Path file = stream
-                    .filter(path -> path.toFile().isFile())
-                    .filter(path -> path.getFileName().toString().equals(fileName))
-                    .findFirst()
-                    .orElse(null);
+        if (Main.selectedDirectory.exists()) { // check if the directory exists
+            if (Main.selectedDirectory.isDirectory()) { // check if the directory is a directory
+                if (Main.selectedDirectory.canWrite()) { // check if the directory is writable
+                    System.out.println("The directory is accessible and writable.");
+                    Path start = Paths.get(Main.selectedDirectory.toURI());
+                    Thread t = threadToOpenFileLocation(start, isrc, scene);
+                    t.start();
 
-            if (file != null) {
-                Path filePath = file.getParent();
-                Desktop.getDesktop().open(filePath.toFile());
-                System.out.println(filePath);
-            } else {
-                Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
-                btnOpenFileLocation.setText("File not found on audio database");
-                btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
-                System.out.println("File not found on audio database");
+                    Platform.runLater(() -> {
+                        Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+                        btnOpenFileLocation.setDisable(true);
+                        btnOpenFileLocation.setText("Searching...");
+                    });
+                }
             }
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        } else {
+            System.out.println("The directory does not exist.");
+            Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+            btnOpenFileLocation.setText("Error in selected audio database directory");
+            btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
         }
     }
 
-    public void onCopyToButtonClicked(MouseEvent mouseEvent) throws IOException {
-        Main.directoryCheck();
+    private static Thread threadToOpenFileLocation(Path start, String isrc, Scene scene) {
+        final Path[] file = new Path[1];
+        Task<Void> task;
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                try (Stream<Path> stream = Files.walk(start)) {
+                    // Get file name to search for location from database
+                    String fileName = DatabaseMySQL.searchFileName(isrc);
+                    // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
+                    file[0] = stream
+                            .filter(path -> path.toFile().isFile())
+                            .filter(path -> path.getFileName().toString().equals(fileName))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (file[0] != null) {
+                        Path filePath = file[0].getParent();
+                        Desktop.getDesktop().open(filePath.toFile());
+                        System.out.println(filePath);
+
+                        Platform.runLater(() -> {
+                            Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+                            btnOpenFileLocation.setText("Open File Location");
+                            btnOpenFileLocation.setDisable(false);
+                        });
+                    } else {
+                        Platform.runLater(() -> {
+                            Button btnOpenFileLocation = (Button) scene.lookup("#btnOpenLocation");
+                            btnOpenFileLocation.setText("File not found on audio database");
+                            btnOpenFileLocation.setStyle("-fx-text-fill: '#F4442E'");
+                        });
+                        System.out.println("File not found on audio database");
+                    }
+                } catch (SQLException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        };
+
+        return new Thread(task);
+    }
+
+    public void onCopyToButtonClicked(MouseEvent mouseEvent) {
+        boolean directoryStatus = Main.directoryCheckNew();
+        DirectoryChooser chooser = new DirectoryChooser();
+
+        if (!directoryStatus) {
+            chooser.setTitle("Audio Database Location");
+            Main.selectedDirectory = chooser.showDialog(btnCopyTo.getScene().getWindow());
+        }
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
@@ -142,49 +449,108 @@ public class UIController {
         String isrc = lblISRC.getText();
 
         Path start = Paths.get(Main.selectedDirectory.toURI());
-        destination = Main.browseDestination();
+        chooser.setTitle("Select a directory");
+        destination = chooser.showDialog(btnCopyTo.getScene().getWindow());
 
-        try (Stream<Path> stream = Files.walk(start)) {
-            String fileName = DatabaseMySQL.searchFileName(isrc);
-            Path file = stream
-                    .filter(path -> path.toFile().isFile())
-                    .filter(path -> path.getFileName().toString().equals(fileName))
-                    .findFirst()
-                    .orElse(null);
+        if (destination != null) {
+            if (Main.selectedDirectory.exists()) { // check if the directory exists
+                if (Main.selectedDirectory.isDirectory()) { // check if the directory is a directory
+                    if (Main.selectedDirectory.canWrite()) { // check if the directory is writable
+                        System.out.println("The directory is accessible and writable.");
+                        Task<Void> task = threadToCopyFile(start, isrc, scene);
 
-            if (file != null) {
-                System.out.println("Executing file: " + file.getFileName());
-                Path targetDir = destination.toPath();
-                Path targetFile = targetDir.resolve(fileName);
-                Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("File copied to: " + targetFile);
-            } else {
-                Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
-                btnCopyTo.setText("File not found on audio database");
-                btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
-                System.out.println("File not found on audio database");
+                        Thread t = new Thread(task);
+                        t.start();
+
+                        Platform.runLater(() -> {
+                            Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
+                            btnCopyTo.setDisable(true);
+                            btnCopyTo.setText("Searching");
+                        });
+                    } else {
+                        System.out.println("The directory is accessible but not writable.");
+                        Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
+                        btnCopyTo.setText("Cannot copy to selected destination");
+                        btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
+                    }
+                }
             }
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
+
+    }
+
+    private Task<Void> threadToCopyFile(Path start, String isrc, Scene scene) {
+        Task<Void> task;
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                try (Stream<Path> stream = Files.walk(start)) {
+                    String fileName = DatabaseMySQL.searchFileName(isrc);
+                    Path file = stream
+                            .filter(path -> path.toFile().isFile())
+                            .filter(path -> path.getFileName().toString().equals(fileName))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (file != null) {
+                        System.out.println("Executing file: " + file.getFileName());
+                        Path targetDir = destination.toPath();
+                        Path targetFile = targetDir.resolve(fileName);
+                        Platform.runLater(() -> {
+                            Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
+                            btnCopyTo.setText("Copying...");
+                        });
+                        Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                        Platform.runLater(() -> {
+                            Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
+                            btnCopyTo.setDisable(false);
+                            btnCopyTo.setText("Copy to");
+                        });
+                        System.out.println("File copied to: " + targetFile);
+                    } else {
+                        Platform.runLater(() -> {
+                            Button btnCopyTo = (Button) scene.lookup("#btnCopyTo");
+                            btnCopyTo.setText("File not found on audio database");
+                            btnCopyTo.setStyle("-fx-text-fill: '#F4442E'");
+                        });
+                        System.out.println("File not found on audio database");
+                    }
+                } catch (SQLException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+
+                return null;
+            }
+        };
+        return task;
     }
 
     public void onBtnPlayClicked(MouseEvent mouseEvent) {
         Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
 
         Main.directoryCheck();
+        Songs sng = new Songs();
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
 
         Label lblISRC = (Label) scene.lookup("#songISRC");
+
         Label lblSongName = (Label) scene.lookup("#songName");
+
         Label lblArtist = (Label) scene.lookup("#songSinger");
+        sng.setSongName(lblSongName.getText());
+        sng.setSinger(lblArtist.getText());
         Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
         Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
         ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
 
-        String isrc = lblISRC.getText();
+        String isrc;
+        try {
+            isrc = lblISRC.getText();
+        } catch (Exception e) {
+            isrc = searchResultISRC.getText();
+        }
 
         Task<Void> task;
         Path start = Paths.get(Main.selectedDirectory.toURI());
@@ -196,38 +562,41 @@ public class UIController {
         lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
         imgMediaPico.setImage(img);
 
+        String finalIsrc = isrc;
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 Clip clip = Main.getClip();
                 if (clip != null) {
                     clip.stop();
-                    status[0] = Main.playAudio(start, isrc);
+                    status[0] = Main.playAudio(start, finalIsrc);
                 } else {
-                    status[0] = Main.playAudio(start, isrc);
+                    status[0] = Main.playAudio(start, finalIsrc);
                 }
                 return null;
             }
         };
 
-        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist, imgMediaPico));
+        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, lblArtist, imgMediaPico,sng));
 
         new Thread(task).start();
     }
 
     @FXML
     protected void onSearchDetailsButtonClick() throws ClassNotFoundException {
-        /*ControllerSearch controllerSearch = new ControllerSearch(this);
-        controllerSearch.loadThingsTempForSongName();*/
+        changeSelectorTo(rctSearchSongs);
         Connection con = checkDatabaseConnection();
 
         if (con != null) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
-                // loader.setController(this);
+                FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-recent-songs.fxml"));
                 Parent newContent = loader.load();
+                Parent sidepanelNewContent = sidepanelLoader.load();
                 mainVBox.getChildren().clear();
                 mainVBox.getChildren().add(newContent);
+                sideVBox.getChildren().clear();
+                sideVBox.getChildren().add(sidepanelNewContent);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -237,23 +606,37 @@ public class UIController {
         }
     }
 
-    public void onSearchByISRCButtonClick() throws ClassNotFoundException {
-        ControllerSearch controllerSearch = new ControllerSearch(this);
-        controllerSearch.loadThingsTempForISRC();
+    private void changeSelectorTo(Rectangle selector) {
+        rctSearchSongs.setVisible(false);
+        rctCollectSongs.setVisible(false);
+        rctRevenue.setVisible(false);
+        rctArtistReports.setVisible(false);
+
+        selector.setVisible(true);
     }
 
     public void onSearchedSongClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, IOException {
-        String name = searchResultSongName.getText();
         String isrc = searchResultISRC.getText();
 
         DatabaseMySQL db = new DatabaseMySQL();
         List<String> songDetails = db.searchSongDetails(isrc);
 
-        // System.out.println(songDetails.size());
+        // Get Composer and Lyricist
+        String composer = songDetails.get(6);
+        String lyricist = songDetails.get(7);
 
-        // For reference
-        System.out.println("Song name: " + name);
-        System.out.println("ISRC: " + isrc);
+        // Search Composer and Lyricist from Artists Table
+        Boolean composerCeyMusic = DatabaseMySQL.searchArtistTable(composer);
+        Boolean lyricistCeyMusic = DatabaseMySQL.searchArtistTable(lyricist);
+
+        String percentage;
+        if (composerCeyMusic && lyricistCeyMusic) {
+            percentage = "100%";
+        } else if (composerCeyMusic || lyricistCeyMusic) {
+            percentage = "50%";
+        } else {
+            percentage = "0%";
+        }
 
         // Getting the current parent layout
         FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
@@ -272,6 +655,7 @@ public class UIController {
         Label songName = (Label) scene.lookup("#songName");
         Label songISRC = (Label) scene.lookup("#songISRC");
         Label songSinger = (Label) scene.lookup("#songSinger");
+        Label songFeaturing = (Label) scene.lookup("#songFeaturing");
         Label songComposer = (Label) scene.lookup("#songComposer");
         Label songLyricist = (Label) scene.lookup("#songLyricist");
         Label songUPC = (Label) scene.lookup("#songUPC");
@@ -283,14 +667,18 @@ public class UIController {
         songName.setText(songDetails.get(3));
         songNameViewTitle.setText(songDetails.get(3));
         songSinger.setText(songDetails.get(4));
+        songFeaturing.setText(songDetails.get(5));
         songComposer.setText(songDetails.get(6));
         songLyricist.setText(songDetails.get(7));
-        songShare.setText("No Detail");
+        songShare.setText(percentage);
     }
 
-    public void getText(KeyEvent keyEvent) throws IOException {
+    final int[] pressCount = {0};
+
+    public void getText() throws IOException {
         // Getting search keywords
         String text = searchArea.getText();
+
 
         // Connecting to database
         DatabaseMySQL db = new DatabaseMySQL();
@@ -303,7 +691,7 @@ public class UIController {
         Task<List<Songs>> task = new Task<>() {
             @Override
             protected java.util.List<Songs> call() throws Exception {
-                return db.searchSongDetailsBySongName(text);
+                return db.searchSongDetailsBySearchType(text, searchType);
             }
         };
 
@@ -315,13 +703,18 @@ public class UIController {
             for (int i = 0; i < nodes.length; i++) {
                 try {
                     nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
-                    Label lblSongName = (Label) nodes[i].lookup("#searchResultSongName");
+                    Label lblSongName = (Label) nodes[i].lookup("#songName");
                     Label lblISRC = (Label) nodes[i].lookup("#searchResultISRC");
-                    Label lblArtist = (Label) nodes[i].lookup("#searchResultArtist");
+                    Label lblArtist = (Label) nodes[i].lookup("#songSinger");
+                    Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
+                    Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
                     lblSongName.setText(songList.get(i).getSongName());
                     lblISRC.setText(songList.get(i).getISRC().trim());
                     lblArtist.setText(songList.get(i).getSinger().trim());
+                    lblComposer.setText(songList.get(i).getComposer().trim());
+                    lblLyricist.setText(songList.get(i).getLyricist().trim());
                     vboxSong.getChildren().add(nodes[i]);
+
                 } catch (NullPointerException | IOException ex) {
                     ex.printStackTrace();
                 }
@@ -330,6 +723,90 @@ public class UIController {
 
         Thread thread = new Thread(task);
         thread.start();
+    }
+
+    public void copyISRC() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songISRC.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songISRCCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songISRCCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copySinger() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songSinger.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songSingerCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songSingerCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyComposer() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songComposer.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songComposerCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songComposerCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyLyricist() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songLyricist.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songLyricistCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songLyricistCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyFeaturing() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songFeaturing.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songFeaturingCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songFeaturingCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyUPC() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songUPC.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songUPCCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songUPCCopied.setVisible(false)));
+            timeline.play();
+        }
+    }
+
+    public void copyProductName() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songProductName.getText());
+        boolean status = clipboard.setContent(content);
+        if (status) {
+            songAlbumNameCopied.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> songAlbumNameCopied.setVisible(false)));
+            timeline.play();
+        }
     }
     //</editor-fold>
 
@@ -340,7 +817,7 @@ public class UIController {
         if (con != null) {
             nb.displayTrayInfo("Database Connected", "Database Connection Success");
         } else {
-            nb.displayTrayError("Error", "Error connecting database");
+            NotificationBuilder.displayTrayError("Error", "Error connecting database");
         }
     }
 
@@ -356,14 +833,14 @@ public class UIController {
             String password = "ceymusic";
             con = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
-            lblDatabaseStatus.setText("Database offline");
+            lblDatabaseStatus.setText("Offline");
             lblDatabaseStatus.setStyle("-fx-text-fill: '#931621'");
             return con;
         }
 
         if (con != null) {
-            lblDatabaseStatus.setText("Database online");
-            lblDatabaseStatus.setStyle("-fx-text-fill: '#32746D'");
+            lblDatabaseStatus.setText("Online");
+            lblDatabaseStatus.setStyle("-fx-text-fill: '#00864E'");
         }
 
         return con;
@@ -396,13 +873,29 @@ public class UIController {
             Node node = (Node) event.getSource();
             Scene scene = node.getScene();
 
-            int listSize = Main.getSongList().size();
+            List<String> songList = Main.getSongList();
+            int listSize = songList.size();
             Label lblListCount = (Label) scene.lookup("#lblListCount");
+            Label songListButtonSubtitle = (Label) scene.lookup("#lblSongListSub");
             lblListCount.setText("Total: " + listSize);
+
+            try {
+                if (listSize > 1) {
+                    String text = songList.getFirst() + " + " + (listSize - 1) + " other songs added";
+                    songListButtonSubtitle.setText(text);
+                    System.out.println(text);
+                } else {
+                    songListButtonSubtitle.setText(songList.getFirst());
+                    System.out.println(songList.getFirst());
+                }
+            } catch (Exception e) {
+                songListButtonSubtitle.setText("Click Here to Add Songs");
+            }
         }
     }
 
     public void onPlaySongClicked(MouseEvent mouseEvent) {
+        System.out.println("Test");
         Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
 
         Main.directoryCheck();
@@ -416,9 +909,11 @@ public class UIController {
 
         String isrc = srchRsISRC.getText();
 
-        System.out.println("Song Name: " + srchRsSongName.getText());
-        System.out.println("ISRC: " + isrc);
-        System.out.println("Artist: " + srchRsArtist.getText());
+        Platform.runLater(() -> {
+            System.out.println("Song Name: " + srchRsSongName.getText());
+            System.out.println("ISRC: " + isrc);
+            System.out.println("Artist: " + srchRsArtist.getText());
+        });
 
         Task<Void> task;
         Path start = Paths.get(Main.selectedDirectory.toURI());
@@ -434,35 +929,38 @@ public class UIController {
                 Clip clip = Main.getClip();
                 if (clip != null) {
                     clip.stop();
-                    status[0] = Main.playAudio(start, isrc);
-                } else {
-                    status[0] = Main.playAudio(start, isrc);
                 }
+                status[0] = Main.playAudio(start, isrc);
                 return null;
             }
         };
 
-        task.setOnSucceeded(event -> UIController.setPlayerInfo(status, lblPlayerSongName, srchRsSongName, lblPlayerArtist, srchRsArtist, imgMediaPico));
+        Songs song = new Songs();
+
+        task.setOnSucceeded(event -> UIController.setPlayerInfo(status, lblPlayerSongName, srchRsSongName, lblPlayerArtist, srchRsArtist, imgMediaPico, song));
 
         new Thread(task).start();
     }
     //</editor-fold>
 
     //<editor-fold desc="Music Player Stuff">
-    public static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico) {
+    public static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, Label lblArtist, ImageView imgMediaPico, Songs sng) {
         Image pauseImg = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
-        Image errorImg = new Image("com/example/song_finder_fx/images/icon _error (xrp)_.png");
+        Image imgPlay = new Image("com/example/song_finder_fx/images/icon _play circle_.png");
 
         if (status[0]) {
             imgMediaPico.setImage(pauseImg);
             lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-            lblPlayerSongName.setText(lblSongName.getText());
-            lblPlayerArtist.setText(lblArtist.getText());
+            Platform.runLater(() -> {
+                System.out.println("lblSongName = " + lblSongName.getText());
+            });
+            // lblPlayerSongName.setText(lblSongName.getText());
+            lblPlayerSongName.setText(sng.getSongName());
+            lblPlayerArtist.setText(sng.getSinger());
         } else {
-            imgMediaPico.setImage(errorImg);
+            imgMediaPico.setImage(imgPlay);
             lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-            lblPlayerSongName.setText("Error Loading Audio");
-            lblPlayerSongName.setStyle("-fx-text-fill: '#931621'");
+            lblPlayerSongName.setText("N/A");
         }
     }
 
@@ -488,7 +986,7 @@ public class UIController {
     //</editor-fold>
 
     //<editor-fold desc="Settings">
-    public void onSettingsButtonClicked(MouseEvent mouseEvent) throws IOException, SQLException, ClassNotFoundException {
+    public void onSettingsButtonClicked() throws IOException, SQLException, ClassNotFoundException {
         ControllerSettings cs = new ControllerSettings(this);
         cs.loadThings();
     }
@@ -504,6 +1002,7 @@ public class UIController {
     }
 
     public void onCollectSongsButtonClick(MouseEvent event) throws ClassNotFoundException, SQLException {
+        changeSelectorTo(rctCollectSongs);
         checkDatabaseConnection();
         /*Task<Void> task;*/
 
@@ -526,15 +1025,29 @@ public class UIController {
 
     @FXML
     protected void onBrowseAudioButtonClick() {
-        directory = Main.browseLocation();
-        String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
-        btnAudioDatabase.setText("   Database: " + shortenedString + "...");
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select audio database directory");
+        directory = chooser.showDialog(btnAudioDatabase.getScene().getWindow());
+
+        if (directory != null) {
+            String shortenedString = directory.getAbsolutePath().substring(0, Math.min(directory.getAbsolutePath().length(), 73));
+            btnAudioDatabase.setText("   Database: " + shortenedString + "...");
+        } else {
+            System.out.println("No directory selected");
+        }
     }
 
     public void onBrowseDestinationButtonClick() {
-        destination = Main.browseDestination();
-        String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
-        btnDestination.setText("   Destination: " + shortenedString + "...");
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select your destination");
+        destination = chooser.showDialog(btnAudioDatabase.getScene().getWindow());
+
+        if (destination != null) {
+            String shortenedString = destination.getAbsolutePath().substring(0, Math.min(destination.getAbsolutePath().length(), 73));
+            btnDestination.setText("   Destination: " + shortenedString + "...");
+        } else {
+            System.out.println("No destination selected");
+        }
     }
 
     public void onProceedButtonClick() throws ClassNotFoundException, SQLException {
@@ -689,24 +1202,47 @@ public class UIController {
     }
     //</editor-fold>
 
-    //<editor-fold desc="Testing">
-    public void onTestButtonClick() throws GeneralSecurityException, IOException {
-        // SheetsForJava.getSheetTest();
+    public void onAboutButtonClicked() throws IOException {
+        ControllerSettings cs = new ControllerSettings(this);
+        cs.loadAbout();
     }
 
-    public void onImportToBaseButtonClick() throws SQLException, ClassNotFoundException, IOException {
-        DatabaseMySQL dbmsql = new DatabaseMySQL();
-        Main main = new Main();
+    public void onRevenueAnalysisBtnClick() throws IOException {
+        changeSelectorTo(rctRevenue);
+        ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
+        revenueGenerator.loadRevenueGenerator();
+    }
 
-        dbmsql.CreateBase();
-        File file = main.browseFile();
-        if (file != null) {
-            dbmsql.ImportToBase(file);
+    //<editor-fold desc="Invoice">
+    public void onPercentageChangeButtonClicked() throws SQLException, ClassNotFoundException {
+        String song_share = songShare.getText();
+        String song_name = songName.getText();
+        Image plusImg = new Image("com/example/song_finder_fx/images/icon_plus.png");
+        Image minusImg = new Image("com/example/song_finder_fx/images/icon_minus.png");
+
+        if (Objects.equals(song_share, "100%")) {
+            boolean status = Database.changePercentage(song_name, "50%");
+            if (status) {
+                songShare.setText("50%");
+                btnPercentageChange.setImage(plusImg);
+            }
         } else {
-            System.out.println("Error! No file selected to import into Database");
+            boolean status = Database.changePercentage(song_name, "100%");
+            if (status) {
+                songShare.setText("100%");
+                btnPercentageChange.setImage(minusImg);
+            }
         }
+    }
+
+    public void onDeleteBtnClicked() {
+        System.out.println("UIController.onDeleteBtnClicked");
     }
     //</editor-fold>
 
-
+    public void onArtistReportsBtnClick() throws IOException {
+        changeSelectorTo(rctArtistReports);
+        ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
+        revenueGenerator.loadArtistReports();
+    }
 }

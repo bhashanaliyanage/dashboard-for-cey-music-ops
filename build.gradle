@@ -1,10 +1,11 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    /*id 'org.javamodularity.moduleplugin' version '1.8.12'*/
     id 'org.openjfx.javafxplugin' version '0.0.13'
     id 'org.beryx.jlink' version '2.25.0'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'java-library'
 }
 
 
@@ -27,7 +28,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 application {
-    mainModule = 'com.example.song_finder_fx'
+    /*mainModule = 'com.example.song_finder_fx'*/
     mainClass = 'com.example.song_finder_fx.Main'
 }
 
@@ -45,11 +46,11 @@ javafx {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+
     // SQLite connection
     implementation "org.xerial:sqlite-jdbc:3.36.0.3"
 
     // MySQL Connection
-    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
     implementation 'mysql:mysql-connector-java:8.0.28'
 
     // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
@@ -63,6 +64,16 @@ dependencies {
     implementation 'com.google.apis:google-api-services-sheets:v4-rev20220927-2.0.0'
     // https://mvnrepository.com/artifact/com.google.http-client/google-http-client-jackson2
     implementation 'com.google.http-client:google-http-client-jackson2:1.43.3'
+    implementation 'com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0'
+    // https://mvnrepository.com/artifact/com.google.auth/google-auth-library-oauth2-http
+    implementation 'com.google.auth:google-auth-library-oauth2-http:1.20.0'
+
+
+    // https://mvnrepository.com/artifact/com.itextpdf/itext7-core
+    implementation 'com.itextpdf:itext7-core:7.0.4'
+
+    // https://mvnrepository.com/artifact/com.opencsv/opencsv
+    implementation 'com.opencsv:opencsv:5.7.1'
 
 }
 

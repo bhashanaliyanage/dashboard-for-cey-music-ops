@@ -2,9 +2,11 @@ package com.example.song_finder_fx;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -89,60 +91,101 @@ public class ControllerSongList {
         }
     }
 
-    public void onCopyToButtonClicked() throws SQLException, ClassNotFoundException {
-        // System.out.println("Copy to button clicked!!");
+    public void onCopyToButtonClicked() {
         Task<Void> task;
         List<String> songList = Main.getSongList();
         if (songList.isEmpty()) {
             btnCopyTo.setText("Please add song(s) to list to proceed");
             btnCopyTo.setStyle("-fx-border-color: '#931621'");
         } else {
-            Connection con = DatabaseMySQL.getConn();
-            File directory = Main.getSelectedDirectory();
-            // System.out.println("Selected Audio Database Directory: " + directory.getAbsolutePath());
+            File selectedDirectory = Main.getSelectedDirectory();
 
-            if (directory == null) {
+            if (selectedDirectory.exists()) { // check if the directory exists
+                if (selectedDirectory.isDirectory()) { // check if the directory is a directory
+                    if (selectedDirectory.canWrite()) { // check if the directory is writable
+                        System.out.println("The directory is accessible and writable.");
+                        File destination = Main.browseDestination();
+
+                        task = new Task<>() {
+                            @Override
+                            protected Void call() throws Exception {
+                                int songListSize = songList.size();
+
+                                for (int i = 0; i < songListSize; i++) {
+                                    String isrc = songList.get(i);
+
+                                    int finalI = i;
+                                    Platform.runLater(() -> updateButtonProceed("Copying " + (finalI + 1) + " of " + songListSize));
+                                    Main.copyAudio(isrc, selectedDirectory, destination);
+                                }
+                                return null;
+                            }
+                        };
+
+                        task.setOnSucceeded(event -> {
+                            updateButtonProceed("Copy List to Location");
+
+                            if (!DatabaseMySQL.errorBuffer.isEmpty()) {
+                                ErrorDialog.showErrorDialogWithLog("File Not Found Error", "Error! Some files are missing in your audio database", DatabaseMySQL.errorBuffer.toString());
+                            }
+
+                            NotificationBuilder nb = new NotificationBuilder();
+
+                            try {
+                                nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
+                            } catch (AWTException exception) {
+                                throw new RuntimeException(exception);
+                            }
+                        });
+
+                        new Thread(task).start();
+                    }
+                }
+            } else {
+                System.out.println("The directory does not exist.");
                 btnCopyTo.setText("Error! Please set audio database location in settings");
                 btnCopyTo.setStyle("-fx-border-color: '#931621'");
-            } else {
-                File destination = Main.browseDestination();
-
-                task = new Task<>() {
-                    @Override
-                    protected Void call() throws Exception {
-                        int songListSize = songList.size();
-
-                        for (int i = 0; i < songListSize; i++) {
-                            String isrc = songList.get(i);
-                            // System.out.println(isrc);
-
-                            int finalI = i;
-                            Platform.runLater(() -> updateButtonProceed("Copying " + (finalI + 1) + " of " + songListSize));
-                            Main.copyAudio(isrc, directory, destination);
-                        }
-                        return null;
-                    }
-                };
-
-                task.setOnSucceeded(event -> {
-                    updateButtonProceed("Copy List to Location");
-
-                    if (!DatabaseMySQL.errorBuffer.isEmpty()) {
-                        ErrorDialog.showErrorDialogWithLog("File Not Found Error", "Error! Some files are missing in your audio database", DatabaseMySQL.errorBuffer.toString());
-                    }
-
-                    NotificationBuilder nb = new NotificationBuilder();
-
-                    try {
-                        nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
-                    } catch (AWTException exception) {
-                        throw new RuntimeException(exception);
-                    }
-                });
-
-                new Thread(task).start();
             }
         }
+    }
+
+    public void onAddMoreButtonClicked(ActionEvent actionEvent) throws IOException {
+        Node node = (Node) actionEvent.getSource();
+        Scene scene = node.getScene();
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+        mainVBox.getChildren().clear();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
+        Parent newContent = loader.load();
+        mainVBox.getChildren().add(newContent);
+    }
+
+    public void onGenerateInvoiceButtonClicked(ActionEvent actionEvent) {
+        ControllerInvoice controllerInvoice = new ControllerInvoice(mainUIController);
+        Node node = (Node) actionEvent.getSource();
+        Scene scene = node.getScene();
+        Button btnGenerateInvoice = (Button) scene.lookup("#btnGenerateInvoice");
+        btnGenerateInvoice.setText("Loading...");
+        Thread t = loadInvoicePageThread(actionEvent, controllerInvoice);
+        t.start();
+    }
+
+    private static Thread loadInvoicePageThread(ActionEvent actionEvent, ControllerInvoice controllerInvoice) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    try {
+                        controllerInvoice.loadThings(actionEvent);
+                    } catch (IOException | SQLException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                return null;
+            }
+        };
+
+        return new Thread(task);
     }
 
     private void updateButtonProceed(String s) {

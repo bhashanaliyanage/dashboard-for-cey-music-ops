@@ -1,17 +1,15 @@
 package com.example.song_finder_fx;
 
+import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,13 +20,33 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Main extends Application {
-
+    public static Double PRODUCT_VERSION = 23.04;
+    public static Stage primaryStage = null;
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
 
     public static void main(String[] args) {
-        new Thread(() -> launch(args)).start();
+        LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
+    }
+
+    public static File browseForCSV(Window window) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select CSV");
+        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
+
+        return fileChooser.showOpenDialog(window);
+    }
+
+    @Override
+    public void init() throws Exception {
+        InitPreloader init = new InitPreloader();
+        init.checkFunctions();
+    }
+
+    @Override
+    public void start(Stage stage) throws IOException, InterruptedException {
+        Main.primaryStage = stage;
     }
 
     public static boolean deleteSongFromList(String isrc) {
@@ -37,45 +55,6 @@ public class Main extends Application {
             System.out.println("ISRC: " + isrc + " Removed from Song List");
         }
         return status;
-    }
-
-    @Override
-    public void start(Stage stage) throws IOException, InterruptedException {
-        // Loading layout file
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("layouts/main-view.fxml"));
-        Scene scene = new Scene(loader.load(), 1030, 610);
-        Task<Void> task;
-        final String[] audioDatabasePath = {null};
-
-        stage.setTitle("CeyMusic Toolkit 2023.2");
-        stage.setScene(scene);
-        stage.setMinWidth(995);
-        stage.setMinHeight(650);
-
-        Image image = new Image("com/example/song_finder_fx/icons/icon.png");
-
-        stage.getIcons().add(image);
-
-        stage.show();
-
-        task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                audioDatabasePath[0] = getDirectoryFromDB();
-                return null;
-            }
-        };
-
-        Thread t = new Thread(task);
-        t.start();
-        t.join();
-
-        Platform.runLater(() -> {
-            Button btnAudioDatabase = (Button) scene.lookup("#btnAudioDatabase");
-            btnAudioDatabase.setText("   Audio Database: " + audioDatabasePath[0]);
-        });
-
-        stage.setOnCloseRequest(e -> Platform.exit());
     }
 
     public static Clip getClip() {
@@ -104,17 +83,21 @@ public class Main extends Application {
         }
     }
 
+    public static Boolean directoryCheckNew() {
+        return selectedDirectory != null;
+    }
+
     public static File getSelectedDirectory() {
         return selectedDirectory;
     }
 
     static boolean playAudio(Path start, String isrc) throws IOException {
+        File file = null;
         try (Stream<Path> stream = Files.walk(start)) {
             Path path = getFileByISRC(isrc, stream);
 
             if (path != null) {
-                // TODO: Play audio, handle audio player UI
-                File file = new File(path.toUri());
+                file = new File(path.toUri());
 
                 AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
                 clip = AudioSystem.getClip();
@@ -122,15 +105,18 @@ public class Main extends Application {
                 clip.start();
                 return true;
             } else {
-                // TODO: Handle UI showing audio file is missing
                 System.out.println("Cannot load file!");
                 return false;
             }
 
         } catch (SQLException | ClassNotFoundException | LineUnavailableException e) {
+            // return false;
             throw new RuntimeException(e);
         } catch (UnsupportedAudioFileException e) {
             System.out.println("Unsupported audio");
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(file);
+            }
         }
         return false;
     }
@@ -151,12 +137,6 @@ public class Main extends Application {
         return directoryTemp;
     }
 
-    public File browseFile() {
-        FileChooser fileChooser = new FileChooser();
-
-        return fileChooser.showOpenDialog(null);
-    }
-
     public static File browseLocation() {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Choose a directory");
@@ -168,6 +148,13 @@ public class Main extends Application {
             System.out.println("Selected audio database directory: " + selectedDirectory.getAbsolutePath());
         }
         return selectedDirectory;
+    }
+
+    public static File browseLocationNew(javafx.stage.Window ownerWindow) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Save As");
+
+        return chooser.showDialog(ownerWindow);
     }
 
     public static void copyAudio(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
@@ -188,19 +175,18 @@ public class Main extends Application {
     }
 }
 
-// TODO: Check current progress with test cases
-// TODO: Adding admin switch
-// TODO: Song list view
-// TODO: Click to copy data
-// TODO: Make about section
-// TODO: Add a separate threads for open file location, copy to, and check database
-// TODO: Add a place to show the featuring artist in song-view.fxml
-// TODO: Implement a column in database to put CeyMusic share
-// TODO: Add another VBox to the song-view.fxml to show similar results for the song that user is viewing by song title or something
-// TODO: Keyboard movement handling for search
-// TODO: Code is malfunctioning when pasted UPCs
-// TODO: File copying thread works again and again
-// TODO: Disable button of the main UI when the proceed button clicked
+// TODO: 12/9/2023 Side-Panel design for all pages
+// TODO: 12/9/2023 Sub views of revenue analysis UI
+// TODO: 11/27/2023 Edit list in the invoice view
+// TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
 // TODO: Offer cancel method after proceed button clicked
-// TODO: Improve search to search by singer, composer, lyricist, and also search by all at once
-// TODO: Most viewed and recently viewed songs
+// TODO: 12/14/2023 In the check missing ISRC button, it doesn't show results after the program is built
+// TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
+// TODO: 12/15/2023 Set not to show alert dialog when there's no missing ISRCs in check missing ISRC function
+// TODO: If copy to button clicked and user not chose any location the application starts to search
+
+// TODO: Import Report
+// TODO: Missing ISRC > Song Database Update
+// TODO: Search Song Database and Assign Payees
+// TODO: Give a list of Missing Payees
+//  TODO: Update Payees (Manual Process)

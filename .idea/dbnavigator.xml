@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DBNavigator.Project.DataEditorManager">
     <record-view-column-sorting-type value="BY_INDEX" />
-    <value-preview-text-wrapping value="true" />
+    <value-preview-text-wrapping value="false" />
     <value-preview-pinned value="false" />
   </component>
   <component name="DBNavigator.Project.DatabaseBrowserManager">
@@ -20,11 +20,10 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="e7371ff6-b33b-4ee1-ac69-a11b133ae782" object-ref="schemas/songdata/tables/songs" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="e7371ff6-b33b-4ee1-ac69-a11b133ae782" dataset="songdata.artists" active-filter-id="EMPTY_FILTER" />
     <filter-actions connection-id="e7371ff6-b33b-4ee1-ac69-a11b133ae782" dataset="songdata.songs" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">

@@ -12,18 +12,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class Database {
-    private static Connection conn = null;
+    private static final Connection conn = null;
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
-        if (conn == null) {
-            Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite:songs.db");
-        }
-        return conn;
+        Connection connection;
+        Class.forName("org.sqlite.JDBC");
+        connection = DriverManager.getConnection("jdbc:sqlite::resource:songs.db");
+        return connection;
     }
 
     public static void CreateBase() throws SQLException, ClassNotFoundException {
@@ -59,86 +59,6 @@ public class Database {
         ps.executeUpdate();
     }
 
-    public static void updateBase(File file) throws SQLException, ClassNotFoundException, IOException {
-        Connection db = Database.getConn();
-        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
-        sc.useDelimiter(",");
-
-        PreparedStatement ps = db.prepareStatement("UPDATE 'songData'" +
-                "SET FILE_NAME = ?" +
-                "WHERE ISRC = ?");
-
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line; // Test
-
-        while ((line = reader.readLine()) != null) {
-            String[] columnNames = line.split(",");
-
-            try {
-                if (columnNames.length > 0) {
-                    ps.setString(1, columnNames[12]);
-                    System.out.println(columnNames[12]);
-                    ps.setString(2, columnNames[0]);
-
-                    ps.executeUpdate();
-                }
-            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
-                e.printStackTrace();
-            }
-        }
-        sc.close();
-    }
-
-    public static void ImportToBase(File file) throws SQLException, ClassNotFoundException, IOException {
-        Connection db = Database.getConn();
-        Scanner sc = new Scanner(new File(file.getAbsolutePath()));
-        sc.useDelimiter(",");
-
-        PreparedStatement ps = db.prepareStatement("INSERT INTO 'songData' (ISRC," +
-                "ALBUM_TITLE," +
-                "UPC," +
-                "CAT_NO," +
-                "PRODUCT_PRIMARY," +
-                "ALBUM_FORMAT," +
-                "TRACK_TITLE," +
-                "TRACK_VERSION," +
-                "SINGER," +
-                "FEATURING," +
-                "COMPOSER," +
-                "LYRICIST," +
-                "FILE_NAME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line; // Test
-
-        while ((line = reader.readLine()) != null) {
-            String[] columnNames = line.split(",");
-
-            try {
-                if (columnNames.length > 0) {
-                    ps.setString(1, columnNames[0]);
-                    ps.setString(2, columnNames[1]);
-                    ps.setString(3, columnNames[2]);
-                    ps.setString(4, columnNames[3]);
-                    ps.setString(5, columnNames[4]);
-                    ps.setString(6, columnNames[5]);
-                    ps.setString(7, columnNames[6]);
-                    ps.setString(8, columnNames[7]);
-                    ps.setString(9, columnNames[8]);
-                    ps.setString(10, columnNames[9]);
-                    ps.setString(11, columnNames[10]);
-                    ps.setString(12, columnNames[11]);
-                    ps.setString(13, columnNames[12]);
-
-                    ps.executeUpdate();
-                }
-            } catch (ArrayIndexOutOfBoundsException | SQLiteException e) {
-                e.printStackTrace();
-            }
-        }
-        sc.close();
-    }
-
     public static void SearchSongsFromDB(String[] ISRCCodes, File directory, File destination) throws SQLException, ClassNotFoundException {
         Connection db = Database.getConn();
         ResultSet rs;
@@ -169,12 +89,12 @@ public class Database {
                         Path targetDir = destination.toPath();
                         Path targetFile = targetDir.resolve(finalFilename);
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("File copied to: " + targetFile.toString());
+                        System.out.println("File copied to: " + targetFile);
                     } else {
                         System.out.println("File not found.");
                     }
                 } catch (Exception e) {
-                    showErrorDialog("Error", "An error occurred during file copy.", e.getMessage().toString() + "\n Please consider using an accessible location");
+                    showErrorDialog("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
                     throw new RuntimeException(e);
                 }
             }
@@ -182,6 +102,7 @@ public class Database {
     }
 
     private static void showErrorDialog(String title, String headerText, String contentText) {
+        // TODO: 12/15/2023 Change this to a dialog (See check missing ISRC function)
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
@@ -207,6 +128,16 @@ public class Database {
         return path;
     }
 
+    public static ResultSet getSongList() throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+        ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT SONG, CONTROL, COPYRIGHT_OWNER FROM 'list_temp'");
+        rs = ps.executeQuery();
+
+        return rs;
+    }
+
     public static Boolean saveDirectory(String directoryString) throws SQLException, ClassNotFoundException {
         Connection db = Database.getConn();
         int status;
@@ -224,5 +155,83 @@ public class Database {
         }
 
         return status > 0;
+    }
+
+    public static boolean handleSongListTemp(String song, String control, String copyrightOwner) throws SQLException, ClassNotFoundException {
+        makeTableSongList();
+
+        Connection db = Database.getConn();
+
+        PreparedStatement ps = db.prepareStatement("INSERT INTO 'list_temp' (SONG," +
+                "CONTROL," +
+                "COPYRIGHT_OWNER) VALUES (?, ?, ?)"
+        );
+
+        ps.setString(1, song);
+        ps.setString(2, control);
+        ps.setString(3, copyrightOwner);
+
+        int rs = ps.executeUpdate();
+
+        return rs > 0;
+    }
+
+    private static void makeTableSongList() throws SQLException, ClassNotFoundException {
+        // Load the JDBC driver
+        Connection db = Database.getConn();
+
+        PreparedStatement ps = db.prepareStatement("CREATE TABLE IF NOT EXISTS list_temp (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "SONG TEXT," +
+                "CONTROL TEXT," +
+                "COPYRIGHT_OWNER TEXT)"
+        );
+
+        ps.executeUpdate();
+    }
+
+    public static boolean emptyTableSongListTemp() throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+
+        PreparedStatement checkTable = db.prepareStatement("SELECT name FROM sqlite_master WHERE type='table' AND name='list_temp';");
+        ResultSet resultSet = checkTable.executeQuery();
+
+        if (resultSet.next()) {
+            PreparedStatement ps = db.prepareStatement("DELETE FROM list_temp");
+            int rs = ps.executeUpdate();
+            return rs > 0;
+        } else {
+            System.out.println("Table does not exist");
+            return false;
+        }
+    }
+
+    public static boolean changePercentage(String songName, String percentage) throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+
+        PreparedStatement preparedStatement = db.prepareStatement("UPDATE 'list_temp' SET CONTROL = ? WHERE SONG = ?");
+        preparedStatement.setString(1, percentage);
+        preparedStatement.setString(2, songName);
+        int rs = preparedStatement.executeUpdate();
+        return rs > 0;
+    }
+
+
+    public static double calculateTotalDue(double amountPerItem) throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+        PreparedStatement ps = db.prepareStatement("SELECT CONTROL FROM 'list_temp'");
+        ResultSet rs = ps.executeQuery();
+        double total = 0.00;
+
+        while (rs.next()) {
+            String control = rs.getString("CONTROL");
+            if (Objects.equals(control, "50%")) {
+                total += amountPerItem;
+            } else {
+                total += (amountPerItem * 2);
+            }
+        }
+
+        return total;
     }
 }
