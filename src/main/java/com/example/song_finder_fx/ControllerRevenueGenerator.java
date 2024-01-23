@@ -660,39 +660,6 @@ public class ControllerRevenueGenerator {
         return null;
     }
 
-    public void comboPayeeOnAction() {
-        /*DecimalFormat df = new DecimalFormat("0.00");
-        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
-
-        // Getting Selected Item
-        String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
-
-        // Get the gross revenue for the selected artist
-        comboPayees.setDisable(true);
-        lblGross.setText("Loading...");
-        lblP_Share.setText("Loading...");
-
-        Thread tGrossRevenue = new Thread(() -> {
-            try {
-                royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
-
-            } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-
-            String formattedGrossRevenue = df.format(royalty[0].getFirst());
-            String formattedPartnerShare = df.format(royalty[0].get(1));
-
-            Platform.runLater(() -> {
-                lblGross.setText("EUR " + formattedGrossRevenue);
-                lblP_Share.setText("EUR " + formattedPartnerShare);
-                comboPayees.setDisable(false);
-            });
-        });
-
-        tGrossRevenue.start();*/
-    }
-
     public void onLoadReportBtnClick() {
         String userInputRate = txtRate.getText();
         double doubleConvertedRate;
@@ -753,9 +720,6 @@ public class ControllerRevenueGenerator {
                 Task<Void> taskCoWriterShare = new Task<>() {
                     @Override
                     protected Void call() throws SQLException, ClassNotFoundException {
-                        // Initialize UI Labels
-                        Platform.runLater(this::initializeArtistReportUI_Labels);
-
                         // Get the co-writer name and share in EUR from the database
                         ResultSet rsCoWriterShares = DatabaseMySQL.getCoWriterShares(selectedItem);
                         int count = 0;
@@ -795,28 +759,56 @@ public class ControllerRevenueGenerator {
 
                         return null;
                     }
-
-                    private void initializeArtistReportUI_Labels() {
-                        lblWriter01.setText("-");
-                        lblWriter02.setText("-");
-                        lblWriter03.setText("-");
-                        lblWriter04.setText("-");
-                        lblWriter05.setText("-");
-                        lblWriter01Streams.setText("-");
-                        lblWriter02Streams.setText("-");
-                        lblWriter03Streams.setText("-");
-                        lblWriter04Streams.setText("-");
-                        lblWriter05Streams.setText("-");
-                    }
                 };
 
                 Task<Void> taskTopPerformingSongs = new Task<>() {
                     @Override
                     protected Void call() throws Exception {
                         ResultSet rsTopPerformingSongs = DatabaseMySQL.getTopPerformingSongs(selectedItem);
+                        int count = 0;
+
+                        while (rsTopPerformingSongs.next()) {
+                            count++;
+
+                            String assetTitle = rsTopPerformingSongs.getString(1);
+                            double reportedRoyalty = rsTopPerformingSongs.getDouble(2);
+
+                            if (count == 1) {
+                                Platform.runLater(() -> {
+                                    lblAsset01.setText(assetTitle);
+                                    lblAsset01Streams.setText(df.format(reportedRoyalty));
+                                });
+                            } else if (count == 2) {
+                                Platform.runLater(() -> {
+                                    lblAsset02.setText(assetTitle);
+                                    lblAsset02Streams.setText(df.format(reportedRoyalty));
+                                });
+                            } else if (count == 3) {
+                                Platform.runLater(() -> {
+                                    lblAsset03.setText(assetTitle);
+                                    lblAsset03Streams.setText(df.format(reportedRoyalty));
+                                });
+                            } else if (count == 4) {
+                                Platform.runLater(() -> {
+                                    lblAsset04.setText(assetTitle);
+                                    lblAsset04Streams.setText(df.format(reportedRoyalty));
+                                });
+                            } else if (count == 5) {
+                                Platform.runLater(() -> {
+                                    lblAsset05.setText(assetTitle);
+                                    lblAsset05Streams.setText(df.format(reportedRoyalty));
+                                });
+                            }
+                        }
+
                         return null;
                     }
                 };
+
+                taskCoWriterShare.setOnSucceeded(event -> {
+                    Thread threadTopPerformingSongs = new Thread(taskTopPerformingSongs);
+                    threadTopPerformingSongs.start();
+                });
 
                 taskGrossRevenue.setOnSucceeded(event -> {
                     Thread threadCoWriterShare = new Thread(taskCoWriterShare);
@@ -825,6 +817,7 @@ public class ControllerRevenueGenerator {
 
                 Thread threadGrossRevenue = new Thread(taskGrossRevenue);
                 threadGrossRevenue.start();
+
             } else {
                 // When User Input Contains Texts
                 txtRate.setStyle("-fx-border-color: red;");
@@ -836,11 +829,36 @@ public class ControllerRevenueGenerator {
     }
 
     private void initializeArtistReportUILabels() {
+        // Top bar labels
         txtRate.setStyle("-fx-border-color: '#e9ebee';");
         lblGross.setText("Loading...");
         lblP_Share.setText("Loading...");
         lblTax.setText("Loading...");
         lblAmtPayable.setText("Loading...");
+
+        // Co-Writer labels
+        lblWriter01.setText("-");
+        lblWriter02.setText("-");
+        lblWriter03.setText("-");
+        lblWriter04.setText("-");
+        lblWriter05.setText("-");
+        lblWriter01Streams.setText("-");
+        lblWriter02Streams.setText("-");
+        lblWriter03Streams.setText("-");
+        lblWriter04Streams.setText("-");
+        lblWriter05Streams.setText("-");
+
+        // Top performing songs block labels
+        lblAsset01.setText("-");
+        lblAsset02.setText("-");
+        lblAsset03.setText("-");
+        lblAsset04.setText("-");
+        lblAsset05.setText("-");
+        lblAsset01Streams.setText("-");
+        lblAsset02Streams.setText("-");
+        lblAsset03Streams.setText("-");
+        lblAsset04Streams.setText("-");
+        lblAsset05Streams.setText("-");
     }
 
     public void onUpdatePayeeDetailsBtnClick() {

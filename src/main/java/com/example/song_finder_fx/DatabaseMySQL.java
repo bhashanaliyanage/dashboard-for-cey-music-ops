@@ -435,7 +435,12 @@ public class DatabaseMySQL {
                     });
                     status = true;
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    Platform.runLater(() -> {
+                        lblSongDB_Progress.setVisible(true);
+                        lblSongDB_Progress.setText("Error!");
+                        lblSongDB_Progress.setStyle("-fx-text-fill: '#FF0000'");
+                        throw new RuntimeException(e);
+                    });
                 }
             }
         }
