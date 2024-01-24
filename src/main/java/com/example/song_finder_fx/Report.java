@@ -23,6 +23,9 @@ import static com.example.song_finder_fx.Invoice.loadFont;
 public class Report {
     private static final Color INVOICE_LIGHT_BLUE = new DeviceRgb(232, 243, 251);
     private static final Color INVOICE_BLUE = new DeviceRgb(136, 193, 232);
+    private static PdfFont FONT_RUBIK = null;
+    private static PdfFont FONT_RUBIK_SEMIBOLD = null;
+    private static PdfFont FONT_POPPINS = null;
 
     public Document generateReport(Window window, String payee) throws IOException {
         String path = getSaveLocation(window);
@@ -34,43 +37,14 @@ public class Report {
         Image reportHeading = loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/marketing-head-report-1.png");
 
         // Fonts
-        PdfFont font_rubik = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-Regular.ttf");
-        PdfFont font_rubik_semi_bold = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf");
-        PdfFont font_poppins = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf");
+        FONT_RUBIK = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-Regular.ttf");
+        FONT_RUBIK_SEMIBOLD = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf");
+        FONT_POPPINS = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf");
 
         // Table 01
-        float[] columnWidth = {1000f};
-        Table table01 = new Table(columnWidth);
-
-        //<editor-fold desc="Header">
-        // Table 01 Row 01
-        table01.addCell(new Cell().add(reportHeading).setBorder(Border.NO_BORDER).setMargin(0f));
-        // Table 01 Row 02
-        table01.addCell(new Cell()
-                .add(new Paragraph(""))
-                .setBackgroundColor(INVOICE_LIGHT_BLUE)
-                .setBorder(Border.NO_BORDER)
-        );
-        //</editor-fold>
-
-        // Table 02
-        float[] columnWidthTable02 = {500f, 500f};
-        Table table02 = new Table(columnWidthTable02);
-        table02.setMarginLeft(20f);
-        table02.setMarginRight(20f);
-
-        // Table 02 Row 01
-        table02.addCell(new Cell().add(new Paragraph("CLIENT REPORT")
-                        .setFontSize(28f)
-                        .setFontColor(INVOICE_BLUE)
-                        .setFont(font_rubik_semi_bold))
-                .setBorder(Border.NO_BORDER));
-        table02.addCell(new Cell().add(new Paragraph(DatabaseMySQL.getReportNumber(payee))
-                        .setFontSize(16f)
-                        .setFont(font_rubik_semi_bold))
-                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setTextAlignment(TextAlignment.RIGHT)
-                .setBorder(Border.NO_BORDER));
+        Table table01 = getTable01(reportHeading);
+        Table table02 = getTable02(payee);
+        Table table03 = getTable03(payee);
 
         document.add(table01); // Header
         document.add(table02); // Report ID
@@ -78,6 +52,57 @@ public class Report {
         document.close();
 
         return document;
+    }
+
+    private Table getTable03(String payee) {
+        // Table 03
+        float[] columnWidth = {250f, 250f, 250f, 250f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+        table.setMarginTop(10f);
+
+        return table;
+        // TODO: Finalize Table
+    }
+
+    private static Table getTable02(String payee) {
+        // Table 02
+        float[] columnWidth = {500f, 500f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+
+        // Table 02 Row 01
+        table.addCell(new Cell().add(new Paragraph("CLIENT REPORT")
+                        .setFontSize(28f)
+                        .setFontColor(INVOICE_BLUE)
+                        .setFont(FONT_RUBIK_SEMIBOLD))
+                .setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().add(new Paragraph(DatabaseMySQL.getReportNumber(payee))
+                        .setFontSize(16f)
+                        .setFont(FONT_RUBIK_SEMIBOLD))
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setBorder(Border.NO_BORDER));
+        return table;
+    }
+
+    private static Table getTable01(Image reportHeading) {
+        float[] columnWidth = {1000f};
+        Table table = new Table(columnWidth);
+
+        //<editor-fold desc="Header">
+        // Table 01 Row 01
+        table.addCell(new Cell().add(reportHeading).setBorder(Border.NO_BORDER).setMargin(0f));
+        // Table 01 Row 02
+        table.addCell(new Cell()
+                .add(new Paragraph(""))
+                .setBackgroundColor(INVOICE_LIGHT_BLUE)
+                .setBorder(Border.NO_BORDER)
+        );
+        //</editor-fold>
+        return table;
     }
 
     private static String getSaveLocation(Window window) {
