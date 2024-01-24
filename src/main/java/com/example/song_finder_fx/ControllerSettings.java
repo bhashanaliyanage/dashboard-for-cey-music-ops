@@ -1,7 +1,9 @@
 package com.example.song_finder_fx;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
@@ -11,6 +13,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +29,9 @@ public class ControllerSettings {
     public Label lblVersion;
     public Label lblVersionInfoAboutPage;
 
+    public ControllerSettings() {
+
+    }
     public ControllerSettings(UIController MainUIController) {
         this.mainUIController = MainUIController;
     }
@@ -103,15 +110,13 @@ public class ControllerSettings {
         }
     }
 
-    public void loadAbout() throws IOException {
-        FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/about.fxml"));
-        loader.setController(this);
-        Parent newContent = loader.load();
-
+    public void loadAbout(Node aboutView) throws IOException {
         mainUIController.mainVBox.getChildren().clear();
-        mainUIController.mainVBox.getChildren().add(newContent);
+        mainUIController.mainVBox.getChildren().add(aboutView);
 
         String versionInfo = "Build " + Main.PRODUCT_VERSION + " by Bhashana Liyanage";
+        Scene scene = aboutView.getScene();
+        lblVersionInfoAboutPage = (Label) scene.lookup("#lblVersionInfoAboutPage");
         lblVersionInfoAboutPage.setText(versionInfo);
 
         if ((InitPreloader.PRODUCT_VERSION != null) && (Main.PRODUCT_VERSION < InitPreloader.PRODUCT_VERSION)) {
@@ -137,21 +142,9 @@ public class ControllerSettings {
         }
     }*/
 
-    public void onUpdateBtnClick() throws IOException {
-        /*String location = InitPreloader.updateLocation;
-        Path path = Paths.get(location);
-        try (BufferedInputStream in = new BufferedInputStream(new URL(location).openStream());
-             FileOutputStream fileOutputStream = new FileOutputStream("CrystalDiskInfo8_17_13.exe")) {
-            byte[] dataBuffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                fileOutputStream.write(dataBuffer, 0, 1024);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+    public void onUpdateBtnClick() throws IOException, URISyntaxException {
         Path tempDir = Files.createTempDirectory("CeyMusic_Dashboard_UpdateTemp");
-        InputStream in = new URL(InitPreloader.updateLocation).openStream();
+        InputStream in = new URI(InitPreloader.updateLocation).toURL().openStream();
         Path tempFile = Files.createTempFile(tempDir, "update_cey_dash", ".msi");
         Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
         Desktop.getDesktop().open(new File(tempFile.toUri()));

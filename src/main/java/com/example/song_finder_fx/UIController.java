@@ -47,6 +47,18 @@ public class UIController {
     public VBox sideVBox;
     private String searchType = "TRACK_TITLE";
     private final NotificationBuilder nb = new NotificationBuilder();
+    static final Node[] mainNodes = new Node[7];
+
+    public static void setAllScenes() throws IOException {
+        // About
+        mainNodes[1] = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/about.fxml")));
+        // Search
+        mainNodes[2] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/search-details.fxml")));
+        // Search and collect songs
+        mainNodes[3] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/collect-songs.fxml")));
+        // Revenue Analysis
+        // mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/revenue-generator.fxml")));
+    }
 
     //<editor-fold desc="Variables">
     //<editor-fold desc="TextArea">
@@ -290,16 +302,13 @@ public class UIController {
         }
     }
 
-    public void backButtonImplementationForSearchSong(MouseEvent event) throws IOException {
+    public void backButtonImplementationForSearchSong(MouseEvent event) {
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
         VBox mainVBox = (VBox) scene.lookup("#mainVBox");
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
-        // loader.setController(this);
-        Parent newContent = loader.load();
         mainVBox.getChildren().clear();
-        mainVBox.getChildren().add(newContent);
+        mainVBox.getChildren().add(mainNodes[2]);
     }
 
     public void onAddToListButtonClicked(ActionEvent actionEvent) {
@@ -576,7 +585,7 @@ public class UIController {
             }
         };
 
-        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblSongName, lblPlayerArtist, imgMediaPico, sng));
+        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblPlayerArtist, imgMediaPico, sng));
 
         new Thread(task).start();
     }
@@ -588,12 +597,10 @@ public class UIController {
 
         if (con != null) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
                 FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-recent-songs.fxml"));
-                Parent newContent = loader.load();
                 Parent sidepanelNewContent = sidepanelLoader.load();
                 mainVBox.getChildren().clear();
-                mainVBox.getChildren().add(newContent);
+                mainVBox.getChildren().add(mainNodes[2]);
                 sideVBox.getChildren().clear();
                 sideVBox.getChildren().add(sidepanelNewContent);
             } catch (IOException e) {
@@ -936,14 +943,14 @@ public class UIController {
 
         Songs song = new Songs();
 
-        task.setOnSucceeded(event -> UIController.setPlayerInfo(status, lblPlayerSongName, srchRsSongName, lblPlayerArtist, imgMediaPico, song));
+        task.setOnSucceeded(event -> UIController.setPlayerInfo(status, lblPlayerSongName, lblPlayerArtist, imgMediaPico, song));
 
         new Thread(task).start();
     }
     //</editor-fold>
 
     //<editor-fold desc="Music Player Stuff">
-    public static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblSongName, Label lblPlayerArtist, ImageView imgMediaPico, Songs sng) {
+    public static void setPlayerInfo(boolean[] status, Label lblPlayerSongName, Label lblPlayerArtist, ImageView imgMediaPico, Songs sng) {
         Image pauseImg = new Image("com/example/song_finder_fx/images/icon _pause circle.png");
         Image imgPlay = new Image("com/example/song_finder_fx/images/icon _play circle_.png");
 
@@ -1000,17 +1007,9 @@ public class UIController {
     public void onCollectSongsButtonClick(MouseEvent event) throws ClassNotFoundException, SQLException {
         changeSelectorTo(rctCollectSongs);
         checkDatabaseConnection();
-        /*Task<Void> task;*/
 
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/collect-songs.fxml"));
-            Parent newContent = loader.load();
-
-            mainVBox.getChildren().clear();
-            mainVBox.getChildren().add(newContent);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        mainVBox.getChildren().clear();
+        mainVBox.getChildren().add(mainNodes[3]);
 
         String directoryString = Main.getDirectoryFromDB();
         Node node = (Node) event.getSource();
@@ -1200,7 +1199,7 @@ public class UIController {
 
     public void onAboutButtonClicked() throws IOException {
         ControllerSettings cs = new ControllerSettings(this);
-        cs.loadAbout();
+        cs.loadAbout(mainNodes[1]);
     }
 
     public void onRevenueAnalysisBtnClick() throws IOException {

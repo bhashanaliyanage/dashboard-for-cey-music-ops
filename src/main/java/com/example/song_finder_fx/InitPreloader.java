@@ -43,29 +43,6 @@ public class InitPreloader implements Initializable {
         final String[] con = new String[1];
         final String[] message = {""};
         final String[] connection = {null};
-        Thread connectionCheck = new Thread(() -> {
-            message[0] = "Checking Connection";
-
-            Platform.runLater(() -> lblLoadingg.setText(message[0]));
-
-            try {
-                connection[0] = SheetsCOn.checkAccess(lblLoadingg);
-                if (Objects.equals(connection[0], "1")) {
-                    System.out.println("Access Granted");
-                    Platform.runLater(() -> lblLoadingg.setText("Access Granted"));
-                } else {
-                    System.out.println("Unable to access");
-                    Platform.runLater(() -> lblLoadingg.setText("Unable to access"));
-                }
-            } catch (GeneralSecurityException | IOException e) {
-                e.printStackTrace();
-                Platform.runLater(() -> lblLoadingg.setText("Check Internet Connection"));
-            }
-
-            if (Objects.equals(connection[0], "0")) {
-                Platform.runLater(() -> lblLoadingg.setText("Unable to validate credentials"));
-            }
-        });
 
         Thread databaseCheck = new Thread(() -> {
             message[0] = "Checking Database Connection";
@@ -128,17 +105,28 @@ public class InitPreloader implements Initializable {
             }
         });
 
+        Thread loadScenes = new Thread(() -> {
+            message[0] = "Loading Scenes";
+
+            Platform.runLater(() -> lblLoadingg.setText(message[0]));
+
+            try {
+                UIController.setAllScenes();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+
         Thread mainWindow = new Thread(() -> Platform.runLater(() -> {
             try {
                 starting = true;
-                Parent root = FXMLLoader.load(getClass().getResource("layouts/main-view.fxml"));
+                Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/main-view.fxml")));
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
 
                 VBox main = (VBox) scene.lookup("#mainVBox");
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
-                Parent newContent = loader.load();
-                main.getChildren().add(newContent);
+                main.getChildren().add(UIController.mainNodes[2]);
 
                 stage.setTitle("CeyMusic Toolkit v" + Main.PRODUCT_VERSION);
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
@@ -161,24 +149,18 @@ public class InitPreloader implements Initializable {
             }
         }));
 
-        // connectionCheck.start();
-        // connectionCheck.join();
-
         databaseCheck.start();
         databaseCheck.join();
         audioDatabaseCheck.start();
         audioDatabaseCheck.join();
-
-        /*if (connection[0] != null) {
-            if (connection[0].equals("1")) {
-            }
-        }*/
 
         if (Objects.equals(con[0], "Connection Succeed")) {
             revenueAnalysisCheck.start();
             revenueAnalysisCheck.join();
             updatesCheck.start();
             updatesCheck.join();
+            loadScenes.start();
+            loadScenes.join();
             mainWindow.start();
             mainWindow.join();
         }
