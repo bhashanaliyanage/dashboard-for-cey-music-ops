@@ -668,6 +668,10 @@ public class DatabaseMySQL {
         return ps.executeQuery();
     }
 
+    public static String getReportNumber(String payee) {
+        return "null";
+    }
+
     public List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException, ClassNotFoundException {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;

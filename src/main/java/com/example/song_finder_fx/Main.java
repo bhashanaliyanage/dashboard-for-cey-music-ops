@@ -178,15 +178,12 @@ public class Main extends Application {
 // TODO: 12/9/2023 Side-Panel design for all pages
 // TODO: 12/9/2023 Sub views of revenue analysis UI
 // TODO: 11/27/2023 Edit list in the invoice view
-// TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
 // TODO: Offer cancel method after proceed button clicked
-// TODO: 12/14/2023 In the check missing ISRC button, it doesn't show results after the program is built
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
-// TODO: 12/15/2023 Set not to show alert dialog when there's no missing ISRCs in check missing ISRC function
-// TODO: If copy to button clicked and user not chose any location the application starts to search
-
-// TODO: Import Report
-// TODO: Missing ISRC > Song Database Update
-// TODO: Search Song Database and Assign Payees
-// TODO: Give a list of Missing Payees
-// TODO: Update Payees (Manual Process)
+// TODO: Add search click detail view to side panel
+// TODO: Optimize User Interface for responsiveness
+    // TODO: Search on web button to the search
+    // TODO: Show if an asset is an original in the search results
+    // TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
+    // TODO: If copy to button clicked and user not chose any location the application starts to search
+    // TODO: Export Song List data to a CSV

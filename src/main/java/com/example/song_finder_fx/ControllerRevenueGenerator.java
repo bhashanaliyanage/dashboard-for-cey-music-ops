@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.itextpdf.layout.Document;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
@@ -906,6 +907,25 @@ public class ControllerRevenueGenerator {
 
         } else {
             System.out.println("No Report Imported");
+        }
+    }
+
+    public void onGetReportBtnClick(MouseEvent mouseEvent) throws IOException {
+        System.out.println("ControllerRevenueGenerator.onGetReportBtnClick");
+        String payee = comboPayees.getSelectionModel().getSelectedItem();
+
+        if (!Objects.equals(payee, null)) {
+            comboPayees.setStyle("-fx-border-color: '#e9ebee';");
+
+            Node node = (Node) mouseEvent.getSource();
+            Scene scene = node.getScene();
+            Window window = scene.getWindow();
+
+            Report report = new Report();
+            Document document = report.generateReport(window, payee);
+        } else {
+            // If no Payee Selected
+            comboPayees.setStyle("-fx-border-color: red;");
         }
     }
 }

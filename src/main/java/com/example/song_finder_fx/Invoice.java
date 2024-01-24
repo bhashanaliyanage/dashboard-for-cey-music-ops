@@ -24,6 +24,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.ResultSet;
@@ -46,11 +47,8 @@ public class Invoice {
         chooser.setTitle("Save As");
         File pathTo = chooser.showSaveDialog(window);
         String path = pathTo.getAbsolutePath();
-        PdfWriter pdfWriter = new PdfWriter(path);
-        PdfDocument pdfDocument = new PdfDocument(pdfWriter);
-        pdfDocument.setDefaultPageSize(PageSize.A4);
-        Document document = new Document(pdfDocument);
-        document.setMargins(0f, 0f, 0f, 0f);
+
+        Document document = getDocument(path);
 
         // Invoice Heading Image
         Image invoiceHeading = loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/marketing-head-invoice-heading-cropped.png");
@@ -344,12 +342,21 @@ public class Invoice {
         document.close();
     }
 
-    private static PdfFont loadFont(String location) throws IOException {
+    private static Document getDocument(String path) throws FileNotFoundException {
+        PdfWriter pdfWriter = new PdfWriter(path);
+        PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+        pdfDocument.setDefaultPageSize(PageSize.A4);
+        Document document = new Document(pdfDocument);
+        document.setMargins(0f, 0f, 0f, 0f);
+        return document;
+    }
+
+    static PdfFont loadFont(String location) throws IOException {
         FontProgram fontProgram = FontProgramFactory.createFont(location);
         return PdfFontFactory.createFont(fontProgram, PdfEncodings.WINANSI, true);
     }
 
-    private static Image loadAutoScaledImage(String location) throws MalformedURLException {
+    static Image loadAutoScaledImage(String location) throws MalformedURLException {
         ImageData invoiceHeadingImageData = ImageDataFactory.create(location);
         Image invoiceHeading = new Image(invoiceHeadingImageData);
         invoiceHeading.setAutoScale(true);
