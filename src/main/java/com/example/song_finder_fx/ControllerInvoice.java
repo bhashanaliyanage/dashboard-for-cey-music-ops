@@ -1,5 +1,8 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.SongDetails;
+import com.example.song_finder_fx.Model.SongList;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -16,6 +19,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -70,9 +74,15 @@ public class ControllerInvoice {
         }
 
         for (int i = 0; i < nodes.length; i++) {
-            try {
-                List<String> songDetail = db.searchSongDetails(songList.get(i));
 
+            SongDetails sn =  new SongDetails();
+            try {
+
+                List<String> songDetail = db.searchSongDetails(songList.get(i));
+                Platform.runLater(() -> {
+                    System.out.println(songDetail+"song list");
+                });
+//                System.out.println(songDetail+"songg list");
                 // Search Composer and Lyricist from Artists Table
                 Boolean composerCeyMusic = db.searchArtistTable(songDetail.get(6)); // 6
                 Boolean lyricistCeyMusic = db.searchArtistTable(songDetail.get(7)); // 7
@@ -99,7 +109,11 @@ public class ControllerInvoice {
 
                 // Adding song details to a temporary SQLite table
                 String songName = songDetail.get(3);
-                boolean status = Database.handleSongListTemp(songName, percentage, copyrightOwnerTemp);
+                boolean status = DatabaseMySQL.handleSongListTemp(songName, percentage, copyrightOwnerTemp);
+
+                //set new meth
+
+//                getList(songName,percentage,copyrightOwnerTemp);
 
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist-invoice.fxml")));
 
@@ -196,5 +210,19 @@ public class ControllerInvoice {
                 scrlpneMain.setVvalue(0);
             }
         }
+    }
+
+
+    public List<SongDetails> getList(String name, String percentage, String copywriter){
+    List<SongDetails> list =  new ArrayList<>();
+
+    SongDetails sngDe =  new SongDetails();
+
+   sngDe.setSongName(name);
+   sngDe.setCpywriteTemp(percentage);
+   sngDe.setPrecentage(copywriter);
+    list.add(sngDe);
+
+        return list;
     }
 }

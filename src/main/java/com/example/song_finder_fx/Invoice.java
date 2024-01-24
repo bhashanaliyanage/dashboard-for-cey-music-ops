@@ -1,5 +1,7 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.SongDetails;
+import com.example.song_finder_fx.Model.SongList;
 import com.itextpdf.io.font.FontProgram;
 import com.itextpdf.io.font.FontProgramFactory;
 import com.itextpdf.io.font.PdfEncodings;
@@ -30,7 +32,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+
+
 
 public class Invoice {
     private static final Color INVOICE_BLUE = new DeviceRgb(136, 193, 232);
@@ -185,7 +191,16 @@ public class Invoice {
 
         // Getting Song List to generate Invoice
         int rowCount = 0;
-        ResultSet songList = Database.getSongList();
+
+//        List<SongDetails> songList =  new ArrayList<>();
+//        songList=new ControllerInvoice().getList();
+
+
+
+
+
+//        ResultSet songList = Database.getSongList();
+        ResultSet songList =DatabaseMySQL.getSongList();
 
         Table currentTable = createNewTable(); // createNewTable is a method to create a new table like table03
         currentTable.addCell(new Cell().add(new Paragraph("SONG").setFont(font_rubik))

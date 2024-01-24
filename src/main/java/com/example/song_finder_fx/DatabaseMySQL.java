@@ -663,6 +663,34 @@ public class DatabaseMySQL {
         return ps.executeQuery();
     }
 
+//    24/01/2024 new method to avoid user sqlLite
+    public static boolean handleSongListTemp(String songName, String percentage, String copyrightOwnerTemp) throws SQLException, ClassNotFoundException {
+        String sql ="INSERT INTO `temp_songs_report` ( `name`, `copywrite_owner`, `control`) VALUES ( ?, ?, ?)";
+        Connection  con = getConn();
+        Boolean bl = false;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1,songName);
+            ps.setString(2,copyrightOwnerTemp);
+            ps.setString(3,percentage);
+//            ps.executeUpdate() ? false : true;
+           bl = ps.executeUpdate() == 0;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return bl;
+    }
+
+    public static ResultSet getSongList() throws SQLException, ClassNotFoundException {
+        Connection db = Database.getConn();
+        ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT name,copywrite_owner,control FROM `temp_songs_report` WHERE 1;");
+        rs = ps.executeQuery();
+
+        return rs;
+    }
+
     public List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException, ClassNotFoundException {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;
