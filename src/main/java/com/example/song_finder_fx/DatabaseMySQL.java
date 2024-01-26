@@ -25,7 +25,6 @@ public class DatabaseMySQL {
     static StringBuilder errorBuffer = new StringBuilder();
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
-
         if (conn == null) {
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://192.168.1.200/songData";

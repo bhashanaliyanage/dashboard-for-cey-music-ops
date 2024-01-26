@@ -44,6 +44,7 @@ public class ControllerRevenueGenerator {
     //</editor-fold>
 
     //<editor-fold desc="Labels">
+    public Label lblStatus;
     public Label lblWriter01;
     public Label lblWriter02;
     public Label lblWriter03;
@@ -100,6 +101,7 @@ public class ControllerRevenueGenerator {
     public ImageView imgDSP02;
     public ImageView imgDSP03;
     public ImageView imgDSP04;
+    public ImageView imgLoading;
     public ImageView lblIC_Caution;
     public ImageView imgImportCaution;
     public ImageView imgSongDB_Status;
@@ -580,17 +582,26 @@ public class ControllerRevenueGenerator {
         task = new Task<>() {
             @Override
             protected Void call() throws SQLException, ClassNotFoundException {
+                Platform.runLater(() -> {
+                    lblStatus.setText("> Checking ISRC Sync...");
+                    comboPayees.setDisable(true);
+                });
+
                 ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
                 int rowCount = 0;
 
-                while (resultSet.next() && ((resultSet.getString(2) == null) && (resultSet.getString(3) == null))) {
-                    rowCount++;
+                while (resultSet.next()) {
+                    if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
+                        rowCount++;
+                    }
                 }
 
                 System.out.println("rowCount = " + rowCount);
 
                 if (rowCount > 0) {
                     Platform.runLater(() -> {
+                        lblStatus.setVisible(false);
+                        imgLoading.setVisible(false);
                         vbArtistReports.setDisable(true);
                         try {
                             NotificationBuilder.displayTrayError("ISRC Sync Error", "Please Update Missing ISRCs in Song Database to Sync Payee List");
@@ -601,10 +612,14 @@ public class ControllerRevenueGenerator {
                 } else {
                     Platform.runLater(() -> {
                         try {
+                            lblStatus.setText("Loading Payees...");
                             ResultSet rsPayees = DatabaseMySQL.getPayees();
                             while (rsPayees.next()) {
                                 comboPayees.getItems().add(rsPayees.getString(1));
                             }
+                            lblStatus.setVisible(false);
+                            imgLoading.setVisible(false);
+                            comboPayees.setDisable(false);
                         } catch (SQLException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }
@@ -914,15 +929,17 @@ public class ControllerRevenueGenerator {
         System.out.println("ControllerRevenueGenerator.onGetReportBtnClick");
         String payee = comboPayees.getSelectionModel().getSelectedItem();
 
+        comboPayees.setStyle("-fx-border-color: '#e9ebee';");
+
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Window window = scene.getWindow();
+
+        Report report = new Report();
+        Document document = report.generateReport(window, payee);
+
         if (!Objects.equals(payee, null)) {
-            comboPayees.setStyle("-fx-border-color: '#e9ebee';");
-
-            Node node = (Node) mouseEvent.getSource();
-            Scene scene = node.getScene();
-            Window window = scene.getWindow();
-
-            Report report = new Report();
-            Document document = report.generateReport(window, payee);
+            // TODO: Moved content outside temporary
         } else {
             // If no Payee Selected
             comboPayees.setStyle("-fx-border-color: red;");
