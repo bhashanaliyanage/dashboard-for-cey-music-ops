@@ -750,7 +750,7 @@ public class ControllerRevenueGenerator {
                         // Calculating amount payable
                         amountPayable[0] = grossRevenueInLKR - tax[0];
 
-                        report.setGrossRevenue(grossRevenueInLKR, partnerShareInLKR, tax[0], amountPayable[0]);
+                        report.setGrossRevenue(selectedItem, grossRevenueInLKR, partnerShareInLKR, tax[0], amountPayable[0]);
 
                         // Update UI
                         Platform.runLater(() -> {

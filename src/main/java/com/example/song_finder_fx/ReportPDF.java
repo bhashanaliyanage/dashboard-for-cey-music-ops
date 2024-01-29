@@ -29,7 +29,7 @@ public class ReportPDF {
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
 
-    public Document generateReport(Window window, String payee, String formattedGrossRevenue) throws IOException {
+    public Document generateReport(Window window, Report report) throws IOException {
         String path = getSaveLocation(window);
 
         PDFDocument pdfDocument = new PDFDocument();
@@ -44,8 +44,8 @@ public class ReportPDF {
 
         // Table 01
         Table table01 = getTable01(reportHeading);
-        Table table02 = getTable02(payee);
-        Table table03 = getTable03(payee);
+        Table table02 = getTable02(report.getPayee());
+        Table table03 = getTable03(report.getPayee());
 
         document.add(table01); // Header
         document.add(table02); // Report ID

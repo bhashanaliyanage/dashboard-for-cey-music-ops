@@ -3,13 +3,15 @@ package com.example.song_finder_fx;
 import java.text.DecimalFormat;
 
 public class Report {
+    private String payee;
     private String grossRevenueInLKR;
     private String partnerShareInLKR;
     private String taxAmount;
     private String amountPayable;
     private final DecimalFormat df = new DecimalFormat("0.00");
 
-    public void setGrossRevenue(double grossRevenueInLKR, double partnerShareInLKR, double tax, double amountPayable) {
+    public void setGrossRevenue(String selectedItem, double grossRevenueInLKR, double partnerShareInLKR, double tax, double amountPayable) {
+        this.payee = selectedItem;
         this.grossRevenueInLKR = df.format(grossRevenueInLKR);
         this.partnerShareInLKR = df.format(partnerShareInLKR);
         this.taxAmount = df.format(tax);
@@ -30,5 +32,9 @@ public class Report {
 
     public String getAmountPayable() {
         return amountPayable;
+    }
+
+    public String getPayee() {
+        return payee;
     }
 }

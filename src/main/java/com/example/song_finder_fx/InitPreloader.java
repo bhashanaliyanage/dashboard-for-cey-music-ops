@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -42,7 +41,6 @@ public class InitPreloader implements Initializable {
     public void checkFunctions() throws InterruptedException {
         final String[] con = new String[1];
         final String[] message = {""};
-        final String[] connection = {null};
 
         Thread databaseCheck = new Thread(() -> {
             message[0] = "Checking Database Connection";

@@ -82,15 +82,15 @@ public class DatabaseMySQL {
         reader.close();
     }
 
-    public static boolean loadReport(File reportPDF, Label btnLoadReport, Label lbl_import, ImageView imgImportCaution) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
+    public static boolean loadReport(File report, Label btnLoadReport, Label lbl_import, ImageView imgImportCaution) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
         Connection db = DatabaseMySQL.getConn();
         int rs = 0;
         DecimalFormat df = new DecimalFormat("0.00");
 
-        PreparedStatement emptyTable = db.prepareStatement("DELETE FROM reportPDF;");
+        PreparedStatement emptyTable = db.prepareStatement("DELETE FROM report;");
         emptyTable.executeUpdate();
 
-        PreparedStatement ps = db.prepareStatement("INSERT INTO reportPDF " +
+        PreparedStatement ps = db.prepareStatement("INSERT INTO report " +
                 "(Sale_Start_date, Sale_End_date, DSP, Sale_Store_Name, Sale_Type, Sale_User_Type, Territory, " +
                 "Product_UPC, Product_Reference, Product_Catalog_Number, Product_Label, Product_Artist, Product_Title, " +
                 "Asset_Artist, Asset_Title, Asset_Version, Asset_Duration, Asset_ISRC, Asset_Reference, AssetOrProduct, " +
@@ -99,8 +99,8 @@ public class DatabaseMySQL {
                 "Sale_ID) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        CSVReader reader = new CSVReader(new FileReader(reportPDF.getAbsolutePath()));
-        BufferedReader bReader = new BufferedReader(new FileReader(reportPDF));
+        CSVReader reader = new CSVReader(new FileReader(report.getAbsolutePath()));
+        BufferedReader bReader = new BufferedReader(new FileReader(report));
         int rowcount = 0; // Total RowCount
         int rowcount2 = 0; // While loop's row count
 
@@ -248,7 +248,7 @@ public class DatabaseMySQL {
         Connection db = DatabaseMySQL.getConn();
 
         PreparedStatement ps = db.prepareStatement("SELECT Asset_ISRC, Asset_Title, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
-                "FROM reportPDF GROUP BY Asset_ISRC ORDER BY Total_Royalty DESC LIMIT 5;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                "FROM report GROUP BY Asset_ISRC ORDER BY Total_Royalty DESC LIMIT 5;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
         return ps.executeQuery();
     }
@@ -257,7 +257,7 @@ public class DatabaseMySQL {
         Connection db = DatabaseMySQL.getConn();
 
         PreparedStatement ps = db.prepareStatement("SELECT DSP, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
-                "FROM reportPDF GROUP BY DSP ORDER BY Total_Royalty DESC;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                "FROM report GROUP BY DSP ORDER BY Total_Royalty DESC;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
         return ps.executeQuery();
     }
@@ -266,7 +266,7 @@ public class DatabaseMySQL {
         Connection db = DatabaseMySQL.getConn();
 
         PreparedStatement ps = db.prepareStatement("SELECT Territory, SUM(Reported_Royalty) AS Total_Royalty, Currency " +
-                "FROM reportPDF GROUP BY Territory ORDER BY Total_Royalty DESC LIMIT 5;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                "FROM report GROUP BY Territory ORDER BY Total_Royalty DESC LIMIT 5;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
         return ps.executeQuery();
     }
@@ -275,7 +275,7 @@ public class DatabaseMySQL {
         Connection db = DatabaseMySQL.getConn();
         ResultSet rs;
 
-        PreparedStatement ps = db.prepareStatement("SELECT COUNT(*) FROM ( SELECT Asset_ISRC FROM reportPDF GROUP BY Asset_ISRC ) AS subquery;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        PreparedStatement ps = db.prepareStatement("SELECT COUNT(*) FROM ( SELECT Asset_ISRC FROM report GROUP BY Asset_ISRC ) AS subquery;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         rs = ps.executeQuery();
         rs.next();
         return rs.getString(1);
@@ -285,14 +285,14 @@ public class DatabaseMySQL {
         Connection db = DatabaseMySQL.getConn();
         ResultSet rs;
 
-        PreparedStatement ps = db.prepareStatement("SELECT Sale_Start_date FROM reportPDF LIMIT 1;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        PreparedStatement ps = db.prepareStatement("SELECT Sale_Start_date FROM report LIMIT 1;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         rs = ps.executeQuery();
         rs.next();
         return rs.getString(1);
     }
 
     public static ResultSet getFullBreakdown() throws SQLException, ClassNotFoundException {
-        /*SELECT Asset_ISRC, SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END) AS 'AU_Earnings', (SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9 AS After_GST, SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END) AS 'Other_Territories_Earnings', ((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END)) AS Reported_Royalty_After_GST, (((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS Reported_Royalty_For_CEYMUSIC FROM reportPDF GROUP BY Asset_ISRC;*/
+        /*SELECT Asset_ISRC, SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END) AS 'AU_Earnings', (SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9 AS After_GST, SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END) AS 'Other_Territories_Earnings', ((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END)) AS Reported_Royalty_After_GST, (((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS Reported_Royalty_For_CEYMUSIC FROM report GROUP BY Asset_ISRC;*/
         Connection db = DatabaseMySQL.getConn();
 
         PreparedStatement ps = db.prepareStatement("SELECT Asset_ISRC, SUM(Reported_Royalty) AS Reported_Royalty_Summary, " +
@@ -301,7 +301,7 @@ public class DatabaseMySQL {
                 "SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END) AS 'Other_Territories_Earnings', " +
                 "((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END)) AS Reported_Royalty_After_GST, " +
                 "(((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS Reported_Royalty_For_CEYMUSIC " +
-                "FROM reportPDF GROUP BY Asset_ISRC ORDER BY Reported_Royalty_Summary DESC;");
+                "FROM report GROUP BY Asset_ISRC ORDER BY Reported_Royalty_Summary DESC;");
 
         return ps.executeQuery();
     }
@@ -318,7 +318,7 @@ public class DatabaseMySQL {
                 "(((SUM(CASE WHEN DSP = 'Apple Music' AND Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN DSP = 'Apple Music' AND Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS Apple_Music, " +
                 "(((SUM(CASE WHEN DSP = 'Facebook Audio Library' OR DSP = 'Facebook Fingerprinting' AND Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN DSP = 'Facebook Audio Library' OR DSP = 'Facebook Fingerprinting' AND Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS Facebook, " +
                 "(((SUM(CASE WHEN DSP != 'Facebook Audio Library' AND DSP != 'Facebook Fingerprinting' AND DSP != 'Youtube Ad Supported' AND DSP != 'Youtube Music' AND DSP != 'Spotify' AND DSP != 'TikTok' AND DSP != 'Apple Music' AND Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN DSP != 'Facebook Audio Library' AND DSP != 'Facebook Fingerprinting' AND DSP != 'Youtube Ad Supported' AND DSP != 'Youtube Music' AND DSP != 'Spotify' AND DSP != 'TikTok' AND DSP != 'Apple Music' AND Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS Rest " +
-                "FROM reportPDF " +
+                "FROM report " +
                 "GROUP BY Asset_ISRC ORDER BY SUM(Reported_Royalty) DESC;");
 
         return ps.executeQuery();
@@ -340,7 +340,7 @@ public class DatabaseMySQL {
                 "(SUM(CASE WHEN Territory = 'JP' THEN Reported_Royalty ELSE 0 END)) * 0.85 AS JP, " +
                 "(SUM(CASE WHEN Territory = 'CA' THEN Reported_Royalty ELSE 0 END)) * 0.85 AS CA, " +
                 "SUM(CASE WHEN Territory != 'AU' AND Territory != 'US' AND Territory != 'GB' AND Territory != 'IT' AND Territory != 'KR' AND Territory != 'LK' AND Territory != 'AE' AND Territory != 'JP' AND Territory != 'CA' THEN Reported_Royalty ELSE 0 END) * 0.85 AS Rest " +
-                "FROM reportPDF " +
+                "FROM report " +
                 "GROUP BY Asset_ISRC ORDER BY SUM(Reported_Royalty) DESC;");
 
         return ps.executeQuery();
@@ -365,11 +365,11 @@ public class DatabaseMySQL {
         Connection db = DatabaseMySQL.getConn();
 
         PreparedStatement ps = db.prepareStatement("""
-                SELECT reportPDF.Asset_ISRC,\s
-                (CASE WHEN songs.ISRC = reportPDF.Asset_ISRC THEN songs.COMPOSER END) AS Composer,\s
-                (CASE WHEN songs.ISRC = reportPDF.Asset_ISRC THEN songs.LYRICIST END) AS Lyricist\s
-                FROM reportPDF\s
-                LEFT OUTER JOIN songs ON reportPDF.Asset_ISRC = songs.ISRC\s
+                SELECT report.Asset_ISRC,\s
+                (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.COMPOSER END) AS Composer,\s
+                (CASE WHEN songs.ISRC = report.Asset_ISRC THEN songs.LYRICIST END) AS Lyricist\s
+                FROM report\s
+                LEFT OUTER JOIN songs ON report.Asset_ISRC = songs.ISRC\s
                 GROUP BY Asset_ISRC \s
                 ORDER BY `Composer` ASC""", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY
         );
@@ -489,8 +489,8 @@ public class DatabaseMySQL {
         PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +
                 "((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY, " +
                 "(((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
-                "FROM `reportPDF` " +
-                "JOIN isrc_payees ON isrc_payees.ISRC = reportPDF.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
+                "FROM `report` " +
+                "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
                 "ORDER BY `REPORTED_ROYALTY` DESC;");
         psGetGross.setString(1, artistName);
         ResultSet rsGross = psGetGross.executeQuery();
@@ -506,11 +506,11 @@ public class DatabaseMySQL {
         Connection connection = DatabaseMySQL.getConn();
 
         PreparedStatement psGetCoWriterShare = connection.prepareStatement("SELECT `isrc_payees`.`PAYEE`, " +
-                "((((SUM(CASE WHEN `reportPDF`.`Territory` = 'AU' THEN `reportPDF`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `reportPDF`.`Territory` != 'AU' THEN `reportPDF`.`Reported_Royalty` ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY " +
+                "((((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY " +
                 "FROM `isrc_payees` " +
-                "JOIN `reportPDF` ON `isrc_payees`.`ISRC` = `reportPDF`.`Asset_ISRC` " +
+                "JOIN `report` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC` " +
                 "WHERE `isrc_payees`.`ISRC` IN (SELECT ISRC FROM isrc_payees WHERE PAYEE = ?) AND `isrc_payees`.`PAYEE` != ? " +
-                "GROUP BY `reportPDF`.`Asset_ISRC`" +
+                "GROUP BY `report`.`Asset_ISRC`" +
                 "LIMIT 5;");
 
         psGetCoWriterShare.setString(1, artistName);
@@ -650,17 +650,17 @@ public class DatabaseMySQL {
     }
 
     public static ResultSet getTopPerformingSongs(String selectedItem) throws SQLException, ClassNotFoundException {
-        /*SELECT `reportPDF`.`Asset_Title`, (((SUM(CASE WHEN `reportPDF`.`Territory` = 'AU' THEN `reportPDF`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `reportPDF`.`Territory` != 'AU' THEN `reportPDF`.`Reported_Royalty` ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY
-        FROM `reportPDF` JOIN `isrc_payees` ON `isrc_payees`.`ISRC` = `reportPDF`.`Asset_ISRC`
-        WHERE `reportPDF`.`Asset_ISRC` IN (SELECT `isrc_payees`.`ISRC` WHERE `isrc_payees`.`PAYEE` = 'Sarath De Alwis')
-        GROUP BY `reportPDF`.`Asset_ISRC`
+        /*SELECT `report`.`Asset_Title`, (((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY
+        FROM `report` JOIN `isrc_payees` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC`
+        WHERE `report`.`Asset_ISRC` IN (SELECT `isrc_payees`.`ISRC` WHERE `isrc_payees`.`PAYEE` = 'Sarath De Alwis')
+        GROUP BY `report`.`Asset_ISRC`
         LIMIT 5;*/
         Connection connection = getConn();
 
-        PreparedStatement ps = connection.prepareStatement("SELECT `reportPDF`.`Asset_Title`, (((SUM(CASE WHEN `reportPDF`.`Territory` = 'AU' THEN `reportPDF`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `reportPDF`.`Territory` != 'AU' THEN `reportPDF`.`Reported_Royalty` ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY " +
-                "FROM `reportPDF` JOIN `isrc_payees` ON `isrc_payees`.`ISRC` = `reportPDF`.`Asset_ISRC` " +
-                "WHERE `reportPDF`.`Asset_ISRC` IN (SELECT `isrc_payees`.`ISRC` WHERE `isrc_payees`.`PAYEE` = ?) " +
-                "GROUP BY `reportPDF`.`Asset_ISRC` " +
+        PreparedStatement ps = connection.prepareStatement("SELECT `report`.`Asset_Title`, (((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY " +
+                "FROM `report` JOIN `isrc_payees` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC` " +
+                "WHERE `report`.`Asset_ISRC` IN (SELECT `isrc_payees`.`ISRC` WHERE `isrc_payees`.`PAYEE` = ?) " +
+                "GROUP BY `report`.`Asset_ISRC` " +
                 "LIMIT 5;");
         ps.setString(1, selectedItem);
 
