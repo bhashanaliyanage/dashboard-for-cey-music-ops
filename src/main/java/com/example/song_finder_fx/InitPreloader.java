@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.Revenue;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -23,15 +24,8 @@ public class InitPreloader implements Initializable {
     public Label lblLoading;
     public static Label lblLoadingg;
     public static boolean starting;
-    public static ResultSet top5Territories;
-    public static ResultSet top4DSPs;
-    public static String count;
-    public static ResultSet top5StreamedAssets;
-    public static String salesDate;
-    public static String[] date;
-    public static String month;
-    public static Double PRODUCT_VERSION;
     public static String updateLocation;
+    public static Revenue revenue = new Revenue();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -73,13 +67,15 @@ public class InitPreloader implements Initializable {
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
-                top5Territories = DatabaseMySQL.getTop5Territories();
-                top4DSPs = DatabaseMySQL.getTop4DSPs();
-                count = DatabaseMySQL.getTotalAssetCount();
-                top5StreamedAssets = DatabaseMySQL.getTop5StreamedAssets();
-                salesDate = DatabaseMySQL.getSalesDate();
-                date = salesDate.split("-");
-                month = date[1];
+                ResultSet top5Territories = DatabaseMySQL.getTop5Territories();
+                ResultSet top4DSPs = DatabaseMySQL.getTop4DSPs();
+                String assetCount = DatabaseMySQL.getTotalAssetCount();
+                ResultSet top5StreamedAssets = DatabaseMySQL.getTop5StreamedAssets();
+                String salesDate = DatabaseMySQL.getSalesDate();
+                String[] date = salesDate.split("-");
+                String month = date[1];
+
+                revenue.setValues(top5Territories, top4DSPs, assetCount, top5StreamedAssets, month);
             } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -94,9 +90,9 @@ public class InitPreloader implements Initializable {
                 ResultSet versionDetails = DatabaseMySQL.checkUpdates();
                 if (versionDetails != null) {
                     versionDetails.next();
-                    PRODUCT_VERSION = versionDetails.getDouble(1);
                     System.out.println("versionDetails = " + versionDetails.getDouble(1));
                     updateLocation = versionDetails.getString(2);
+                    Main.versionInfo.setServerVerion(versionDetails.getDouble(1), versionDetails.getString(2));
                 }
             } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
@@ -126,7 +122,7 @@ public class InitPreloader implements Initializable {
                 VBox main = (VBox) scene.lookup("#mainVBox");
                 main.getChildren().add(UIController.mainNodes[2]);
 
-                stage.setTitle("CeyMusic Toolkit v" + Main.PRODUCT_VERSION);
+                stage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionInfo());
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
                 stage.setMinWidth(1300);
@@ -134,9 +130,7 @@ public class InitPreloader implements Initializable {
                 stage.setScene(scene);
                 stage.show();
 
-                if ((PRODUCT_VERSION != null) && (Main.PRODUCT_VERSION < PRODUCT_VERSION)) {
-                    System.out.println("Main.PRODUCT_VERSION = " + Main.PRODUCT_VERSION);
-                    System.out.println("PRODUCT_VERSION = " + PRODUCT_VERSION);
+                if (Main.versionInfo.updateAvailable()) {
                     Label updateNotify = (Label) scene.lookup("#lblUserEmailAndUpdate");
                     updateNotify.setText("Update Available");
                     updateNotify.setStyle("-fx-text-fill: '#FEA82F'");

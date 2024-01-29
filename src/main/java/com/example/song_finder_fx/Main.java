@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.ProductVersion;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.stage.DirectoryChooser;
@@ -20,11 +21,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Main extends Application {
-    public static Double PRODUCT_VERSION = 23.04;
     public static Stage primaryStage = null;
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
+    public static ProductVersion versionInfo = new ProductVersion(23.04);
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);

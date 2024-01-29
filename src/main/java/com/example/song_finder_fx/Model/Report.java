@@ -1,4 +1,4 @@
-package com.example.song_finder_fx;
+package com.example.song_finder_fx.Model;
 
 import java.text.DecimalFormat;
 

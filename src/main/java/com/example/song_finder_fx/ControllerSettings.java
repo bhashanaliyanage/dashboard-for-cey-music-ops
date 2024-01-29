@@ -12,13 +12,7 @@ import javafx.stage.FileChooser;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 
 public class ControllerSettings {
@@ -114,12 +108,11 @@ public class ControllerSettings {
         mainUIController.mainVBox.getChildren().clear();
         mainUIController.mainVBox.getChildren().add(aboutView);
 
-        String versionInfo = "Build " + Main.PRODUCT_VERSION + " by Bhashana Liyanage";
         Scene scene = aboutView.getScene();
         lblVersionInfoAboutPage = (Label) scene.lookup("#lblVersionInfoAboutPage");
-        lblVersionInfoAboutPage.setText(versionInfo);
+        lblVersionInfoAboutPage.setText(Main.versionInfo.getCurrentVersionInfo());
 
-        if ((InitPreloader.PRODUCT_VERSION != null) && (Main.PRODUCT_VERSION < InitPreloader.PRODUCT_VERSION)) {
+        if (Main.versionInfo.updateAvailable()) {
             loadUpdate();
         }
     }
@@ -132,21 +125,11 @@ public class ControllerSettings {
         mainUIController.sideVBox.getChildren().clear();
         mainUIController.sideVBox.getChildren().add(sidepanelContent);
 
-        lblVersion.setText("Version " + InitPreloader.PRODUCT_VERSION);
+        lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
     }
 
-    /*public void onUpdateBtnClick() throws IOException {
-        File setup = new File("http:\\192.168.1.200:8080\\ceymusic-dahsboard-software-updates\\CrystalDiskInfo8_17_13.exe");
-        if (Desktop.isDesktopSupported()) {
-            Desktop.getDesktop().open(setup);
-        }
-    }*/
-
     public void onUpdateBtnClick() throws IOException, URISyntaxException {
-        Path tempDir = Files.createTempDirectory("CeyMusic_Dashboard_UpdateTemp");
-        InputStream in = new URI(InitPreloader.updateLocation).toURL().openStream();
-        Path tempFile = Files.createTempFile(tempDir, "update_cey_dash", ".msi");
-        Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
-        Desktop.getDesktop().open(new File(tempFile.toUri()));
+        File updateFile = Main.versionInfo.getUpdate();
+        Desktop.getDesktop().open(updateFile);
     }
 }

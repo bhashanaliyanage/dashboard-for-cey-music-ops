@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.Report;
 import com.itextpdf.layout.Document;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -126,34 +127,33 @@ public class ControllerRevenueGenerator {
         loaderSide.setController(this);
         Parent newContentMain = loaderMain.load();
         Parent newContentSide = loaderSide.load();
-        ItemSwitcher itemSwitcher = new ItemSwitcher();
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
         mainUIController.sideVBox.getChildren().setAll(newContentSide);
 
-        Thread threadLoadAssets = getThreadLoadAssets(itemSwitcher);
+        Thread threadLoadAssets = getThreadLoadAssets();
         threadLoadAssets.start();
     }
 
-    private Thread getThreadLoadAssets(ItemSwitcher itemSwitcher) {
+    private Thread getThreadLoadAssets() {
         Task<Void> taskLoadAssets;
 
         taskLoadAssets = new Task<>() {
             @Override
             protected Void call() {
                 Platform.runLater(() -> {
-                    if (InitPreloader.month != null) {
-                        lblTitleMonth.setText(itemSwitcher.setMonth(InitPreloader.month));
+                    if (InitPreloader.revenue.getMonth() != null) {
+                        lblTitleMonth.setText(InitPreloader.revenue.getMonth());
                     }
 
-                    if (InitPreloader.count != null) {
-                        lblTotalAssets.setText(InitPreloader.count);
+                    if (InitPreloader.revenue.getAssetCount() != null) {
+                        lblTotalAssets.setText(InitPreloader.revenue.getAssetCount());
                     }
 
                     try {
-                        loadTopStreamedAssets(InitPreloader.top5StreamedAssets);
-                        loadTop5Territories(InitPreloader.top5Territories);
-                        loadTop4DSPs(InitPreloader.top4DSPs);
+                        loadTopStreamedAssets(InitPreloader.revenue.getTop5StreamedAssets());
+                        loadTop5Territories(InitPreloader.revenue.getTop5Territories());
+                        loadTop4DSPs(InitPreloader.revenue.getTop4DSPs());
                     } catch (SQLException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }
