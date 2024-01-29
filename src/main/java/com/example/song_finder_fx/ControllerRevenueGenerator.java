@@ -44,6 +44,7 @@ public class ControllerRevenueGenerator {
     //</editor-fold>
 
     //<editor-fold desc="Labels">
+    public Label lblUpdateSongsDatabase;
     public Label lblStatus;
     public Label lblWriter01;
     public Label lblWriter02;
@@ -112,6 +113,7 @@ public class ControllerRevenueGenerator {
     private final UIController mainUIController;
     private final Path tempDir = Files.createTempDirectory("missing_isrcs");
     private final Path csvFile = tempDir.resolve("missing_isrcs.csv");
+    private final Report report = new Report();
 
     public ControllerRevenueGenerator(UIController uiController) throws IOException {
         mainUIController = uiController;
@@ -566,6 +568,37 @@ public class ControllerRevenueGenerator {
         }
     }
 
+    public void onSidePanelUpdateSongsDatabaseBtnClick(MouseEvent mouseEvent) {
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Window window = scene.getWindow();
+        File file = Main.browseForCSV(window);
+
+        if (file != null) {
+            // System.out.println("Check");
+
+            Task<Void> taskUpdateSongDatabase;
+
+            taskUpdateSongDatabase = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    boolean status = DatabaseMySQL.updateSongsTable(file, lblUpdateSongsDatabase, lblUpdateSongsDatabase);
+
+                    if (status) {
+                        Platform.runLater(() -> lblUpdateSongsDatabase.setText("Done"));
+                    } else {
+                        Platform.runLater(() -> lblUpdateSongsDatabase.setText("Error"));
+                    }
+
+                    return null;
+                }
+            };
+
+            Thread threadUpdateSongDatabase = new Thread(taskUpdateSongDatabase);
+            threadUpdateSongDatabase.start();
+        }
+    }
+
     public void loadArtistReports() throws IOException {
         FXMLLoader loaderMain = new FXMLLoader(ControllerSettings.class.getResource("layouts/artist-reports.fxml"));
         loaderMain.setController(this);
@@ -717,17 +750,14 @@ public class ControllerRevenueGenerator {
                         // Calculating amount payable
                         amountPayable[0] = grossRevenueInLKR - tax[0];
 
-                        String formattedGrossRevenue = df.format(grossRevenueInLKR);
-                        String formattedPartnerShare = df.format(partnerShareInLKR);
-                        String formattedTax = df.format(tax[0]);
-                        String formattedAmountPayable = df.format(amountPayable[0]);
+                        report.setGrossRevenue(grossRevenueInLKR, partnerShareInLKR, tax[0], amountPayable[0]);
 
                         // Update UI
                         Platform.runLater(() -> {
-                            lblGross.setText("LKR " + formattedGrossRevenue);
-                            lblP_Share.setText("LKR " + formattedPartnerShare);
-                            lblTax.setText("LKR " + formattedTax);
-                            lblAmtPayable.setText("LKR " + formattedAmountPayable);
+                            lblGross.setText(report.getGrossRevenueInLKR());
+                            lblP_Share.setText(report.getPartnerShareInLKR());
+                            lblTax.setText(report.getTaxAmount());
+                            lblAmtPayable.setText(report.getAmountPayable());
                         });
                         return null;
                     }
@@ -935,8 +965,8 @@ public class ControllerRevenueGenerator {
         Scene scene = node.getScene();
         Window window = scene.getWindow();
 
-        Report report = new Report();
-        Document document = report.generateReport(window, payee);
+        ReportPDF reportPDF = new ReportPDF();
+        Document document = reportPDF.generateReport(window, report);
 
         if (!Objects.equals(payee, null)) {
             // TODO: Moved content outside temporary
