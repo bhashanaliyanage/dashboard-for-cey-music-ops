@@ -1,27 +1,47 @@
 package com.example.song_finder_fx.Model;
 
+import com.example.song_finder_fx.DatabaseMySQL;
+
+import java.sql.SQLException;
+
 public class Songs {
     private String isrc;
-    private String songName;
+    private String trackTitle;
     private String singer;
     private String composer;
     private String lyricist;
+    private String productTitle;
+    private String upc;
+    private String featuringArtist;
 
-    public void setSongName(String songName) {
-        this.songName = songName;
+    public void setTrackTitle(String trackTitle) {
+        this.trackTitle = trackTitle;
     }
 
     public Songs() {
     }
 
+    public void setSongDetails(String isrcFromDatabase, String albumTitle, String upc, String trackTitle, String singer,
+                               String featuringArtist, String composer, String lyricist, String fileName) {
+        isrc = isrcFromDatabase;
+        this.productTitle = albumTitle;
+        this.upc = upc;
+        this.trackTitle = trackTitle;
+        this.singer = singer;
+        this.featuringArtist = featuringArtist;
+        this.composer = composer;
+        this.lyricist = lyricist;
+
+    }
+
     public Songs(String songName, String isrc, String singer) {
-        this.songName = songName;
+        this.trackTitle = songName;
         this.isrc = isrc;
         this.singer = singer;
     }
 
     public Songs(String songName, String isrc, String singer, String composer, String lyricist) {
-        this.songName = songName;
+        this.trackTitle = songName;
         this.isrc = isrc;
         this.singer = singer;
         this.composer = composer;
@@ -32,8 +52,8 @@ public class Songs {
         this.isrc = isrc;
     }
 
-    public String getSongName() {
-        return songName;
+    public String getTrackTitle() {
+        return trackTitle;
     }
 
     public String getISRC() {
@@ -62,5 +82,35 @@ public class Songs {
 
     public void setLyricist(String lyricist) {
         this.lyricist = lyricist;
+    }
+
+    public boolean composerAndLyricistCeyMusic() throws SQLException, ClassNotFoundException {
+        boolean composerCeyMusic = DatabaseMySQL.searchArtistTable(composer);
+        boolean lyricistCeyMusic = DatabaseMySQL.searchArtistTable(lyricist);
+
+        return composerCeyMusic && lyricistCeyMusic;
+    }
+
+    public boolean composerOrLyricistCeyMusic() throws SQLException, ClassNotFoundException {
+        boolean composerCeyMusic = DatabaseMySQL.searchArtistTable(composer);
+        boolean lyricistCeyMusic = DatabaseMySQL.searchArtistTable(lyricist);
+
+        return composerCeyMusic || lyricistCeyMusic;
+    }
+
+    public boolean composerCeyMusic() throws SQLException, ClassNotFoundException {
+        return DatabaseMySQL.searchArtistTable(composer);
+    }
+
+    public String getProductName() {
+        return productTitle;
+    }
+
+    public String getUPC() {
+        return upc;
+    }
+
+    public String getFeaturing() {
+        return featuringArtist;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.Songs;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -74,14 +75,14 @@ public class ControllerSongList {
 
         for (int i = 0; i < nodes.length; i++) {
             try {
-                List<String> songDetail = db.searchSongDetails(songList.get(i));
+                Songs songDetail = db.searchSongDetails(songList.get(i));
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist.fxml")));
                 Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
                 Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
                 Label lblArtist = (Label) nodes[i].lookup("#srchRsArtist");
-                lblSongName.setText(songDetail.get(3));
-                lblISRC.setText(songDetail.get(0));
-                lblArtist.setText(songDetail.get(4));
+                lblSongName.setText(songDetail.getTrackTitle());
+                lblISRC.setText(songDetail.getISRC());
+                lblArtist.setText(songDetail.getSinger());
                 vboxSong.getChildren().add(nodes[i]);
             } catch (NullPointerException | IOException ex) {
                 ex.printStackTrace();
@@ -176,7 +177,7 @@ public class ControllerSongList {
             protected Void call() {
                 Platform.runLater(() -> {
                     try {
-                        controllerInvoice.loadThings(actionEvent);
+                        controllerInvoice.loadThings();
                     } catch (IOException | SQLException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }

@@ -267,7 +267,7 @@ public class UIController {
             String isrc = searchResultISRC.getText();
 
             DatabaseMySQL db = new DatabaseMySQL();
-            List<String> songDetails = db.searchSongDetails(isrc);
+            Songs songDetails = db.searchSongDetails(isrc);
 
             // Getting the current parent layout
             FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
@@ -290,16 +290,15 @@ public class UIController {
             Label songUPC = (Label) scene.lookup("#songUPC");
             Label songProductName = (Label) scene.lookup("#songProductName");
             Label songShare = (Label) scene.lookup("#songShare");
-            songISRC.setText(songDetails.get(0));
-            songProductName.setText(songDetails.get(1));
-            songUPC.setText(songDetails.get(2));
-            songName.setText(songDetails.get(3));
-            songNameViewTitle.setText(songDetails.get(3));
-            songSinger.setText(songDetails.get(4));
-            songFeaturing.setText(songDetails.get(5));
-            System.out.println("songDetails.get(5) = " + songDetails.get(5));
-            songComposer.setText(songDetails.get(6));
-            songLyricist.setText(songDetails.get(7));
+            songISRC.setText(songDetails.getISRC());
+            songProductName.setText(songDetails.getProductName());
+            songUPC.setText(songDetails.getUPC());
+            songName.setText(songDetails.getTrackTitle());
+            songNameViewTitle.setText(songDetails.getTrackTitle());
+            songSinger.setText(songDetails.getSinger());
+            songFeaturing.setText(songDetails.getFeaturing());
+            songComposer.setText(songDetails.getComposer());
+            songLyricist.setText(songDetails.getLyricist());
             songShare.setText("No Detail");
         }
     }
@@ -551,7 +550,7 @@ public class UIController {
         Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
         ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
 
-        song.setSongName(lblSongName.getText());
+        song.setTrackTitle(lblSongName.getText());
         song.setSinger(lblArtist.getText());
 
         String isrc;
@@ -621,20 +620,12 @@ public class UIController {
         String isrc = searchResultISRC.getText();
 
         DatabaseMySQL db = new DatabaseMySQL();
-        List<String> songDetails = db.searchSongDetails(isrc);
-
-        // Get Composer and Lyricist
-        String composer = songDetails.get(6);
-        String lyricist = songDetails.get(7);
-
-        // Search Composer and Lyricist from Artists Table
-        Boolean composerCeyMusic = DatabaseMySQL.searchArtistTable(composer);
-        Boolean lyricistCeyMusic = DatabaseMySQL.searchArtistTable(lyricist);
+        Songs songDetails = db.searchSongDetails(isrc);
 
         String percentage;
-        if (composerCeyMusic && lyricistCeyMusic) {
+        if (songDetails.composerAndLyricistCeyMusic()) {
             percentage = "100%";
-        } else if (composerCeyMusic || lyricistCeyMusic) {
+        } else if (songDetails.composerOrLyricistCeyMusic()) {
             percentage = "50%";
         } else {
             percentage = "0%";
@@ -663,15 +654,15 @@ public class UIController {
         Label songUPC = (Label) scene.lookup("#songUPC");
         Label songProductName = (Label) scene.lookup("#songProductName");
         Label songShare = (Label) scene.lookup("#songShare");
-        songISRC.setText(songDetails.get(0));
-        songProductName.setText(songDetails.get(1));
-        songUPC.setText(songDetails.get(2));
-        songName.setText(songDetails.get(3));
-        songNameViewTitle.setText(songDetails.get(3));
-        songSinger.setText(songDetails.get(4));
-        songFeaturing.setText(songDetails.get(5));
-        songComposer.setText(songDetails.get(6));
-        songLyricist.setText(songDetails.get(7));
+        songISRC.setText(songDetails.getISRC());
+        songProductName.setText(songDetails.getProductName());
+        songUPC.setText(songDetails.getUPC());
+        songName.setText(songDetails.getTrackTitle());
+        songNameViewTitle.setText(songDetails.getTrackTitle());
+        songSinger.setText(songDetails.getSinger());
+        songFeaturing.setText(songDetails.getFeaturing());
+        songComposer.setText(songDetails.getComposer());
+        songLyricist.setText(songDetails.getLyricist());
         songShare.setText(percentage);
     }
 
@@ -708,7 +699,7 @@ public class UIController {
                     Label lblArtist = (Label) nodes[i].lookup("#songSinger");
                     Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
                     Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
-                    lblSongName.setText(songList.get(i).getSongName());
+                    lblSongName.setText(songList.get(i).getTrackTitle());
                     lblISRC.setText(songList.get(i).getISRC().trim());
                     lblArtist.setText(songList.get(i).getSinger().trim());
                     lblComposer.setText(songList.get(i).getComposer().trim());
@@ -950,7 +941,7 @@ public class UIController {
         if (status[0]) {
             imgMediaPico.setImage(pauseImg);
             lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-            lblPlayerSongName.setText(sng.getSongName());
+            lblPlayerSongName.setText(sng.getTrackTitle());
             lblPlayerArtist.setText(sng.getSinger());
             // Platform.runLater(() -> System.out.println("lblSongName = " + lblSongName.getText()));
         } else {

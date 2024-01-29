@@ -695,9 +695,9 @@ public class DatabaseMySQL {
 
         try {
             // Printing Searched Content
-            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName() + " | " + songs.get(0).getSinger());
-            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName() + " | " + songs.get(1).getSinger());
-            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName() + " | " + songs.get(2).getSinger());
+            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getTrackTitle() + " | " + songs.get(0).getSinger());
+            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getTrackTitle() + " | " + songs.get(1).getSinger());
+            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getTrackTitle() + " | " + songs.get(2).getSinger());
 
             // Printing new line
             System.out.println("================");
@@ -725,9 +725,9 @@ public class DatabaseMySQL {
 
         try {
             // Printing Searched Content
-            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName() + " | " + songs.get(0).getSinger());
-            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName() + " | " + songs.get(1).getSinger());
-            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName() + " | " + songs.get(2).getSinger());
+            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getTrackTitle() + " | " + songs.get(0).getSinger());
+            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getTrackTitle() + " | " + songs.get(1).getSinger());
+            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getTrackTitle() + " | " + songs.get(2).getSinger());
 
             // Printing new line
             System.out.println("================");
@@ -738,10 +738,9 @@ public class DatabaseMySQL {
         return songs;
     }
 
-    public List<String> searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
-        // Songs songDetails = new Songs();
+    public Songs searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
+        Songs song = new Songs();
         ResultSet rs;
-        List<String> songDetails = new ArrayList<>();
 
         Connection conn = getConn();
 
@@ -769,21 +768,10 @@ public class DatabaseMySQL {
             String composer = rs.getString(7);
             String lyricist = rs.getString(8);
             String fileName = rs.getString(9);
-            songDetails.add(isrcFromDatabase);
-            songDetails.add(albumTitle);
-            songDetails.add(upc);
-            songDetails.add(trackTitle);
-            songDetails.add(singer);
-            songDetails.add(featuringArtist);
-            songDetails.add(composer);
-            songDetails.add(lyricist);
-            songDetails.add(fileName);
-            // songDetails.songDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist, fileName);
+            song.setSongDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist, fileName);
         }
 
-        System.out.println(songDetails.size());
-
-        return songDetails;
+        return song;
     }
 
     public static Boolean searchArtistTable(String artist) throws SQLException, ClassNotFoundException {

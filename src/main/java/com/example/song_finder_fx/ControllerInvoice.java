@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.Songs;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -41,7 +42,7 @@ public class ControllerInvoice {
         this.mainUIController = mainUIController;
     }
 
-    public void loadThings(ActionEvent actionEvent) throws IOException, SQLException, ClassNotFoundException {
+    public void loadThings() throws IOException, SQLException, ClassNotFoundException {
         FXMLLoader loader = new FXMLLoader(ControllerInvoice.class.getResource("layouts/song-list-invoice.fxml"));
         loader.setController(this);
         Parent newContent = loader.load();
@@ -71,34 +72,32 @@ public class ControllerInvoice {
 
         for (int i = 0; i < nodes.length; i++) {
             try {
-                List<String> songDetail = db.searchSongDetails(songList.get(i));
+                Songs songDetail = db.searchSongDetails(songList.get(i));
 
                 // Search Composer and Lyricist from Artists Table
-                Boolean composerCeyMusic = db.searchArtistTable(songDetail.get(6)); // 6
-                Boolean lyricistCeyMusic = db.searchArtistTable(songDetail.get(7)); // 7
                 String percentage;
                 String copyrightOwner = null;
                 String copyrightOwnerTemp = null;
 
-                if (composerCeyMusic && lyricistCeyMusic) {
+                if (songDetail.composerAndLyricistCeyMusic()) {
                     percentage = "100%";
-                    copyrightOwner = songDetail.get(6) + "\n" + songDetail.get(7);
-                    copyrightOwnerTemp = songDetail.get(6) + " | " + songDetail.get(7);
-                } else if (composerCeyMusic || lyricistCeyMusic) {
+                    copyrightOwner = songDetail.getComposer() + "\n" + songDetail.getLyricist();
+                    copyrightOwnerTemp = songDetail.getComposer() + " | " + songDetail.getLyricist();
+                } else if (songDetail.composerOrLyricistCeyMusic()) {
                     percentage = "50%";
-                    if (composerCeyMusic) {
-                        copyrightOwner = songDetail.get(6);
-                        copyrightOwnerTemp = songDetail.get(6);
+                    if (songDetail.composerCeyMusic()) {
+                        copyrightOwner = songDetail.getComposer();
+                        copyrightOwnerTemp = songDetail.getComposer();
                     } else {
-                        copyrightOwner = songDetail.get(7);
-                        copyrightOwnerTemp = songDetail.get(7);
+                        copyrightOwner = songDetail.getLyricist();
+                        copyrightOwnerTemp = songDetail.getLyricist();
                     }
                 } else {
                     percentage = "0%";
                 }
 
                 // Adding song details to a temporary SQLite table
-                String songName = songDetail.get(3);
+                String songName = songDetail.getTrackTitle();
                 boolean status = Database.handleSongListTemp(songName, percentage, copyrightOwnerTemp);
 
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist-invoice.fxml")));
@@ -121,7 +120,7 @@ public class ControllerInvoice {
                 Label lblArtist = (Label) nodes[i].lookup("#songArtist");
                 Label lblSongShare = (Label) nodes[i].lookup("#songShare");
 
-                lblSongName.setText(songDetail.get(3));
+                lblSongName.setText(songDetail.getTrackTitle());
                 lblArtist.setText(copyrightOwner);
                 lblSongShare.setText(percentage);
 
