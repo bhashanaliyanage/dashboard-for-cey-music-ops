@@ -1,6 +1,6 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Model.Report;
+import com.example.song_finder_fx.Model.ArtistReport;
 import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.color.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
@@ -30,7 +30,7 @@ public class ReportPDF {
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
 
-    public Document generateReport(Window window, Report report) throws IOException {
+    public Document generateReport(Window window, ArtistReport report) throws IOException {
         String path = getSaveLocation(window);
 
         PDFDocument pdfDocument = new PDFDocument();

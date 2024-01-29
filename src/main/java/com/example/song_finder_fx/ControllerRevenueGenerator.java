@@ -1,6 +1,7 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Model.Report;
+import com.example.song_finder_fx.Controller.CSVController;
+import com.example.song_finder_fx.Model.ArtistReport;
 import com.itextpdf.layout.Document;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -114,7 +115,7 @@ public class ControllerRevenueGenerator {
     private final UIController mainUIController;
     private final Path tempDir = Files.createTempDirectory("missing_isrcs");
     private final Path csvFile = tempDir.resolve("missing_isrcs.csv");
-    private final Report report = new Report();
+    private final ArtistReport report = new ArtistReport();
 
     public ControllerRevenueGenerator(UIController uiController) throws IOException {
         mainUIController = uiController;
@@ -342,10 +343,12 @@ public class ControllerRevenueGenerator {
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                boolean status = DatabaseMySQL.loadReport(report, lblReportProgress, lbl_import, imgImportCaution);
+                CSVController csvController = new CSVController(report);
+                int status = csvController.loadFUGAReport(lblReportProgress, imgImportCaution, lbl_import);
+                // boolean status = DatabaseMySQL.loadReport(report, lblReportProgress, lbl_import, imgImportCaution);
 
                 Platform.runLater(() -> {
-                    if (status) {
+                    if (status > 0) {
                         lblReportProgress.setText("CSV Imported to Database");
                         imgImportCaution.setVisible(true);
                     }
@@ -966,7 +969,7 @@ public class ControllerRevenueGenerator {
         Window window = scene.getWindow();
 
         ReportPDF reportPDF = new ReportPDF();
-        Document document = reportPDF.generateReport(window, report);
+        reportPDF.generateReport(window, report);
 
         if (!Objects.equals(payee, null)) {
             // TODO: Moved content outside temporary

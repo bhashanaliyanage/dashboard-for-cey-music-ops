@@ -2,7 +2,7 @@ package com.example.song_finder_fx.Model;
 
 import java.text.DecimalFormat;
 
-public class Report {
+public class ArtistReport {
     private String payee;
     private String grossRevenueInLKR;
     private String partnerShareInLKR;
