@@ -682,7 +682,6 @@ public class UIController {
         String text = searchArea.getText();
 
         // Connecting to database
-        DatabaseMySQL db = new DatabaseMySQL();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
         loader.load();
 

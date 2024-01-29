@@ -1,18 +1,11 @@
 package com.example.song_finder_fx.Model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Songs {
     private String isrc;
-    private String albumTitle;
-    private String upc;
     private String songName;
     private String singer;
-    private String featuringArtist;
     private String composer;
     private String lyricist;
-    private String fileName;
 
     public void setSongName(String songName) {
         this.songName = songName;
@@ -33,18 +26,6 @@ public class Songs {
         this.singer = singer;
         this.composer = composer;
         this.lyricist = lyricist;
-    }
-
-    public void songDetails(String isrc, String albumTitle, String upc, String trackTitle, String singer, String featuringArtist, String Composer, String lyricist, String fileName) {
-        this.isrc = isrc;
-        this.albumTitle = albumTitle;
-        this.upc = upc;
-        songName = trackTitle;
-        this.singer = singer;
-        this.featuringArtist = featuringArtist;
-        this.composer = Composer;
-        this.lyricist = lyricist;
-        this.fileName = fileName;
     }
 
     public void setIsrc(String isrc) {
