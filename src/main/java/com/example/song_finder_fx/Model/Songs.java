@@ -1,4 +1,4 @@
-package com.example.song_finder_fx;
+package com.example.song_finder_fx.Model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,22 +51,6 @@ public class Songs {
         this.isrc = isrc;
     }
 
-    public List<String> getSongDetails() {
-        List<String> songDetails = new ArrayList<>();
-
-        songDetails.add(isrc);
-        songDetails.add(albumTitle);
-        songDetails.add(upc);
-        songDetails.add(songName);
-        songDetails.add(singer);
-        songDetails.add(featuringArtist);
-        songDetails.add(composer);
-        songDetails.add(lyricist);
-        songDetails.add(fileName);
-
-        return songDetails;
-    }
-
     public String getSongName() {
         return songName;
     }
@@ -89,5 +73,13 @@ public class Songs {
 
     public void setSinger(String text) {
         this.singer = text;
+    }
+
+    public void setComposer(String composer) {
+        this.composer = composer;
+    }
+
+    public void setLyricist(String lyricist) {
+        this.lyricist = lyricist;
     }
 }

@@ -1,5 +1,7 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.Search;
+import com.example.song_finder_fx.Model.Songs;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -45,20 +47,9 @@ import java.util.stream.Stream;
 
 public class UIController {
     public VBox sideVBox;
-    private String searchType = "TRACK_TITLE";
     private final NotificationBuilder nb = new NotificationBuilder();
     static final Node[] mainNodes = new Node[7];
-
-    public static void setAllScenes() throws IOException {
-        // About
-        mainNodes[1] = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/about.fxml")));
-        // Search
-        mainNodes[2] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/search-details.fxml")));
-        // Search and collect songs
-        mainNodes[3] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/collect-songs.fxml")));
-        // Revenue Analysis
-        // mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/revenue-generator.fxml")));
-    }
+    private final Search search = new Search();
 
     //<editor-fold desc="Variables">
     //<editor-fold desc="TextArea">
@@ -146,30 +137,41 @@ public class UIController {
     //</editor-fold>
     //</editor-fold>
 
+    public static void setAllScenes() throws IOException {
+        // About
+        mainNodes[1] = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/about.fxml")));
+        // Search
+        mainNodes[2] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/search-details.fxml")));
+        // Search and collect songs
+        mainNodes[3] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/collect-songs.fxml")));
+        // Revenue Analysis
+        // mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/revenue-generator.fxml")));
+    }
+
     //<editor-fold desc="Search">
     public void btnSetSearchTypeISRC() {
         lblSearchType.setText("ISRC");
-        searchType = "ISRC";
+        search.setType("ISRC");
     }
 
     public void btnSetSearchTypeSinger() {
         lblSearchType.setText("Singer");
-        searchType = "SINGER";
+        search.setType("SINGER");
     }
 
     public void btnSetSearchTypeComposer() {
         lblSearchType.setText("Composer");
-        searchType = "COMPOSER";
+        search.setType("COMPOSER");
     }
 
     public void btnSetSearchTypeLyricist() {
         lblSearchType.setText("Lyricist");
-        searchType = "LYRICIST";
+        search.setType("LYRICIST");
     }
 
     public void btnSetSearchTypeName() {
         lblSearchType.setText("Name");
-        searchType = "TRACK_TITLE";
+        search.setType("TRACK_TITLE");
     }
 
     public void onSearchedSongPress(KeyEvent event) {
@@ -537,21 +539,20 @@ public class UIController {
         Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
 
         Main.directoryCheck();
-        Songs sng = new Songs();
+        Songs song = new Songs();
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
 
         Label lblISRC = (Label) scene.lookup("#songISRC");
-
         Label lblSongName = (Label) scene.lookup("#songName");
-
         Label lblArtist = (Label) scene.lookup("#songSinger");
-        sng.setSongName(lblSongName.getText());
-        sng.setSinger(lblArtist.getText());
         Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
         Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
         ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
+
+        song.setSongName(lblSongName.getText());
+        song.setSinger(lblArtist.getText());
 
         String isrc;
         try {
@@ -564,8 +565,6 @@ public class UIController {
         Path start = Paths.get(Main.selectedDirectory.toURI());
         final boolean[] status = new boolean[1];
 
-        System.out.println(isrc);
-
         lblPlayerSongName.setText("Loading audio");
         lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
         imgMediaPico.setImage(img);
@@ -577,15 +576,13 @@ public class UIController {
                 Clip clip = Main.getClip();
                 if (clip != null) {
                     clip.stop();
-                    status[0] = Main.playAudio(start, finalIsrc);
-                } else {
-                    status[0] = Main.playAudio(start, finalIsrc);
                 }
+                status[0] = Main.playAudio(start, finalIsrc);
                 return null;
             }
         };
 
-        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblPlayerArtist, imgMediaPico, sng));
+        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblPlayerArtist, imgMediaPico, song));
 
         new Thread(task).start();
     }
@@ -606,7 +603,6 @@ public class UIController {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("onSearchDetailsButtonClick");
         } else {
             UIController.showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
         }
@@ -685,7 +681,6 @@ public class UIController {
         // Getting search keywords
         String text = searchArea.getText();
 
-
         // Connecting to database
         DatabaseMySQL db = new DatabaseMySQL();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
@@ -697,7 +692,7 @@ public class UIController {
         Task<List<Songs>> task = new Task<>() {
             @Override
             protected java.util.List<Songs> call() throws Exception {
-                return db.searchSongDetailsBySearchType(text, searchType);
+                return search.search(text);
             }
         };
 
@@ -720,7 +715,6 @@ public class UIController {
                     lblComposer.setText(songList.get(i).getComposer().trim());
                     lblLyricist.setText(songList.get(i).getLyricist().trim());
                     vboxSong.getChildren().add(nodes[i]);
-
                 } catch (NullPointerException | IOException ex) {
                     ex.printStackTrace();
                 }

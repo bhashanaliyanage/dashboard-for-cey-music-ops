@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
@@ -671,7 +672,7 @@ public class DatabaseMySQL {
         return "null";
     }
 
-    public List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException, ClassNotFoundException {
+    public static List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException, ClassNotFoundException {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;
 
@@ -684,13 +685,12 @@ public class DatabaseMySQL {
 
         while (rs.next()) {
             songs.add(new Songs(
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getString(3),
-                    rs.getString(4),
-                    rs.getString(5)
+                    rs.getString(1), // TRACK_TITLE
+                    rs.getString(2), // ISRC
+                    rs.getString(3), // SINGER
+                    rs.getString(4), // COMPOSER
+                    rs.getString(5) // LYRICIST
             ));
-            System.out.println(rs.getString(1));
         }
 
         try {
