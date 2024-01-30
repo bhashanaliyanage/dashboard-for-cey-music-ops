@@ -45,7 +45,7 @@ public class ControllerInvoice {
     }
 
     public void loadThings() throws IOException, SQLException, ClassNotFoundException {
-        FXMLLoader loader = new FXMLLoader(ControllerInvoice.class.getResource("./layouts/song-list-invoice.fxml"));
+        FXMLLoader loader = new FXMLLoader(ControllerInvoice.class.getResource("layouts/song-list-invoice.fxml"));
         loader.setController(this);
         Parent newContent = loader.load();
         mainUIController.mainVBox.getChildren().clear();

@@ -27,6 +27,10 @@ public class ProductVersion {
         return "Build " + currentVersion + " by Bhashana Liyanage";
     }
 
+    public double getCurrentVersionNumber() {
+        return currentVersion;
+    }
+
     public boolean updateAvailable() {
         return currentVersion < updateVersion;
     }

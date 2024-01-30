@@ -125,7 +125,7 @@ public class InitPreloader implements Initializable {
                 VBox main = (VBox) scene.lookup("#mainVBox");
                 main.getChildren().add(UIController.mainNodes[2]);
 
-                stage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionInfo());
+                stage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionNumber());
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
                 stage.setMinWidth(1300);
