@@ -185,8 +185,6 @@ public class Invoice {
 
         // Getting Song List to generate Invoice
         int rowCount = 0;
-        // ResultSet songList = Database.getSongList();
-        int songCount = songs.size();
 
         Table currentTable = createNewTable(); // createNewTable is a method to create a new table like table03
         currentTable.addCell(new Cell().add(new Paragraph("SONG").setFont(font_rubik))
