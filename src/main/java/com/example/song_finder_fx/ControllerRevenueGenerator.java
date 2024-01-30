@@ -1,6 +1,9 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.CSVController;
+import com.example.song_finder_fx.Controller.ItemSwitcher;
+import com.example.song_finder_fx.Controller.NotificationBuilder;
+import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Model.ArtistReport;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -921,7 +924,7 @@ public class ControllerRevenueGenerator {
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                csvController.setReport(report);
+                csvController.setFUGAReport(report);
                 int status = csvController.loadFUGAReport(lblReportProgress, imgImportCaution, lbl_import);
                 // boolean status = DatabaseMySQL.loadReport(report, lblReportProgress, lbl_import, imgImportCaution);
 

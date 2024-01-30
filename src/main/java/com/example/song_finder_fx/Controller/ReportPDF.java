@@ -1,5 +1,6 @@
-package com.example.song_finder_fx;
+package com.example.song_finder_fx.Controller;
 
+import com.example.song_finder_fx.DatabaseMySQL;
 import com.example.song_finder_fx.Model.ArtistReport;
 import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.color.DeviceRgb;
@@ -19,8 +20,8 @@ import javafx.stage.Window;
 import java.io.File;
 import java.io.IOException;
 
-import static com.example.song_finder_fx.Invoice.loadAutoScaledImage;
-import static com.example.song_finder_fx.Invoice.loadFont;
+import static com.example.song_finder_fx.Controller.Invoice.loadAutoScaledImage;
+import static com.example.song_finder_fx.Controller.Invoice.loadFont;
 
 public class ReportPDF {
     private static final Color INVOICE_LIGHT_BLUE = new DeviceRgb(232, 243, 251);

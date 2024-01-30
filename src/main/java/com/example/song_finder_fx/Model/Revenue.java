@@ -1,6 +1,6 @@
 package com.example.song_finder_fx.Model;
 
-import com.example.song_finder_fx.ItemSwitcher;
+import com.example.song_finder_fx.Controller.ItemSwitcher;
 
 import java.sql.ResultSet;
 

@@ -31,52 +31,8 @@ public class CSVController {
 
     }
 
-
-    public void setReport(File report) {
-        this.csv = report;
-    }
-
-    public int loadFUGAReport(Label lblReportProgress, ImageView imgImportCaution, Label lbl_import) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
-        int status = 0;
-        CSVReader reader = new CSVReader(new FileReader(csv.getAbsolutePath()));
-        BufferedReader bReader = new BufferedReader(new FileReader(csv));
-
-        DatabaseMySQL.emptyReportTable();
-
-        int totalRowCount = getTotalRowCount(bReader);
-        int rowcount2 = 0; // While loop's row count
-
-        reader.readNext(); // Skipping the header
-        String[] nextLine;
-        while ((nextLine = reader.readNext()) != null) {
-            rowcount2++;
-            double percentage = ((double) rowcount2 / totalRowCount) * 100;
-
-            Platform.runLater(() -> lblReportProgress.setText("Processing " + df.format(percentage) + "%"));
-
-            FUGAReport report = getFugaReport(nextLine);
-
-            Platform.runLater(() -> System.out.println("percentage = " + percentage));
-
-            try {
-                status = DatabaseMySQL.addRowFUGAReport(report);
-            } catch (SQLException | ClassNotFoundException e) {
-                Platform.runLater(() -> {
-                    lbl_import.setText("Import Error");
-                    Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
-                    imgImportCaution.setImage(imgCaution);
-                    imgImportCaution.setVisible(true);
-                    throw new RuntimeException(e);
-                });
-            }
-        }
-
-        return status;
-    }
-
-    private static FUGAReport getFugaReport(String[] nextLine) {
+    private static FUGAReport getFUGAReport(String[] nextLine) {
         FUGAReport report = new FUGAReport();
-
 
         report.setSaleStartDate(nextLine[0]);
         report.setSaleEndDate(nextLine[1]);
@@ -113,7 +69,7 @@ public class CSVController {
         return report;
     }
 
-    private static int getTotalRowCount(BufferedReader bReader) throws IOException {
+    private static int getReportTotalRowCount(BufferedReader bReader) throws IOException {
         int rowcount = 0; // Total RowCount
         while ((bReader.readLine()) != null) {
             rowcount++;
@@ -122,6 +78,47 @@ public class CSVController {
         return rowcount;
     }
 
+    public void setFUGAReport(File report) {
+        this.csv = report;
+    }
+
+    public int loadFUGAReport(Label lblReportProgress, ImageView imgImportCaution, Label lbl_import) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+        int status = 0;
+        CSVReader reader = new CSVReader(new FileReader(csv.getAbsolutePath()));
+        BufferedReader bReader = new BufferedReader(new FileReader(csv));
+
+        DatabaseMySQL.emptyReportTable();
+
+        int totalRowCount = getReportTotalRowCount(bReader);
+        int rowcount2 = 0; // While loop's row count
+
+        reader.readNext(); // Skipping the header
+        String[] nextLine;
+        while ((nextLine = reader.readNext()) != null) {
+            rowcount2++;
+            double percentage = ((double) rowcount2 / totalRowCount) * 100;
+
+            Platform.runLater(() -> lblReportProgress.setText("Processing " + df.format(percentage) + "%"));
+
+            FUGAReport report = getFUGAReport(nextLine);
+
+            Platform.runLater(() -> System.out.println("percentage = " + percentage));
+
+            try {
+                status = DatabaseMySQL.addRowFUGAReport(report);
+            } catch (SQLException | ClassNotFoundException e) {
+                Platform.runLater(() -> {
+                    lbl_import.setText("Import Error");
+                    Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
+                    imgImportCaution.setImage(imgCaution);
+                    imgImportCaution.setVisible(true);
+                    throw new RuntimeException(e);
+                });
+            }
+        }
+
+        return status;
+    }
 
     public int writeMissingISRCs() throws SQLException, ClassNotFoundException, IOException {
         ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();

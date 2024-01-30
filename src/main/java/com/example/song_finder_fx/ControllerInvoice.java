@@ -1,7 +1,7 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.Invoice;
 import com.example.song_finder_fx.Model.Songs;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,13 +38,14 @@ public class ControllerInvoice {
     public ScrollPane scrlpneMain;
     public VBox vboxSong;
     public ImageView btnPercentageChange;
+    private final ArrayList<Songs> songs = new ArrayList<>();
 
     public ControllerInvoice(UIController mainUIController) {
         this.mainUIController = mainUIController;
     }
 
     public void loadThings() throws IOException, SQLException, ClassNotFoundException {
-        FXMLLoader loader = new FXMLLoader(ControllerInvoice.class.getResource("layouts/song-list-invoice.fxml"));
+        FXMLLoader loader = new FXMLLoader(ControllerInvoice.class.getResource("./layouts/song-list-invoice.fxml"));
         loader.setController(this);
         Parent newContent = loader.load();
         mainUIController.mainVBox.getChildren().clear();
@@ -63,12 +65,12 @@ public class ControllerInvoice {
         nodes = new Node[songList.size()];
         vboxSong.getChildren().clear();
 
-        boolean deleted = Database.emptyTableSongListTemp();
-        if (deleted) {
+        // boolean deleted = Database.emptyTableSongListTemp();
+        /*if (deleted) {
             System.out.println("Table Emptied");
         } else {
             System.out.println("Table doesn't exists or an error occurred");
-        }
+        }*/
 
         for (int i = 0; i < nodes.length; i++) {
             try {
@@ -77,28 +79,27 @@ public class ControllerInvoice {
                 // Search Composer and Lyricist from Artists Table
                 String percentage;
                 String copyrightOwner = null;
-                String copyrightOwnerTemp = null;
 
                 if (songDetail.composerAndLyricistCeyMusic()) {
                     percentage = "100%";
                     copyrightOwner = songDetail.getComposer() + "\n" + songDetail.getLyricist();
-                    copyrightOwnerTemp = songDetail.getComposer() + " | " + songDetail.getLyricist();
                 } else if (songDetail.composerOrLyricistCeyMusic()) {
                     percentage = "50%";
                     if (songDetail.composerCeyMusic()) {
                         copyrightOwner = songDetail.getComposer();
-                        copyrightOwnerTemp = songDetail.getComposer();
                     } else {
                         copyrightOwner = songDetail.getLyricist();
-                        copyrightOwnerTemp = songDetail.getLyricist();
                     }
                 } else {
                     percentage = "0%";
                 }
 
-                // Adding song details to a temporary SQLite table
+                /*// Adding song details to a temporary SQLite table
                 String songName = songDetail.getTrackTitle();
-                boolean status = Database.handleSongListTemp(songName, percentage, copyrightOwnerTemp);
+                boolean status = Database.handleSongListTemp(songName, percentage, copyrightOwnerTemp);*/
+                songDetail.setPercentage(percentage);
+                songDetail.setCopyrightOwner(copyrightOwner);
+                songs.add(songDetail);
 
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist-invoice.fxml")));
 
@@ -187,7 +188,7 @@ public class ControllerInvoice {
                     hboxCurrencyFormat.requestFocus();
                     scrlpneMain.setVvalue(0);
                 } else {
-                    Invoice.generateInvoice(invoiceTo, invoiceNo, date, amountPerItem, currencyFormat, discount, txtInvoiceTo.getScene().getWindow());
+                    Invoice.generateInvoice(invoiceTo, invoiceNo, date, amountPerItem, currencyFormat, discount, txtInvoiceTo.getScene().getWindow(), songs);
                 }
             } else {
                 hboxAmountPerItem.setStyle("-fx-border-color: '#931621';");

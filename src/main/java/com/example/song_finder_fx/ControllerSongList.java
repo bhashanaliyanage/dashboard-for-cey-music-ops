@@ -1,5 +1,7 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.ErrorDialog;
+import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Model.Songs;
 import javafx.application.Platform;
 import javafx.concurrent.Task;

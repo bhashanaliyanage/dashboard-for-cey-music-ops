@@ -13,6 +13,8 @@ public class Songs {
     private String productTitle;
     private String upc;
     private String featuringArtist;
+    private String percentage;
+    private String copyrightOwner;
 
     public void setTrackTitle(String trackTitle) {
         this.trackTitle = trackTitle;
@@ -112,5 +114,21 @@ public class Songs {
 
     public String getFeaturing() {
         return featuringArtist;
+    }
+
+    public void setPercentage(String percentage) {
+        this.percentage = percentage;
+    }
+
+    public void setCopyrightOwner(String copyrightOwner) {
+        this.copyrightOwner = copyrightOwner;
+    }
+
+    public String getControl() {
+        return percentage;
+    }
+
+    public String getCopyrightOwner() {
+        return copyrightOwner;
     }
 }
