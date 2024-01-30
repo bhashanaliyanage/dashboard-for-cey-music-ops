@@ -3,24 +3,36 @@ package com.example.song_finder_fx.Controller;
 import com.example.song_finder_fx.DatabaseMySQL;
 import com.example.song_finder_fx.Model.FUGAReport;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class CSVController {
-    private final File csv;
+    private File csv;
     private static final DecimalFormat df = new DecimalFormat("0.00");
+    private final Path tempDir = Files.createTempDirectory("missing_isrcs");
+    private final Path csvFile = tempDir.resolve("missing_isrcs.csv");
 
-    public CSVController(File report) {
+    public CSVController() throws IOException {
+
+    }
+
+
+    public void setReport(File report) {
         this.csv = report;
     }
 
@@ -108,5 +120,31 @@ public class CSVController {
         }
         System.out.println("rowcount = " + rowcount);
         return rowcount;
+    }
+
+
+    public int writeMissingISRCs() throws SQLException, ClassNotFoundException, IOException {
+        ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+        CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
+        List<String[]> rows = new ArrayList<>();
+
+        while (resultSet.next()) {
+            if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
+                String[] row = new String[]{
+                        resultSet.getString(1)
+                };
+                rows.add(row);
+            }
+        }
+
+        csvWriter.writeAll(rows);
+        csvWriter.close();
+
+        return rows.size();
+    }
+
+    public void copyMissingISRCList(File destination) throws IOException {
+        Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
+        Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
     }
 }

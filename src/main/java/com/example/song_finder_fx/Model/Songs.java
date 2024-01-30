@@ -22,7 +22,7 @@ public class Songs {
     }
 
     public void setSongDetails(String isrcFromDatabase, String albumTitle, String upc, String trackTitle, String singer,
-                               String featuringArtist, String composer, String lyricist, String fileName) {
+                               String featuringArtist, String composer, String lyricist) {
         isrc = isrcFromDatabase;
         this.productTitle = albumTitle;
         this.upc = upc;

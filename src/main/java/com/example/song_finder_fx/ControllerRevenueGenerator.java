@@ -2,7 +2,6 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.CSVController;
 import com.example.song_finder_fx.Model.ArtistReport;
-import com.itextpdf.layout.Document;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
@@ -113,9 +112,8 @@ public class ControllerRevenueGenerator {
     public ComboBox<String> comboPayees;
     public TextField txtRate;
     private final UIController mainUIController;
-    private final Path tempDir = Files.createTempDirectory("missing_isrcs");
-    private final Path csvFile = tempDir.resolve("missing_isrcs.csv");
     private final ArtistReport report = new ArtistReport();
+    CSVController csvController = new CSVController();
 
     public ControllerRevenueGenerator(UIController uiController) throws IOException {
         mainUIController = uiController;
@@ -283,82 +281,6 @@ public class ControllerRevenueGenerator {
         }
     }
 
-
-    private Task<Void> checkMissingISRCs() {
-        Task<Void> task;
-        task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                Platform.runLater(() -> {
-                    lblISRC_Check.setVisible(true);
-                    lblISRC_Check.setText("Searching Missing ISRCs");
-                    lblIC_Caution.setVisible(false);
-                });
-
-                ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
-
-                CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
-
-                List<String[]> rows = new ArrayList<>();
-
-                while (resultSet.next()) {
-                    if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
-                        String[] row = new String[]{
-                                resultSet.getString(1)
-                        };
-                        rows.add(row);
-                    }
-                }
-
-                csvWriter.writeAll(rows);
-                csvWriter.close();
-
-                Platform.runLater(() -> {
-                    int size = rows.size();
-                    if (size > 0) {
-                        lblIC_Save.setText(size + " Missing ISRCs. (Click Here to Save List)");
-                        lblCountMissingISRCs.setText(size + " Missing ISRCs");
-                        Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
-                        lblIC_Caution.setImage(imgCaution);
-                        lblIC_Caution.setVisible(true);
-                        lblIC_Save.setVisible(true);
-                        lblUpdateNote.setVisible(true);
-                        vboxUpdateSongDB.setVisible(true);
-                    } else {
-                        lblIC_Save.setText("Report and Song Databases Synced");
-                        Image imgDone = new Image("com/example/song_finder_fx/images/done.png");
-                        lblIC_Caution.setImage(imgDone);
-                        lblIC_Caution.setVisible(true);
-                    }
-                });
-
-                return null;
-            }
-        };
-        return task;
-    }
-
-    private Task<Void> loadReport(File report) {
-        Task<Void> task;
-        task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                CSVController csvController = new CSVController(report);
-                int status = csvController.loadFUGAReport(lblReportProgress, imgImportCaution, lbl_import);
-                // boolean status = DatabaseMySQL.loadReport(report, lblReportProgress, lbl_import, imgImportCaution);
-
-                Platform.runLater(() -> {
-                    if (status > 0) {
-                        lblReportProgress.setText("CSV Imported to Database");
-                        imgImportCaution.setVisible(true);
-                    }
-                });
-                return null;
-            }
-        };
-        return task;
-    }
-
     public void onSaveListLblClick(MouseEvent event) throws IOException {
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
@@ -366,8 +288,7 @@ public class ControllerRevenueGenerator {
         File destination = Main.browseLocationNew(scene.getWindow());
 
         if (destination != null) {
-            Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
-            Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            csvController.copyMissingISRCList(destination);
         }
     }
 
@@ -956,6 +877,64 @@ public class ControllerRevenueGenerator {
         } else {
             System.out.println("No Report Imported");
         }
+    }
+
+    private Task<Void> checkMissingISRCs() {
+        Task<Void> task;
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Platform.runLater(() -> {
+                    lblISRC_Check.setVisible(true);
+                    lblISRC_Check.setText("Searching Missing ISRCs");
+                    lblIC_Caution.setVisible(false);
+                });
+
+                int size = csvController.writeMissingISRCs();
+
+                Platform.runLater(() -> {
+                    if (size > 0) {
+                        lblIC_Save.setText(size + " Missing ISRCs. (Click Here to Save List)");
+                        lblCountMissingISRCs.setText(size + " Missing ISRCs");
+                        Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
+                        lblIC_Caution.setImage(imgCaution);
+                        lblIC_Caution.setVisible(true);
+                        lblIC_Save.setVisible(true);
+                        lblUpdateNote.setVisible(true);
+                        vboxUpdateSongDB.setVisible(true);
+                    } else {
+                        lblIC_Save.setText("Report and Song Databases Synced");
+                        Image imgDone = new Image("com/example/song_finder_fx/images/done.png");
+                        lblIC_Caution.setImage(imgDone);
+                        lblIC_Caution.setVisible(true);
+                    }
+                });
+
+                return null;
+            }
+        };
+        return task;
+    }
+
+    private Task<Void> loadReport(File report) {
+        Task<Void> task;
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                csvController.setReport(report);
+                int status = csvController.loadFUGAReport(lblReportProgress, imgImportCaution, lbl_import);
+                // boolean status = DatabaseMySQL.loadReport(report, lblReportProgress, lbl_import, imgImportCaution);
+
+                Platform.runLater(() -> {
+                    if (status > 0) {
+                        lblReportProgress.setText("CSV Imported to Database");
+                        imgImportCaution.setVisible(true);
+                    }
+                });
+                return null;
+            }
+        };
+        return task;
     }
 
     public void onGetReportBtnClick(MouseEvent mouseEvent) throws IOException {

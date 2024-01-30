@@ -55,9 +55,12 @@ public class InitPreloader implements Initializable {
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
+                /*Platform.runLater(() -> {
+                    System.out.println("Here!");
+                });*/
                 Main.getDirectoryFromDB();
             } catch (SQLException | ClassNotFoundException e) {
-                System.out.println("Cannot get audio database directory");
+                Platform.runLater(() -> System.out.println("Cannot get audio database directory"));
             }
         });
 

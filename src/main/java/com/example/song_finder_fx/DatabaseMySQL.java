@@ -793,8 +793,7 @@ public class DatabaseMySQL {
             String featuringArtist = rs.getString(6);
             String composer = rs.getString(7);
             String lyricist = rs.getString(8);
-            String fileName = rs.getString(9);
-            song.setSongDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist, fileName);
+            song.setSongDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist);
         }
 
         return song;
