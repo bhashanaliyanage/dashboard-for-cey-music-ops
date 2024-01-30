@@ -278,7 +278,35 @@ public class Invoice {
             addRowToTable(currentTable, songs.get(rowCount), font_poppins, amountPerItem, currencyFormat, grayBorder); // addRowToTable is a method to add a new row
             rowCount++;
 
-            if (pageNumber == 1) {
+            if (rowCount == 8) {
+                // Add the current table to the document
+                document.add(currentTable);
+
+                // Start a new table
+                currentTable = createNewTable();
+
+                // Add a page break
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+                pageNumber++;
+
+                document.add(tableFooter);
+            } else if (rowCount > 8 && (rowCount - 8) % 14 == 0) {
+                // Add the current table to the document
+                document.add(currentTable);
+
+                // Start a new table
+                currentTable = createNewTable();
+
+                // Add a page break
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+                pageNumber++;
+
+                document.add(tableFooter);
+            }
+
+            /*if (pageNumber == 1) {
                 if (rowCount % 8 == 0) {
                     // Add the current table to the document
                     document.add(currentTable);
@@ -308,7 +336,7 @@ public class Invoice {
 
                     document.add(tableFooter);
                 }
-            }
+            }*/
         }
 
         if (currentTable.getNumberOfRows() > 0) {
