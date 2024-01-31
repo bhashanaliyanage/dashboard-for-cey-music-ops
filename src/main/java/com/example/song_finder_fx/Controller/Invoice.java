@@ -1,7 +1,7 @@
-package com.example.song_finder_fx;
+package com.example.song_finder_fx.Controller;
 
-import com.example.song_finder_fx.Model.SongDetails;
-import com.example.song_finder_fx.Model.SongList;
+import com.example.song_finder_fx.Database;
+import com.example.song_finder_fx.Model.Songs;
 import com.itextpdf.io.font.FontProgram;
 import com.itextpdf.io.font.FontProgramFactory;
 import com.itextpdf.io.font.PdfEncodings;
@@ -26,17 +26,14 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-
-
 
 public class Invoice {
     private static final Color INVOICE_BLUE = new DeviceRgb(136, 193, 232);
@@ -46,17 +43,14 @@ public class Invoice {
     private static final DecimalFormat df = new DecimalFormat("0.00");
     private static int pageNumber = 1;
 
-    public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date, double amountPerItem, String currencyFormat, double discount, Window window) throws IOException, SQLException, ClassNotFoundException {
+    public static void generateInvoice(String invoiceTo, String invoiceNo, LocalDate date, double amountPerItem, String currencyFormat, double discount, Window window, ArrayList<Songs> songs) throws IOException, SQLException, ClassNotFoundException {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files (*.pdf)", "*.pdf"));
         chooser.setTitle("Save As");
         File pathTo = chooser.showSaveDialog(window);
         String path = pathTo.getAbsolutePath();
-        PdfWriter pdfWriter = new PdfWriter(path);
-        PdfDocument pdfDocument = new PdfDocument(pdfWriter);
-        pdfDocument.setDefaultPageSize(PageSize.A4);
-        Document document = new Document(pdfDocument);
-        document.setMargins(0f, 0f, 0f, 0f);
+
+        Document document = getDocument(path);
 
         // Invoice Heading Image
         Image invoiceHeading = loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/marketing-head-invoice-heading-cropped.png");
@@ -192,16 +186,6 @@ public class Invoice {
         // Getting Song List to generate Invoice
         int rowCount = 0;
 
-//        List<SongDetails> songList =  new ArrayList<>();
-//        songList=new ControllerInvoice().getList();
-
-
-
-
-
-//        ResultSet songList = Database.getSongList();
-        ResultSet songList =DatabaseMySQL.getSongList();
-
         Table currentTable = createNewTable(); // createNewTable is a method to create a new table like table03
         currentTable.addCell(new Cell().add(new Paragraph("SONG").setFont(font_rubik))
                 .setFontColor(Invoice.INVOICE_WHITE)
@@ -288,11 +272,39 @@ public class Invoice {
                 .setBorder(Border.NO_BORDER)
                 .setTextAlignment(TextAlignment.RIGHT));
 
-        while (songList.next()) {
-            addRowToTable(currentTable, songList, font_poppins, amountPerItem, currencyFormat, grayBorder); // addRowToTable is a method to add a new row
+        while (rowCount < songs.size()) {
+            addRowToTable(currentTable, songs.get(rowCount), font_poppins, amountPerItem, currencyFormat, grayBorder); // addRowToTable is a method to add a new row
             rowCount++;
 
-            if (pageNumber == 1) {
+            if (rowCount == 8) {
+                // Add the current table to the document
+                document.add(currentTable);
+
+                // Start a new table
+                currentTable = createNewTable();
+
+                // Add a page break
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+                pageNumber++;
+
+                document.add(tableFooter);
+            } else if (rowCount > 8 && (rowCount - 8) % 14 == 0) {
+                // Add the current table to the document
+                document.add(currentTable);
+
+                // Start a new table
+                currentTable = createNewTable();
+
+                // Add a page break
+                document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+                pageNumber++;
+
+                document.add(tableFooter);
+            }
+
+            /*if (pageNumber == 1) {
                 if (rowCount % 8 == 0) {
                     // Add the current table to the document
                     document.add(currentTable);
@@ -322,7 +334,7 @@ public class Invoice {
 
                     document.add(tableFooter);
                 }
-            }
+            }*/
         }
 
         if (currentTable.getNumberOfRows() > 0) {
@@ -359,12 +371,21 @@ public class Invoice {
         document.close();
     }
 
-    private static PdfFont loadFont(String location) throws IOException {
+    private static Document getDocument(String path) throws FileNotFoundException {
+        PdfWriter pdfWriter = new PdfWriter(path);
+        PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+        pdfDocument.setDefaultPageSize(PageSize.A4);
+        Document document = new Document(pdfDocument);
+        document.setMargins(0f, 0f, 0f, 0f);
+        return document;
+    }
+
+    static PdfFont loadFont(String location) throws IOException {
         FontProgram fontProgram = FontProgramFactory.createFont(location);
         return PdfFontFactory.createFont(fontProgram, PdfEncodings.WINANSI, true);
     }
 
-    private static Image loadAutoScaledImage(String location) throws MalformedURLException {
+    static Image loadAutoScaledImage(String location) throws MalformedURLException {
         ImageData invoiceHeadingImageData = ImageDataFactory.create(location);
         Image invoiceHeading = new Image(invoiceHeadingImageData);
         invoiceHeading.setAutoScale(true);
@@ -437,10 +458,10 @@ public class Invoice {
         return tableFooter;
     }
 
-    private static void addRowToTable(Table currentTable, ResultSet songList, PdfFont fontPoppins, double amountPerItem, String currencyFormat, Border grayBorder) throws SQLException {
-        String song = songList.getString("SONG");
-        String control = songList.getString("CONTROL");
-        String copyright = songList.getString("COPYRIGHT_OWNER");
+    private static void addRowToTable(Table currentTable, Songs songList, PdfFont fontPoppins, double amountPerItem, String currencyFormat, Border grayBorder) throws SQLException {
+        String song = songList.getTrackTitle();
+        String control = songList.getControl();
+        String copyright = songList.getCopyrightOwner();
 
         currentTable.addCell(new Cell().add(new Paragraph(song)
                         .setFont(fontPoppins))

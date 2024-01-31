@@ -1,4 +1,4 @@
-package com.example.song_finder_fx;
+package com.example.song_finder_fx.Controller;
 
 import javafx.scene.image.Image;
 
@@ -40,7 +40,7 @@ public class ItemSwitcher {
         };
     }
 
-    public String setMonth(String month) {
+    public static String setMonth(String month) {
         return switch (month) {
             case "01" -> "January";
             case "02" -> "February";

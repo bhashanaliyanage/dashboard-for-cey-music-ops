@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.Revenue;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -12,7 +13,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -24,15 +24,8 @@ public class InitPreloader implements Initializable {
     public Label lblLoading;
     public static Label lblLoadingg;
     public static boolean starting;
-    public static ResultSet top5Territories;
-    public static ResultSet top4DSPs;
-    public static String count;
-    public static ResultSet top5StreamedAssets;
-    public static String salesDate;
-    public static String[] date;
-    public static String month;
-    public static Double PRODUCT_VERSION;
     public static String updateLocation;
+    public static Revenue revenue = new Revenue();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -42,30 +35,6 @@ public class InitPreloader implements Initializable {
     public void checkFunctions() throws InterruptedException {
         final String[] con = new String[1];
         final String[] message = {""};
-        final String[] connection = {null};
-        Thread connectionCheck = new Thread(() -> {
-            message[0] = "Checking Connection";
-
-            Platform.runLater(() -> lblLoadingg.setText(message[0]));
-
-            try {
-                connection[0] = SheetsCOn.checkAccess(lblLoadingg);
-                if (Objects.equals(connection[0], "1")) {
-                    System.out.println("Access Granted");
-                    Platform.runLater(() -> lblLoadingg.setText("Access Granted"));
-                } else {
-                    System.out.println("Unable to access");
-                    Platform.runLater(() -> lblLoadingg.setText("Unable to access"));
-                }
-            } catch (GeneralSecurityException | IOException e) {
-                e.printStackTrace();
-                Platform.runLater(() -> lblLoadingg.setText("Check Internet Connection"));
-            }
-
-            if (Objects.equals(connection[0], "0")) {
-                Platform.runLater(() -> lblLoadingg.setText("Unable to validate credentials"));
-            }
-        });
 
         Thread databaseCheck = new Thread(() -> {
             message[0] = "Checking Database Connection";
@@ -86,9 +55,12 @@ public class InitPreloader implements Initializable {
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
+                /*Platform.runLater(() -> {
+                    System.out.println("Here!");
+                });*/
                 Main.getDirectoryFromDB();
             } catch (SQLException | ClassNotFoundException e) {
-                System.out.println("Cannot get audio database directory");
+                Platform.runLater(() -> System.out.println("Cannot get audio database directory"));
             }
         });
 
@@ -98,13 +70,15 @@ public class InitPreloader implements Initializable {
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
-                top5Territories = DatabaseMySQL.getTop5Territories();
-                top4DSPs = DatabaseMySQL.getTop4DSPs();
-                count = DatabaseMySQL.getTotalAssetCount();
-                top5StreamedAssets = DatabaseMySQL.getTop5StreamedAssets();
-                salesDate = DatabaseMySQL.getSalesDate();
-                date = salesDate.split("-");
-                month = date[1];
+                ResultSet top5Territories = DatabaseMySQL.getTop5Territories();
+                ResultSet top4DSPs = DatabaseMySQL.getTop4DSPs();
+                String assetCount = DatabaseMySQL.getTotalAssetCount();
+                ResultSet top5StreamedAssets = DatabaseMySQL.getTop5StreamedAssets();
+                String salesDate = DatabaseMySQL.getSalesDate();
+                String[] date = salesDate.split("-");
+                String month = date[1];
+
+                revenue.setValues(top5Territories, top4DSPs, assetCount, top5StreamedAssets, month);
             } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -119,28 +93,39 @@ public class InitPreloader implements Initializable {
                 ResultSet versionDetails = DatabaseMySQL.checkUpdates();
                 if (versionDetails != null) {
                     versionDetails.next();
-                    PRODUCT_VERSION = versionDetails.getDouble(1);
                     System.out.println("versionDetails = " + versionDetails.getDouble(1));
                     updateLocation = versionDetails.getString(2);
+                    Main.versionInfo.setServerVerion(versionDetails.getDouble(1), versionDetails.getString(2));
                 }
             } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         });
 
+        Thread loadScenes = new Thread(() -> {
+            message[0] = "Loading Scenes";
+
+            Platform.runLater(() -> lblLoadingg.setText(message[0]));
+
+            try {
+                UIController.setAllScenes();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+
         Thread mainWindow = new Thread(() -> Platform.runLater(() -> {
             try {
                 starting = true;
-                Parent root = FXMLLoader.load(getClass().getResource("layouts/main-view.fxml"));
+                Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/main-view.fxml")));
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
 
                 VBox main = (VBox) scene.lookup("#mainVBox");
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
-                Parent newContent = loader.load();
-                main.getChildren().add(newContent);
+                main.getChildren().add(UIController.mainNodes[2]);
 
-                stage.setTitle("CeyMusic Toolkit v" + Main.PRODUCT_VERSION);
+                stage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionNumber());
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
                 stage.setMinWidth(1300);
@@ -148,9 +133,7 @@ public class InitPreloader implements Initializable {
                 stage.setScene(scene);
                 stage.show();
 
-                if ((PRODUCT_VERSION != null) && (Main.PRODUCT_VERSION < PRODUCT_VERSION)) {
-                    System.out.println("Main.PRODUCT_VERSION = " + Main.PRODUCT_VERSION);
-                    System.out.println("PRODUCT_VERSION = " + PRODUCT_VERSION);
+                if (Main.versionInfo.updateAvailable()) {
                     Label updateNotify = (Label) scene.lookup("#lblUserEmailAndUpdate");
                     updateNotify.setText("Update Available");
                     updateNotify.setStyle("-fx-text-fill: '#FEA82F'");
@@ -161,24 +144,18 @@ public class InitPreloader implements Initializable {
             }
         }));
 
-        // connectionCheck.start();
-        // connectionCheck.join();
-
         databaseCheck.start();
         databaseCheck.join();
         audioDatabaseCheck.start();
         audioDatabaseCheck.join();
-
-        /*if (connection[0] != null) {
-            if (connection[0].equals("1")) {
-            }
-        }*/
 
         if (Objects.equals(con[0], "Connection Succeed")) {
             revenueAnalysisCheck.start();
             revenueAnalysisCheck.join();
             updatesCheck.start();
             updatesCheck.join();
+            loadScenes.start();
+            loadScenes.join();
             mainWindow.start();
             mainWindow.join();
         }

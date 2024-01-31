@@ -1,9 +1,7 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Model.SongDetails;
-import com.example.song_finder_fx.Model.SongList;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
+import com.example.song_finder_fx.Controller.Invoice;
+import com.example.song_finder_fx.Model.Songs;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -40,12 +38,13 @@ public class ControllerInvoice {
     public ScrollPane scrlpneMain;
     public VBox vboxSong;
     public ImageView btnPercentageChange;
+    private final ArrayList<Songs> songs = new ArrayList<>();
 
     public ControllerInvoice(UIController mainUIController) {
         this.mainUIController = mainUIController;
     }
 
-    public void loadThings(ActionEvent actionEvent) throws IOException, SQLException, ClassNotFoundException {
+    public void loadThings() throws IOException, SQLException, ClassNotFoundException {
         FXMLLoader loader = new FXMLLoader(ControllerInvoice.class.getResource("layouts/song-list-invoice.fxml"));
         loader.setController(this);
         Parent newContent = loader.load();
@@ -66,54 +65,41 @@ public class ControllerInvoice {
         nodes = new Node[songList.size()];
         vboxSong.getChildren().clear();
 
-        boolean deleted = Database.emptyTableSongListTemp();
-        if (deleted) {
+        // boolean deleted = Database.emptyTableSongListTemp();
+        /*if (deleted) {
             System.out.println("Table Emptied");
         } else {
             System.out.println("Table doesn't exists or an error occurred");
-        }
+        }*/
 
         for (int i = 0; i < nodes.length; i++) {
-
-            SongDetails sn =  new SongDetails();
             try {
+                Songs songDetail = db.searchSongDetails(songList.get(i));
 
-                List<String> songDetail = db.searchSongDetails(songList.get(i));
-                Platform.runLater(() -> {
-                    System.out.println(songDetail+"song list");
-                });
-//                System.out.println(songDetail+"songg list");
                 // Search Composer and Lyricist from Artists Table
-                Boolean composerCeyMusic = db.searchArtistTable(songDetail.get(6)); // 6
-                Boolean lyricistCeyMusic = db.searchArtistTable(songDetail.get(7)); // 7
                 String percentage;
                 String copyrightOwner = null;
-                String copyrightOwnerTemp = null;
 
-                if (composerCeyMusic && lyricistCeyMusic) {
+                if (songDetail.composerAndLyricistCeyMusic()) {
                     percentage = "100%";
-                    copyrightOwner = songDetail.get(6) + "\n" + songDetail.get(7);
-                    copyrightOwnerTemp = songDetail.get(6) + " | " + songDetail.get(7);
-                } else if (composerCeyMusic || lyricistCeyMusic) {
+                    copyrightOwner = songDetail.getComposer() + "\n" + songDetail.getLyricist();
+                } else if (songDetail.composerOrLyricistCeyMusic()) {
                     percentage = "50%";
-                    if (composerCeyMusic) {
-                        copyrightOwner = songDetail.get(6);
-                        copyrightOwnerTemp = songDetail.get(6);
+                    if (songDetail.composerCeyMusic()) {
+                        copyrightOwner = songDetail.getComposer();
                     } else {
-                        copyrightOwner = songDetail.get(7);
-                        copyrightOwnerTemp = songDetail.get(7);
+                        copyrightOwner = songDetail.getLyricist();
                     }
                 } else {
                     percentage = "0%";
                 }
 
-                // Adding song details to a temporary SQLite table
-                String songName = songDetail.get(3);
-                boolean status = DatabaseMySQL.handleSongListTemp(songName, percentage, copyrightOwnerTemp);
-
-                //set new meth
-
-//                getList(songName,percentage,copyrightOwnerTemp);
+                /*// Adding song details to a temporary SQLite table
+                String songName = songDetail.getTrackTitle();
+                boolean status = Database.handleSongListTemp(songName, percentage, copyrightOwnerTemp);*/
+                songDetail.setPercentage(percentage);
+                songDetail.setCopyrightOwner(copyrightOwner);
+                songs.add(songDetail);
 
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist-invoice.fxml")));
 
@@ -135,7 +121,7 @@ public class ControllerInvoice {
                 Label lblArtist = (Label) nodes[i].lookup("#songArtist");
                 Label lblSongShare = (Label) nodes[i].lookup("#songShare");
 
-                lblSongName.setText(songDetail.get(3));
+                lblSongName.setText(songDetail.getTrackTitle());
                 lblArtist.setText(copyrightOwner);
                 lblSongShare.setText(percentage);
 
@@ -202,7 +188,7 @@ public class ControllerInvoice {
                     hboxCurrencyFormat.requestFocus();
                     scrlpneMain.setVvalue(0);
                 } else {
-                    Invoice.generateInvoice(invoiceTo, invoiceNo, date, amountPerItem, currencyFormat, discount, txtInvoiceTo.getScene().getWindow());
+                    Invoice.generateInvoice(invoiceTo, invoiceNo, date, amountPerItem, currencyFormat, discount, txtInvoiceTo.getScene().getWindow(), songs);
                 }
             } else {
                 hboxAmountPerItem.setStyle("-fx-border-color: '#931621';");
@@ -210,19 +196,5 @@ public class ControllerInvoice {
                 scrlpneMain.setVvalue(0);
             }
         }
-    }
-
-
-    public List<SongDetails> getList(String name, String percentage, String copywriter){
-    List<SongDetails> list =  new ArrayList<>();
-
-    SongDetails sngDe =  new SongDetails();
-
-   sngDe.setSongName(name);
-   sngDe.setCpywriteTemp(percentage);
-   sngDe.setPrecentage(copywriter);
-    list.add(sngDe);
-
-        return list;
     }
 }

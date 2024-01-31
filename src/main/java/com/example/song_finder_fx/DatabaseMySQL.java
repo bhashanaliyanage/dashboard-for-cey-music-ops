@@ -1,5 +1,7 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.FUGAReport;
+import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
@@ -25,7 +27,6 @@ public class DatabaseMySQL {
     static StringBuilder errorBuffer = new StringBuilder();
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
-
         if (conn == null) {
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://192.168.1.200/songData";
@@ -245,6 +246,54 @@ public class DatabaseMySQL {
         return rs > 0;
     }
 
+    public static int addRowFUGAReport(FUGAReport report) throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
+
+        PreparedStatement ps = db.prepareStatement("INSERT INTO report " +
+                "(Sale_Start_date, Sale_End_date, DSP, Sale_Store_Name, Sale_Type, Sale_User_Type, Territory, " +
+                "Product_UPC, Product_Reference, Product_Catalog_Number, Product_Label, Product_Artist, Product_Title, " +
+                "Asset_Artist, Asset_Title, Asset_Version, Asset_Duration, Asset_ISRC, Asset_Reference, AssetOrProduct, " +
+                "Product_Quantity, Asset_Quantity, Original_Gross_Income, Original_currency, Exchange_Rate, " +
+                "Converted_Gross_Income, Contract_deal_term, Reported_Royalty, Currency, Report_Run_ID, Report_ID, " +
+                "Sale_ID) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        ps.setString(1, report.getSaleStartDate());
+        ps.setString(2, report.getSaleEndDate());
+        ps.setString(3, report.getDsp());
+        ps.setString(4, report.getSaleStoreName());
+        ps.setString(5, report.getSaleType());
+        ps.setString(6, report.getSaleUserType());
+        ps.setString(7, report.getTerritory());
+        ps.setLong(8, report.getProductUPC());
+        ps.setLong(9, report.getProductReference());
+        ps.setString(10, report.getProductCatalogNumber());
+        ps.setString(11, report.getProductLabel());
+        ps.setString(12, report.getProductArtist());
+        ps.setString(13, report.getProductTitle());
+        ps.setString(14, report.getAssetArtist());
+        ps.setString(15, report.getAssetTitle());
+        ps.setString(16, report.getAssetVersion());
+        ps.setInt(17, report.getAssetDuration());
+        ps.setString(18, report.getAssetISRC());
+        ps.setLong(19, report.getAssetReference());
+        ps.setString(20, report.getAssetOrProduct());
+        ps.setInt(21, report.getProductQuantity());
+        ps.setInt(22, report.getAssetQuantity());
+        ps.setDouble(23, report.getOriginalGrossIncome());
+        ps.setString(24, report.getOriginalCurrency());
+        ps.setDouble(25, report.getExchangeRate());
+        ps.setDouble(26, report.getConvertedGrossIncome());
+        ps.setString(27, report.getContractDealTerm());
+        ps.setDouble(28, report.getReportedRoyalty());
+        ps.setString(29, report.getCurrency());
+        ps.setInt(30, report.getReportRunID());
+        ps.setInt(31, report.getReportID());
+        ps.setLong(32, report.getSaleID());
+        
+        return ps.executeUpdate();
+    }
+
     public static ResultSet getTop5StreamedAssets() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
 
@@ -435,7 +484,12 @@ public class DatabaseMySQL {
                     });
                     status = true;
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    Platform.runLater(() -> {
+                        lblSongDB_Progress.setVisible(true);
+                        lblSongDB_Progress.setText("Error!");
+                        lblSongDB_Progress.setStyle("-fx-text-fill: '#FF0000'");
+                        throw new RuntimeException(e);
+                    });
                 }
             }
         }
@@ -663,35 +717,11 @@ public class DatabaseMySQL {
         return ps.executeQuery();
     }
 
-//    24/01/2024 new method to avoid user sqlLite
-    public static boolean handleSongListTemp(String songName, String percentage, String copyrightOwnerTemp) throws SQLException, ClassNotFoundException {
-        String sql ="INSERT INTO `temp_songs_report` ( `name`, `copywrite_owner`, `control`) VALUES ( ?, ?, ?)";
-        Connection  con = getConn();
-        Boolean bl = false;
-        try {
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1,songName);
-            ps.setString(2,copyrightOwnerTemp);
-            ps.setString(3,percentage);
-//            ps.executeUpdate() ? false : true;
-           bl = ps.executeUpdate() == 0;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return bl;
+    public static String getReportNumber(String payee) {
+        return "null";
     }
 
-    public static ResultSet getSongList() throws SQLException, ClassNotFoundException {
-        Connection db = Database.getConn();
-        ResultSet rs;
-
-        PreparedStatement ps = db.prepareStatement("SELECT name,copywrite_owner,control FROM `temp_songs_report` WHERE 1;");
-        rs = ps.executeQuery();
-
-        return rs;
-    }
-
-    public List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException, ClassNotFoundException {
+    public static List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException, ClassNotFoundException {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;
 
@@ -704,20 +734,19 @@ public class DatabaseMySQL {
 
         while (rs.next()) {
             songs.add(new Songs(
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getString(3),
-                    rs.getString(4),
-                    rs.getString(5)
+                    rs.getString(1), // TRACK_TITLE
+                    rs.getString(2), // ISRC
+                    rs.getString(3), // SINGER
+                    rs.getString(4), // COMPOSER
+                    rs.getString(5) // LYRICIST
             ));
-            System.out.println(rs.getString(1));
         }
 
         try {
             // Printing Searched Content
-            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName() + " | " + songs.get(0).getSinger());
-            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName() + " | " + songs.get(1).getSinger());
-            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName() + " | " + songs.get(2).getSinger());
+            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getTrackTitle() + " | " + songs.get(0).getSinger());
+            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getTrackTitle() + " | " + songs.get(1).getSinger());
+            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getTrackTitle() + " | " + songs.get(2).getSinger());
 
             // Printing new line
             System.out.println("================");
@@ -728,40 +757,16 @@ public class DatabaseMySQL {
         return songs;
     }
 
-    public List<Songs> searchSongNamesByISRC(String searchText) throws ClassNotFoundException, SQLException {
-        List<Songs> songs = new ArrayList<>();
-        ResultSet rs;
+    public static void emptyReportTable() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
 
-        Connection conn = getConn();
-
-        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER FROM songs WHERE ISRC LIKE ? LIMIT 15");
-        ps.setString(1, "%" + searchText + "%");
-        rs = ps.executeQuery();
-
-        while (rs.next()) {
-            songs.add(new Songs(rs.getString(1), rs.getString(2), rs.getString(3)));
-            System.out.println(rs.getString(1));
-        }
-
-        try {
-            // Printing Searched Content
-            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName() + " | " + songs.get(0).getSinger());
-            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName() + " | " + songs.get(1).getSinger());
-            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName() + " | " + songs.get(2).getSinger());
-
-            // Printing new line
-            System.out.println("================");
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("End of results");
-        }
-
-        return songs;
+        PreparedStatement emptyTable = db.prepareStatement("DELETE FROM report;");
+        emptyTable.executeUpdate();
     }
 
-    public List<String> searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
-        // Songs songDetails = new Songs();
+    public Songs searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
+        Songs song = new Songs();
         ResultSet rs;
-        List<String> songDetails = new ArrayList<>();
 
         Connection conn = getConn();
 
@@ -788,22 +793,10 @@ public class DatabaseMySQL {
             String featuringArtist = rs.getString(6);
             String composer = rs.getString(7);
             String lyricist = rs.getString(8);
-            String fileName = rs.getString(9);
-            songDetails.add(isrcFromDatabase);
-            songDetails.add(albumTitle);
-            songDetails.add(upc);
-            songDetails.add(trackTitle);
-            songDetails.add(singer);
-            songDetails.add(featuringArtist);
-            songDetails.add(composer);
-            songDetails.add(lyricist);
-            songDetails.add(fileName);
-            // songDetails.songDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist, fileName);
+            song.setSongDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist);
         }
 
-        System.out.println(songDetails.size());
-
-        return songDetails;
+        return song;
     }
 
     public static Boolean searchArtistTable(String artist) throws SQLException, ClassNotFoundException {

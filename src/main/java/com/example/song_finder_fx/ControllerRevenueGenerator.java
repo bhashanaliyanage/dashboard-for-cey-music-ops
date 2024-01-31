@@ -1,5 +1,10 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.CSVController;
+import com.example.song_finder_fx.Controller.ItemSwitcher;
+import com.example.song_finder_fx.Controller.NotificationBuilder;
+import com.example.song_finder_fx.Controller.ReportPDF;
+import com.example.song_finder_fx.Model.ArtistReport;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
@@ -43,6 +48,8 @@ public class ControllerRevenueGenerator {
     //</editor-fold>
 
     //<editor-fold desc="Labels">
+    public Label lblUpdateSongsDatabase;
+    public Label lblStatus;
     public Label lblWriter01;
     public Label lblWriter02;
     public Label lblWriter03;
@@ -99,6 +106,7 @@ public class ControllerRevenueGenerator {
     public ImageView imgDSP02;
     public ImageView imgDSP03;
     public ImageView imgDSP04;
+    public ImageView imgLoading;
     public ImageView lblIC_Caution;
     public ImageView imgImportCaution;
     public ImageView imgSongDB_Status;
@@ -107,8 +115,8 @@ public class ControllerRevenueGenerator {
     public ComboBox<String> comboPayees;
     public TextField txtRate;
     private final UIController mainUIController;
-    private final Path tempDir = Files.createTempDirectory("missing_isrcs");
-    private final Path csvFile = tempDir.resolve("missing_isrcs.csv");
+    private final ArtistReport report = new ArtistReport();
+    CSVController csvController = new CSVController();
 
     public ControllerRevenueGenerator(UIController uiController) throws IOException {
         mainUIController = uiController;
@@ -121,34 +129,33 @@ public class ControllerRevenueGenerator {
         loaderSide.setController(this);
         Parent newContentMain = loaderMain.load();
         Parent newContentSide = loaderSide.load();
-        ItemSwitcher itemSwitcher = new ItemSwitcher();
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
         mainUIController.sideVBox.getChildren().setAll(newContentSide);
 
-        Thread threadLoadAssets = getThreadLoadAssets(itemSwitcher);
+        Thread threadLoadAssets = getThreadLoadAssets();
         threadLoadAssets.start();
     }
 
-    private Thread getThreadLoadAssets(ItemSwitcher itemSwitcher) {
+    private Thread getThreadLoadAssets() {
         Task<Void> taskLoadAssets;
 
         taskLoadAssets = new Task<>() {
             @Override
             protected Void call() {
                 Platform.runLater(() -> {
-                    if (InitPreloader.month != null) {
-                        lblTitleMonth.setText(itemSwitcher.setMonth(InitPreloader.month));
+                    if (InitPreloader.revenue.getMonth() != null) {
+                        lblTitleMonth.setText(InitPreloader.revenue.getMonth());
                     }
 
-                    if (InitPreloader.count != null) {
-                        lblTotalAssets.setText(InitPreloader.count);
+                    if (InitPreloader.revenue.getAssetCount() != null) {
+                        lblTotalAssets.setText(InitPreloader.revenue.getAssetCount());
                     }
 
                     try {
-                        loadTopStreamedAssets(InitPreloader.top5StreamedAssets);
-                        loadTop5Territories(InitPreloader.top5Territories);
-                        loadTop4DSPs(InitPreloader.top4DSPs);
+                        loadTopStreamedAssets(InitPreloader.revenue.getTop5StreamedAssets());
+                        loadTop5Territories(InitPreloader.revenue.getTop5Territories());
+                        loadTop4DSPs(InitPreloader.revenue.getTop4DSPs());
                     } catch (SQLException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }
@@ -277,80 +284,6 @@ public class ControllerRevenueGenerator {
         }
     }
 
-
-    private Task<Void> checkMissingISRCs() {
-        Task<Void> task;
-        task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                Platform.runLater(() -> {
-                    lblISRC_Check.setVisible(true);
-                    lblISRC_Check.setText("Searching Missing ISRCs");
-                    lblIC_Caution.setVisible(false);
-                });
-
-                ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
-
-                CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
-
-                List<String[]> rows = new ArrayList<>();
-
-                while (resultSet.next()) {
-                    if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
-                        String[] row = new String[]{
-                                resultSet.getString(1)
-                        };
-                        rows.add(row);
-                    }
-                }
-
-                csvWriter.writeAll(rows);
-                csvWriter.close();
-
-                Platform.runLater(() -> {
-                    int size = rows.size();
-                    if (size > 0) {
-                        lblIC_Save.setText(size + " Missing ISRCs. (Click Here to Save List)");
-                        lblCountMissingISRCs.setText(size + " Missing ISRCs");
-                        Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
-                        lblIC_Caution.setImage(imgCaution);
-                        lblIC_Caution.setVisible(true);
-                        lblIC_Save.setVisible(true);
-                        lblUpdateNote.setVisible(true);
-                        vboxUpdateSongDB.setVisible(true);
-                    } else {
-                        lblIC_Save.setText("Report and Song Databases Synced");
-                        Image imgDone = new Image("com/example/song_finder_fx/images/done.png");
-                        lblIC_Caution.setImage(imgDone);
-                        lblIC_Caution.setVisible(true);
-                    }
-                });
-
-                return null;
-            }
-        };
-        return task;
-    }
-
-    private Task<Void> loadReport(File report) {
-        Task<Void> task;
-        task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                boolean status = DatabaseMySQL.loadReport(report, lblReportProgress, lbl_import, imgImportCaution);
-
-                Platform.runLater(() -> {
-                    if (status) {
-                        lblReportProgress.setText("CSV Imported to Database");
-                        imgImportCaution.setVisible(true);
-                    }
-                });
-                return null;
-            }
-        };
-        return task;
-    }
-
     public void onSaveListLblClick(MouseEvent event) throws IOException {
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
@@ -358,8 +291,7 @@ public class ControllerRevenueGenerator {
         File destination = Main.browseLocationNew(scene.getWindow());
 
         if (destination != null) {
-            Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
-            Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            csvController.copyMissingISRCList(destination);
         }
     }
 
@@ -563,6 +495,37 @@ public class ControllerRevenueGenerator {
         }
     }
 
+    public void onSidePanelUpdateSongsDatabaseBtnClick(MouseEvent mouseEvent) {
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Window window = scene.getWindow();
+        File file = Main.browseForCSV(window);
+
+        if (file != null) {
+            // System.out.println("Check");
+
+            Task<Void> taskUpdateSongDatabase;
+
+            taskUpdateSongDatabase = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    boolean status = DatabaseMySQL.updateSongsTable(file, lblUpdateSongsDatabase, lblUpdateSongsDatabase);
+
+                    if (status) {
+                        Platform.runLater(() -> lblUpdateSongsDatabase.setText("Done"));
+                    } else {
+                        Platform.runLater(() -> lblUpdateSongsDatabase.setText("Error"));
+                    }
+
+                    return null;
+                }
+            };
+
+            Thread threadUpdateSongDatabase = new Thread(taskUpdateSongDatabase);
+            threadUpdateSongDatabase.start();
+        }
+    }
+
     public void loadArtistReports() throws IOException {
         FXMLLoader loaderMain = new FXMLLoader(ControllerSettings.class.getResource("layouts/artist-reports.fxml"));
         loaderMain.setController(this);
@@ -579,17 +542,26 @@ public class ControllerRevenueGenerator {
         task = new Task<>() {
             @Override
             protected Void call() throws SQLException, ClassNotFoundException {
+                Platform.runLater(() -> {
+                    lblStatus.setText("> Checking ISRC Sync...");
+                    comboPayees.setDisable(true);
+                });
+
                 ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
                 int rowCount = 0;
 
-                while (resultSet.next() && ((resultSet.getString(2) == null) && (resultSet.getString(3) == null))) {
-                    rowCount++;
+                while (resultSet.next()) {
+                    if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
+                        rowCount++;
+                    }
                 }
 
                 System.out.println("rowCount = " + rowCount);
 
                 if (rowCount > 0) {
                     Platform.runLater(() -> {
+                        lblStatus.setVisible(false);
+                        imgLoading.setVisible(false);
                         vbArtistReports.setDisable(true);
                         try {
                             NotificationBuilder.displayTrayError("ISRC Sync Error", "Please Update Missing ISRCs in Song Database to Sync Payee List");
@@ -600,10 +572,14 @@ public class ControllerRevenueGenerator {
                 } else {
                     Platform.runLater(() -> {
                         try {
+                            lblStatus.setText("Loading Payees...");
                             ResultSet rsPayees = DatabaseMySQL.getPayees();
                             while (rsPayees.next()) {
                                 comboPayees.getItems().add(rsPayees.getString(1));
                             }
+                            lblStatus.setVisible(false);
+                            imgLoading.setVisible(false);
+                            comboPayees.setDisable(false);
                         } catch (SQLException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }
@@ -660,39 +636,6 @@ public class ControllerRevenueGenerator {
         return null;
     }
 
-    public void comboPayeeOnAction() {
-        /*DecimalFormat df = new DecimalFormat("0.00");
-        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
-
-        // Getting Selected Item
-        String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
-
-        // Get the gross revenue for the selected artist
-        comboPayees.setDisable(true);
-        lblGross.setText("Loading...");
-        lblP_Share.setText("Loading...");
-
-        Thread tGrossRevenue = new Thread(() -> {
-            try {
-                royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
-
-            } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-
-            String formattedGrossRevenue = df.format(royalty[0].getFirst());
-            String formattedPartnerShare = df.format(royalty[0].get(1));
-
-            Platform.runLater(() -> {
-                lblGross.setText("EUR " + formattedGrossRevenue);
-                lblP_Share.setText("EUR " + formattedPartnerShare);
-                comboPayees.setDisable(false);
-            });
-        });
-
-        tGrossRevenue.start();*/
-    }
-
     public void onLoadReportBtnClick() {
         String userInputRate = txtRate.getText();
         double doubleConvertedRate;
@@ -734,17 +677,14 @@ public class ControllerRevenueGenerator {
                         // Calculating amount payable
                         amountPayable[0] = grossRevenueInLKR - tax[0];
 
-                        String formattedGrossRevenue = df.format(grossRevenueInLKR);
-                        String formattedPartnerShare = df.format(partnerShareInLKR);
-                        String formattedTax = df.format(tax[0]);
-                        String formattedAmountPayable = df.format(amountPayable[0]);
+                        report.setGrossRevenue(selectedItem, grossRevenueInLKR, partnerShareInLKR, tax[0], amountPayable[0]);
 
                         // Update UI
                         Platform.runLater(() -> {
-                            lblGross.setText("LKR " + formattedGrossRevenue);
-                            lblP_Share.setText("LKR " + formattedPartnerShare);
-                            lblTax.setText("LKR " + formattedTax);
-                            lblAmtPayable.setText("LKR " + formattedAmountPayable);
+                            lblGross.setText(report.getGrossRevenueInLKR());
+                            lblP_Share.setText(report.getPartnerShareInLKR());
+                            lblTax.setText(report.getTaxAmount());
+                            lblAmtPayable.setText(report.getAmountPayable());
                         });
                         return null;
                     }
@@ -753,9 +693,6 @@ public class ControllerRevenueGenerator {
                 Task<Void> taskCoWriterShare = new Task<>() {
                     @Override
                     protected Void call() throws SQLException, ClassNotFoundException {
-                        // Initialize UI Labels
-                        Platform.runLater(this::initializeArtistReportUI_Labels);
-
                         // Get the co-writer name and share in EUR from the database
                         ResultSet rsCoWriterShares = DatabaseMySQL.getCoWriterShares(selectedItem);
                         int count = 0;
@@ -795,28 +732,56 @@ public class ControllerRevenueGenerator {
 
                         return null;
                     }
-
-                    private void initializeArtistReportUI_Labels() {
-                        lblWriter01.setText("-");
-                        lblWriter02.setText("-");
-                        lblWriter03.setText("-");
-                        lblWriter04.setText("-");
-                        lblWriter05.setText("-");
-                        lblWriter01Streams.setText("-");
-                        lblWriter02Streams.setText("-");
-                        lblWriter03Streams.setText("-");
-                        lblWriter04Streams.setText("-");
-                        lblWriter05Streams.setText("-");
-                    }
                 };
 
                 Task<Void> taskTopPerformingSongs = new Task<>() {
                     @Override
                     protected Void call() throws Exception {
                         ResultSet rsTopPerformingSongs = DatabaseMySQL.getTopPerformingSongs(selectedItem);
+                        int count = 0;
+
+                        while (rsTopPerformingSongs.next()) {
+                            count++;
+
+                            String assetTitle = rsTopPerformingSongs.getString(1);
+                            double reportedRoyalty = rsTopPerformingSongs.getDouble(2);
+
+                            if (count == 1) {
+                                Platform.runLater(() -> {
+                                    lblAsset01.setText(assetTitle);
+                                    lblAsset01Streams.setText(df.format(reportedRoyalty));
+                                });
+                            } else if (count == 2) {
+                                Platform.runLater(() -> {
+                                    lblAsset02.setText(assetTitle);
+                                    lblAsset02Streams.setText(df.format(reportedRoyalty));
+                                });
+                            } else if (count == 3) {
+                                Platform.runLater(() -> {
+                                    lblAsset03.setText(assetTitle);
+                                    lblAsset03Streams.setText(df.format(reportedRoyalty));
+                                });
+                            } else if (count == 4) {
+                                Platform.runLater(() -> {
+                                    lblAsset04.setText(assetTitle);
+                                    lblAsset04Streams.setText(df.format(reportedRoyalty));
+                                });
+                            } else if (count == 5) {
+                                Platform.runLater(() -> {
+                                    lblAsset05.setText(assetTitle);
+                                    lblAsset05Streams.setText(df.format(reportedRoyalty));
+                                });
+                            }
+                        }
+
                         return null;
                     }
                 };
+
+                taskCoWriterShare.setOnSucceeded(event -> {
+                    Thread threadTopPerformingSongs = new Thread(taskTopPerformingSongs);
+                    threadTopPerformingSongs.start();
+                });
 
                 taskGrossRevenue.setOnSucceeded(event -> {
                     Thread threadCoWriterShare = new Thread(taskCoWriterShare);
@@ -825,6 +790,7 @@ public class ControllerRevenueGenerator {
 
                 Thread threadGrossRevenue = new Thread(taskGrossRevenue);
                 threadGrossRevenue.start();
+
             } else {
                 // When User Input Contains Texts
                 txtRate.setStyle("-fx-border-color: red;");
@@ -836,11 +802,36 @@ public class ControllerRevenueGenerator {
     }
 
     private void initializeArtistReportUILabels() {
+        // Top bar labels
         txtRate.setStyle("-fx-border-color: '#e9ebee';");
         lblGross.setText("Loading...");
         lblP_Share.setText("Loading...");
         lblTax.setText("Loading...");
         lblAmtPayable.setText("Loading...");
+
+        // Co-Writer labels
+        lblWriter01.setText("-");
+        lblWriter02.setText("-");
+        lblWriter03.setText("-");
+        lblWriter04.setText("-");
+        lblWriter05.setText("-");
+        lblWriter01Streams.setText("-");
+        lblWriter02Streams.setText("-");
+        lblWriter03Streams.setText("-");
+        lblWriter04Streams.setText("-");
+        lblWriter05Streams.setText("-");
+
+        // Top performing songs block labels
+        lblAsset01.setText("-");
+        lblAsset02.setText("-");
+        lblAsset03.setText("-");
+        lblAsset04.setText("-");
+        lblAsset05.setText("-");
+        lblAsset01Streams.setText("-");
+        lblAsset02Streams.setText("-");
+        lblAsset03Streams.setText("-");
+        lblAsset04Streams.setText("-");
+        lblAsset05Streams.setText("-");
     }
 
     public void onUpdatePayeeDetailsBtnClick() {
@@ -888,6 +879,85 @@ public class ControllerRevenueGenerator {
 
         } else {
             System.out.println("No Report Imported");
+        }
+    }
+
+    private Task<Void> checkMissingISRCs() {
+        Task<Void> task;
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Platform.runLater(() -> {
+                    lblISRC_Check.setVisible(true);
+                    lblISRC_Check.setText("Searching Missing ISRCs");
+                    lblIC_Caution.setVisible(false);
+                });
+
+                int size = csvController.writeMissingISRCs();
+
+                Platform.runLater(() -> {
+                    if (size > 0) {
+                        lblIC_Save.setText(size + " Missing ISRCs. (Click Here to Save List)");
+                        lblCountMissingISRCs.setText(size + " Missing ISRCs");
+                        Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
+                        lblIC_Caution.setImage(imgCaution);
+                        lblIC_Caution.setVisible(true);
+                        lblIC_Save.setVisible(true);
+                        lblUpdateNote.setVisible(true);
+                        vboxUpdateSongDB.setVisible(true);
+                    } else {
+                        lblIC_Save.setText("Report and Song Databases Synced");
+                        Image imgDone = new Image("com/example/song_finder_fx/images/done.png");
+                        lblIC_Caution.setImage(imgDone);
+                        lblIC_Caution.setVisible(true);
+                    }
+                });
+
+                return null;
+            }
+        };
+        return task;
+    }
+
+    private Task<Void> loadReport(File report) {
+        Task<Void> task;
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                csvController.setFUGAReport(report);
+                int status = csvController.loadFUGAReport(lblReportProgress, imgImportCaution, lbl_import);
+                // boolean status = DatabaseMySQL.loadReport(report, lblReportProgress, lbl_import, imgImportCaution);
+
+                Platform.runLater(() -> {
+                    if (status > 0) {
+                        lblReportProgress.setText("CSV Imported to Database");
+                        imgImportCaution.setVisible(true);
+                    }
+                });
+                return null;
+            }
+        };
+        return task;
+    }
+
+    public void onGetReportBtnClick(MouseEvent mouseEvent) throws IOException {
+        System.out.println("ControllerRevenueGenerator.onGetReportBtnClick");
+        String payee = comboPayees.getSelectionModel().getSelectedItem();
+
+        comboPayees.setStyle("-fx-border-color: '#e9ebee';");
+
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+        Window window = scene.getWindow();
+
+        ReportPDF reportPDF = new ReportPDF();
+        reportPDF.generateReport(window, report);
+
+        if (!Objects.equals(payee, null)) {
+            // TODO: Moved content outside temporary
+        } else {
+            // If no Payee Selected
+            comboPayees.setStyle("-fx-border-color: red;");
         }
     }
 }
