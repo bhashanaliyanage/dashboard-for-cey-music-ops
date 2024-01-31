@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainVBox" prefWidth="750.0" spacing="10.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<VBox fx:id="mainVBox" prefWidth="750.0" spacing="10.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerSearch">
    <Label text="Search">
       <font>
          <Font name="Segoe UI Semibold" size="28.0" />
@@ -68,7 +68,7 @@
                <Insets />
             </HBox.margin>
          </TextField>
-         <ImageView fitHeight="20.0" fitWidth="20.0" onMouseClicked="#getText" pickOnBounds="true" preserveRatio="true">
+         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
             <HBox.margin>
                <Insets left="5.0" right="5.0" />
             </HBox.margin>
@@ -82,7 +82,7 @@
          <VBox.margin>
             <Insets bottom="30.0" left="28.0" right="30.0" top="5.0" />
          </VBox.margin>
-         <VBox fx:id="vboxSong" onKeyPressed="#onSearchedSongPress" prefWidth="615.0" styleClass="search-results-pane" stylesheets="@../styles.css" />
+         <VBox fx:id="vboxSong" prefWidth="615.0" styleClass="search-results-pane" stylesheets="@../styles.css" />
       </ScrollPane>
    </VBox>
 </VBox>
