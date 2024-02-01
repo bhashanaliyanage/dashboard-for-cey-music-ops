@@ -67,7 +67,7 @@ public class ReportPDF {
 
     private Table getFooterTable(ArtistReport report) {
         // Table
-        float[] columnWidth = {500f, 500f};
+        float[] columnWidth = {800f, 200f};
         Table table = new Table(columnWidth);
         table.setMarginLeft(20f);
         table.setMarginRight(20f);
