@@ -37,6 +37,20 @@ public class DatabaseMySQL {
         return conn;
     }
 
+
+    //new meth for testdb
+    public static Connection getConntest() throws ClassNotFoundException, SQLException {
+        Connection con1 = null;
+
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        String url = "jdbc:mysql://192.168.1.200/testdb";
+        String username = "ceymusic";
+        String password = "ceymusic";
+        con1 = DriverManager.getConnection(url, username, password);
+
+        return con1;
+    }
+
     public static String searchFileName(String isrc) throws SQLException, ClassNotFoundException {
         Connection db = getConn();
         ResultSet rs;
@@ -290,9 +304,32 @@ public class DatabaseMySQL {
         ps.setInt(30, report.getReportRunID());
         ps.setInt(31, report.getReportID());
         ps.setLong(32, report.getSaleID());
-        
+
         return ps.executeUpdate();
     }
+
+
+    //new 01/02/2023
+    public static int addRowFUGAReportnew(FUGAReport report) throws SQLException, ClassNotFoundException {
+        try (Connection db = DatabaseMySQL.getConntest();
+             CallableStatement cs = db.prepareCall("{call insert_report_new(?,?,?,?,?)}")) {
+
+            cs.setString(1, report.getAssetISRC());
+            cs.setBigDecimal(2, report.getReportedRoyalty());
+            cs.setString(3, report.getTerritory());
+            cs.setDate(4, report.getSaleStartDate());
+            cs.setString(5, report.getDsp());
+
+            return cs.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+
+
+        }
+    }
+
+
 
     public static ResultSet getTop5StreamedAssets() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
@@ -340,7 +377,7 @@ public class DatabaseMySQL {
         rs.next();
         return rs.getString(1);
     }
-
+       
     public static ResultSet getFullBreakdown() throws SQLException, ClassNotFoundException {
         /*SELECT Asset_ISRC, SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END) AS 'AU_Earnings', (SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9 AS After_GST, SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END) AS 'Other_Territories_Earnings', ((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END)) AS Reported_Royalty_After_GST, (((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS Reported_Royalty_For_CEYMUSIC FROM report GROUP BY Asset_ISRC;*/
         Connection db = DatabaseMySQL.getConn();
