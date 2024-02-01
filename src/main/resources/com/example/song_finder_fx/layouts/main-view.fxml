@@ -10,7 +10,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="610.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<BorderPane prefHeight="610.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
     <center>
         <VBox fx:id="mainVBox" alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="650.0" prefHeight="444.0" styleClass="main-vbox" stylesheets="@../styles.css" BorderPane.alignment="CENTER">
             <VBox prefWidth="750.0" stylesheets="@../styles.css" VBox.vgrow="ALWAYS" />
@@ -123,7 +123,7 @@
                     </Label>
                 </VBox>
             </HBox>
-            <HBox fx:id="btnArtistReports" disable="true" layoutX="35.0" layoutY="215.0" maxWidth="278.0" onMouseClicked="#onArtistReportsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
+            <HBox fx:id="btnArtistReports" layoutX="35.0" layoutY="215.0" maxWidth="278.0" onMouseClicked="#onArtistReportsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
                 <VBox.margin>
                     <Insets left="25.0" />
                 </VBox.margin>

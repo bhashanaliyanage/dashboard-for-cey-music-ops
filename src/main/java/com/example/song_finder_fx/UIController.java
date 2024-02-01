@@ -52,6 +52,7 @@ public class UIController {
     static final Node[] mainNodes = new Node[7];
     private final Search search = new Search();
 
+
     //<editor-fold desc="Variables">
     //<editor-fold desc="TextArea">
     public TextArea textArea;
@@ -135,8 +136,11 @@ public class UIController {
     public Rectangle rctCollectSongs;
     public Rectangle rctRevenue;
     public Rectangle rctArtistReports;
+
     //</editor-fold>
     //</editor-fold>
+    public UIController() throws IOException {
+    }
 
     public static void setAllScenes() throws IOException {
         // About
@@ -588,21 +592,19 @@ public class UIController {
     }
 
     @FXML
-    protected void onSearchDetailsButtonClick() throws ClassNotFoundException {
+    protected void onSearchDetailsButtonClick() throws ClassNotFoundException, IOException {
         changeSelectorTo(rctSearchSongs);
         Connection con = checkDatabaseConnection();
 
         if (con != null) {
-            try {
-                FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-recent-songs.fxml"));
-                Parent sidepanelNewContent = sidepanelLoader.load();
-                mainVBox.getChildren().clear();
-                mainVBox.getChildren().add(mainNodes[2]);
-                sideVBox.getChildren().clear();
-                sideVBox.getChildren().add(sidepanelNewContent);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            // SearchController searchController = new SearchController();
+            // searchController.loadSearch();
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-recent-songs.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(mainNodes[2]);
+            sideVBox.getChildren().clear();
+            sideVBox.getChildren().add(sidepanelNewContent);
         } else {
             UIController.showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
         }

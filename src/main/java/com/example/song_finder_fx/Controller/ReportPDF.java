@@ -1,6 +1,5 @@
 package com.example.song_finder_fx.Controller;
 
-import com.example.song_finder_fx.DatabaseMySQL;
 import com.example.song_finder_fx.Model.ArtistReport;
 import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.color.DeviceRgb;
@@ -27,11 +26,14 @@ public class ReportPDF {
     private static final Color INVOICE_LIGHT_BLUE = new DeviceRgb(232, 243, 251);
     private static final Color INVOICE_BLUE = new DeviceRgb(136, 193, 232);
     private static final Color INVOICE_WHITE = new DeviceRgb(255, 255, 255);
+    private static final Color INVOICE_BLACK = new DeviceRgb(25, 23, 22);
+    private static final Color INVOICE_RED = new DeviceRgb(178, 110, 99);
     private static final Border BLUE_BORDER = new SolidBorder(INVOICE_BLUE, 0.5f);
+    private static final Border BLACK_BORDER = new SolidBorder(INVOICE_BLACK, 0.5f);
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
 
-    public Document generateReport(Window window, ArtistReport report) throws IOException {
+    public void generateReport(Window window, ArtistReport report) throws IOException {
         String path = getSaveLocation(window);
 
         PDFDocument pdfDocument = new PDFDocument();
@@ -46,19 +48,51 @@ public class ReportPDF {
 
         // Table 01
         Table table01 = getTable01(reportHeading);
-        Table table02 = getTable02(report.getPayee());
-        Table table03 = getTable03(report.getPayee());
+        Table table02 = getTable02(report);
+        Table table03 = getTable03(report);
+        Table table04 = getTable04(report);
 
         document.add(table01); // Header
         document.add(table02); // Report ID
-        document.add(table03); // Report Month, Artist, Gross Rev, and Partner share amount
+        document.add(table03); // Report Month, Artist, Gross Rev
+        document.add(table04); // Partner Share of Gross, Amount Payable, Tax
 
         document.close();
 
-        return document;
     }
 
-    private Table getTable03(String payee) {
+    private Table getTable04(ArtistReport report) {
+        // Table
+        float[] columnWidth = {400f, 5f, 200f, 5f, 200f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+        table.setMarginTop(10f);
+
+        // Row 01
+        table.addCell(new Cell().add(new Paragraph("Partner Share of Gross").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_BLACK).setBorder(BLACK_BORDER));
+        table.addCell(new Cell().add(new Paragraph("")));
+        table.addCell(new Cell().add(new Paragraph("Amount Payable").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_BLACK).setBorder(BLACK_BORDER));
+        table.addCell(new Cell().add(new Paragraph("")));
+        table.addCell(new Cell().add(new Paragraph("14% TAX (If Applicable)").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_RED).setBorder(BLACK_BORDER));
+
+        // Row 02
+        table.addCell(new Cell().add(new Paragraph(report.getPartnerShareInLKR()).setFont(FONT_POPPINS))
+                .setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBorder(BLACK_BORDER));
+        table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().add(new Paragraph(report.getAmountPayable()).setFont(FONT_POPPINS))
+                .setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBorder(BLACK_BORDER));
+        table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().add(new Paragraph(report.getTaxAmount()).setFont(FONT_POPPINS))
+                .setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBorder(BLACK_BORDER));
+
+        return table;
+    }
+
+    private Table getTable03(ArtistReport report) {
         // Table
         float[] columnWidth = {200f, 5f, 200f, 5f, 200f, 200f};
         Table table = new Table(columnWidth);
@@ -77,27 +111,27 @@ public class ReportPDF {
                 .setBorder(Border.NO_BORDER));
         table.addCell(new Cell().add(new Paragraph("Gross Revenue Produced").setFont(FONT_POPPINS))
                 .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setFontSize(10f).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().add(new Paragraph("{AMOUNT}").setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph(report.getGrossRevenueInLKR()).setFont(FONT_POPPINS))
                 .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setFontSize(10f).setBorder(BLUE_BORDER));
 
         // Row 02
-        table.addCell(new Cell().add(new Paragraph("{MONTH}").setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph(report.getMonth()).setFont(FONT_POPPINS))
                 .setFontSize(10f).setTextAlignment(TextAlignment.CENTER).setBorder(BLUE_BORDER));
         table.addCell(new Cell().add(new Paragraph(""))
                 .setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().add(new Paragraph("{ARTIST}").setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph(report.getPayee()).setFont(FONT_POPPINS))
                 .setFontSize(10f).setTextAlignment(TextAlignment.CENTER).setBorder(BLUE_BORDER));
         table.addCell(new Cell().add(new Paragraph(""))
                 .setBorder(Border.NO_BORDER));
         table.addCell(new Cell().add(new Paragraph("Partner Revenue Share").setFont(FONT_POPPINS))
                 .setPaddingLeft(5f).setFontSize(10f).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().add(new Paragraph("{PRS AMOUNT}").setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph("90%").setFont(FONT_POPPINS))
                 .setPaddingLeft(5f).setFontSize(10f).setBorder(BLUE_BORDER));
 
         return table;
     }
 
-    private static Table getTable02(String payee) {
+    private static Table getTable02(ArtistReport report) {
         // Table 02
         float[] columnWidth = {500f, 500f};
         Table table = new Table(columnWidth);
@@ -110,7 +144,7 @@ public class ReportPDF {
                         .setFontColor(INVOICE_BLUE)
                         .setFont(FONT_RUBIK_SEMIBOLD))
                 .setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().add(new Paragraph(DatabaseMySQL.getReportNumber(payee))
+        table.addCell(new Cell().add(new Paragraph(report.getPayee())
                         .setFontSize(16f)
                         .setFont(FONT_RUBIK_SEMIBOLD))
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)

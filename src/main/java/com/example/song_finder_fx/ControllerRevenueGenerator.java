@@ -677,7 +677,16 @@ public class ControllerRevenueGenerator {
                         // Calculating amount payable
                         amountPayable[0] = grossRevenueInLKR - tax[0];
 
-                        report.setGrossRevenue(selectedItem, grossRevenueInLKR, partnerShareInLKR, tax[0], amountPayable[0]);
+                        // Testing values before assigning
+                        Platform.runLater(() -> {
+                            System.out.println("selectedItem = " + selectedItem);
+                            System.out.println("grossRevenueInLKR = " + grossRevenueInLKR);
+                            System.out.println("partnerShareInLKR = " + partnerShareInLKR);
+                            System.out.println("tax[0] = " + tax[0]);
+                            System.out.println("amountPayable[0] = " + amountPayable[0]);
+                            System.out.println("InitPreloader.revenue.getMonth() = " + InitPreloader.revenue.getMonth());
+                        });
+                        report.setGrossRevenue(selectedItem, grossRevenueInLKR, partnerShareInLKR, tax[0], amountPayable[0], InitPreloader.revenue.getMonth());
 
                         // Update UI
                         Platform.runLater(() -> {
