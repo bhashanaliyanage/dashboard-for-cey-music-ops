@@ -315,9 +315,9 @@ public class DatabaseMySQL {
              CallableStatement cs = db.prepareCall("{call insert_report_new(?,?,?,?,?)}")) {
 
             cs.setString(1, report.getAssetISRC());
-            cs.setBigDecimal(2, report.getReportedRoyalty());
+           cs.setDouble(2,report.getReportedRoyalty());
             cs.setString(3, report.getTerritory());
-            cs.setDate(4, report.getSaleStartDate());
+            cs.setString(4,report.getSaleStartDate());
             cs.setString(5, report.getDsp());
 
             return cs.executeUpdate();

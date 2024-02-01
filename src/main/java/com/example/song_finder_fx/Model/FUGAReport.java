@@ -1,8 +1,5 @@
 package com.example.song_finder_fx.Model;
 
-import java.math.BigDecimal;
-import java.sql.Date;
-
 public class FUGAReport {
     private String saleStartDate;
     private String saleEndDate;
@@ -38,7 +35,7 @@ public class FUGAReport {
     private long saleID = 0;
 
     // Getters
-    public Date getSaleStartDate() {
+    public String getSaleStartDate() {
         return saleStartDate;
     }
 
@@ -146,7 +143,7 @@ public class FUGAReport {
         return contractDealTerm;
     }
 
-    public BigDecimal getReportedRoyalty() {
+    public double getReportedRoyalty() {
         return reportedRoyalty;
     }
 
