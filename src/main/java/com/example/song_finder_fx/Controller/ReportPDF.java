@@ -47,23 +47,84 @@ public class ReportPDF {
         FONT_POPPINS = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf");
 
         // Table 01
-        Table table01 = getTable01(reportHeading);
+        Table tableHeader = getHeaderTable(reportHeading);
         Table table02 = getTable02(report);
         Table table03 = getTable03(report);
         Table table04 = getTable04(report);
+        Table tableCoWriterPaymentSummary = getCoWriterTable(report);
+        Table tableFooter = getFooterTable(report);
 
-        document.add(table01); // Header
-        document.add(table02); // Report ID
-        document.add(table03); // Report Month, Artist, Gross Rev
-        document.add(table04); // Partner Share of Gross, Amount Payable, Tax
+        document.add(tableHeader); // Header
+        document.add(table02);
+        document.add(table03);
+        document.add(table04);
+        document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
+        document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
+        document.add(tableFooter);
 
         document.close();
+    }
 
+    private Table getFooterTable(ArtistReport report) {
+        // Table
+        float[] columnWidth = {500f, 500f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+        table.setMarginTop(10f);
+
+        return table;
+    }
+
+    private Table getCoWriterTable(ArtistReport report) {
+        // Table
+        float[] columnWidth = {500f, 500f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+        table.setMarginTop(10f);
+
+        // Table 02 Row 01
+        table.addCell(new Cell(1, 2).add(new Paragraph("Co-Writer Payment Summary").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+
+        // Table 02 Row 02
+        table.addCell(new Cell().add(new Paragraph("Rukshan Mark").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().add(new Paragraph("Rs 2,972.32").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        // Table 02 Row 02
+        table.addCell(new Cell().add(new Paragraph("Rukshan Mark").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().add(new Paragraph("Rs 2,972.32").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        // Table 02 Row 02
+        table.addCell(new Cell().add(new Paragraph("Rukshan Mark").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().add(new Paragraph("Rs 2,972.32").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        // Table 02 Row 02
+        table.addCell(new Cell().add(new Paragraph("Rukshan Mark").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().add(new Paragraph("Rs 2,972.32").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        // Table 02 Row 02
+        table.addCell(new Cell().add(new Paragraph("Rukshan Mark").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().add(new Paragraph("Rs 2,972.32").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        // Table 02 Row 02
+        table.addCell(new Cell().add(new Paragraph("Rukshan Mark").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().add(new Paragraph("Rs 2,972.32").setFont(FONT_POPPINS))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+
+        return table;
     }
 
     private Table getTable04(ArtistReport report) {
         // Table
-        float[] columnWidth = {400f, 5f, 200f, 5f, 200f};
+        float[] columnWidth = {300f, 5f, 200f, 5f, 300f};
         Table table = new Table(columnWidth);
         table.setMarginLeft(20f);
         table.setMarginRight(20f);
@@ -72,10 +133,10 @@ public class ReportPDF {
         // Row 01
         table.addCell(new Cell().add(new Paragraph("Partner Share of Gross").setFont(FONT_RUBIK_SEMIBOLD))
                 .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_BLACK).setBorder(BLACK_BORDER));
-        table.addCell(new Cell().add(new Paragraph("")));
+        table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));
         table.addCell(new Cell().add(new Paragraph("Amount Payable").setFont(FONT_RUBIK_SEMIBOLD))
                 .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_BLACK).setBorder(BLACK_BORDER));
-        table.addCell(new Cell().add(new Paragraph("")));
+        table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));
         table.addCell(new Cell().add(new Paragraph("14% TAX (If Applicable)").setFont(FONT_RUBIK_SEMIBOLD))
                 .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_RED).setBorder(BLACK_BORDER));
 
@@ -153,7 +214,7 @@ public class ReportPDF {
         return table;
     }
 
-    private static Table getTable01(Image reportHeading) {
+    private static Table getHeaderTable(Image reportHeading) {
         float[] columnWidth = {1000f};
         Table table = new Table(columnWidth);
 
