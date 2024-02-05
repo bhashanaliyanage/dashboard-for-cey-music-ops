@@ -1,7 +1,5 @@
 package com.example.song_finder_fx.Model;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 

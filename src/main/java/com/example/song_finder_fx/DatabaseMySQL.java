@@ -289,7 +289,7 @@ public class DatabaseMySQL {
     private static PreparedStatement getPreparedStatementAddRowToFuga() throws ClassNotFoundException, SQLException {
         Connection db = DatabaseMySQL.getConn();
 
-        PreparedStatement ps = db.prepareStatement("INSERT INTO report " +
+        return db.prepareStatement("INSERT INTO report " +
                 "(Sale_Start_date, Sale_End_date, DSP, Sale_Store_Name, Sale_Type, Sale_User_Type, Territory, " +
                 "Product_UPC, Product_Reference, Product_Catalog_Number, Product_Label, Product_Artist, Product_Title, " +
                 "Asset_Artist, Asset_Title, Asset_Version, Asset_Duration, Asset_ISRC, Asset_Reference, AssetOrProduct, " +
@@ -297,7 +297,6 @@ public class DatabaseMySQL {
                 "Converted_Gross_Income, Contract_deal_term, Reported_Royalty, Currency, Report_Run_ID, Report_ID, " +
                 "Sale_ID) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        return ps;
     }
 
     public static ResultSet getTop5StreamedAssets() throws SQLException, ClassNotFoundException {
