@@ -1,6 +1,9 @@
 package com.example.song_finder_fx.Model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class ArtistReport {
     private String payee = "";
@@ -10,6 +13,17 @@ public class ArtistReport {
     private String amountPayable = "";
     private String month = "";
     private final DecimalFormat df = new DecimalFormat("0.00");
+    private final ArrayList<String> coWriters = new ArrayList<>();
+
+    public ArrayList<String> getCoWriters() {
+        return coWriters;
+    }
+
+    public ArrayList<String> getCoWriterShare() {
+        return coWriterShare;
+    }
+
+    private final ArrayList<String> coWriterShare = new ArrayList<>();
 
     public void setGrossRevenue(String selectedItem, double grossRevenueInLKR, double partnerShareInLKR, double tax, double amountPayable, String month) {
         this.payee = selectedItem;
@@ -39,7 +53,16 @@ public class ArtistReport {
     public String getPayee() {
         return payee;
     }
+
     public String getMonth() {
         return month;
+    }
+
+    public void addCoWriter(String artist) {
+        coWriters.add(artist);
+    }
+
+    public void addCoWriterShare(double share) {
+        coWriterShare.add("Rs. " + df.format(share));
     }
 }

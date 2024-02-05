@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 public class DatabaseMySQL {
     private static Connection conn = null;
+    private static Connection con1 = null;
     static StringBuilder errorBuffer = new StringBuilder();
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
@@ -247,16 +248,7 @@ public class DatabaseMySQL {
     }
 
     public static int addRowFUGAReport(FUGAReport report) throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
-
-        PreparedStatement ps = db.prepareStatement("INSERT INTO report " +
-                "(Sale_Start_date, Sale_End_date, DSP, Sale_Store_Name, Sale_Type, Sale_User_Type, Territory, " +
-                "Product_UPC, Product_Reference, Product_Catalog_Number, Product_Label, Product_Artist, Product_Title, " +
-                "Asset_Artist, Asset_Title, Asset_Version, Asset_Duration, Asset_ISRC, Asset_Reference, AssetOrProduct, " +
-                "Product_Quantity, Asset_Quantity, Original_Gross_Income, Original_currency, Exchange_Rate, " +
-                "Converted_Gross_Income, Contract_deal_term, Reported_Royalty, Currency, Report_Run_ID, Report_ID, " +
-                "Sale_ID) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        PreparedStatement ps = getPreparedStatementAddRowToFuga();
 
         ps.setString(1, report.getSaleStartDate());
         ps.setString(2, report.getSaleEndDate());
@@ -290,8 +282,22 @@ public class DatabaseMySQL {
         ps.setInt(30, report.getReportRunID());
         ps.setInt(31, report.getReportID());
         ps.setLong(32, report.getSaleID());
-        
+
         return ps.executeUpdate();
+    }
+
+    private static PreparedStatement getPreparedStatementAddRowToFuga() throws ClassNotFoundException, SQLException {
+        Connection db = DatabaseMySQL.getConn();
+
+        PreparedStatement ps = db.prepareStatement("INSERT INTO report " +
+                "(Sale_Start_date, Sale_End_date, DSP, Sale_Store_Name, Sale_Type, Sale_User_Type, Territory, " +
+                "Product_UPC, Product_Reference, Product_Catalog_Number, Product_Label, Product_Artist, Product_Title, " +
+                "Asset_Artist, Asset_Title, Asset_Version, Asset_Duration, Asset_ISRC, Asset_Reference, AssetOrProduct, " +
+                "Product_Quantity, Asset_Quantity, Original_Gross_Income, Original_currency, Exchange_Rate, " +
+                "Converted_Gross_Income, Contract_deal_term, Reported_Royalty, Currency, Report_Run_ID, Report_ID, " +
+                "Sale_ID) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        return ps;
     }
 
     public static ResultSet getTop5StreamedAssets() throws SQLException, ClassNotFoundException {
@@ -561,7 +567,7 @@ public class DatabaseMySQL {
                 "JOIN `report` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC` " +
                 "WHERE `isrc_payees`.`ISRC` IN (SELECT ISRC FROM isrc_payees WHERE PAYEE = ?) AND `isrc_payees`.`PAYEE` != ? " +
                 "GROUP BY `report`.`Asset_ISRC`" +
-                "LIMIT 5;");
+                "LIMIT 6;");
 
         psGetCoWriterShare.setString(1, artistName);
         psGetCoWriterShare.setString(2, artistName);
@@ -813,5 +819,34 @@ public class DatabaseMySQL {
         }
 
         return artistName != null;
+    }
+
+    public static int addRowFUGAReportnew(FUGAReport report) throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConTest();
+        try (CallableStatement cs = db.prepareCall("{call insert_report_new(?,?,?,?,?)}")) {
+
+            cs.setString(1, report.getAssetISRC());
+            cs.setDouble(2, report.getReportedRoyalty());
+            cs.setString(3, report.getTerritory());
+            cs.setString(4, report.getSaleStartDate());
+            cs.setString(5, report.getDsp());
+
+            return cs.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public static Connection getConTest() throws ClassNotFoundException, SQLException {
+        if (con1 == null) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            String url = "jdbc:mysql://192.168.1.200/testdb";
+            String username = "ceymusic";
+            String password = "ceymusic";
+            con1 = DriverManager.getConnection(url, username, password);
+        }
+
+        return con1;
     }
 }

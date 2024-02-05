@@ -710,6 +710,8 @@ public class ControllerRevenueGenerator {
                             count++;
                             String artist = rsCoWriterShares.getString(1);
                             double share = rsCoWriterShares.getDouble(2) * doubleConvertedRate;
+                            report.addCoWriter(artist);
+                            report.addCoWriterShare(share);
 
                             if (count == 1) {
                                 Platform.runLater(() -> {
