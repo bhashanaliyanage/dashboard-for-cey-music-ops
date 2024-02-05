@@ -54,7 +54,9 @@ public class ReportPDF {
         Table table03 = getTable03(report);
         Table table04 = getTable04(report);
         Table tableCoWriterPaymentSummary = getCoWriterTable(report);
+        // Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
         Table tableFooter = getFooterTable();
+
         tableFooter.setFixedPosition(20f, document.getBottomMargin(), document.getWidth());
 
         document.add(tableHeader); // Header
@@ -62,11 +64,15 @@ public class ReportPDF {
         document.add(table03);
         document.add(table04);
         document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
-        document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
+        // document.add(tableTopPerformingSongsSummary); // Co-Writer Payment Summary
         document.add(tableFooter);
 
         document.close();
     }
+
+    /*private Table getTopPerformingSongsTable(ArtistReport report) {
+
+    }*/
 
     private Table getFooterTable() {
         // Table
