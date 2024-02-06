@@ -33,9 +33,9 @@
       </Label>
       <ImageView fx:id="imgLoading" fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
          <HBox.margin>
-            <Insets left="10.0"/>
+            <Insets left="10.0" />
          </HBox.margin>
-         <Image url="@../images/loading.gif"/>
+         <Image url="@../images/loading.gif" />
       </ImageView>
    </HBox>
    <HBox alignment="CENTER_LEFT" prefWidth="200.0">
@@ -100,44 +100,43 @@
       <VBox.margin>
          <Insets left="30.0" right="30.0" top="30.0" />
       </VBox.margin>
-      <VBox fx:id="vboxTopStreams" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg"
-            stylesheets="@../styles.css">
+      <VBox fx:id="vboxTopStreams" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
          <Group>
             <VBox.margin>
-               <Insets left="20.0" top="20.0"/>
+               <Insets left="20.0" top="20.0" />
             </VBox.margin>
             <Label text="Co-Writer Payment Summary">
                <font>
-                  <Font name="Segoe UI Semibold" size="19.0"/>
+                  <Font name="Segoe UI Semibold" size="19.0" />
                </font>
                <cursor>
-                  <Cursor fx:constant="DEFAULT"/>
+                  <Cursor fx:constant="DEFAULT" />
                </cursor>
             </Label>
             <Label layoutY="28.0" text="for Top Streamed Assets">
                <cursor>
-                  <Cursor fx:constant="DEFAULT"/>
+                  <Cursor fx:constant="DEFAULT" />
                </cursor>
             </Label>
          </Group>
          <HBox fx:id="asset01">
             <VBox.margin>
-               <Insets left="20.0" top="30.0"/>
+               <Insets left="20.0" top="30.0" />
             </VBox.margin>
             <children>
                <Label fx:id="lblWriter01" text="N/A">
                   <cursor>
-                     <Cursor fx:constant="DEFAULT"/>
+                     <Cursor fx:constant="DEFAULT" />
                   </cursor>
                </Label>
                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                   <HBox.margin>
-                     <Insets right="30.0"/>
+                     <Insets right="30.0" />
                   </HBox.margin>
                   <children>
                      <Label fx:id="lblWriter01Streams" text="N/A">
                         <cursor>
-                           <Cursor fx:constant="DEFAULT"/>
+                           <Cursor fx:constant="DEFAULT" />
                         </cursor>
                      </Label>
                   </children>
@@ -148,20 +147,20 @@
             <children>
                <Label fx:id="lblWriter02" text="N/A">
                   <cursor>
-                     <Cursor fx:constant="DEFAULT"/>
+                     <Cursor fx:constant="DEFAULT" />
                   </cursor>
                   <padding>
-                     <Insets left="20.0" top="10.0"/>
+                     <Insets left="20.0" top="10.0" />
                   </padding>
                </Label>
                <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
                   <HBox.margin>
-                     <Insets right="30.0"/>
+                     <Insets right="30.0" />
                   </HBox.margin>
                   <children>
                      <Label fx:id="lblWriter02Streams" text="N/A">
                         <cursor>
-                           <Cursor fx:constant="DEFAULT"/>
+                           <Cursor fx:constant="DEFAULT" />
                         </cursor>
                      </Label>
                   </children>
@@ -172,22 +171,22 @@
             <children>
                <Label fx:id="lblWriter03" text="N/A">
                   <cursor>
-                     <Cursor fx:constant="DEFAULT"/>
+                     <Cursor fx:constant="DEFAULT" />
                   </cursor>
                   <padding>
-                     <Insets left="20.0" top="10.0"/>
+                     <Insets left="20.0" top="10.0" />
                   </padding>
                </Label>
                <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
                   <children>
                      <Label fx:id="lblWriter03Streams" text="N/A">
                         <cursor>
-                           <Cursor fx:constant="DEFAULT"/>
+                           <Cursor fx:constant="DEFAULT" />
                         </cursor>
                      </Label>
                   </children>
                   <HBox.margin>
-                     <Insets right="30.0"/>
+                     <Insets right="30.0" />
                   </HBox.margin>
                </HBox>
             </children>
@@ -196,22 +195,22 @@
             <children>
                <Label fx:id="lblWriter04" text="N/A">
                   <cursor>
-                     <Cursor fx:constant="DEFAULT"/>
+                     <Cursor fx:constant="DEFAULT" />
                   </cursor>
                   <padding>
-                     <Insets left="20.0" top="10.0"/>
+                     <Insets left="20.0" top="10.0" />
                   </padding>
                </Label>
                <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
                   <children>
                      <Label fx:id="lblWriter04Streams" text="N/A">
                         <cursor>
-                           <Cursor fx:constant="DEFAULT"/>
+                           <Cursor fx:constant="DEFAULT" />
                         </cursor>
                      </Label>
                   </children>
                   <HBox.margin>
-                     <Insets right="30.0"/>
+                     <Insets right="30.0" />
                   </HBox.margin>
                </HBox>
             </children>
@@ -220,27 +219,27 @@
             <children>
                <Label fx:id="lblWriter05" text="N/A">
                   <cursor>
-                     <Cursor fx:constant="DEFAULT"/>
+                     <Cursor fx:constant="DEFAULT" />
                   </cursor>
                </Label>
                <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
                   <children>
                      <Label fx:id="lblWriter05Streams" text="N/A">
                         <cursor>
-                           <Cursor fx:constant="DEFAULT"/>
+                           <Cursor fx:constant="DEFAULT" />
                         </cursor>
                      </Label>
                   </children>
                   <HBox.margin>
-                     <Insets right="30.0"/>
+                     <Insets right="30.0" />
                   </HBox.margin>
                </HBox>
             </children>
             <padding>
-               <Insets left="20.0" top="10.0"/>
+               <Insets left="20.0" top="10.0" />
             </padding>
             <VBox.margin>
-               <Insets bottom="20.0"/>
+               <Insets bottom="20.0" />
             </VBox.margin>
          </HBox>
       </VBox>
@@ -271,7 +270,7 @@
                   <Insets left="20.0" top="30.0" />
                </VBox.margin>
                <children>
-                  <Label fx:id="lblAsset01" text="N/A">
+                  <Label fx:id="lblAsset01" maxWidth="200.0" text="N/A">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
@@ -292,7 +291,7 @@
             </HBox>
             <HBox fx:id="asset021" layoutX="31.0" layoutY="106.0" prefWidth="529.0">
                <children>
-                  <Label fx:id="lblAsset02" text="N/A">
+                  <Label fx:id="lblAsset02" maxWidth="200.0" text="N/A">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
@@ -316,7 +315,7 @@
             </HBox>
             <HBox fx:id="asset031" layoutX="11.0" layoutY="123.0">
                <children>
-                  <Label fx:id="lblAsset03" text="N/A">
+                  <Label fx:id="lblAsset03" maxWidth="200.0" text="N/A">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
@@ -340,7 +339,7 @@
             </HBox>
             <HBox fx:id="asset041" layoutX="11.0" layoutY="140.0">
                <children>
-                  <Label fx:id="lblAsset04" text="N/A">
+                  <Label fx:id="lblAsset04" maxWidth="200.0" text="N/A">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
@@ -364,7 +363,7 @@
             </HBox>
             <HBox fx:id="asset051" layoutX="11.0" layoutY="157.0">
                <children>
-                  <Label fx:id="lblAsset05" text="N/A">
+                  <Label fx:id="lblAsset05" maxWidth="200.0" text="N/A">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
@@ -392,7 +391,7 @@
          </children>
       </VBox>
    </HBox>
-   <Button minHeight="30.0" minWidth="690.0" mnemonicParsing="false" onMouseClicked="#onGetReportBtnClick" styleClass="button_inside_brown" text="Get PDF Report">
+   <Button fx:id="btnGetPDFReport" minHeight="30.0" minWidth="690.0" mnemonicParsing="false" onMouseClicked="#onGetReportBtnClick" styleClass="button_inside_brown" text="Get PDF Report">
       <VBox.margin>
          <Insets left="30.0" right="30.0" top="20.0" />
       </VBox.margin>

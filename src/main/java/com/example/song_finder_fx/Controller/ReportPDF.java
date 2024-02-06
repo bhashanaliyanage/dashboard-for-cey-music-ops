@@ -54,7 +54,7 @@ public class ReportPDF {
         Table table03 = getTable03(report);
         Table table04 = getTable04(report);
         Table tableCoWriterPaymentSummary = getCoWriterTable(report);
-        // Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
+        Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
         Table tableFooter = getFooterTable();
 
         tableFooter.setFixedPosition(20f, document.getBottomMargin(), document.getWidth());
@@ -64,15 +64,39 @@ public class ReportPDF {
         document.add(table03);
         document.add(table04);
         document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
-        // document.add(tableTopPerformingSongsSummary); // Co-Writer Payment Summary
+        document.add(tableTopPerformingSongsSummary); // Co-Writer Payment Summary
         document.add(tableFooter);
 
         document.close();
     }
 
-    /*private Table getTopPerformingSongsTable(ArtistReport report) {
+    private Table getTopPerformingSongsTable(ArtistReport report) {
+        float[] columnWidth = {300f, 300f, 300f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+        table.setMarginTop(10f);
 
-    }*/
+        ArrayList<String> topPerformingSongs = report.getTopPerformingSongs();
+        ArrayList<String> topPerformingSongPayees = report.getTopPerformingSongPayees();
+        ArrayList<String> topPerformingSongPayeeShares = report.getTopPerformingSongPayeeShare();
+        int songCount = topPerformingSongs.size();
+
+        // Table 02 Row 01
+        table.addCell(new Cell(1, 3).add(new Paragraph("Top Performing Songs Summary").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+
+        for (int i = 0; i <= (songCount -1); i++) {
+            table.addCell(new Cell().add(new Paragraph(topPerformingSongs.get(i)).setFont(FONT_POPPINS))
+                    .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+            table.addCell(new Cell().add(new Paragraph(topPerformingSongPayees.get(i)).setFont(FONT_POPPINS))
+                    .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+            table.addCell(new Cell().add(new Paragraph(topPerformingSongPayeeShares.get(i)).setFont(FONT_POPPINS))
+                    .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+        }
+
+        return table;
+    }
 
     private Table getFooterTable() {
         // Table

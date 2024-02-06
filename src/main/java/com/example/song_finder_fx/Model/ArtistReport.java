@@ -12,16 +12,18 @@ public class ArtistReport {
     private String month = "";
     private final DecimalFormat df = new DecimalFormat("0.00");
     private final ArrayList<String> coWriters = new ArrayList<>();
-
-    public ArrayList<String> getCoWriters() {
-        return coWriters;
-    }
-
-    public ArrayList<String> getCoWriterShare() {
-        return coWriterShare;
-    }
-
+    private final ArrayList<String> topPerformingSongs = new ArrayList<>();
+    private final ArrayList<String> topPerformingSongPayees = new ArrayList<>();
+    private final ArrayList<String> topPerformingSongPayeeShare = new ArrayList<>();
     private final ArrayList<String> coWriterShare = new ArrayList<>();
+
+    public void clear() {
+        coWriters.clear();
+        coWriterShare.clear();
+        topPerformingSongs.clear();
+        topPerformingSongPayees.clear();
+        topPerformingSongPayeeShare.clear();
+    }
 
     public void setGrossRevenue(String selectedItem, double grossRevenueInLKR, double partnerShareInLKR, double tax, double amountPayable, String month) {
         this.payee = selectedItem;
@@ -62,5 +64,30 @@ public class ArtistReport {
 
     public void addCoWriterShare(double share) {
         coWriterShare.add("Rs. " + df.format(share));
+    }
+
+    public void setTopPerformingSongDetails(String assetTitle, String payee, String reportedRoyalty) {
+        topPerformingSongs.add(assetTitle);
+        topPerformingSongPayees.add(payee);
+        topPerformingSongPayeeShare.add("Rs. " + reportedRoyalty);
+    }
+    public ArrayList<String> getTopPerformingSongs() {
+        return topPerformingSongs;
+    }
+
+    public ArrayList<String> getTopPerformingSongPayees() {
+        return topPerformingSongPayees;
+    }
+
+    public ArrayList<String> getTopPerformingSongPayeeShare() {
+        return topPerformingSongPayeeShare;
+    }
+
+    public ArrayList<String> getCoWriters() {
+        return coWriters;
+    }
+
+    public ArrayList<String> getCoWriterShare() {
+        return coWriterShare;
     }
 }

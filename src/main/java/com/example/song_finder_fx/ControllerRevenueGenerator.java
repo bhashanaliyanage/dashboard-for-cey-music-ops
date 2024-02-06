@@ -637,11 +637,16 @@ public class ControllerRevenueGenerator {
     }
 
     public void onLoadReportBtnClick() {
+        report.clear();
         String userInputRate = txtRate.getText();
         double doubleConvertedRate;
         String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
         DecimalFormat df = new DecimalFormat("0.00");
-        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
+
+        final ArrayList<Double>[] royalty = new ArrayList[] {
+                new ArrayList<Double>()
+        };
+
         final double[] tax = {0};
         final double[] amountPayable = new double[1];
 
@@ -748,39 +753,42 @@ public class ControllerRevenueGenerator {
                 Task<Void> taskTopPerformingSongs = new Task<>() {
                     @Override
                     protected Void call() throws Exception {
-                        ResultSet rsTopPerformingSongs = DatabaseMySQL.getTopPerformingSongs(selectedItem);
+                        ResultSet rsTopPerformingSongs = DatabaseMySQL.getTopPerformingSongsEdit(selectedItem);
                         int count = 0;
 
                         while (rsTopPerformingSongs.next()) {
                             count++;
 
                             String assetTitle = rsTopPerformingSongs.getString(1);
-                            double reportedRoyalty = rsTopPerformingSongs.getDouble(2);
+                            String payee = rsTopPerformingSongs.getString(2);
+                            double reportedRoyalty = rsTopPerformingSongs.getDouble(4);
+
+                            report.setTopPerformingSongDetails(assetTitle, payee, df.format(reportedRoyalty * doubleConvertedRate));
 
                             if (count == 1) {
                                 Platform.runLater(() -> {
-                                    lblAsset01.setText(assetTitle);
-                                    lblAsset01Streams.setText(df.format(reportedRoyalty));
+                                    lblAsset01.setText(assetTitle + " (" + payee + ")");
+                                    lblAsset01Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
                                 });
                             } else if (count == 2) {
                                 Platform.runLater(() -> {
-                                    lblAsset02.setText(assetTitle);
-                                    lblAsset02Streams.setText(df.format(reportedRoyalty));
+                                    lblAsset02.setText(assetTitle + " (" + payee + ")");
+                                    lblAsset02Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
                                 });
                             } else if (count == 3) {
                                 Platform.runLater(() -> {
-                                    lblAsset03.setText(assetTitle);
-                                    lblAsset03Streams.setText(df.format(reportedRoyalty));
+                                    lblAsset03.setText(assetTitle + " (" + payee + ")");
+                                    lblAsset03Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
                                 });
                             } else if (count == 4) {
                                 Platform.runLater(() -> {
-                                    lblAsset04.setText(assetTitle);
-                                    lblAsset04Streams.setText(df.format(reportedRoyalty));
+                                    lblAsset04.setText(assetTitle + " (" + payee + ")");
+                                    lblAsset04Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
                                 });
                             } else if (count == 5) {
                                 Platform.runLater(() -> {
-                                    lblAsset05.setText(assetTitle);
-                                    lblAsset05Streams.setText(df.format(reportedRoyalty));
+                                    lblAsset05.setText(assetTitle + " (" + payee + ")");
+                                    lblAsset05Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
                                 });
                             }
                         }
@@ -961,11 +969,13 @@ public class ControllerRevenueGenerator {
         Scene scene = node.getScene();
         Window window = scene.getWindow();
 
-        ReportPDF reportPDF = new ReportPDF();
-        reportPDF.generateReport(window, report);
-
         if (!Objects.equals(payee, null)) {
-            // TODO: Moved content outside temporary
+            ReportPDF reportPDF = new ReportPDF();
+            try {
+                reportPDF.generateReport(window, report);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             // If no Payee Selected
             comboPayees.setStyle("-fx-border-color: red;");
