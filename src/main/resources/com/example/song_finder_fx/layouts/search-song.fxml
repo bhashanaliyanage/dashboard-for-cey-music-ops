@@ -2,25 +2,28 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vboxSongSearch" alignment="CENTER_LEFT" onKeyPressed="#onSearchedSongPress2" prefHeight="100.0" prefWidth="650.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
-    <HBox>
-        <HBox alignment="CENTER_LEFT" onMouseClicked="#onSearchedSongClick" prefWidth="512.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
+<VBox fx:id="vboxSongSearch" alignment="CENTER_LEFT" onKeyPressed="#onSearchedSongPress2" prefHeight="100.0" prefWidth="650.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerSearch">
+    <HBox fx:id="hboxSongSearch">
+        <HBox fx:id="hbox2" alignment="CENTER_LEFT" onMouseClicked="#onSearchedSongClick" prefWidth="512.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
             <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
                 <Image url="@../images/logo_small_70x_2.png" />
                 <HBox.margin>
                     <Insets />
                 </HBox.margin>
             </ImageView>
-            <VBox alignment="CENTER_LEFT" prefWidth="400.0">
+            <VBox fx:id="vboxSongDetails" prefWidth="400.0">
                 <HBox.margin>
-                    <Insets left="10.0" />
+                    <Insets left="10.0" top="10.0" />
                 </HBox.margin>
                 <Label fx:id="songName" text="Song Name">
                     <font>
@@ -41,47 +44,69 @@
                 </HBox>
                 <HBox layoutX="10.0" layoutY="49.0">
                     <VBox.margin>
-                        <Insets top="5.0"/>
+                        <Insets top="5.0" />
                     </VBox.margin>
                     <ImageView fitHeight="18.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                         <HBox.margin>
-                            <Insets right="5.0"/>
+                            <Insets right="5.0" />
                         </HBox.margin>
-                        <Image url="@../images/music-note%201.png"/>
+                        <Image url="@../images/music-note%201.png" />
                     </ImageView>
-                    <Label fx:id="searchResultComposer" text="Composer" textFill="#656565"/>
-                    <Label layoutX="10.0" layoutY="10.0" minWidth="10.0" text=" | " textFill="#656565"/>
-                    <ImageView fitHeight="18.0" fitWidth="16.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true"
-                               preserveRatio="true">
+                    <Label fx:id="searchResultComposer" text="Composer" textFill="#656565" />
+                    <Label layoutX="10.0" layoutY="10.0" minWidth="10.0" text=" | " textFill="#656565" />
+                    <ImageView fitHeight="18.0" fitWidth="16.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
                         <HBox.margin>
-                            <Insets right="5.0"/>
+                            <Insets right="5.0" />
                         </HBox.margin>
-                        <Image url="@../images/pencil%201.png"/>
+                        <Image url="@../images/pencil%201.png" />
                     </ImageView>
-                    <Label fx:id="searchResultLyricist" layoutX="10.0" layoutY="10.0" text="Lyricist"
-                           textFill="#656565"/>
+                    <Label fx:id="searchResultLyricist" layoutX="10.0" layoutY="10.0" text="Lyricist" textFill="#656565" />
                 </HBox>
             </VBox>
         </HBox>
-        <HBox alignment="CENTER_RIGHT">
-            <ImageView fx:id="btnPlay" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#onAddToListButtonClickedInSearchSong" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-                <cursor>
-                    <Cursor fx:constant="HAND" />
-                </cursor>
-                <HBox.margin>
-                    <Insets left="20.0" right="20.0" />
-                </HBox.margin>
-                <Image url="@../images/icon_plus_circle.png" />
-            </ImageView>
-            <ImageView fx:id="btnPlay1" fitHeight="30.0" fitWidth="30.0" layoutX="10.0" layoutY="30.0" onMouseClicked="#onBtnPlayClicked" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-                <cursor>
-                    <Cursor fx:constant="HAND" />
-                </cursor>
-                <HBox.margin>
-                    <Insets right="20.0" />
-                </HBox.margin>
-                <Image url="@../images/icon%20_play%20circle_.png" />
-            </ImageView>
-        </HBox>
+        <VBox>
+            <children>
+                <HBox alignment="CENTER_RIGHT" VBox.vgrow="ALWAYS">
+                    <ImageView fx:id="btnPlay" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#onAddToListButtonClickedInSearchSong" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+                        <cursor>
+                            <Cursor fx:constant="HAND" />
+                        </cursor>
+                        <HBox.margin>
+                            <Insets left="20.0" right="20.0" />
+                        </HBox.margin>
+                        <Image url="@../images/icon_plus_circle.png" />
+                    </ImageView>
+                    <ImageView fx:id="btnPlay1" fitHeight="30.0" fitWidth="30.0" layoutX="10.0" layoutY="30.0" onMouseClicked="#onBtnPlayClicked" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+                        <cursor>
+                            <Cursor fx:constant="HAND" />
+                        </cursor>
+                        <HBox.margin>
+                            <Insets right="20.0" />
+                        </HBox.margin>
+                        <Image url="@../images/icon%20_play%20circle_.png" />
+                    </ImageView>
+                </HBox>
+                <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Button fx:id="btnCopy" mnemonicParsing="false" prefWidth="80.0" styleClass="button_inside_brown" text="Copy">
+                            <contextMenu>
+                                <ContextMenu onShown="#contextM">
+                                    <items>
+                                        <MenuItem fx:id="miSongName" onAction="#copySongName" mnemonicParsing="false" text="Song Name" />
+                                        <MenuItem fx:id="mi_ISRC" onAction="#copyISRC" mnemonicParsing="false" text="ISRC" />
+                                        <MenuItem fx:id="miSinger" onAction="#copySinger" mnemonicParsing="false" text="Singer" />
+                                        <MenuItem fx:id="miFeaturing" onAction="#copyFeaturing" mnemonicParsing="false" text="Featuring" />
+                                        <MenuItem fx:id="miComposer" onAction="#copyComposer" mnemonicParsing="false" text="Composer" />
+                                        <MenuItem fx:id="miLyricist" onAction="#copyLyricist" mnemonicParsing="false" text="Lyricist" />
+                                        <MenuItem fx:id="miUPC" onAction="#copyUPC" mnemonicParsing="false" text="UPC" />
+                                        <MenuItem fx:id="miProductName" onAction="#copyProductName" mnemonicParsing="false" text="Album Name" />
+                                    </items>
+                                </ContextMenu>
+                            </contextMenu>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
     </HBox>
 </VBox>

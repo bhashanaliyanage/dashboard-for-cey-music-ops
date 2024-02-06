@@ -5,16 +5,16 @@ import com.example.song_finder_fx.DatabaseMySQL;
 import java.sql.SQLException;
 
 public class Songs {
-    private String isrc;
-    private String trackTitle;
-    private String singer;
-    private String composer;
-    private String lyricist;
-    private String productTitle;
-    private String upc;
-    private String featuringArtist;
-    private String percentage;
-    private String copyrightOwner;
+    private String isrc = "";
+    private String trackTitle = "";
+    private String singer = "";
+    private String composer = "";
+    private String lyricist = "";
+    private String productTitle = "";
+    private String upc = "";
+    private String featuringArtist = "";
+    private String percentage = "";
+    private String copyrightOwner = "";
 
     public void setTrackTitle(String trackTitle) {
         this.trackTitle = trackTitle;

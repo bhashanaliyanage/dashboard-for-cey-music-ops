@@ -2,24 +2,60 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
 public class ControllerSearch {
+    public HBox hboxSongSearch;
+    public VBox vboxSongDetails;
+    public HBox hbox2;
+    @FXML
+    private ImageView btnPlay;
+
+    @FXML
+    private ImageView btnPlay1;
+
+    @FXML
+    private Label searchResultComposer;
+
+    @FXML
+    private Label searchResultISRC;
+
+    @FXML
+    private Label searchResultLyricist;
+
+    @FXML
+    private Label songName;
+
+    @FXML
+    private Label songSinger;
+
+    @FXML
+    private VBox vboxSongSearch;
+    public VBox mainVBox;
     @FXML
     private Label lblSearchType;
 
@@ -31,8 +67,27 @@ public class ControllerSearch {
 
     @FXML
     private VBox vboxSong;
+    @FXML
+    private Label lblFeaturing;
+
+    @FXML
+    private Label lblProductName;
+
+    @FXML
+    private Label lblShare;
+
+    @FXML
+    private Label lblUPC;
+    @FXML
+    private Button btnCopy;
+    private Parent newContent;
     private final Search search = new Search();
-    public ControllerSearch() {}
+    private boolean toggle = false;
+    Songs songDetails;
+
+    public ControllerSearch() {
+
+    }
 
     @FXML
     void btnSetSearchTypeComposer() {
@@ -106,5 +161,216 @@ public class ControllerSearch {
 
         Thread thread = new Thread(task);
         thread.start();
+    }
+
+    public void testSlide() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/sidepanel-song-view.fxml"));
+        newContent = loader.load();
+
+        mainVBox.getChildren().set(1, newContent);
+    }
+
+    public void testClose() {
+        Scene scene = newContent.getScene();
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+        mainVBox.getChildren().remove(1);
+    }
+
+    @FXML
+    void onAddToListButtonClickedInSearchSong(MouseEvent event) {
+
+    }
+
+    @FXML
+    void onBtnPlayClicked(MouseEvent event) {
+
+    }
+
+    @FXML
+    void onSearchedSongClick() throws IOException, SQLException, ClassNotFoundException {
+        Duration duration = Duration.seconds(0.100);
+
+        // Create a timeline for increasing heights
+        Timeline timelineIncreaseHeight = new Timeline(
+                new KeyFrame(duration, new KeyValue(vboxSongSearch.prefHeightProperty(), 190)),
+                new KeyFrame(duration, new KeyValue(hboxSongSearch.prefHeightProperty(), 180))
+        );
+
+        HBox hbox = new HBox();
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/search-song-expanded-view.fxml")));
+        Scene scene = vboxSongSearch.getScene();
+        hbox.getChildren().add(node);
+
+        if (!toggle) {
+            timelineIncreaseHeight.play();
+            timelineIncreaseHeight.setOnFinished(event -> {
+                vboxSongDetails.getChildren().add(hbox);
+                Label lblFeaturing = (Label) scene.lookup("#lblFeaturing");
+                Label lblProductName = (Label) scene.lookup("#lblProductName");
+                Label lblUPC = (Label) scene.lookup("#lblUPC");
+                Label lblShare = (Label) scene.lookup("#lblShare");
+
+                String isrc = searchResultISRC.getText();
+                try {
+                    songDetails = DatabaseMySQL.searchSongDetails(isrc);
+                } catch (SQLException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+
+                String percentage;
+                try {
+                    if (songDetails.composerAndLyricistCeyMusic()) {
+                        percentage = "100%";
+                    } else if (songDetails.composerOrLyricistCeyMusic()) {
+                        percentage = "50%";
+                    } else {
+                        percentage = "0%";
+                    }
+                } catch (SQLException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                songDetails.setPercentage(percentage);
+
+                lblFeaturing.setText(songDetails.getFeaturing());
+                lblProductName.setText(songDetails.getProductName());
+                lblUPC.setText(songDetails.getUPC());
+                lblShare.setText(percentage);
+            });
+            // Play the animation
+
+            toggle = true;
+        } else {
+            // Create a timeline for increasing heights
+            vboxSongDetails.getChildren().remove(3);
+            Timeline timelineDecreaseHeigt = new Timeline(
+                    new KeyFrame(duration, new KeyValue(vboxSongSearch.prefHeightProperty(), 100)),
+                    new KeyFrame(duration, new KeyValue(hboxSongSearch.prefHeightProperty(), 90))
+            );
+            timelineDecreaseHeigt.play();
+            toggle = false;
+        }
+    }
+
+    @FXML
+    void onSearchedSongPress2() {
+
+    }
+
+    @FXML
+    void contextM() throws SQLException, ClassNotFoundException {
+        System.out.println("ControllerSearch.contextM");
+        String isrc = searchResultISRC.getText();
+        songDetails = DatabaseMySQL.searchSongDetails(isrc);
+    }
+
+    @FXML
+    public void copyISRC() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songDetails.getISRC());
+        boolean status = clipboard.setContent(content);
+        System.out.println("status = " + status);
+        if (status) {
+            btnCopy.setText("Copied");
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));
+            timeline.play();
+        }
+    }
+
+    @FXML
+    void copySinger() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songDetails.getSinger());
+        boolean status = clipboard.setContent(content);
+        System.out.println("status = " + status);
+        if (status) {
+            btnCopy.setText("Copied");
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));
+            timeline.play();
+        }
+    }
+
+    @FXML
+    void copyComposer() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songDetails.getControl());
+        boolean status = clipboard.setContent(content);
+        System.out.println("status = " + status);
+        if (status) {
+            btnCopy.setText("Copied");
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));
+            timeline.play();
+        }
+    }
+
+    @FXML
+    void copyLyricist() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songDetails.getLyricist());
+        boolean status = clipboard.setContent(content);
+        System.out.println("status = " + status);
+        if (status) {
+            btnCopy.setText("Copied");
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));
+            timeline.play();
+        }
+    }
+
+    @FXML
+    void copyFeaturing() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songDetails.getFeaturing());
+        boolean status = clipboard.setContent(content);
+        System.out.println("status = " + status);
+        if (status) {
+            btnCopy.setText("Copied");
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));
+            timeline.play();
+        }
+    }
+
+    @FXML
+    void copyUPC() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songDetails.getUPC());
+        boolean status = clipboard.setContent(content);
+        System.out.println("status = " + status);
+        if (status) {
+            btnCopy.setText("Copied");
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));
+            timeline.play();
+        }
+    }
+
+    @FXML
+    void copyProductName() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songDetails.getProductName());
+        boolean status = clipboard.setContent(content);
+        System.out.println("status = " + status);
+        if (status) {
+            btnCopy.setText("Copied");
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));
+            timeline.play();
+        }
+    }
+
+    public void copySongName() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(songDetails.getTrackTitle());
+        boolean status = clipboard.setContent(content);
+        System.out.println("status = " + status);
+        if (status) {
+            btnCopy.setText("Copied");
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));
+            timeline.play();
+        }
     }
 }

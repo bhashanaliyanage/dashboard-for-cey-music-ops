@@ -779,7 +779,7 @@ public class DatabaseMySQL {
         emptyTable.executeUpdate();
     }
 
-    public Songs searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
+    public static Songs searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
         Songs song = new Songs();
         ResultSet rs;
 
