@@ -69,7 +69,7 @@ public class CSVController {
         return report;
     }
 
-    private static int getReportTotalRowCount(BufferedReader bReader) throws IOException {
+    public static int getReportTotalRowCount(BufferedReader bReader) throws IOException {
         int rowcount = 0; // Total RowCount
         while ((bReader.readLine()) != null) {
             rowcount++;
@@ -119,6 +119,7 @@ public class CSVController {
 
         return status;
     }
+
 
     public int writeMissingISRCs() throws SQLException, ClassNotFoundException, IOException {
         ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
