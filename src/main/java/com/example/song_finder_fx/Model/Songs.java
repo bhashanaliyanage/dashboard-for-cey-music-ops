@@ -1,6 +1,7 @@
 package com.example.song_finder_fx.Model;
 
 import com.example.song_finder_fx.DatabaseMySQL;
+import com.example.song_finder_fx.Main;
 
 import java.sql.SQLException;
 import java.util.Objects;
@@ -141,5 +142,22 @@ public class Songs {
 
     public boolean isOriginal() {
         return !Objects.equals(singer, "");
+    }
+
+    public boolean isInList() {
+        boolean isIsrcPresent = false;
+        String targetIsrc = isrc.trim().replaceAll("\\p{C}", "");;
+
+
+        for (String isrc2 : Main.getSongList()) {
+            String trimmedSong = isrc2.trim().replaceAll("\\p{C}", "");
+
+            if (trimmedSong.equalsIgnoreCase(targetIsrc)) {
+                isIsrcPresent = true;
+                break;
+            }
+        }
+
+        return isIsrcPresent;
     }
 }

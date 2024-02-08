@@ -2,9 +2,11 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
+import com.itextpdf.kernel.color.Lab;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,7 +27,9 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import javax.sound.sampled.Clip;
+import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -143,6 +147,7 @@ public class ControllerSearch {
                     Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
                     Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
                     Label songType = (Label) nodes[i].lookup("#songType");
+                    HBox hbox2 = (HBox) nodes[i].lookup("#hbox2");
                     lblSongName.setText(songList.get(i).getTrackTitle());
                     lblISRC.setText(songList.get(i).getISRC().trim());
                     lblArtist.setText(songList.get(i).getSinger().trim());
@@ -151,6 +156,10 @@ public class ControllerSearch {
 
                     if (songList.get(i).isOriginal()) {
                         songType.setVisible(true);
+                    }
+
+                    if (songList.get(i).isInList()) {
+                        hbox2.setStyle("-fx-border-color: #6eb0e0");
                     }
 
                     vboxSong.getChildren().add(nodes[i]);
@@ -194,6 +203,8 @@ public class ControllerSearch {
             songListButtonSubtitle.setText(songList.getFirst());
             System.out.println(songList.getFirst());
         }
+
+        hbox2.setStyle("-fx-border-color: #6eb0e0");
     }
 
     @FXML
@@ -431,6 +442,38 @@ public class ControllerSearch {
             btnCopy.setText("Copied");
             Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));
             timeline.play();
+        }
+    }
+
+    public void onSearchOnYoutubeBtnClicked(MouseEvent mouseEvent) {
+        String query = searchArea.getText();
+        query = query.replace(" ", "+");
+        query = "https://www.youtube.com/results?search_query=" + query;
+        System.out.println("query = " + query);
+
+        try {
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                URI uri = new URI(query);
+                Desktop.getDesktop().browse(uri);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onSearchOnGoogleBtnClicked(MouseEvent mouseEvent) {
+        String query = searchArea.getText();
+        query = query.replace(" ", "+");
+        query = "https://www.google.com/search?q=" + query + "+lyrics";
+        System.out.println("query = " + query);
+
+        try {
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                URI uri = new URI(query);
+                Desktop.getDesktop().browse(uri);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

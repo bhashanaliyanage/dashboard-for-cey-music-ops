@@ -60,7 +60,7 @@
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
-         <TextField fx:id="searchArea" onKeyPressed="#getText" prefHeight="30.0" prefWidth="590.0" promptText="Enter song name">
+         <TextField fx:id="searchArea" onKeyPressed="#getText" prefHeight="30.0" prefWidth="550.0" promptText="Enter song name">
             <font>
                <Font size="14.0" />
             </font>
@@ -68,14 +68,25 @@
                <Insets />
             </HBox.margin>
          </TextField>
-         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+         <ImageView fitHeight="20.0" fitWidth="20.0" onMouseClicked="#onSearchOnYoutubeBtnClicked" opacity="0.8" pickOnBounds="true" preserveRatio="true">
             <HBox.margin>
                <Insets left="5.0" right="5.0" />
             </HBox.margin>
             <cursor>
                <Cursor fx:constant="HAND" />
             </cursor>
-            <Image url="@../images/icon%20_search%20normal%201_.png" />
+            <Image url="@../images/youtube.png" />
+         </ImageView>
+         <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="607.0" layoutY="25.0" onMouseClicked="#onSearchOnGoogleBtnClicked" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+            <image>
+               <Image url="@../images/google.png" />
+            </image>
+            <HBox.margin>
+               <Insets left="5.0" />
+            </HBox.margin>
          </ImageView>
       </HBox>
       <ScrollPane fx:id="scrlpneSong" hbarPolicy="NEVER" prefWidth="544.0" styleClass="scroll-pane" stylesheets="@../styles.css" vbarPolicy="ALWAYS" visible="false" VBox.vgrow="ALWAYS">
