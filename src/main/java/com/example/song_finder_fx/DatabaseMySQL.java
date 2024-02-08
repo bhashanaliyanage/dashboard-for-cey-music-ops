@@ -742,7 +742,7 @@ public class DatabaseMySQL {
 
         Connection conn = getConn();
 
-        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER, COMPOSER, LYRICIST " +
+        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER, COMPOSER, LYRICIST, TYPE " +
                 "FROM songs WHERE " + searchType + " LIKE ? LIMIT 15");
         ps.setString(1, searchText + "%");
         rs = ps.executeQuery();
@@ -753,7 +753,8 @@ public class DatabaseMySQL {
                     rs.getString(2), // ISRC
                     rs.getString(3), // SINGER
                     rs.getString(4), // COMPOSER
-                    rs.getString(5) // LYRICIST
+                    rs.getString(5), // LYRICIST
+                    rs.getString(6) // TYPE
             ));
         }
 

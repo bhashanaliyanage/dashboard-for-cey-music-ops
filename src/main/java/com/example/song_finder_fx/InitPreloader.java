@@ -8,8 +8,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -164,7 +162,6 @@ public class InitPreloader implements Initializable {
 
                 stage.widthProperty().addListener((obs, oldVal, newVal) -> {
                     if ((oldVal.intValue() > newVal.intValue()) && (newVal.intValue() <= 1235)) {
-                        // Width 100
                         leftVBox.setPrefWidth(100);
                         leftVBox.setMinWidth(100);
                         hboxAbout.setVisible(false);
@@ -180,7 +177,6 @@ public class InitPreloader implements Initializable {
                     }
 
                     if ((oldVal.intValue() < newVal.intValue()) && (newVal.intValue() >= 1235)) {
-                        // borderPane.setLeft(UIController.mainNodes[4]);
                         leftVBox.setPrefWidth(293);
                         leftVBox.setMinWidth(293);
                         hboxAbout.setVisible(true);
@@ -192,6 +188,7 @@ public class InitPreloader implements Initializable {
                         vboxSongList.setVisible(true);
                         btnDatabaseCheck.setVisible(true);
                         btnDatabaseCheck2.setVisible(true);
+                        // borderPane.setLeft(UIController.mainNodes[4]);
                     }
                 });
 

@@ -3,8 +3,10 @@ package com.example.song_finder_fx.Model;
 import com.example.song_finder_fx.DatabaseMySQL;
 
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class Songs {
+    private String type = "";
     private String isrc = "";
     private String trackTitle = "";
     private String singer = "";
@@ -42,12 +44,13 @@ public class Songs {
         this.singer = singer;
     }
 
-    public Songs(String songName, String isrc, String singer, String composer, String lyricist) {
+    public Songs(String songName, String isrc, String singer, String composer, String lyricist, String type) {
         this.trackTitle = songName;
         this.isrc = isrc;
         this.singer = singer;
         this.composer = composer;
         this.lyricist = lyricist;
+        this.type = type;
     }
 
     public void setIsrc(String isrc) {
@@ -130,5 +133,13 @@ public class Songs {
 
     public String getCopyrightOwner() {
         return copyrightOwner;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public boolean isOriginal() {
+        return !Objects.equals(singer, "");
     }
 }

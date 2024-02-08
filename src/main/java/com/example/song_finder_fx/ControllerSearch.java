@@ -5,20 +5,20 @@ import com.example.song_finder_fx.Model.Songs;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -38,20 +38,9 @@ public class ControllerSearch {
     public HBox hboxSongSearch;
     public VBox vboxSongDetails;
     public HBox hbox2;
-    @FXML
-    private ImageView btnPlay;
-
-    @FXML
-    private ImageView btnPlay1;
-
-    @FXML
-    private Label searchResultComposer;
 
     @FXML
     private Label searchResultISRC;
-
-    @FXML
-    private Label searchResultLyricist;
 
     @FXML
     private Label songName;
@@ -126,7 +115,7 @@ public class ControllerSearch {
     }
 
     @FXML
-    void getText(KeyEvent event) throws IOException {
+    void getText() {
         // Getting search keywords
         String text = searchArea.getText();
 
@@ -153,11 +142,17 @@ public class ControllerSearch {
                     Label lblArtist = (Label) nodes[i].lookup("#songSinger");
                     Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
                     Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
+                    Label songType = (Label) nodes[i].lookup("#songType");
                     lblSongName.setText(songList.get(i).getTrackTitle());
                     lblISRC.setText(songList.get(i).getISRC().trim());
                     lblArtist.setText(songList.get(i).getSinger().trim());
                     lblComposer.setText(songList.get(i).getComposer().trim());
                     lblLyricist.setText(songList.get(i).getLyricist().trim());
+
+                    if (songList.get(i).isOriginal()) {
+                        songType.setVisible(true);
+                    }
+
                     vboxSong.getChildren().add(nodes[i]);
                 } catch (NullPointerException | IOException ex) {
                     ex.printStackTrace();
@@ -174,12 +169,6 @@ public class ControllerSearch {
         newContent = loader.load();
 
         mainVBox.getChildren().set(1, newContent);
-    }
-
-    public void testClose() {
-        Scene scene = newContent.getScene();
-        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
-        mainVBox.getChildren().remove(1);
     }
 
     @FXML
