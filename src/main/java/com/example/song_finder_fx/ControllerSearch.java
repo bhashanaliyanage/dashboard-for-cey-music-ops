@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -23,10 +24,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import javax.sound.sampled.Clip;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+
+import static com.example.song_finder_fx.UIController.setPlayerInfo;
 
 public class ControllerSearch {
     public HBox hboxSongSearch;
@@ -178,12 +184,77 @@ public class ControllerSearch {
 
     @FXML
     void onAddToListButtonClickedInSearchSong(MouseEvent event) {
+        // Getting scene
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
 
+        // Getting label from scene
+        Label songListButtonSubtitle = (Label) scene.lookup("#lblSongListSub");
+
+        // Adding songs to list
+        Main.addSongToList(searchResultISRC.getText());
+
+        List<String> songList = Main.getSongList();
+        int songListLength = songList.size();
+
+        if (songListLength > 1) {
+            String text = songList.getFirst() + " + " + (songListLength - 1) + " other songs added";
+            songListButtonSubtitle.setText(text);
+            System.out.println(text);
+        } else {
+            songListButtonSubtitle.setText(songList.getFirst());
+            System.out.println(songList.getFirst());
+        }
     }
 
     @FXML
-    void onBtnPlayClicked(MouseEvent event) {
+    void onBtnPlayClicked(MouseEvent mouseEvent) {
+        Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
+        String isrc;
 
+        Main.directoryCheck();
+        Songs song = new Songs();
+
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+
+        Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
+        Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
+        ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
+
+        song.setTrackTitle(songName.getText());
+        song.setSinger(songSinger.getText());
+
+        try {
+            isrc = searchResultISRC.getText();
+        } catch (Exception e) {
+            isrc = searchResultISRC.getText();
+        }
+
+        Task<Void> task;
+        Path start = Paths.get(Main.selectedDirectory.toURI());
+        final boolean[] status = new boolean[1];
+
+        lblPlayerSongName.setText("Loading audio");
+        lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
+        imgMediaPico.setImage(img);
+
+        String finalIsrc = isrc;
+        task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Clip clip = Main.getClip();
+                if (clip != null) {
+                    clip.stop();
+                }
+                status[0] = Main.playAudio(start, finalIsrc);
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblPlayerArtist, imgMediaPico, song));
+
+        new Thread(task).start();
     }
 
     @FXML
