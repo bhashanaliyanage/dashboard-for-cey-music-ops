@@ -176,9 +176,6 @@ public class Main extends Application {
     }
 }
 
-// Search
-// TODO: 2/5/2024 Show a feedback in the song in the search panel when added to the list
-
 // Invoice
 // TODO: 11/27/2023 Edit list in the invoice view
 
@@ -200,3 +197,6 @@ public class Main extends Application {
 
 // Revenue Analysis
 // TODO: 12/9/2023 Sub views of revenue analysis UI
+
+// Search
+// TODO: 2/8/2024 Edit Song Details

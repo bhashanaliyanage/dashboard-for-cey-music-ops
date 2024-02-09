@@ -64,9 +64,6 @@ public class ControllerSongList {
         // Song List
         List<String> songList = Main.getSongList();
 
-        // Connecting to database
-        DatabaseMySQL db = new DatabaseMySQL();
-
         // Setting up UI
         scrlpneSong.setVisible(true);
         scrlpneSong.setContent(vboxSong);
@@ -77,7 +74,8 @@ public class ControllerSongList {
 
         for (int i = 0; i < nodes.length; i++) {
             try {
-                Songs songDetail = db.searchSongDetails(songList.get(i));
+                System.out.println("i = " + i);
+                Songs songDetail = DatabaseMySQL.searchSongDetails(songList.get(i));
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist.fxml")));
                 Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
                 Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");

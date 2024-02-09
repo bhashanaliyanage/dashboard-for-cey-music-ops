@@ -134,6 +134,7 @@ public class UIController {
     static File directory;
     public BorderPane borderpane;
     public static BorderPane borderpanestatic;
+    public Rectangle rctIngests;
     File destination;
     public Rectangle rctSearchSongs;
     public Rectangle rctCollectSongs;
@@ -620,6 +621,7 @@ public class UIController {
         rctCollectSongs.setVisible(false);
         rctRevenue.setVisible(false);
         rctArtistReports.setVisible(false);
+        rctIngests.setVisible(false);
 
         selector.setVisible(true);
     }
@@ -1233,7 +1235,14 @@ public class UIController {
         revenueGenerator.loadArtistReports();
     }
 
-    public void hideLeft(MouseEvent mouseEvent) {
+    public void hideLeft() {
         borderpane.setLeft(null);
+    }
+
+    public void onIngestsBtnClick() throws IOException {
+        changeSelectorTo(rctIngests);
+
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests.fxml")));
+        mainVBox.getChildren().setAll(node);
     }
 }

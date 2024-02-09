@@ -68,7 +68,7 @@
                             <Font name="Segoe UI Light" size="14.0" />
                         </font>
                         <VBox.margin>
-                            <Insets left="5.0" />
+                            <Insets left="3.0" />
                         </VBox.margin>
                     </Label>
                 </VBox>
@@ -93,7 +93,7 @@
                             <Font name="Segoe UI Light" size="14.0" />
                         </font>
                         <VBox.margin>
-                            <Insets left="5.0" />
+                            <Insets left="4.0" />
                         </VBox.margin>
                     </Label>
                 </VBox>
@@ -118,7 +118,7 @@
                             <Font name="Segoe UI Light" size="14.0" />
                         </font>
                         <VBox.margin>
-                            <Insets left="5.0" />
+                            <Insets left="4.0" />
                         </VBox.margin>
                     </Label>
                 </VBox>
@@ -148,32 +148,53 @@
                     </Label>
                 </VBox>
             </HBox>
+            <HBox fx:id="btnIngests" layoutX="35.0" layoutY="257.0" maxWidth="278.0" onMouseClicked="#onIngestsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
+                <VBox.margin>
+                    <Insets left="25.0" />
+                </VBox.margin>
+                <Rectangle fx:id="rctIngests" arcHeight="5.0" arcWidth="5.0" fill="#79b7e3" height="19.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" visible="false" width="5.0" />
+                <ImageView fitHeight="19.0" fitWidth="19.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets left="13.0" />
+                    </HBox.margin>
+                    <Image url="@../images/icon_csv.png" />
+                </ImageView>
+                <VBox stylesheets="@../styles.css">
+                    <padding>
+                        <Insets left="10.0" right="10.0" />
+                    </padding>
+                    <Label fx:id="lblArtistReports1" prefHeight="40.0" text="Ingests">
+                        <font>
+                            <Font name="Segoe UI Light" size="14.0" />
+                        </font>
+                        <VBox.margin>
+                            <Insets left="4.0" />
+                        </VBox.margin>
+                    </Label>
+                </VBox>
+            </HBox>
          <HBox fx:id="btnArtistReports1" layoutX="35.0" layoutY="260.0" maxWidth="278.0" onMouseClicked="#hideLeft" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css" visible="false">
             <children>
                <Rectangle fx:id="rctArtistReports1" arcHeight="5.0" arcWidth="5.0" fill="#79b7e3" height="19.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" visible="false" width="5.0" />
-               <ImageView fitHeight="19.0" fitWidth="19.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-                  <HBox.margin>
-                     <Insets left="10.0" />
-                  </HBox.margin>
-                  <image>
-                     <Image url="@../images/icon_setting.png" />
-                  </image>
-               </ImageView>
-               <VBox stylesheets="@../styles.css">
-                  <padding>
-                     <Insets left="10.0" right="10.0" />
-                  </padding>
-                  <children>
-                     <Label prefHeight="40.0" text="Hide">
-                        <font>
+                <ImageView fitHeight="19.0" fitWidth="19.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets left="10.0" />
+                    </HBox.margin>
+                    <Image url="@../images/icon_setting.png" />
+                </ImageView>
+                <VBox stylesheets="@../styles.css">
+                    <padding>
+                        <Insets left="10.0" right="10.0" />
+                    </padding>
+                    <Label prefHeight="40.0" text="Hide">
+                       <font>
                            <Font name="Segoe UI Light" size="14.0" />
-                        </font>
-                        <VBox.margin>
+                       </font>
+                       <VBox.margin>
                            <Insets left="5.0" />
-                        </VBox.margin>
-                     </Label>
-                  </children>
-               </VBox>
+                       </VBox.margin>
+                    </Label>
+                </VBox>
             </children>
             <VBox.margin>
                <Insets left="25.0" />
