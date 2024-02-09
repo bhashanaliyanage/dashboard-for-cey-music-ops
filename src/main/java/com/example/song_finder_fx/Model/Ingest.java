@@ -81,9 +81,9 @@ public class Ingest {
         return destination != null;
     }
 
-    public void writeCSV() throws CsvValidationException, IOException {
+    public void writeCSV() {
         List<CsvSong> songList;
-        songList = songlistRead1(csv);
+        songList = readSongList(csv);
         File resultCSV = new File(destination, "new_file.csv");
         for (String upc :
              upcArray) {
@@ -192,8 +192,7 @@ public class Ingest {
         }
     }
 
-    public static List<CsvSong> songlistRead1(File csv) throws CsvValidationException, IOException {
-//        File csv = new File("D:\\Work\\dashboard-for-cey-music-ops\\CSV Template First.csv");
+    public static List<CsvSong> readSongList(File csv) {
         List<CsvSong> songList = new ArrayList<>();
 
         try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).withSkipLines(1).build()) {
@@ -211,9 +210,6 @@ public class Ingest {
                     cs.setSinger(singer);
                     cs.setLyrics(lyrics);
                     cs.setComposer(composer);
-
-
-//                    System.out.println(title);
 
                     songList.add(cs);
                 }
