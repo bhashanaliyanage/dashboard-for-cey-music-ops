@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 public class Songs {
-    private String type = "";
     private String isrc = "";
     private String trackTitle = "";
     private String singer = "";
@@ -45,13 +44,12 @@ public class Songs {
         this.singer = singer;
     }
 
-    public Songs(String songName, String isrc, String singer, String composer, String lyricist, String type) {
+    public Songs(String songName, String isrc, String singer, String composer, String lyricist) {
         this.trackTitle = songName;
         this.isrc = isrc;
         this.singer = singer;
         this.composer = composer;
         this.lyricist = lyricist;
-        this.type = type;
     }
 
     public void setIsrc(String isrc) {
@@ -136,17 +134,13 @@ public class Songs {
         return copyrightOwner;
     }
 
-    public String getType() {
-        return type;
-    }
-
     public boolean isOriginal() {
         return !Objects.equals(singer, "");
     }
 
     public boolean isInList() {
         boolean isIsrcPresent = false;
-        String targetIsrc = isrc.trim().replaceAll("\\p{C}", "");;
+        String targetIsrc = isrc.trim().replaceAll("\\p{C}", "");
 
 
         for (String isrc2 : Main.getSongList()) {
