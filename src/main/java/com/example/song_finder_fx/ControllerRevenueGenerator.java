@@ -9,7 +9,6 @@ import com.example.song_finder_fx.Model.CsvSong;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
-import com.opencsv.ICSVWriter;
 import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
@@ -38,12 +37,11 @@ import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import static com.example.song_finder_fx.Controller.CSVController.getReportTotalRowCount;
 
 public class ControllerRevenueGenerator {
     //<editor-fold desc="Buttons">
@@ -842,42 +840,43 @@ public class ControllerRevenueGenerator {
 
 
     //read and write csv main file
+
     /**
-    private Task<Void> loadRepo(File report, String primaryArtist) throws IOException, CsvException {
-
-        List<CsvSong> songList = readCSVFile("/filepath", primaryArtist);
-
-        for (CsvSong sng : songList) {
-            sng.setComposer("test");
-        }
-
-
-        return null;
-
-    }
-    */
+     * private Task<Void> loadRepo(File report, String primaryArtist) throws IOException, CsvException {
+     * <p>
+     * List<CsvSong> songList = readCSVFile("/filepath", primaryArtist);
+     * <p>
+     * for (CsvSong sng : songList) {
+     * sng.setComposer("test");
+     * }
+     * <p>
+     * <p>
+     * return null;
+     * <p>
+     * }
+     */
     public static void main(String[] args) throws IOException, CsvValidationException {
         File csv = new File("D:\\Work\\dashboard-for-cey-music-ops\\CSV Template First.csv");
-        File csv1 =  new File("D:\\Sudesh\\newrepo1.csv");
-        int UPC = Integer.parseInt("111");
+        File csv1 = new File("D:\\Sudesh\\newrepo1.csv");
+        int UPC = Integer.parseInt("0");
         List<CsvSong> songList = new ArrayList<>();
         System.out.println("main");
-        String[] upcArray = {"value1", "value2", "value3"};
-        int upc = 1;
+        String[] upcArray = {"value0", "value1", "value5","value3"};
+//        int upc = 1;
 
-
+        String catelogNum = "tectCat";
+        String albumTitle = "Golden hits";
         songList = songlistRead1(csv);
-
-        writeCSVFile1(songList,csv1,UPC);
-
+        String PrimaryArtist = "Dharmasiri Gamage";
+        writeCSVFile1(songList, csv1, upcArray, albumTitle, 1,catelogNum,PrimaryArtist);
 
 
     }
 
-//Read Csv
-    public static List<CsvSong> songlistRead1(File csv)throws CsvValidationException, IOException {
+    //Read Csv
+    public static List<CsvSong> songlistRead1(File csv) throws CsvValidationException, IOException {
 //        File csv = new File("D:\\Work\\dashboard-for-cey-music-ops\\CSV Template First.csv");
-        List<CsvSong> songList =  new ArrayList<>();
+        List<CsvSong> songList = new ArrayList<>();
 
         try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).withSkipLines(1).build()) {
             String[] record;
@@ -885,10 +884,10 @@ public class ControllerRevenueGenerator {
                 if (record.length >= 2) { // Ensure at least two columns are present
                     String title = record[0].trim(); // Trim whitespace from name
                     String FileName = record[1].trim(); // Trim whitespace from email
-                    String singer =  record[2].trim();
+                    String singer = record[2].trim();
                     String lyrics = record[3].trim();
                     String composer = record[4].trim();
-                    CsvSong cs =  new CsvSong();
+                    CsvSong cs = new CsvSong();
                     cs.setSongTitle(title);
                     cs.setFileName(FileName);
                     cs.setSinger(singer);
@@ -906,62 +905,110 @@ public class ControllerRevenueGenerator {
         }
 
 
-        return  songList;
+        return songList;
     }
 
-//Write Csv file
-public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath,int UPC) {
+    //Write Csv file
+    public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath, String[] upcArray, String albumTitle, int startNum, String catelog, String PrimaryArtist) {
 
-    String UPC1 = null;
+        String UPC1 = null;
+        String titl = null;
+        int UPC = 0;
 
-
-
-    System.out.println("write method");
-    try (CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFilePath))) {
-        String[] headerRecord = {"Title", "FileName", "Singer","Lyrics","Composer","Primary Artists","UPC"}; // CSV Head
-        csvWriter.writeNext(headerRecord);
-        int count = 0;
-        String upc= null;
+        System.out.println("write method");
+        try (CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFilePath))) {
+            String[] headerRecord = {"Fname", "Album title", "Album version", "UPC", "Catalog number", "Primary Artists", "Featuring artists", "Release date", "Main genre", "Main subgenre", "Alternate genre", "Alternate subgenre",
+                    "Label", "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory", "Recording year", "Recording location", "Album format", "Number of volumes",
+                    "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier", "Track title", "Track version", "ISRC", "Track primary artists", "Featuring artists",
+                    "Volume number", "Track main genre", "Track main subgenre", "Track alternate genre", "Track alternate subgenre", "Track language (Metadata)", "Audio language", "Lyrics", "Available separately",
+                    "Track parental advisory", "Preview start", "Preview length", "Track recording year", "Track recording location", "Contributing artists", "Composer", "Lyrics", "Remixers",
+                    "Performers", "Producers", "Writers", "Publishers", "Track sequence", "Track catalog tier", "Original file name", "Original release date"}; // CSV Head
+            csvWriter.writeNext(headerRecord);
+            int count = 0;
+            int titlenum1 = startNum;
+            String upc = null;
 //        int u = Integer.parseInt(String.valueOf(UPC));
-        int u = UPC;
+            int u = UPC;
+            for (CsvSong cs : sgList) {
+                String sg = cs.getSinger();
+                String ly = cs.getLyrics();
+                String com = cs.getComposer();
+                String artist = null;
+                if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist))  {
+                    artist = PrimaryArtist;
+//                    System.out.println(artist+"1");
+                } else if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = ly+"|"+com+"|"+sg;
+//                    System.out.println(artist+"2");
+                } else if(sg.equalsIgnoreCase(PrimaryArtist) && ly.equalsIgnoreCase(PrimaryArtist)){
+
+                    artist = ly + "|"  + sg+"|"+com;
+//                    System.out.println(artist+"3");
+                }else if(com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist)){
+                    artist = com+"|"+sg+"|"+ly;
+                }else if(com.equalsIgnoreCase(PrimaryArtist)){
+                    artist=com+"|"+sg+"|"+ly;
+                }else if(ly.equalsIgnoreCase(PrimaryArtist)){
+                    artist=ly+"|"+sg+"|"+com;
+                }else if(sg.equalsIgnoreCase(PrimaryArtist)){
+                    artist=sg+"|"+ly+"|"+com;
+                }else{
+                    artist=null;
+                }
+                //add UPC
+//                UPC1 = String.valueOf(u);
+                UPC1 = upcArray[u];
+                titl = String.valueOf(titlenum1);
+                count++;
 
 
-        for (CsvSong cs : sgList) {
-            String sg = cs.getSinger();
-            String ly = cs.getLyrics();
-            String com= cs.getComposer();
-            String artist= null;
-            if (ly.equalsIgnoreCase(com)) {
-                artist = ly;
-            } else if (ly.equalsIgnoreCase(com) && com.equalsIgnoreCase(sg)) {
-                artist = ly;
-            } else {
-                artist = ly + "|" + com + "|" + sg;
-            }
-            //add UPC
-            UPC1=String.valueOf(u);
-            count++;
-                if(count%25==0){
-                    u=u+1;
+//                String catelog = "TEST CATELOG";
+//                String PrimaryArtist = artist;
+                String albumTitle1 = albumTitle + ", Vol. 0" + titl;
+                LocalDate currentDate = LocalDate.now();
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                String releasedate = currentDate.format(dateFormatter);
+                String year[] = releasedate.split("/");
+                String curruntYear = year[0];
+                String isrc = "testISRCNUMBER001";
+                String trackPrimaryArtist = ly + " | " + sg + " | " + com;
+                String compoNlyrics = com + " | " + ly;
+                if (count % 25 == 0) {
+                    u = u + 1;
+                    titlenum1 = titlenum1 + 1;
+//                    albumTitle1 = albumTitle+". Vol. "+titl;
                 }
 
-                String[] dataRecord = {cs.getSongTitle(), cs.getFileName(),cs.getSinger(),cs.getLyrics(),cs.getComposer(),artist, UPC1};
+                String[] dataRecord = {"", albumTitle1, "", UPC1, catelog, artist, "", releasedate, "pop", "", "", "",
+                        "CeyMusic Records", curruntYear, "CeyMusic Publishing", curruntYear, "CeyMusic Records", "N", curruntYear, "Sri Lanka", "Album", "1",
+                        "World", "", "Si", "", cs.getSongTitle(), "", isrc, trackPrimaryArtist, cs.getSinger(),
+                        "1", "pop", "", "", "", "SI", "SI", "", "Y",
+                        "N", "0", "120", curruntYear, "Sri Lanka", "", cs.getComposer(), cs.getLyrics(), "",
+                        "", "", compoNlyrics, "CeyMusic Publishing", String.valueOf(count), "Mid", cs.getFileName(), releasedate};
                 csvWriter.writeNext(dataRecord);
-
-
 
 //COMMENTED FOR TEST WORKING CODE
 //            String[] dataRecord = {cs.getSongTitle(), cs.getFileName(),cs.getSinger(),cs.getLyrics(),cs.getComposer(),artist,UPC };
 //            csvWriter.writeNext(dataRecord);
-            //PU TO  THIS
+                //PU TO  THIS
+            }
+
+            System.out.println("CSV file written successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static int getCount(int count) {
+        int i = 1;
+        for (int a = 0; a <= 200; a++) {
+            if (count % 25 == 0) {
+                i++;
+            }
         }
 
-        System.out.println("CSV file written successfully.");
-    } catch (IOException e) {
-        e.printStackTrace();
+        return i;
     }
-}
-
 
     private static CsvSong getReport(String[] nextLine) {
         CsvSong repo = new CsvSong();
@@ -971,126 +1018,123 @@ public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath,int UPC)
         repo.setLyrics(nextLine[3]);
         repo.setComposer(nextLine[4]);
 
-        return  repo;
+        return repo;
 
     }
-
 
 
     //new method to read CSV FILE
     /**
-    public static List<CsvSong> readCSVFile(String csvFilePath, String primaryArt) {
-        List<CsvSong> songList = new ArrayList<>();
-        System.out.println("read");
-        System.out.println(csvFilePath+"-"+"file path");
-        try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(csvFilePath)).withSkipLines(1).build()) {
+     public static List<CsvSong> readCSVFile(String csvFilePath, String primaryArt) {
+     List<CsvSong> songList = new ArrayList<>();
+     System.out.println("read");
+     System.out.println(csvFilePath+"-"+"file path");
+     try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(csvFilePath)).withSkipLines(1).build()) {
 
-            List<String[]> records = csvReader.readAll();
-
-
-            String[] header = records.get(0);
-            int titleIndex = -1;
-            int filenameIndex = -1;
-            int singerIndex = -1;
-            int lyricsIndex = -1;
-            int composerIndex = -1;
+     List<String[]> records = csvReader.readAll();
 
 
-            // Find the indices of the columns
-            for (int i = 0; i < header.length; i++) {
-//                System.out.println(header.length);
-                if ("title".equalsIgnoreCase(header[i])) {
-                    titleIndex = i;
-//                    System.out.println(titleIndex);
-                } else if ("filename".equalsIgnoreCase(header[i])) {
-                    filenameIndex = i;
-//                    System.out.println(filenameIndex);
-                } else if ("singer".equalsIgnoreCase(header[i])) {
-                    singerIndex = i;
-                } else if ("lyrics".equalsIgnoreCase(header[i])) {
-                    lyricsIndex = i;
-                } else if ("composer".equalsIgnoreCase(header[i])) {
-                    composerIndex = i;
-                }
+     String[] header = records.get(0);
+     int titleIndex = -1;
+     int filenameIndex = -1;
+     int singerIndex = -1;
+     int lyricsIndex = -1;
+     int composerIndex = -1;
 
-            }
 
-            System.out.println(titleIndex);
-            System.out.println(filenameIndex);
-            System.out.println(singerIndex);
-            System.out.println(lyricsIndex);
-            System.out.println(composerIndex);
+     // Find the indices of the columns
+     for (int i = 0; i < header.length; i++) {
+     //                System.out.println(header.length);
+     if ("title".equalsIgnoreCase(header[i])) {
+     titleIndex = i;
+     //                    System.out.println(titleIndex);
+     } else if ("filename".equalsIgnoreCase(header[i])) {
+     filenameIndex = i;
+     //                    System.out.println(filenameIndex);
+     } else if ("singer".equalsIgnoreCase(header[i])) {
+     singerIndex = i;
+     } else if ("lyrics".equalsIgnoreCase(header[i])) {
+     lyricsIndex = i;
+     } else if ("composer".equalsIgnoreCase(header[i])) {
+     composerIndex = i;
+     }
 
-            if (titleIndex != -1 && filenameIndex != -1 && singerIndex != -1 && lyricsIndex != -1 && composerIndex != -1) {
-                for (String[] record : records.subList(1, records.size())) {
-                    CsvSong song = new CsvSong(record[titleIndex], record[filenameIndex], record[singerIndex], record[lyricsIndex], record[composerIndex]);
-                    System.out.println(song+"song");
-                    System.out.println(song.getSongTitle());
-                    System.out.println(song.getLyrics());
-                    System.out.println(song.getComposer());
-                    System.out.println(song.getSinger());
-                    System.out.println(song.getTrackPrimaryArtist());
+     }
 
-                    songList.add(song);
-                }
-            } else {
-                System.out.println("Columns not found in the CSV file.");
-            }
+     System.out.println(titleIndex);
+     System.out.println(filenameIndex);
+     System.out.println(singerIndex);
+     System.out.println(lyricsIndex);
+     System.out.println(composerIndex);
 
-        } catch (IOException | CsvException e) {
-            e.printStackTrace();
-        }
+     if (titleIndex != -1 && filenameIndex != -1 && singerIndex != -1 && lyricsIndex != -1 && composerIndex != -1) {
+     for (String[] record : records.subList(1, records.size())) {
+     CsvSong song = new CsvSong(record[titleIndex], record[filenameIndex], record[singerIndex], record[lyricsIndex], record[composerIndex]);
+     System.out.println(song+"song");
+     System.out.println(song.getSongTitle());
+     System.out.println(song.getLyrics());
+     System.out.println(song.getComposer());
+     System.out.println(song.getSinger());
+     System.out.println(song.getTrackPrimaryArtist());
 
-        return songList;
-    }
-    */
+     songList.add(song);
+     }
+     } else {
+     System.out.println("Columns not found in the CSV file.");
+     }
+
+     } catch (IOException | CsvException e) {
+     e.printStackTrace();
+     }
+
+     return songList;
+     }
+     */
 //    --------
+
     /**
-public static List<CsvSong> readCSVFile(String csvFilePath, String primaryArt) {
-//    public static List<CsvSong> readSongsFromCSV(String filePath) {
-        List<CsvSong> songs = new ArrayList<>();
-    System.out.println("CSV READER METHOD");
-
-
-        try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(csvFilePath)).withSkipLines(1).build()) {
-            String[] headers = csvReader.readNext(); // Read the header row to get column names
-            int titleIndex = getIndex1(headers, "title");
-            int fileNameIndex = getIndex1(headers, "fileName");
-            int singerIndex = getIndex1(headers, "singer");
-            int lyricsIndex = getIndex1(headers, "lyrics");
-            int composerIndex = getIndex1(headers, "composer");
-            System.out.println(titleIndex+ "-"+"title index");
-            System.out.println(fileNameIndex);
-
-
-
-            if (titleIndex == -1 || fileNameIndex == -1 || singerIndex == -1 || lyricsIndex == -1 || composerIndex == -1) {
-                throw new CsvValidationException("One or more required columns not found in CSV file.");
-            }
-
-            String[] record;
-            while ((record = csvReader.readNext()) != null) {
-                String title = record[titleIndex];
-                String fileName = record[fileNameIndex];
-                String singer = record[singerIndex];
-                String lyrics = record[lyricsIndex];
-                String composer = record[composerIndex];
-
-                CsvSong song = new CsvSong(title, fileName, singer, lyrics, composer);
-                songs.add(song);
-            }
-        } catch (IOException | CsvException e) {
-            e.printStackTrace();
-        }
-
-        return songs;
-
-
-*/
+     * public static List<CsvSong> readCSVFile(String csvFilePath, String primaryArt) {
+     * //    public static List<CsvSong> readSongsFromCSV(String filePath) {
+     * List<CsvSong> songs = new ArrayList<>();
+     * System.out.println("CSV READER METHOD");
+     * <p>
+     * <p>
+     * try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(csvFilePath)).withSkipLines(1).build()) {
+     * String[] headers = csvReader.readNext(); // Read the header row to get column names
+     * int titleIndex = getIndex1(headers, "title");
+     * int fileNameIndex = getIndex1(headers, "fileName");
+     * int singerIndex = getIndex1(headers, "singer");
+     * int lyricsIndex = getIndex1(headers, "lyrics");
+     * int composerIndex = getIndex1(headers, "composer");
+     * System.out.println(titleIndex+ "-"+"title index");
+     * System.out.println(fileNameIndex);
+     * <p>
+     * <p>
+     * <p>
+     * if (titleIndex == -1 || fileNameIndex == -1 || singerIndex == -1 || lyricsIndex == -1 || composerIndex == -1) {
+     * throw new CsvValidationException("One or more required columns not found in CSV file.");
+     * }
+     * <p>
+     * String[] record;
+     * while ((record = csvReader.readNext()) != null) {
+     * String title = record[titleIndex];
+     * String fileName = record[fileNameIndex];
+     * String singer = record[singerIndex];
+     * String lyrics = record[lyricsIndex];
+     * String composer = record[composerIndex];
+     * <p>
+     * CsvSong song = new CsvSong(title, fileName, singer, lyrics, composer);
+     * songs.add(song);
+     * }
+     * } catch (IOException | CsvException e) {
+     * e.printStackTrace();
+     * }
+     * <p>
+     * return songs;
+     */
 //}
 
 // Get index method
-
     private static int getIndex1(String[] headers, String columnName) {
         for (int i = 0; i < headers.length; i++) {
             System.out.println(headers.length);
@@ -1101,6 +1145,7 @@ public static List<CsvSong> readCSVFile(String csvFilePath, String primaryArt) {
         }
         return -1; // Column not found
     }
+
     //new -----
     public static List<String> readColumnData(String csvFilePath, String columnName) {
         List<String> columnData = new ArrayList<>();
@@ -1127,9 +1172,9 @@ public static List<CsvSong> readCSVFile(String csvFilePath, String primaryArt) {
 
     //----
 
-//    ------------
+    //    ------------
     //new method for csv read
-    public static void writeCSVFile(String csvFilePath, List<CsvSong> songList,int upc) throws IOException {
+    public static void writeCSVFile(String csvFilePath, List<CsvSong> songList, int upc) throws IOException {
         try (CSVWriter csvWriter = new CSVWriter(new FileWriter("csvFilePath"))) {
             csvWriter.writeNext(new String[]{"title", "filename", "singer", "lyrics", "composer"});
 
@@ -1204,7 +1249,7 @@ public static List<CsvSong> readCSVFile(String csvFilePath, String primaryArt) {
 
     private Task<Void> loadReport1(File report) {
         Task<Void> task;
-    return null;
+        return null;
 
     }
 
