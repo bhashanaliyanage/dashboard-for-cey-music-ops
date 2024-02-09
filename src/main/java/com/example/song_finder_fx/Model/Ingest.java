@@ -3,11 +3,15 @@ package com.example.song_finder_fx.Model;
 import com.example.song_finder_fx.ControllerRevenueGenerator;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -88,7 +92,107 @@ public class Ingest {
             System.out.println("upc = " + upc);
         }
         String isrc = "LKA0W2301403";
-        ControllerRevenueGenerator.writeCSVFile1(songList, finalCsv, upcArray, productTitle, 1, sampleCatNo, primaryArtist, isrc);
+        writeCSVFile1(songList, finalCsv, upcArray, productTitle, 1, sampleCatNo, primaryArtist, isrc);
+    }
+
+    public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath, String[] upcArray, String albumTitle, int startNum, String catelog, String PrimaryArtist,String ISRC) {
+
+        String UPC1 = null;
+        String titl = null;
+        int UPC = 0;
+        String s= ISRC.substring(7);
+        int isr = Integer.parseInt(s);
+        String isrcName = ISRC.substring(0,8);
+
+        System.out.println("write method");
+        try (CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFilePath))) {
+            String[] headerRecord = {"Fname", "Album title", "Album version", "UPC", "Catalog number", "Primary Artists", "Featuring artists", "Release date", "Main genre", "Main subgenre", "Alternate genre", "Alternate subgenre",
+                    "Label", "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory", "Recording year", "Recording location", "Album format", "Number of volumes",
+                    "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier", "Track title", "Track version", "ISRC", "Track primary artists", "Featuring artists",
+                    "Volume number", "Track main genre", "Track main subgenre", "Track alternate genre", "Track alternate subgenre", "Track language (Metadata)", "Audio language", "Lyrics", "Available separately",
+                    "Track parental advisory", "Preview start", "Preview length", "Track recording year", "Track recording location", "Contributing artists", "Composer", "Lyrics", "Remixers",
+                    "Performers", "Producers", "Writers", "Publishers", "Track sequence", "Track catalog tier", "Original file name", "Original release date"}; // CSV Head
+            csvWriter.writeNext(headerRecord);
+            int count = 0;
+            int titlenum1 = startNum;
+            String upc = null;
+//        int u = Integer.parseInt(String.valueOf(UPC));
+            int u = UPC;
+            for (CsvSong cs : sgList) {
+                String sg = cs.getSinger();
+                String ly = cs.getLyrics();
+                String com = cs.getComposer();
+                String artist = null;
+                if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist))  {
+                    artist = PrimaryArtist;
+//                    System.out.println(artist+"1");
+                } else if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = ly+"|"+com+"|"+sg;
+//                    System.out.println(artist+"2");
+                } else if(sg.equalsIgnoreCase(PrimaryArtist) && ly.equalsIgnoreCase(PrimaryArtist)){
+
+                    artist = ly + "|"  + sg+"|"+com;
+//                    System.out.println(artist+"3");
+                }else if(com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist)){
+                    artist = com+"|"+sg+"|"+ly;
+                }else if(com.equalsIgnoreCase(PrimaryArtist)){
+                    artist=com+"|"+sg+"|"+ly;
+                }else if(ly.equalsIgnoreCase(PrimaryArtist)){
+                    artist=ly+"|"+sg+"|"+com;
+                }else if(sg.equalsIgnoreCase(PrimaryArtist)){
+                    artist=sg+"|"+ly+"|"+com;
+                }else{
+                    artist=null;
+                }
+                //add UPC
+//                UPC1 = String.valueOf(u);
+                UPC1 = upcArray[u];
+                titl = String.valueOf(titlenum1);
+                count++;
+                isr++;
+
+
+//                String catelog = "TEST CATELOG";
+//                String PrimaryArtist = artist;
+                String albumTitle1 = albumTitle + ", Vol. 0" + titl;
+                LocalDate currentDate = LocalDate.now();
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                String releasedate = currentDate.format(dateFormatter);
+                String year[] = releasedate.split("/");
+                String curruntYear = year[0];
+
+//                String s= ISRC.substring(7);
+//                int isr = Integer.parseInt(s);
+//                String isrcName = ISRC.substring(0,7);
+
+                String isrc = isrcName+isr;
+
+                String trackPrimaryArtist = ly + " | " + sg + " | " + com;
+                String compoNlyrics = com + " | " + ly;
+                if (count % 25 == 0) {
+                    u = u + 1;
+                    titlenum1 = titlenum1 + 1;
+//                    albumTitle1 = albumTitle+". Vol. "+titl;
+                }
+
+                String[] dataRecord = {"", albumTitle1, "", UPC1, catelog, PrimaryArtist, "", releasedate, "pop", "", "", "",
+                        "CeyMusic Records", curruntYear, "CeyMusic Publishing", curruntYear, "CeyMusic Records", "N", curruntYear, "Sri Lanka", "Album", "1",
+                        "World", "", "Si", "", cs.getSongTitle(), "", isrc, trackPrimaryArtist, cs.getSinger(),
+                        "1", "pop", "", "", "", "SI", "SI", "", "Y",
+                        "N", "0", "120", curruntYear, "Sri Lanka", "", cs.getComposer(), cs.getLyrics(), "",
+                        "", "", compoNlyrics, "CeyMusic Publishing", String.valueOf(count), "Mid", cs.getFileName(), releasedate};
+                csvWriter.writeNext(dataRecord);
+
+//COMMENTED FOR TEST WORKING CODE
+//            String[] dataRecord = {cs.getSongTitle(), cs.getFileName(),cs.getSinger(),cs.getLyrics(),cs.getComposer(),artist,UPC };
+//            csvWriter.writeNext(dataRecord);
+                //PU TO  THIS
+            }
+
+            System.out.println("CSV file written successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<CsvSong> songlistRead1(File csv) throws CsvValidationException, IOException {
