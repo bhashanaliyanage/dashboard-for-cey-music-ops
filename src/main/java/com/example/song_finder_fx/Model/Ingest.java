@@ -87,7 +87,8 @@ public class Ingest {
              upcArray) {
             System.out.println("upc = " + upc);
         }
-        ControllerRevenueGenerator.writeCSVFile1(songList, finalCsv, upcArray, productTitle, 1, sampleCatNo, primaryArtist);
+        String isrc = "LKA0W2301403";
+        ControllerRevenueGenerator.writeCSVFile1(songList, finalCsv, upcArray, productTitle, 1, sampleCatNo, primaryArtist, isrc);
     }
 
     public static List<CsvSong> songlistRead1(File csv) throws CsvValidationException, IOException {
