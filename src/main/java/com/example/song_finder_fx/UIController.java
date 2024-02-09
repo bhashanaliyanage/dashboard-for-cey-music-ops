@@ -886,7 +886,7 @@ public class UIController {
                     System.out.println(text);
                 } else {
                     songListButtonSubtitle.setText(songList.getFirst());
-                    System.out.println(songList.getFirst());
+//                    System.out.println(songList.getFirst());
                 }
             } catch (Exception e) {
                 songListButtonSubtitle.setText("Click Here to Add Songs");

@@ -176,6 +176,8 @@ public class Database {
         return rs > 0;
     }
 
+
+
     private static void makeTableSongList() throws SQLException, ClassNotFoundException {
         // Load the JDBC driver
         Connection db = Database.getConn();

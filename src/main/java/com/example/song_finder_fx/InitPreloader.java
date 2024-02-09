@@ -231,6 +231,7 @@ public class InitPreloader implements Initializable {
                 return message;
             }
         } catch (SQLException | ClassNotFoundException e) {
+            Platform.runLater(e::printStackTrace);
             message = "Connection Error";
             return message;
         }
