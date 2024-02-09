@@ -868,7 +868,8 @@ public class ControllerRevenueGenerator {
         String albumTitle = "Golden hits";
         songList = songlistRead1(csv);
         String PrimaryArtist = "Dharmasiri Gamage";
-        writeCSVFile1(songList, csv1, upcArray, albumTitle, 1,catelogNum,PrimaryArtist);
+        String ISRC = "LKA0W2301403";
+        writeCSVFile1(songList, csv1, upcArray, albumTitle, 1,catelogNum,PrimaryArtist,ISRC);
 
 
     }
@@ -909,11 +910,14 @@ public class ControllerRevenueGenerator {
     }
 
     //Write Csv file
-    public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath, String[] upcArray, String albumTitle, int startNum, String catelog, String PrimaryArtist) {
+    public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath, String[] upcArray, String albumTitle, int startNum, String catelog, String PrimaryArtist,String ISRC) {
 
         String UPC1 = null;
         String titl = null;
         int UPC = 0;
+        String s= ISRC.substring(7);
+        int isr = Integer.parseInt(s);
+        String isrcName = ISRC.substring(0,8);
 
         System.out.println("write method");
         try (CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFilePath))) {
@@ -960,6 +964,7 @@ public class ControllerRevenueGenerator {
                 UPC1 = upcArray[u];
                 titl = String.valueOf(titlenum1);
                 count++;
+                isr++;
 
 
 //                String catelog = "TEST CATELOG";
@@ -970,7 +975,13 @@ public class ControllerRevenueGenerator {
                 String releasedate = currentDate.format(dateFormatter);
                 String year[] = releasedate.split("/");
                 String curruntYear = year[0];
-                String isrc = "testISRCNUMBER001";
+
+//                String s= ISRC.substring(7);
+//                int isr = Integer.parseInt(s);
+//                String isrcName = ISRC.substring(0,7);
+
+                String isrc = isrcName+isr;
+
                 String trackPrimaryArtist = ly + " | " + sg + " | " + com;
                 String compoNlyrics = com + " | " + ly;
                 if (count % 25 == 0) {
@@ -979,7 +990,7 @@ public class ControllerRevenueGenerator {
 //                    albumTitle1 = albumTitle+". Vol. "+titl;
                 }
 
-                String[] dataRecord = {"", albumTitle1, "", UPC1, catelog, artist, "", releasedate, "pop", "", "", "",
+                String[] dataRecord = {"", albumTitle1, "", UPC1, catelog, PrimaryArtist, "", releasedate, "pop", "", "", "",
                         "CeyMusic Records", curruntYear, "CeyMusic Publishing", curruntYear, "CeyMusic Records", "N", curruntYear, "Sri Lanka", "Album", "1",
                         "World", "", "Si", "", cs.getSongTitle(), "", isrc, trackPrimaryArtist, cs.getSinger(),
                         "1", "pop", "", "", "", "SI", "SI", "", "Y",
