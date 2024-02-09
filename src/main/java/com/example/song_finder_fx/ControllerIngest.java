@@ -90,7 +90,7 @@ public class ControllerIngest {
                 lblNIFeedback.setText("CSV Validated");
                 lblNIFeedback.setStyle("-fx-text-fill: #000000");
                 upcs = ingest.getUPCArray();
-                upcCount = upcs.length / 25;
+                upcCount = (upcs.length / 25) + 1;
                 ingest.setUPCCount(upcCount);
                 lblUPCCount.setText(String.valueOf(upcCount));
             } else {
@@ -104,7 +104,7 @@ public class ControllerIngest {
         }
     }
 
-    public void generate() {
+    public void generate() throws CsvValidationException, IOException {
         String productTitle = txtProductTitle.getText();
         String primaryArtist = txtPrimaryArtist.getText();
         String upcs = txtAreaUPC.getText();
@@ -119,6 +119,7 @@ public class ControllerIngest {
 
         if (!anyEmpty) {
             System.out.println("Proceed!");
+            ingest.writeCSV();
         }
     }
 
@@ -139,6 +140,7 @@ public class ControllerIngest {
             anyEmpty = true;
         } else {
             txtProductTitle.setStyle("-fx-border-color: '#e9ebee';");
+            ingest.setProductTitle(productTitle);
         }
         //</editor-fold>
 
@@ -148,6 +150,7 @@ public class ControllerIngest {
             anyEmpty = true;
         } else {
             txtPrimaryArtist.setStyle("-fx-border-color: '#e9ebee';");
+            ingest.setPrimaryArtist(primaryArtist);
         }
         //</editor-fold>
 
@@ -165,6 +168,7 @@ public class ControllerIngest {
                 anyEmpty = true;
             } else {
                 txtAreaUPC.setStyle("-fx-border-color: '#e9ebee';");
+                ingest.setUPCArray(upcArray);
             }
         }
         //</editor-fold>

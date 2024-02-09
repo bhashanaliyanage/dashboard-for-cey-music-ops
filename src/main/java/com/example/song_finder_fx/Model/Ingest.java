@@ -1,17 +1,24 @@
 package com.example.song_finder_fx.Model;
 
+import com.example.song_finder_fx.ControllerRevenueGenerator;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Ingest {
     private File csv;
     private int upcCount;
     private File destination;
+    private String[] upcArray;
+    private String productTitle;
+    private String primaryArtist;
 
     public void setCSV(File csv) {
         this.csv = csv;
@@ -69,5 +76,63 @@ public class Ingest {
 
     public boolean isDestination() {
         return destination != null;
+    }
+
+    public void writeCSV() throws CsvValidationException, IOException {
+        List<CsvSong> songList;
+        songList = songlistRead1(csv);
+        File finalCsv = new File(destination, "new_file.csv");
+        String sampleCatNo = "SAM-CEY-000";
+        for (String upc :
+             upcArray) {
+            System.out.println("upc = " + upc);
+        }
+        ControllerRevenueGenerator.writeCSVFile1(songList, finalCsv, upcArray, productTitle, 1, sampleCatNo, primaryArtist);
+    }
+
+    public static List<CsvSong> songlistRead1(File csv) throws CsvValidationException, IOException {
+//        File csv = new File("D:\\Work\\dashboard-for-cey-music-ops\\CSV Template First.csv");
+        List<CsvSong> songList = new ArrayList<>();
+
+        try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).withSkipLines(1).build()) {
+            String[] record;
+            while ((record = csvReader.readNext()) != null) {
+                if (record.length >= 2) { // Ensure at least two columns are present
+                    String title = record[0].trim(); // Trim whitespace from name
+                    String FileName = record[1].trim(); // Trim whitespace from email
+                    String singer = record[2].trim();
+                    String lyrics = record[3].trim();
+                    String composer = record[4].trim();
+                    CsvSong cs = new CsvSong();
+                    cs.setSongTitle(title);
+                    cs.setFileName(FileName);
+                    cs.setSinger(singer);
+                    cs.setLyrics(lyrics);
+                    cs.setComposer(composer);
+
+
+//                    System.out.println(title);
+
+                    songList.add(cs);
+                }
+            }
+        } catch (IOException | CsvValidationException e) {
+            e.printStackTrace();
+        }
+
+
+        return songList;
+    }
+
+    public void setUPCArray(String[] upcArray) {
+        this.upcArray = upcArray;
+    }
+
+    public void setProductTitle(String productTitle) {
+        this.productTitle = productTitle;
+    }
+
+    public void setPrimaryArtist(String primaryArtist) {
+        this.primaryArtist = primaryArtist;
     }
 }

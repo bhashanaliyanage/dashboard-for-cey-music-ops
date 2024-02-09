@@ -583,7 +583,7 @@ public class ControllerRevenueGenerator {
         String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
         DecimalFormat df = new DecimalFormat("0.00");
 
-        final ArrayList<Double>[] royalty = new ArrayList[] {
+        final ArrayList<Double>[] royalty = new ArrayList[]{
                 new ArrayList<Double>()
         };
 
@@ -871,16 +871,14 @@ public class ControllerRevenueGenerator {
         int UPC = Integer.parseInt("0");
         List<CsvSong> songList = new ArrayList<>();
         System.out.println("main");
-        String[] upcArray = {"value0", "value1", "value5","value3"};
+        String[] upcArray = {"value0", "value1", "value5", "value3"};
 //        int upc = 1;
 
         String catelogNum = "tectCat";
         String albumTitle = "Golden hits";
         songList = songlistRead1(csv);
         String PrimaryArtist = "Dharmasiri Gamage";
-        writeCSVFile1(songList, csv1, upcArray, albumTitle, 1,catelogNum,PrimaryArtist);
-
-
+        writeCSVFile1(songList, csv1, upcArray, albumTitle, 1, catelogNum, PrimaryArtist);
     }
 
     //Read Csv
@@ -944,26 +942,26 @@ public class ControllerRevenueGenerator {
                 String ly = cs.getLyrics();
                 String com = cs.getComposer();
                 String artist = null;
-                if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist))  {
+                if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist) && sg.equalsIgnoreCase(PrimaryArtist)) {
                     artist = PrimaryArtist;
 //                    System.out.println(artist+"1");
                 } else if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)) {
-                    artist = ly+"|"+com+"|"+sg;
+                    artist = ly + "|" + com + "|" + sg;
 //                    System.out.println(artist+"2");
-                } else if(sg.equalsIgnoreCase(PrimaryArtist) && ly.equalsIgnoreCase(PrimaryArtist)){
+                } else if (sg.equalsIgnoreCase(PrimaryArtist) && ly.equalsIgnoreCase(PrimaryArtist)) {
 
-                    artist = ly + "|"  + sg+"|"+com;
+                    artist = ly + "|" + sg + "|" + com;
 //                    System.out.println(artist+"3");
-                }else if(com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist)){
-                    artist = com+"|"+sg+"|"+ly;
-                }else if(com.equalsIgnoreCase(PrimaryArtist)){
-                    artist=com+"|"+sg+"|"+ly;
-                }else if(ly.equalsIgnoreCase(PrimaryArtist)){
-                    artist=ly+"|"+sg+"|"+com;
-                }else if(sg.equalsIgnoreCase(PrimaryArtist)){
-                    artist=sg+"|"+ly+"|"+com;
-                }else{
-                    artist=null;
+                } else if (com.equalsIgnoreCase(PrimaryArtist) && sg.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = com + "|" + sg + "|" + ly;
+                } else if (com.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = com + "|" + sg + "|" + ly;
+                } else if (ly.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = ly + "|" + sg + "|" + com;
+                } else if (sg.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = sg + "|" + ly + "|" + com;
+                } else {
+                    artist = null;
                 }
                 //add UPC
 //                UPC1 = String.valueOf(u);
