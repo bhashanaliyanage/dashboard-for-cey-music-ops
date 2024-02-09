@@ -65,6 +65,9 @@ public class ControllerIngest {
     private VBox vboxUpdateSongDB;
     private Ingest ingest = new Ingest();
 
+    public ControllerIngest() {
+    }
+
     @FXML
     void onImportCSVBtnClick(ActionEvent event) throws IOException, CsvValidationException {
         FileChooser chooser = new FileChooser();
