@@ -1,5 +1,7 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.FUGAReport;
+import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
@@ -22,10 +24,10 @@ import java.util.stream.Stream;
 
 public class DatabaseMySQL {
     private static Connection conn = null;
+    private static Connection con1 = null;
     static StringBuilder errorBuffer = new StringBuilder();
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
-
         if (conn == null) {
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://192.168.1.200/songData";
@@ -34,6 +36,20 @@ public class DatabaseMySQL {
             conn = DriverManager.getConnection(url, username, password);
         }
         return conn;
+    }
+
+
+    //new meth for testdb
+    public static Connection getConntest() throws ClassNotFoundException, SQLException {
+        Connection con1 = null;
+
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        String url = "jdbc:mysql://192.168.1.200/testdb";
+        String username = "ceymusic";
+        String password = "ceymusic";
+        con1 = DriverManager.getConnection(url, username, password);
+
+        return con1;
     }
 
     public static String searchFileName(String isrc) throws SQLException, ClassNotFoundException {
@@ -83,15 +99,49 @@ public class DatabaseMySQL {
         reader.close();
     }
 
-    public static boolean loadReport(File report, Label btnLoadReport, Label lbl_import, ImageView imgImportCaution) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
+    public static int addRowFUGAReport(FUGAReport report) throws SQLException, ClassNotFoundException {
+        PreparedStatement ps = getPreparedStatementAddRowToFuga();
+
+        ps.setString(1, report.getSaleStartDate());
+        ps.setString(2, report.getSaleEndDate());
+        ps.setString(3, report.getDsp());
+        ps.setString(4, report.getSaleStoreName());
+        ps.setString(5, report.getSaleType());
+        ps.setString(6, report.getSaleUserType());
+        ps.setString(7, report.getTerritory());
+        ps.setLong(8, report.getProductUPC());
+        ps.setLong(9, report.getProductReference());
+        ps.setString(10, report.getProductCatalogNumber());
+        ps.setString(11, report.getProductLabel());
+        ps.setString(12, report.getProductArtist());
+        ps.setString(13, report.getProductTitle());
+        ps.setString(14, report.getAssetArtist());
+        ps.setString(15, report.getAssetTitle());
+        ps.setString(16, report.getAssetVersion());
+        ps.setInt(17, report.getAssetDuration());
+        ps.setString(18, report.getAssetISRC());
+        ps.setLong(19, report.getAssetReference());
+        ps.setString(20, report.getAssetOrProduct());
+        ps.setInt(21, report.getProductQuantity());
+        ps.setInt(22, report.getAssetQuantity());
+        ps.setDouble(23, report.getOriginalGrossIncome());
+        ps.setString(24, report.getOriginalCurrency());
+        ps.setDouble(25, report.getExchangeRate());
+        ps.setDouble(26, report.getConvertedGrossIncome());
+        ps.setString(27, report.getContractDealTerm());
+        ps.setDouble(28, report.getReportedRoyalty());
+        ps.setString(29, report.getCurrency());
+        ps.setInt(30, report.getReportRunID());
+        ps.setInt(31, report.getReportID());
+        ps.setLong(32, report.getSaleID());
+
+        return ps.executeUpdate();
+    }
+
+    private static PreparedStatement getPreparedStatementAddRowToFuga() throws ClassNotFoundException, SQLException {
         Connection db = DatabaseMySQL.getConn();
-        int rs = 0;
-        DecimalFormat df = new DecimalFormat("0.00");
 
-        PreparedStatement emptyTable = db.prepareStatement("DELETE FROM report;");
-        emptyTable.executeUpdate();
-
-        PreparedStatement ps = db.prepareStatement("INSERT INTO report " +
+        return db.prepareStatement("INSERT INTO report " +
                 "(Sale_Start_date, Sale_End_date, DSP, Sale_Store_Name, Sale_Type, Sale_User_Type, Territory, " +
                 "Product_UPC, Product_Reference, Product_Catalog_Number, Product_Label, Product_Artist, Product_Title, " +
                 "Asset_Artist, Asset_Title, Asset_Version, Asset_Duration, Asset_ISRC, Asset_Reference, AssetOrProduct, " +
@@ -99,151 +149,34 @@ public class DatabaseMySQL {
                 "Converted_Gross_Income, Contract_deal_term, Reported_Royalty, Currency, Report_Run_ID, Report_ID, " +
                 "Sale_ID) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-        CSVReader reader = new CSVReader(new FileReader(report.getAbsolutePath()));
-        BufferedReader bReader = new BufferedReader(new FileReader(report));
-        int rowcount = 0; // Total RowCount
-        int rowcount2 = 0; // While loop's row count
-
-        System.out.println("Here");
-        while ((bReader.readLine()) != null) {
-            rowcount++;
-            System.out.println("rowcount = " + rowcount);
-        }
-
-        System.out.println("Total rowCount = " + rowcount);
-
-        reader.readNext(); // Skipping the header
-        String[] nextLine;
-        while ((nextLine = reader.readNext()) != null) {
-            rowcount2++;
-
-            double percentage = ((double) rowcount2 / rowcount) * 100;
-            Platform.runLater(() -> btnLoadReport.setText("Processing " + df.format(percentage) + "%"));
-
-            try {
-                ps.setString(1, nextLine[0]); // Sale_Start_date
-                ps.setString(2, nextLine[1]); // Sale_End_date
-                ps.setString(3, nextLine[2]); // DSP
-                ps.setString(4, nextLine[3]); // Sale_Store_Name
-                ps.setString(5, nextLine[4]); // Sale_Type
-                ps.setString(6, nextLine[5]); // Sale_User_Type
-                ps.setString(7, nextLine[6]); // Territory
-                try {
-                    ps.setLong(8, Long.parseLong(nextLine[7])); // Product_UPC
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setLong(8, 0); // Product_UPC
-                }
-                try {
-                    ps.setLong(9, Long.parseLong(nextLine[8])); // Product_Reference
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setLong(9, 0);
-                }
-                ps.setString(10, nextLine[9]); // Product_Catalog_Number
-                ps.setString(11, nextLine[10]); // Product_Label
-                ps.setString(12, nextLine[11]); // Product_Artist
-                ps.setString(13, nextLine[12]); // Product_Title
-                ps.setString(14, nextLine[13]); // Asset_Artist
-                ps.setString(15, nextLine[14]); // Asset_Title
-                ps.setString(16, nextLine[15]); // Asset_Version
-                try {
-                    ps.setInt(17, Integer.parseInt(nextLine[16])); // Asset_Duration
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setInt(17, 0); // Asset_Duration
-                }
-                ps.setString(18, nextLine[17]); // Asset_ISRC
-                try {
-                    ps.setLong(19, Long.parseLong(nextLine[18])); // Asset_Reference
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setLong(19, 0); // Asset_Reference
-                }
-                ps.setString(20, nextLine[19]); // AssetOrProduct
-                if (!(Objects.equals(nextLine[20], ""))) {
-                    ps.setInt(21, Integer.parseInt(nextLine[20])); // Product_Quantity
-                } else {
-                    ps.setInt(21, 0);
-                }
-                try {
-                    ps.setInt(22, Integer.parseInt(nextLine[21])); // Asset_Quantity
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setInt(22, 0); // Asset_Quantity
-                }
-                try {
-                    ps.setDouble(23, Double.parseDouble(nextLine[22])); // Original_Gross_Income
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setDouble(23, 0); // Original_Gross_Income
-                }
-                ps.setString(24, nextLine[23]); // Original_currency
-                try {
-                    ps.setDouble(25, Double.parseDouble(nextLine[24])); // Exchange_Rate
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setDouble(25, 0); // Exchange_Rate
-                }
-                try {
-                    ps.setDouble(26, Double.parseDouble(nextLine[25])); // Converted_Gross_Income
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setDouble(26, 0); // Converted_Gross_Income
-                }
-                ps.setString(27, nextLine[26]); // Contract_deal_term
-                try {
-                    ps.setDouble(28, Double.parseDouble(nextLine[27])); // Reported_Royalty
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setDouble(28, 0); // Reported_Royalty
-                }
-                ps.setString(29, nextLine[28]); // Currency
-                try {
-                    ps.setInt(30, Integer.parseInt(nextLine[29])); // Report_Run_ID
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setInt(30, 0); // Report_Run_ID
-                }
-                try {
-                    ps.setInt(31, Integer.parseInt(nextLine[30])); // Report_ID
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setInt(31, 0); // Report_ID
-                }
-                try {
-                    ps.setLong(32, Long.parseLong(nextLine[31])); // Sale_ID
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (NumberFormatException e) {
-                    ps.setLong(32, 0); // Sale_ID
-                }
-
-                rs = ps.executeUpdate();
-            } catch (SQLException | NumberFormatException e) {
-                Platform.runLater(() -> {
-                    lbl_import.setText("Import Error");
-                    Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
-                    imgImportCaution.setImage(imgCaution);
-                    imgImportCaution.setVisible(true);
-                });
-            }
-        }
-
-        return rs > 0;
     }
+
+
+    //new 01/02/2023
+    public static int addRowFUGAReportnew(FUGAReport report) throws SQLException, ClassNotFoundException {
+        try (Connection db = DatabaseMySQL.getConntest();
+             CallableStatement cs = db.prepareCall("{call insert_report_new(?,?,?,?,?)}")) {
+
+            cs.setString(1, report.getAssetISRC());
+           cs.setDouble(2,report.getReportedRoyalty());
+            cs.setString(3, report.getTerritory());
+            cs.setString(4,report.getSaleStartDate());
+            cs.setString(5, report.getDsp());
+
+            return cs.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+
+
+        }
+        finally {
+
+        }
+
+    }
+
+
 
     public static ResultSet getTop5StreamedAssets() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
@@ -435,7 +368,12 @@ public class DatabaseMySQL {
                     });
                     status = true;
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    Platform.runLater(() -> {
+                        lblSongDB_Progress.setVisible(true);
+                        lblSongDB_Progress.setText("Error!");
+                        lblSongDB_Progress.setStyle("-fx-text-fill: '#FF0000'");
+                        throw new RuntimeException(e);
+                    });
                 }
             }
         }
@@ -507,7 +445,7 @@ public class DatabaseMySQL {
                 "JOIN `report` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC` " +
                 "WHERE `isrc_payees`.`ISRC` IN (SELECT ISRC FROM isrc_payees WHERE PAYEE = ?) AND `isrc_payees`.`PAYEE` != ? " +
                 "GROUP BY `report`.`Asset_ISRC`" +
-                "LIMIT 5;");
+                "LIMIT 6;");
 
         psGetCoWriterShare.setString(1, artistName);
         psGetCoWriterShare.setString(2, artistName);
@@ -663,7 +601,21 @@ public class DatabaseMySQL {
         return ps.executeQuery();
     }
 
-    public List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException, ClassNotFoundException {
+    public static ResultSet getTopPerformingSongsEdit(String selectedItem) throws SQLException, ClassNotFoundException {
+        /*SELECT report.Asset_Title, isrc_payees.PAYEE, isrc_payees.SHARE, ( ( ( SUM( CASE WHEN report.Territory = 'AU' THEN report.Reported_Royalty ELSE 0 END ) ) * 0.9 ) +( SUM( CASE WHEN report.Territory != 'AU' THEN report.Reported_Royalty ELSE 0 END ) ) ) * 0.85 AS REPORTED_ROYALTY FROM report JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC WHERE report.Asset_ISRC IN ( SELECT isrc_payees.ISRC FROM isrc_payees WHERE isrc_payees.PAYEE = 'Sarath De Alwis' ) GROUP BY isrc_payees.PAYEE, isrc_payees.SHARE, report.Asset_Title ORDER BY REPORTED_ROYALTY DESC LIMIT 5;*/
+        Connection connection = getConn();
+
+        PreparedStatement ps = connection.prepareStatement("SELECT report.Asset_Title, isrc_payees.PAYEE, isrc_payees.SHARE, (( ( ( SUM( CASE WHEN report.Territory = 'AU' THEN report.Reported_Royalty ELSE 0 END ) ) * 0.9 ) + ( SUM( CASE WHEN report.Territory != 'AU' THEN report.Reported_Royalty ELSE 0 END ) ) ) * 0.85) * isrc_payees.SHARE/100 AS REPORTED_ROYALTY FROM report JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC WHERE report.Asset_ISRC IN( SELECT isrc_payees.ISRC FROM isrc_payees WHERE isrc_payees.PAYEE = ? ) GROUP BY isrc_payees.PAYEE, isrc_payees.SHARE, report.Asset_Title ORDER BY REPORTED_ROYALTY DESC LIMIT 6;");
+        ps.setString(1, selectedItem);
+
+        return ps.executeQuery();
+    }
+
+    public static String getReportNumber(String payee) {
+        return "null";
+    }
+
+    public static List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException, ClassNotFoundException {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;
 
@@ -676,20 +628,19 @@ public class DatabaseMySQL {
 
         while (rs.next()) {
             songs.add(new Songs(
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getString(3),
-                    rs.getString(4),
-                    rs.getString(5)
+                    rs.getString(1), // TRACK_TITLE
+                    rs.getString(2), // ISRC
+                    rs.getString(3), // SINGER
+                    rs.getString(4), // COMPOSER
+                    rs.getString(5) // LYRICIST
             ));
-            System.out.println(rs.getString(1));
         }
 
         try {
             // Printing Searched Content
-            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName() + " | " + songs.get(0).getSinger());
-            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName() + " | " + songs.get(1).getSinger());
-            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName() + " | " + songs.get(2).getSinger());
+            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getTrackTitle() + " | " + songs.get(0).getSinger());
+            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getTrackTitle() + " | " + songs.get(1).getSinger());
+            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getTrackTitle() + " | " + songs.get(2).getSinger());
 
             // Printing new line
             System.out.println("================");
@@ -700,40 +651,16 @@ public class DatabaseMySQL {
         return songs;
     }
 
-    public List<Songs> searchSongNamesByISRC(String searchText) throws ClassNotFoundException, SQLException {
-        List<Songs> songs = new ArrayList<>();
-        ResultSet rs;
+    public static void emptyReportTable() throws SQLException, ClassNotFoundException {
+        Connection db = DatabaseMySQL.getConn();
 
-        Connection conn = getConn();
-
-        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER FROM songs WHERE ISRC LIKE ? LIMIT 15");
-        ps.setString(1, "%" + searchText + "%");
-        rs = ps.executeQuery();
-
-        while (rs.next()) {
-            songs.add(new Songs(rs.getString(1), rs.getString(2), rs.getString(3)));
-            System.out.println(rs.getString(1));
-        }
-
-        try {
-            // Printing Searched Content
-            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getSongName() + " | " + songs.get(0).getSinger());
-            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getSongName() + " | " + songs.get(1).getSinger());
-            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getSongName() + " | " + songs.get(2).getSinger());
-
-            // Printing new line
-            System.out.println("================");
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("End of results");
-        }
-
-        return songs;
+        PreparedStatement emptyTable = db.prepareStatement("DELETE FROM report;");
+        emptyTable.executeUpdate();
     }
 
-    public List<String> searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
-        // Songs songDetails = new Songs();
+    public static Songs searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
+        Songs song = new Songs();
         ResultSet rs;
-        List<String> songDetails = new ArrayList<>();
 
         Connection conn = getConn();
 
@@ -760,22 +687,10 @@ public class DatabaseMySQL {
             String featuringArtist = rs.getString(6);
             String composer = rs.getString(7);
             String lyricist = rs.getString(8);
-            String fileName = rs.getString(9);
-            songDetails.add(isrcFromDatabase);
-            songDetails.add(albumTitle);
-            songDetails.add(upc);
-            songDetails.add(trackTitle);
-            songDetails.add(singer);
-            songDetails.add(featuringArtist);
-            songDetails.add(composer);
-            songDetails.add(lyricist);
-            songDetails.add(fileName);
-            // songDetails.songDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist, fileName);
+            song.setSongDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist);
         }
 
-        System.out.println(songDetails.size());
-
-        return songDetails;
+        return song;
     }
 
     public static Boolean searchArtistTable(String artist) throws SQLException, ClassNotFoundException {

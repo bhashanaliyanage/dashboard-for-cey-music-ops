@@ -1,5 +1,6 @@
-package com.example.song_finder_fx;
+package com.example.song_finder_fx.Controller;
 
+import com.example.song_finder_fx.Main;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 

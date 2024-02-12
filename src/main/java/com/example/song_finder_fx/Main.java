@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.ProductVersion;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.stage.DirectoryChooser;
@@ -20,11 +21,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Main extends Application {
-    public static Double PRODUCT_VERSION = 23.04;
     public static Stage primaryStage = null;
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
+    public static ProductVersion versionInfo = new ProductVersion(23.05);
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
@@ -45,7 +46,7 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws IOException, InterruptedException {
+    public void start(Stage stage) {
         Main.primaryStage = stage;
     }
 
@@ -175,18 +176,27 @@ public class Main extends Application {
     }
 }
 
-// TODO: 12/9/2023 Side-Panel design for all pages
-// TODO: 12/9/2023 Sub views of revenue analysis UI
+// Invoice
 // TODO: 11/27/2023 Edit list in the invoice view
+
+// Song List
+// TODO: Export Song List data to a CSV
+// TODO: 2/5/2024 Add a delete all button to the list
+
+// User Experience
 // TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
 // TODO: Offer cancel method after proceed button clicked
-// TODO: 12/14/2023 In the check missing ISRC button, it doesn't show results after the program is built
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
-// TODO: 12/15/2023 Set not to show alert dialog when there's no missing ISRCs in check missing ISRC function
+// TODO: 2/8/2024 System Tray
+
+// Performance
 // TODO: If copy to button clicked and user not chose any location the application starts to search
 
-// TODO: Import Report
-// TODO: Missing ISRC > Song Database Update
-// TODO: Search Song Database and Assign Payees
-// TODO: Give a list of Missing Payees
-//  TODO: Update Payees (Manual Process)
+// Side Panels
+// TODO: 12/9/2023 Side-Panel design for all pages
+
+// Revenue Analysis
+// TODO: 12/9/2023 Sub views of revenue analysis UI
+
+// Search
+// TODO: 2/8/2024 Edit Song Details

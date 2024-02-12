@@ -21,11 +21,21 @@
             <HBox.margin>
                 <Insets left="10.0" top="2.5" />
             </HBox.margin>
-            <Label fx:id="srchRsSongName" text="Song Name">
-                <font>
-                    <Font name="Segoe UI Semibold" size="14.0" />
-                </font>
-            </Label>
+            <HBox>
+                <Label fx:id="songNumber" text="Song Number">
+                    <font>
+                        <Font name="Segoe UI Semibold" size="14.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="srchRsSongName" layoutX="10.0" layoutY="10.0" text="Song Name">
+                    <font>
+                        <Font name="Segoe UI Semibold" size="14.0"/>
+                    </font>
+                    <HBox.margin>
+                        <Insets left="5.0"/>
+                    </HBox.margin>
+                </Label>
+            </HBox>
             <HBox>
                 <VBox.margin>
                     <Insets top="5.0" />
