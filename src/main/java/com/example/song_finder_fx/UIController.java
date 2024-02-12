@@ -23,6 +23,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
@@ -49,7 +50,7 @@ import java.util.stream.Stream;
 public class UIController {
     public VBox sideVBox;
     private final NotificationBuilder nb = new NotificationBuilder();
-    static final Node[] mainNodes = new Node[7];
+    public static final Node[] mainNodes = new Node[7];
     private final Search search = new Search();
 
 
@@ -131,6 +132,9 @@ public class UIController {
 
     //<editor-fold desc="Rectangle">
     static File directory;
+    public BorderPane borderpane;
+    public static BorderPane borderpanestatic;
+    public Rectangle rctIngests;
     File destination;
     public Rectangle rctSearchSongs;
     public Rectangle rctCollectSongs;
@@ -149,6 +153,10 @@ public class UIController {
         mainNodes[2] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/search-details.fxml")));
         // Search and collect songs
         mainNodes[3] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/collect-songs.fxml")));
+        // NavBar
+        mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar.fxml")));
+        // NavBar Collapsed
+        mainNodes[5] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar-small.fxml")));
         // Revenue Analysis
         // mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/revenue-generator.fxml")));
     }
@@ -597,8 +605,6 @@ public class UIController {
         Connection con = checkDatabaseConnection();
 
         if (con != null) {
-            // SearchController searchController = new SearchController();
-            // searchController.loadSearch();
             FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-recent-songs.fxml"));
             Parent sidepanelNewContent = sidepanelLoader.load();
             mainVBox.getChildren().clear();
@@ -615,6 +621,7 @@ public class UIController {
         rctCollectSongs.setVisible(false);
         rctRevenue.setVisible(false);
         rctArtistReports.setVisible(false);
+        rctIngests.setVisible(false);
 
         selector.setVisible(true);
     }
@@ -1226,5 +1233,16 @@ public class UIController {
         changeSelectorTo(rctArtistReports);
         ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
         revenueGenerator.loadArtistReports();
+    }
+
+    public void hideLeft() {
+        borderpane.setLeft(null);
+    }
+
+    public void onIngestsBtnClick() throws IOException {
+        changeSelectorTo(rctIngests);
+
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests.fxml")));
+        mainVBox.getChildren().setAll(node);
     }
 }

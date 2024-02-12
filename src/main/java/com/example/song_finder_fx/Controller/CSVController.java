@@ -106,6 +106,7 @@ public class CSVController {
 
             try {
                 status = DatabaseMySQL.addRowFUGAReport(report);
+                // status = DatabaseMySQL.addRowFUGAReportnew(report);
             } catch (SQLException | ClassNotFoundException e) {
                 Platform.runLater(() -> {
                     lbl_import.setText("Import Error");

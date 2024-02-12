@@ -1,20 +1,22 @@
 package com.example.song_finder_fx.Model;
 
 import com.example.song_finder_fx.DatabaseMySQL;
+import com.example.song_finder_fx.Main;
 
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class Songs {
-    private String isrc;
-    private String trackTitle;
-    private String singer;
-    private String composer;
-    private String lyricist;
-    private String productTitle;
-    private String upc;
-    private String featuringArtist;
-    private String percentage;
-    private String copyrightOwner;
+    private String isrc = "";
+    private String trackTitle = "";
+    private String singer = "";
+    private String composer = "";
+    private String lyricist = "";
+    private String productTitle = "";
+    private String upc = "";
+    private String featuringArtist = "";
+    private String percentage = "";
+    private String copyrightOwner = "";
 
     public void setTrackTitle(String trackTitle) {
         this.trackTitle = trackTitle;
@@ -130,5 +132,26 @@ public class Songs {
 
     public String getCopyrightOwner() {
         return copyrightOwner;
+    }
+
+    public boolean isOriginal() {
+        return !Objects.equals(singer, "");
+    }
+
+    public boolean isInList() {
+        boolean isIsrcPresent = false;
+        String targetIsrc = isrc.trim().replaceAll("\\p{C}", "");
+
+
+        for (String isrc2 : Main.getSongList()) {
+            String trimmedSong = isrc2.trim().replaceAll("\\p{C}", "");
+
+            if (trimmedSong.equalsIgnoreCase(targetIsrc)) {
+                isIsrcPresent = true;
+                break;
+            }
+        }
+
+        return isIsrcPresent;
     }
 }
