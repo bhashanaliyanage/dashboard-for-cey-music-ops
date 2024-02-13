@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxWidth="688.0" prefWidth="688.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1"
+      xmlns:fx="http://javafx.com/fxml/1">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+   </padding>
+   <VBox>
+      <Label text="Create Ingest">
+         <font>
+            <Font name="Segoe UI Semibold" size="19.0"/>
+         </font>
+         <cursor>
+            <Cursor fx:constant="DEFAULT"/>
+         </cursor>
+      </Label>
+      <HBox>
+         <Label text="Single Song Ingest" textFill="#656565">
+            <cursor>
+               <Cursor fx:constant="DEFAULT"/>
+            </cursor>
+         </Label>
+         <Label fx:id="lblSongType" layoutX="10.0" layoutY="10.0" text="(Song Type Original or UGC)"
+                textFill="#656565">
+            <cursor>
+               <Cursor fx:constant="DEFAULT"/>
+            </cursor>
+            <HBox.margin>
+               <Insets left="5.0"/>
+            </HBox.margin>
+         </Label>
+      </HBox>
+   </VBox>
+   <HBox prefWidth="200.0" spacing="10.0">
+      <VBox.margin>
+         <Insets top="30.0"/>
+      </VBox.margin>
+      <children>
+         <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="320.0" styleClass="button_inside"
+                       text="Original Album Ingest">
+            <toggleGroup>
+               <ToggleGroup fx:id="songType"/>
+            </toggleGroup>
+         </ToggleButton>
+         <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="320.0" styleClass="button_inside"
+                       text="UGC Album Ingest" toggleGroup="$songType"/>
+      </children>
+   </HBox>
+   <VBox prefHeight="200.0" prefWidth="100.0">
+      <VBox.margin>
+         <Insets top="15.0"/>
+      </VBox.margin>
+   </VBox>
+</VBox>

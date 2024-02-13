@@ -1242,7 +1242,7 @@ public class UIController {
     public void onIngestsBtnClick() throws IOException {
         changeSelectorTo(rctIngests);
 
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests.fxml")));
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests-chooser.fxml")));
         mainVBox.getChildren().setAll(node);
     }
 }

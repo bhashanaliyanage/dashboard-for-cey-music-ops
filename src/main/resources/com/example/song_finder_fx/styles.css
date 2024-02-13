@@ -82,18 +82,17 @@
 .button_inside_brown {
     -fx-background-color: '#6D676E';
     -fx-text-fill: '#FFFFFF';
-    -fx-border-color: '#f3f3f3';
-    -fx-border-width: 0;
+    -fx-border-color: '#6D676E';
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
 }
 
 .button_inside_brown:hover {
     -fx-background-color: '#928a94';
-    -fx-border-width: 0;
 }
 
 .button_inside_brown:pressed {
     -fx-background-color: '#3a373b';
-    -fx-border-width: 0;
 }
 
 .button_brown_invoice {

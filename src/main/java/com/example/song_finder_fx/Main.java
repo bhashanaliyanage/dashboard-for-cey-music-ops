@@ -25,7 +25,7 @@ public class Main extends Application {
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion(23.05);
+    public static ProductVersion versionInfo = new ProductVersion(23.06);
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);

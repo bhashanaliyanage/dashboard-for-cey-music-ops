@@ -4,6 +4,7 @@ import com.example.song_finder_fx.Model.Ingest;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -18,6 +19,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class ControllerIngest {
     public TextField txtProductTitle;
@@ -25,6 +27,8 @@ public class ControllerIngest {
     public Label lblUPCCount;
     public TextArea txtAreaUPC;
     public Label lblDestination;
+    public VBox vboxIngest;
+    public VBox vboxSongDetails;
     @FXML
     private ImageView imgFeedback;
 
@@ -66,6 +70,9 @@ public class ControllerIngest {
     private Ingest ingest = new Ingest();
 
     public ControllerIngest() {
+        // singleIngest = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single.fxml")));
+        // albumIngest = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-album.fxml")));
+        // singleOriginal = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single-original.fxml")));
     }
 
     @FXML
@@ -194,5 +201,25 @@ public class ControllerIngest {
         lblDestination.setText(destination.getAbsolutePath());
         lblDestination.setStyle("-fx-text-fill: #000000");
         ingest.setDestination(destination);
+    }
+
+    public void onIngestSingle() throws IOException {
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single.fxml")));
+        vboxIngest.getChildren().setAll(node);
+    }
+
+    public void onIngestAlbum() throws IOException {
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-album.fxml")));
+        vboxIngest.getChildren().setAll(node);
+    }
+
+    public void onSingleOriginal() throws IOException {
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single-original.fxml")));
+        vboxSongDetails.getChildren().setAll(node);
+    }
+
+    public void onSingleUGC() throws IOException {
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single-ugc.fxml")));
+        vboxSongDetails.getChildren().setAll(node);
     }
 }
