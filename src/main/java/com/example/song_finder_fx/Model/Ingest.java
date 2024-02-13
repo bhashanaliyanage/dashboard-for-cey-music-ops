@@ -1,6 +1,5 @@
 package com.example.song_finder_fx.Model;
 
-import com.example.song_finder_fx.ControllerRevenueGenerator;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
@@ -82,47 +81,55 @@ public class Ingest {
         return destination != null;
     }
 
-    public void writeCSV() throws CsvValidationException, IOException {
+    public void writeCSV() {
         List<CsvSong> songList;
-        songList = songlistRead1(csv);
-        File finalCsv = new File(destination, "new_file.csv");
-        String sampleCatNo = "SAM-CEY-000";
+        songList = readSongList(csv);
+        File resultCSV = new File(destination, "new_file.csv");
         for (String upc :
              upcArray) {
             System.out.println("upc = " + upc);
         }
-        String isrc = "LKA0W2301403";
-        writeCSVFile1(songList, finalCsv, upcArray, productTitle, 1, sampleCatNo, primaryArtist, isrc);
+        String sampleCatNo = "SAM-CEY-000";
+        String sampleISRC = "LKA0W2301403";
+        writeCSVFile(songList, resultCSV, upcArray, productTitle, 1, sampleCatNo, primaryArtist, sampleISRC);
     }
 
-    public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath, String[] upcArray, String albumTitle, int startNum, String catelog, String PrimaryArtist,String ISRC) {
+    public static void writeCSVFile(List<CsvSong> sgList, File csvFilePath, String[] upcArray, String albumTitle, int startNumber, String catNo, String PrimaryArtist, String ISRC) {
+        System.out.println("Ingest.writeCSVFile");
 
-        String UPC1 = null;
-        String titl = null;
+        String stringUPC;
+        String albumTitleNumber;
         int UPC = 0;
-        String s= ISRC.substring(7);
-        int isr = Integer.parseInt(s);
-        String isrcName = ISRC.substring(0,8);
+        String isrcIncrementalHalf = ISRC.substring(7);
+        int intISRCIncrementalHalf = Integer.parseInt(isrcIncrementalHalf);
+        String ISRC_First_Half = ISRC.substring(0,8);
 
-        System.out.println("write method");
         try (CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFilePath))) {
-            String[] headerRecord = {"Fname", "Album title", "Album version", "UPC", "Catalog number", "Primary Artists", "Featuring artists", "Release date", "Main genre", "Main subgenre", "Alternate genre", "Alternate subgenre",
-                    "Label", "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory", "Recording year", "Recording location", "Album format", "Number of volumes",
-                    "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier", "Track title", "Track version", "ISRC", "Track primary artists", "Featuring artists",
-                    "Volume number", "Track main genre", "Track main subgenre", "Track alternate genre", "Track alternate subgenre", "Track language (Metadata)", "Audio language", "Lyrics", "Available separately",
-                    "Track parental advisory", "Preview start", "Preview length", "Track recording year", "Track recording location", "Contributing artists", "Composer", "Lyrics", "Remixers",
-                    "Performers", "Producers", "Writers", "Publishers", "Track sequence", "Track catalog tier", "Original file name", "Original release date"}; // CSV Head
+            String[] headerRecord = {
+                    "//Field name:", "Album title", "Album version", "UPC", "Catalog number",
+                    "Primary artists", "Featuring artists", "Release date", "Main genre",
+                    "Main subgenre", "Alternate genre", "Alternate subgenre", "Label",
+                    "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory",
+                    "Recording year", "Recording location", "Album format", "Number of volumes",
+                    "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier",
+                    "Track title", "Track version", "ISRC", "Track primary artists",
+                    "Featuring artists", "Volume number", "Track main genre", "Track main subgenre",
+                    "Track alternate genre", "Track alternate subgenre", "Track language (Metadata)",
+                    "Audio language", "Lyrics", "Available separately", "Track parental advisory",
+                    "Preview start", "Preview length", "Track recording year", "Track recording location",
+                    "Contributing artists", "Composers", "Lyricists", "Remixers", "Performers",
+                    "Producers", "Writers", "CeyMusic Publishing | CeyMusic Publishing",
+                    "Track sequence", "Track catalog tier", "Original file name", "Original release date"
+            }; // CSV Head
             csvWriter.writeNext(headerRecord);
             int count = 0;
-            int titlenum1 = startNum;
-            String upc = null;
-//        int u = Integer.parseInt(String.valueOf(UPC));
-            int u = UPC;
+            int titleNumber = startNumber;
+            int intUPC = UPC;
             for (CsvSong cs : sgList) {
                 String sg = cs.getSinger();
                 String ly = cs.getLyrics();
                 String com = cs.getComposer();
-                String artist = null;
+                /*String artist = null;
                 if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist))  {
                     artist = PrimaryArtist;
 //                    System.out.println(artist+"1");
@@ -141,51 +148,41 @@ public class Ingest {
                     artist=ly+"|"+sg+"|"+com;
                 }else if(sg.equalsIgnoreCase(PrimaryArtist)){
                     artist=sg+"|"+ly+"|"+com;
-                }else{
-                    artist=null;
-                }
-                //add UPC
-//                UPC1 = String.valueOf(u);
-                UPC1 = upcArray[u];
-                titl = String.valueOf(titlenum1);
+                }*/
+
+                // add UPC
+                stringUPC = upcArray[intUPC];
+                albumTitleNumber = String.valueOf(titleNumber);
                 count++;
-                isr++;
+                intISRCIncrementalHalf++;
 
-
-//                String catelog = "TEST CATELOG";
-//                String PrimaryArtist = artist;
-                String albumTitle1 = albumTitle + ", Vol. 0" + titl;
+                String albumTitleFinal = albumTitle + ", Vol. 0" + albumTitleNumber;
                 LocalDate currentDate = LocalDate.now();
                 DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-                String releasedate = currentDate.format(dateFormatter);
-                String year[] = releasedate.split("/");
-                String curruntYear = year[0];
+                String releaseDate = currentDate.format(dateFormatter);
+                String[] year = releaseDate.split("/");
+                String currentYear = year[0];
 
-//                String s= ISRC.substring(7);
-//                int isr = Integer.parseInt(s);
-//                String isrcName = ISRC.substring(0,7);
-
-                String isrc = isrcName+isr;
+                String ISRCFinal = ISRC_First_Half+intISRCIncrementalHalf;
 
                 String trackPrimaryArtist = ly + " | " + sg + " | " + com;
-                String compoNlyrics = com + " | " + ly;
+                String composerNLyricist = com + " | " + ly;
                 if (count % 25 == 0) {
-                    u = u + 1;
-                    titlenum1 = titlenum1 + 1;
-//                    albumTitle1 = albumTitle+". Vol. "+titl;
+                    intUPC = intUPC + 1;
+                    titleNumber = titleNumber + 1;
                 }
 
-                String[] dataRecord = {"", albumTitle1, "", UPC1, catelog, PrimaryArtist, "", releasedate, "pop", "", "", "",
-                        "CeyMusic Records", curruntYear, "CeyMusic Publishing", curruntYear, "CeyMusic Records", "N", curruntYear, "Sri Lanka", "Album", "1",
-                        "World", "", "Si", "", cs.getSongTitle(), "", isrc, trackPrimaryArtist, cs.getSinger(),
-                        "1", "pop", "", "", "", "SI", "SI", "", "Y",
-                        "N", "0", "120", curruntYear, "Sri Lanka", "", cs.getComposer(), cs.getLyrics(), "",
-                        "", "", compoNlyrics, "CeyMusic Publishing", String.valueOf(count), "Mid", cs.getFileName(), releasedate};
+                String[] dataRecord = {"", albumTitleFinal, "", stringUPC, catNo, PrimaryArtist, "", releaseDate, "Pop", "", "", "",
+                        "CeyMusic Records", currentYear, "CeyMusic Publishing", currentYear, "CeyMusic Records", "N", currentYear, "Sri Lanka", "Album", "1",
+                        "World", "", "SI", "", cs.getSongTitle(), "", ISRCFinal, trackPrimaryArtist, cs.getSinger(),
+                        "1", "Pop", "", "", "", "SI", "SI", "", "Y",
+                        "N", "0", "120", currentYear, "Sri Lanka", "", cs.getComposer(), cs.getLyrics(), "",
+                        "", "", composerNLyricist, "CeyMusic Publishing | CeyMusic Publishing", String.valueOf(count), "Mid", cs.getFileName(), releaseDate};
                 csvWriter.writeNext(dataRecord);
 
-//COMMENTED FOR TEST WORKING CODE
-//            String[] dataRecord = {cs.getSongTitle(), cs.getFileName(),cs.getSinger(),cs.getLyrics(),cs.getComposer(),artist,UPC };
-//            csvWriter.writeNext(dataRecord);
+                //COMMENTED FOR TEST WORKING CODE
+                /*String[] dataRecord = {cs.getSongTitle(), cs.getFileName(),cs.getSinger(),cs.getLyrics(),cs.getComposer(),artist,UPC };
+                csvWriter.writeNext(dataRecord);*/
                 //PU TO  THIS
             }
 
@@ -195,8 +192,7 @@ public class Ingest {
         }
     }
 
-    public static List<CsvSong> songlistRead1(File csv) throws CsvValidationException, IOException {
-//        File csv = new File("D:\\Work\\dashboard-for-cey-music-ops\\CSV Template First.csv");
+    public static List<CsvSong> readSongList(File csv) {
         List<CsvSong> songList = new ArrayList<>();
 
         try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).withSkipLines(1).build()) {
@@ -214,9 +210,6 @@ public class Ingest {
                     cs.setSinger(singer);
                     cs.setLyrics(lyrics);
                     cs.setComposer(composer);
-
-
-//                    System.out.println(title);
 
                     songList.add(cs);
                 }
