@@ -3,299 +3,401 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxWidth="688.0" prefWidth="688.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1"
-      xmlns:fx="http://javafx.com/fxml/1">
-   <VBox prefHeight="200.0" prefWidth="100.0">
-      <HBox prefWidth="200.0" spacing="10.0">
-         <VBox HBox.hgrow="ALWAYS">
-            <children>
-               <Label text="Product Title" textFill="#656565">
-                  <cursor>
-                     <Cursor fx:constant="DEFAULT"/>
-                  </cursor>
-               </Label>
-               <TextField fx:id="txtProductTitle" prefHeight="30.0" promptText="Product Title"
-                          styleClass="textarea-bg">
-                  <VBox.margin>
-                     <Insets top="5.0"/>
-                  </VBox.margin>
-               </TextField>
-            </children>
-         </VBox>
-         <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
-            <children>
-               <Label text="UPC" textFill="#656565">
-                  <cursor>
-                     <Cursor fx:constant="DEFAULT"/>
-                  </cursor>
-               </Label>
-               <TextField fx:id="txtProductTitle1" prefHeight="30.0" promptText="UPC" styleClass="textarea-bg">
-                  <VBox.margin>
-                     <Insets top="5.0"/>
-                  </VBox.margin>
-               </TextField>
-            </children>
-         </VBox>
-      </HBox>
-      <HBox layoutX="10.0" layoutY="10.0" prefWidth="200.0" spacing="10.0">
+<VBox prefWidth="688.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <GridPane prefHeight="470.0" prefWidth="688.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="1.7976931348623157E308" vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+          <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+        </rowConstraints>
          <children>
-            <VBox HBox.hgrow="ALWAYS">
+            <VBox>
                <children>
-                  <Label text="Singer" textFill="#656565">
+                  <Label text="Product Title" textFill="#656565">
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
-                  <TextField fx:id="txtProductTitle1" prefHeight="30.0" promptText="Singer" styleClass="textarea-bg">
+                  <TextField fx:id="txtProductTitle" prefHeight="30.0" promptText="Product Title" styleClass="textarea-bg">
                      <VBox.margin>
-                        <Insets top="5.0"/>
+                        <Insets top="5.0" />
                      </VBox.margin>
                   </TextField>
                </children>
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
             </VBox>
-            <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+            <VBox GridPane.columnIndex="1">
+               <children>
+                  <Label text="UPC" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <TextField fx:id="txtProductTitle1" prefHeight="30.0" promptText="UPC" styleClass="textarea-bg">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+               </children>
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </VBox>
+            <VBox layoutX="359.0" layoutY="10.0" GridPane.rowIndex="1">
+               <children>
+                  <Label text="Product Artist 01" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <TextField prefHeight="30.0" promptText="Product Artist 01" styleClass="textarea-bg">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+               </children>
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
+            </VBox>
+            <VBox layoutX="10.0" layoutY="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <Label text="Artist Type" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <ComboBox prefHeight="27.0" prefWidth="339.0" promptText="Select Artist Type">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </ComboBox>
+               </children>
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </VBox>
+            <VBox GridPane.rowIndex="2">
+               <children>
+                  <Label text="Product Artist 02" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <TextField prefHeight="30.0" promptText="Product Artist 02" styleClass="textarea-bg">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+               </children>
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
+            </VBox>
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <children>
+                  <Label text="Artist Type" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <ComboBox prefHeight="27.0" prefWidth="339.0" promptText="Select Artist Type">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </ComboBox>
+               </children>
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </VBox>
+            <VBox GridPane.rowIndex="3">
+               <children>
+                  <Label text="Product Artist 03" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <TextField prefHeight="30.0" promptText="Product Artist 03" styleClass="textarea-bg">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+               </children>
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
+            </VBox>
+            <VBox GridPane.rowIndex="4">
+               <children>
+                  <Label text="Product Artist 04" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <TextField prefHeight="30.0" promptText="Product Artist 04" styleClass="textarea-bg">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+               </children>
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
+            </VBox>
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <children>
+                  <Label text="Artist Type" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <ComboBox prefHeight="27.0" prefWidth="339.0" promptText="Select Artist Type">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </ComboBox>
+               </children>
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </VBox>
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="4">
+               <children>
+                  <Label text="Artist Type" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <ComboBox prefHeight="27.0" prefWidth="339.0" promptText="Select Artist Type">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </ComboBox>
+               </children>
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </VBox>
+            <VBox GridPane.rowIndex="5">
                <children>
                   <Label text="Catalog Number" textFill="#656565">
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
                   <HBox>
                      <VBox.margin>
-                        <Insets top="5.0"/>
+                        <Insets top="5.0" />
                      </VBox.margin>
                      <children>
-                        <TextField fx:id="txtProductTitle11" prefHeight="30.0" prefWidth="110.0"
-                                   promptText="Catalog Number" styleClass="textarea-bg" HBox.hgrow="ALWAYS"/>
+                        <TextField prefHeight="30.0" promptText="Catalog Number" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
                         <Button mnemonicParsing="false" styleClass="button-big">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="23.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../images/star.png"/>
+                                    <Image url="@../images/star.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                            <HBox.margin>
-                              <Insets left="5.0"/>
+                              <Insets left="5.0" />
                            </HBox.margin>
                         </Button>
                      </children>
                   </HBox>
                </children>
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
             </VBox>
-         </children>
-         <VBox.margin>
-            <Insets top="15.0"/>
-         </VBox.margin>
-      </HBox>
-      <HBox layoutX="10.0" layoutY="62.0" prefWidth="200.0" spacing="10.0">
-         <children>
-            <VBox HBox.hgrow="ALWAYS">
-               <children>
-                  <Label text="Composer" textFill="#656565">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
-                     </cursor>
-                  </Label>
-                  <TextField fx:id="txtProductTitle11" prefHeight="30.0" promptText="Composer"
-                             styleClass="textarea-bg">
-                     <VBox.margin>
-                        <Insets top="5.0"/>
-                     </VBox.margin>
-                  </TextField>
-               </children>
-            </VBox>
-            <VBox HBox.hgrow="ALWAYS">
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="5">
                <children>
                   <Label text="ISRC" textFill="#656565">
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
                   <HBox>
                      <VBox.margin>
-                        <Insets top="5.0"/>
+                        <Insets top="5.0" />
                      </VBox.margin>
                      <children>
-                        <TextField fx:id="txtProductTitle112" prefHeight="30.0" prefWidth="110.0" promptText="ISRC"
-                                   styleClass="textarea-bg" HBox.hgrow="ALWAYS"/>
+                        <TextField prefHeight="30.0" promptText="ISRC" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
                         <Button mnemonicParsing="false" styleClass="button-big">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="23.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../images/star.png"/>
+                                    <Image url="@../images/star.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                            <HBox.margin>
-                              <Insets left="5.0"/>
+                              <Insets left="5.0" />
                            </HBox.margin>
                         </Button>
                      </children>
                   </HBox>
                </children>
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
             </VBox>
-         </children>
-         <VBox.margin>
-            <Insets top="15.0"/>
-         </VBox.margin>
-      </HBox>
-      <HBox layoutX="10.0" layoutY="114.0" prefWidth="200.0" spacing="10.0">
-         <children>
-            <VBox HBox.hgrow="ALWAYS">
-               <children>
-                  <Label text="Lyricist" textFill="#656565">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
-                     </cursor>
-                  </Label>
-                  <TextField fx:id="txtProductTitle111" prefHeight="30.0" promptText="Lyricist"
-                             styleClass="textarea-bg">
-                     <VBox.margin>
-                        <Insets top="5.0"/>
-                     </VBox.margin>
-                  </TextField>
-               </children>
-            </VBox>
-            <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label text="Additional Artist(s)" textFill="#656565">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
-                     </cursor>
-                  </Label>
-                  <TextField fx:id="txtProductTitle1111" prefHeight="30.0" promptText="Additional Artist(s)"
-                             styleClass="textarea-bg">
-                     <VBox.margin>
-                        <Insets top="5.0"/>
-                     </VBox.margin>
-                  </TextField>
-               </children>
-            </VBox>
-         </children>
-         <VBox.margin>
-            <Insets top="15.0"/>
-         </VBox.margin>
-      </HBox>
-      <HBox layoutX="10.0" layoutY="160.0" prefWidth="200.0" spacing="10.0">
-         <children>
-            <VBox HBox.hgrow="ALWAYS">
+            <VBox prefWidth="344.0" GridPane.rowIndex="6">
                <children>
                   <Label text="Release Date" textFill="#656565">
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
-                  <TextField fx:id="txtProductTitle1111" prefHeight="30.0" promptText="Release Date"
-                             styleClass="textarea-bg">
+                  <HBox>
                      <VBox.margin>
-                        <Insets top="5.0"/>
+                        <Insets top="5.0" />
                      </VBox.margin>
-                  </TextField>
+                     <children>
+                        <DatePicker prefHeight="30.0" prefWidth="296.0" HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" styleClass="button-big">
+                           <graphic>
+                              <ImageView fitHeight="23.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../images/star.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <HBox.margin>
+                              <Insets left="5.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
                </children>
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
             </VBox>
-            <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="6">
                <children>
                   <Label text="Label" textFill="#656565">
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
-                  <TextField fx:id="txtProductTitle11111" prefHeight="30.0" promptText="Label"
-                             styleClass="textarea-bg">
+                  <HBox>
                      <VBox.margin>
-                        <Insets top="5.0"/>
+                        <Insets top="5.0" />
                      </VBox.margin>
-                  </TextField>
+                     <children>
+                        <TextField prefHeight="30.0" promptText="Label" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" styleClass="button-big">
+                           <graphic>
+                              <ImageView fitHeight="23.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../images/star.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <HBox.margin>
+                              <Insets left="5.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
                </children>
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
             </VBox>
-         </children>
-         <VBox.margin>
-            <Insets top="15.0"/>
-         </VBox.margin>
-      </HBox>
-      <HBox layoutX="10.0" layoutY="206.0" prefWidth="200.0" spacing="10.0">
-         <VBox.margin>
-            <Insets top="15.0"/>
-         </VBox.margin>
-         <children>
-            <VBox HBox.hgrow="ALWAYS">
+            <VBox GridPane.rowIndex="7">
                <children>
                   <Label text="Attach Audio" textFill="#656565">
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
                   <HBox>
                      <VBox.margin>
-                        <Insets top="5.0"/>
+                        <Insets top="5.0" />
                      </VBox.margin>
                      <children>
-                        <TextField fx:id="txtProductTitle113" prefHeight="30.0" prefWidth="110.0"
-                                   promptText="Attach Audio" styleClass="textarea-bg" HBox.hgrow="ALWAYS"/>
+                        <TextField prefHeight="30.0" promptText="Attach Audio" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
                         <Button mnemonicParsing="false" styleClass="button-big">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="23.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../images/star.png"/>
+                                    <Image url="@../images/star.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                            <HBox.margin>
-                              <Insets left="5.0"/>
+                              <Insets left="5.0" />
                            </HBox.margin>
                         </Button>
                      </children>
                   </HBox>
                </children>
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
             </VBox>
-            <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="7">
                <children>
                   <Label text="Attach Artwork" textFill="#656565">
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
                   <HBox>
                      <VBox.margin>
-                        <Insets top="5.0"/>
+                        <Insets top="5.0" />
                      </VBox.margin>
                      <children>
-                        <TextField fx:id="txtProductTitle1131" prefHeight="30.0" prefWidth="110.0"
-                                   promptText="Attach Artwork" styleClass="textarea-bg" HBox.hgrow="ALWAYS"/>
+                        <TextField prefHeight="30.0" promptText="Attach Artwork" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
                         <Button mnemonicParsing="false" styleClass="button-big">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="23.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../images/star.png"/>
+                                    <Image url="@../images/star.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                            <HBox.margin>
-                              <Insets left="5.0"/>
+                              <Insets left="5.0" />
                            </HBox.margin>
                         </Button>
                      </children>
                   </HBox>
                </children>
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
             </VBox>
          </children>
-      </HBox>
-      <HBox layoutX="10.0" layoutY="336.0" prefWidth="200.0" spacing="10.0">
-         <VBox.margin>
-            <Insets top="15.0"/>
-         </VBox.margin>
-         <children>
-            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="690.0" styleClass="button_inside_brown"
-                    text="Save and add to Queue" HBox.hgrow="ALWAYS"/>
-         </children>
-      </HBox>
-   </VBox>
+      </GridPane>
+   </children>
 </VBox>
