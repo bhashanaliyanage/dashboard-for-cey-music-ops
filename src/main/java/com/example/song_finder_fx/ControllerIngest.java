@@ -67,12 +67,18 @@ public class ControllerIngest {
 
     @FXML
     private VBox vboxUpdateSongDB;
-    private Ingest ingest = new Ingest();
+    private final Ingest ingest = new Ingest();
 
-    public ControllerIngest() {
-        // singleIngest = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single.fxml")));
-        // albumIngest = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-album.fxml")));
-        // singleOriginal = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single-original.fxml")));
+    public ControllerIngest(ImageView imgPayeeUpdate, ImageView imgSongDBStatus, Label lblCountMissingISRCs, Label lblPayeeProgress, Label lblPayeeUpdate, Label lblSongDBProgress, Label lblSongDBUpdate, Label lblUpdateNote, VBox vboxUpdateSongDB) {
+        this.imgPayeeUpdate = imgPayeeUpdate;
+        imgSongDB_Status = imgSongDBStatus;
+        this.lblCountMissingISRCs = lblCountMissingISRCs;
+        this.lblPayeeProgress = lblPayeeProgress;
+        this.lblPayeeUpdate = lblPayeeUpdate;
+        lblSongDB_Progress = lblSongDBProgress;
+        lblSongDB_Update = lblSongDBUpdate;
+        this.lblUpdateNote = lblUpdateNote;
+        this.vboxUpdateSongDB = vboxUpdateSongDB;
     }
 
     @FXML
@@ -216,6 +222,33 @@ public class ControllerIngest {
     public void onSingleOriginal() throws IOException {
         Node node = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single-original.fxml")));
         vboxSongDetails.getChildren().setAll(node);
+
+        /*Scene scene = vboxSongDetails.getScene();*/
+
+        // Binding auto-completion to artist name text fields
+        /*TextField txtArtist01 = (TextField) scene.lookup("#txtArtist01");
+        TextField txtArtist02 = (TextField) scene.lookup("#txtArtist02");
+        TextField txtArtist03 = (TextField) scene.lookup("#txtArtist03");
+        TextField txtArtist04 = (TextField) scene.lookup("#txtArtist04");
+        ArrayList<String> artistNames = DatabaseMySQL.getArtistList();
+        TextFields.bindAutoCompletion(txtArtist01, artistNames);
+        TextFields.bindAutoCompletion(txtArtist02, artistNames);
+        TextFields.bindAutoCompletion(txtArtist03, artistNames);
+        TextFields.bindAutoCompletion(txtArtist04, artistNames);*/
+
+        // Setting combo box options
+        /*@SuppressWarnings("unchecked")
+        ComboBox<String> comboArtist01Type = (ComboBox) scene.lookup("#comboArtist01Type");
+        comboArtist01Type.setItems(FXCollections.observableArrayList("Composer","Lyricist","Singer"));
+        @SuppressWarnings("unchecked")
+        ComboBox<String> comboArtist02Type = (ComboBox) scene.lookup("#comboArtist02Type");
+        comboArtist02Type.setItems(FXCollections.observableArrayList("Composer","Lyricist","Singer"));
+        @SuppressWarnings("unchecked")
+        ComboBox<String> comboArtist03Type = (ComboBox) scene.lookup("#comboArtist03Type");
+        comboArtist03Type.setItems(FXCollections.observableArrayList("Composer","Lyricist","Singer"));
+        @SuppressWarnings("unchecked")
+        ComboBox<String> comboArtist04Type = (ComboBox) scene.lookup("#comboArtist04Type");
+        comboArtist04Type.setItems(FXCollections.observableArrayList("Composer","Lyricist","Singer"));*/
     }
 
     public void onSingleUGC() throws IOException {
