@@ -4,11 +4,8 @@ import com.example.song_finder_fx.Model.Songs;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
-import javax.xml.crypto.Data;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -37,7 +34,7 @@ public class ControllerMCTrack {
         txtTrackTitle.setOnAction(event -> {
             String songName = txtTrackTitle.getText();
             System.out.println("songName = " + songName);
-            Songs songs = null;
+            Songs songs;
             try {
                 songs = DatabaseMySQL.searchContributors(songName);
             } catch (SQLException | ClassNotFoundException e) {

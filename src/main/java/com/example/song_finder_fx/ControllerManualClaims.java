@@ -4,15 +4,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -32,7 +26,7 @@ public class ControllerManualClaims {
     }
 
     @FXML
-    void onCheckBtnClicked(ActionEvent event) throws IOException {
+    void onCheckBtnClicked() throws IOException {
         String URL = txtURL.getText();
 
         if (!Objects.equals(URL, "")) {
