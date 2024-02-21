@@ -156,8 +156,6 @@ public class UIController {
         mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar.fxml")));
         // NavBar Collapsed
         mainNodes[5] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar-small.fxml")));
-        // Revenue Analysis
-        // mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/revenue-generator.fxml")));
     }
 
     public void backButtonImplementationForSearchSong(MouseEvent event) {

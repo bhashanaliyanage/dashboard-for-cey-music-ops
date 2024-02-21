@@ -236,3 +236,24 @@
     -fx-border-style: hidden hidden hidden solid;
     -fx-border-width: 1;
 }
+
+.titled-pane > .title {
+    -fx-background-color: white;
+    -fx-border-color: '#e9ebee';
+}
+
+.titled-pane .content {
+    -fx-border-color: '#e9ebee';
+}
+
+.titled-pane:expanded .content {
+    -fx-border-color: '#e9ebee';
+}
+
+.titled-pane:focused > .title > .arrow-button > .arrow {
+    -fx-background-insets: 0;
+}
+
+.titlepane-bg {
+    -fx-background-color: white;
+}

@@ -115,7 +115,6 @@ public class InitPreloader implements Initializable {
             }
         });
 
-
         Thread mainWindow = new Thread(() -> Platform.runLater(() -> {
             try {
                 starting = true;
@@ -150,7 +149,7 @@ public class InitPreloader implements Initializable {
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
                 stage.setWidth(1300);
-                stage.setHeight(800);
+                stage.setHeight(900);
                 stage.setScene(scene);
                 stage.show();
 

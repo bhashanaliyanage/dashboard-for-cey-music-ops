@@ -767,4 +767,49 @@ public class DatabaseMySQL {
 
         return finalCatNo;
     }
+
+    public static List<String> getAllSongs() throws SQLException, ClassNotFoundException {
+        List<String> songTitles = new ArrayList<>();
+
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT TRACK_TITLE FROM `songs`");
+
+        try {
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String trackTitle = rs.getString("TRACK_TITLE");
+                songTitles.add(trackTitle);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return songTitles;
+    }
+
+    public static Songs searchContributors(String songName) throws SQLException, ClassNotFoundException {
+        Connection con = getConn();
+        ResultSet rs;
+        Songs song = new Songs();
+
+        PreparedStatement ps = con.prepareStatement("SELECT LYRICIST, COMPOSER FROM `songs` WHERE TRACK_TITLE = ?");
+        ps.setString(1, songName);
+
+        rs = ps.executeQuery();
+
+        try {
+            while (rs.next()) {
+                String lyricist = rs.getString(1);
+                String composer = rs.getString(2);
+
+                song.setComposer(composer);
+                song.setLyricist(lyricist);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return song;
+    }
 }
