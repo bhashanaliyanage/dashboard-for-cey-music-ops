@@ -15,12 +15,6 @@ public class ControllerMCTrack {
     private TextField txtTrackTitle;
 
     @FXML
-    private TextField txtTrimEnd;
-
-    @FXML
-    private TextField txtTrimStart;
-
-    @FXML
     private TextField txtComposer;
 
     @FXML

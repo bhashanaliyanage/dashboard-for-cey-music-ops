@@ -12,8 +12,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.song_finder_fx.Controller.CSVController.getFUGAReport;
-
 public class DatabasePostgre {
     private static Connection conn;
 
