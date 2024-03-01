@@ -1,6 +1,7 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Model.FUGAReport;
+import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -8,6 +9,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.example.song_finder_fx.Controller.CSVController.getFUGAReport;
 
@@ -15,24 +18,46 @@ public class DatabasePostgre {
     private static Connection conn;
 
     public static void main(String[] args) throws IOException, CsvValidationException, SQLException {
-        File file = new File("src/main/resources/com/example/song_finder_fx/November2023StatementRun_IslandDreamRecords-royalty_product_and_asset.csv");
+        File file = new File("src/main/resources/com/example/song_finder_fx/CeyMusic Song Database  - Song Artist DB Import - 03.csv");
         CSVReader reader = new CSVReader(new FileReader(file.getAbsolutePath()));
         reader.readNext(); // Skipping the header
         String[] nextLine;
-        long startTime = System.nanoTime();
         Connection conn = getConn();
+        ResultSet rs;
+        ResultSet rsArtistInsert;
 
         while ((nextLine = reader.readNext()) != null) {
-            FUGAReport report = getFUGAReport(nextLine);
-            System.out.println("ISRC = " + nextLine[17]);
+            System.out.println("ISRC = " + nextLine[0]);
+            String isrc = nextLine[0];
+            String artistType = nextLine[1];
+            String artistName = nextLine[2];
+
+            String insertQuery = String.format("INSERT INTO public.song_artist (song_isrc, artist_id, artist_type) VALUES ('%s', (SELECT artist_id FROM public.artists WHERE artist_name = '%s' LIMIT 1), '%s');"
+                    , isrc, artistName, artistType);
+            String selectQuery = String.format("SELECT artist_id FROM public.artists WHERE artist_name = '%s';", artistName);
+            String insertArtistQuery = String.format("INSERT INTO public.artists (artist_name) VALUES ('%s') RETURNING artist_id;", artistName);
+
+            Statement statement = conn.createStatement();
+            rs = statement.executeQuery(selectQuery);
+            if (rs.isBeforeFirst()) { // If Artist Available
+                rs.next();
+                int artistID = rs.getInt(1);
+                // System.out.println("artistID = " + artistID);
+                statement = conn.createStatement();
+
+                statement.executeUpdate(insertQuery);
+            } else { // If artist not available
+                rsArtistInsert = statement.executeQuery(insertArtistQuery);
+                rsArtistInsert.next();
+                int artistID = rsArtistInsert.getInt(1);
+                System.out.println("artistID = " + artistID);
+                insertQuery = String.format("INSERT INTO public.song_artist (song_isrc, artist_id, artist_type) VALUES ('%s', '%s', '%s');"
+                        , isrc, artistID, artistType);
+                statement = conn.createStatement();
+                statement.executeUpdate(insertQuery);
+            }
         }
         // System.out.println("reader = " + nextLine[0]);
-
-        long endTime = System.nanoTime();
-        long durationInNano = endTime - startTime;
-        double durationInSeconds = (double) durationInNano / 1_000_000_000;
-
-        System.out.println("Execution time: " + durationInSeconds + " seconds");
     }
 
     public static Connection getConn() {
@@ -54,25 +79,6 @@ public class DatabasePostgre {
         }
 
         return conn;
-    }
-
-    public static void getConn2() {
-        String dbname = "songdata";
-        String user = "postgres";
-        String pass = "ceymusic";
-
-        try {
-            Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/" + dbname, user, pass);
-
-            if (conn != null) {
-                System.out.println("Connection Established!");
-            } else {
-                System.out.println("Error Connecting to Database");
-            }
-        } catch (Exception e) {
-            System.out.println("e = " + e);
-        }
     }
 
     public static int addRowFUGAReport(FUGAReport report, Connection conn) throws SQLException {
@@ -105,5 +111,25 @@ public class DatabasePostgre {
                 FROM public.report GROUP BY Asset_ISRC ORDER BY Reported_Royalty_Summary DESC;""";
         Statement statement = conn.createStatement();
         return statement.executeQuery(query);
+    }
+
+    public static List<String> getAllSongTitles() throws SQLException {
+        String query = "SELECT song_name FROM public.song_metadata GROUP BY song_name ORDER BY song_name ASC;";
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        List<String> songs = new ArrayList<>();
+
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            String song = rs.getString(1);
+            songs.add(song);
+        }
+
+        return songs;
+    }
+
+    public static Songs searchContributors(String songName) {
+        String query = "SELECT song_name, artist, artist_type FROM public.song_metadata WHERE song_name = '%s' ORDER BY song_name ASC;";
+        return null;
     }
 }

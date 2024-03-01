@@ -15,7 +15,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -56,10 +55,7 @@ public class InitPreloader implements Initializable {
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
-                /*Platform.runLater(() -> {
-                    System.out.println("Here!");
-                });*/
-                Main.getDirectoryFromDB();
+                Main.getAudioDatabaseLocation();
             } catch (SQLException | ClassNotFoundException e) {
                 Platform.runLater(() -> System.out.println("Cannot get audio database directory"));
             }
@@ -216,25 +212,15 @@ public class InitPreloader implements Initializable {
 
     private String checkDatabaseConnection() {
         Connection con;
-        String message = null;
+        String message;
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            String url = "jdbc:mysql://192.168.1.200/songData";
-            String username = "ceymusic";
-            String password = "ceymusic";
-            con = DriverManager.getConnection(url, username, password);
+        con = DatabasePostgre.getConn();
 
-            if (con != null) {
-                message = "Connection Succeed";
-                return message;
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            Platform.runLater(e::printStackTrace);
+        if (con != null) {
+            message = "Connection Succeed";
+        } else {
             message = "Connection Error";
-            return message;
         }
-
         return message;
     }
 

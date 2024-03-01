@@ -846,7 +846,7 @@ public class UIController {
         mainVBox.getChildren().clear();
         mainVBox.getChildren().add(mainNodes[3]);
 
-        String directoryString = Main.getDirectoryFromDB();
+        String directoryString = Main.getAudioDatabaseLocation();
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
         Button btnAudioDatabase = (Button) scene.lookup("#btnAudioDatabase");

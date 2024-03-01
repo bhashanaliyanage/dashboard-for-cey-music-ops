@@ -28,18 +28,15 @@ public class ControllerMCTrack {
 
     @FXML
     public void initialize() throws SQLException, ClassNotFoundException {
-        List<String> songTitles = DatabaseMySQL.getAllSongs();
+        // List<String> songTitles = DatabaseMySQL.getAllSongs();
+        List<String> songTitles = DatabasePostgre.getAllSongTitles();
         TextFields.bindAutoCompletion(txtTrackTitle, songTitles);
 
         txtTrackTitle.setOnAction(event -> {
-            String songName = txtTrackTitle.getText();
-            System.out.println("songName = " + songName);
             Songs songs;
-            try {
-                songs = DatabaseMySQL.searchContributors(songName);
-            } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            String songName = txtTrackTitle.getText();
+            // System.out.println("songName = " + songName);
+            songs = DatabasePostgre.searchContributors(songName);
 
             txtComposer.setText(songs.getComposer());
             txtLyricist.setText(songs.getLyricist());

@@ -38,7 +38,7 @@ public class ControllerSettings {
         mainUIController.mainVBox.getChildren().clear();
         mainUIController.mainVBox.getChildren().add(newContent);
 
-        String directorySQLite = Main.getDirectoryFromDB();
+        String directorySQLite = Main.getAudioDatabaseLocation();
 
         if (directorySQLite == null) {
             System.out.println("Directory Null!");
