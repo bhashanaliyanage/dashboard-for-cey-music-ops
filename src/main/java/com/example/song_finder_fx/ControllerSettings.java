@@ -23,6 +23,10 @@ public class ControllerSettings {
     public Label lblVersion;
     public Label lblVersionInfoAboutPage;
 
+    public ControllerSettings() {
+
+    }
+
     public ControllerSettings(UIController MainUIController) {
         this.mainUIController = MainUIController;
     }
