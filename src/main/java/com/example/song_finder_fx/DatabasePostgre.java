@@ -16,46 +16,7 @@ public class DatabasePostgre {
     private static Connection conn;
 
     public static void main(String[] args) throws IOException, CsvValidationException, SQLException {
-        File file = new File("src/main/resources/com/example/song_finder_fx/CeyMusic Song Database  - Song Artist DB Import - 03.csv");
-        CSVReader reader = new CSVReader(new FileReader(file.getAbsolutePath()));
-        reader.readNext(); // Skipping the header
-        String[] nextLine;
-        Connection conn = getConn();
-        ResultSet rs;
-        ResultSet rsArtistInsert;
-
-        while ((nextLine = reader.readNext()) != null) {
-            System.out.println("ISRC = " + nextLine[0]);
-            String isrc = nextLine[0];
-            String artistType = nextLine[1];
-            String artistName = nextLine[2];
-
-            String insertQuery = String.format("INSERT INTO public.song_artist (song_isrc, artist_id, artist_type) VALUES ('%s', (SELECT artist_id FROM public.artists WHERE artist_name = '%s' LIMIT 1), '%s');"
-                    , isrc, artistName, artistType);
-            String selectQuery = String.format("SELECT artist_id FROM public.artists WHERE artist_name = '%s';", artistName);
-            String insertArtistQuery = String.format("INSERT INTO public.artists (artist_name) VALUES ('%s') RETURNING artist_id;", artistName);
-
-            Statement statement = conn.createStatement();
-            rs = statement.executeQuery(selectQuery);
-            if (rs.isBeforeFirst()) { // If Artist Available
-                rs.next();
-                int artistID = rs.getInt(1);
-                // System.out.println("artistID = " + artistID);
-                statement = conn.createStatement();
-
-                statement.executeUpdate(insertQuery);
-            } else { // If artist not available
-                rsArtistInsert = statement.executeQuery(insertArtistQuery);
-                rsArtistInsert.next();
-                int artistID = rsArtistInsert.getInt(1);
-                System.out.println("artistID = " + artistID);
-                insertQuery = String.format("INSERT INTO public.song_artist (song_isrc, artist_id, artist_type) VALUES ('%s', '%s', '%s');"
-                        , isrc, artistID, artistType);
-                statement = conn.createStatement();
-                statement.executeUpdate(insertQuery);
-            }
-        }
-        // System.out.println("reader = " + nextLine[0]);
+        searchContributors("Mawathe Geethaya");
     }
 
     public static Connection getConn() {
@@ -112,8 +73,8 @@ public class DatabasePostgre {
     }
 
     public static List<String> getAllSongTitles() throws SQLException {
-        String query = "SELECT song_name FROM public.song_metadata GROUP BY song_name ORDER BY song_name ASC;";
         Connection conn = getConn();
+        String query = "SELECT song_name FROM public.song_metadata GROUP BY song_name ORDER BY song_name ASC;";
         Statement statement = conn.createStatement();
         List<String> songs = new ArrayList<>();
 
@@ -126,8 +87,18 @@ public class DatabasePostgre {
         return songs;
     }
 
-    public static Songs searchContributors(String songName) {
-        String query = "SELECT song_name, artist, artist_type FROM public.song_metadata WHERE song_name = '%s' ORDER BY song_name ASC;";
-        return null;
+    public static Songs searchContributors(String songName) throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        Songs song = new Songs();
+
+        String query = String.format("SELECT song_name, artist, artist_type FROM public.song_metadata WHERE song_name = '%s' ORDER BY song_name ASC;", songName);
+        ResultSet rs = statement.executeQuery(query);
+        song.getContributorsFromRS(rs);
+
+        System.out.println("song.getLyricist() = " + song.getLyricist());
+        System.out.println("song.getComposer() = " + song.getComposer());
+
+        return song;
     }
 }

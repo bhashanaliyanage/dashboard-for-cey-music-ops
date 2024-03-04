@@ -3,6 +3,7 @@ package com.example.song_finder_fx.Model;
 import com.example.song_finder_fx.DatabaseMySQL;
 import com.example.song_finder_fx.Main;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 
@@ -153,5 +154,19 @@ public class Songs {
         }
 
         return isIsrcPresent;
+    }
+
+    public void getContributorsFromRS(ResultSet rs) throws SQLException {
+        if (rs.isBeforeFirst()) {
+            while (rs.next()) {
+                String artistType = rs.getString(3);
+                String artist = rs.getString(2);
+                if (Objects.equals(artistType, "Composer")) {
+                    composer = artist;
+                } else if (Objects.equals(artistType, "Lyricist")) {
+                    lyricist = artist;
+                }
+            }
+        }
     }
 }
