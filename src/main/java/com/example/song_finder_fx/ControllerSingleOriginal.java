@@ -263,7 +263,6 @@ public class ControllerSingleOriginal {
         }
     }
 
-
     public void onGetCatNo(ActionEvent event) throws SQLException, ClassNotFoundException {
         String mainArtist = txtArtist01.getText();
         if (mainArtist.isEmpty()) { // Checking the artist TextField if empty

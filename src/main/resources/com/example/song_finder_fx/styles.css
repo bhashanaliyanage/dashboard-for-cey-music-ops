@@ -257,3 +257,29 @@
 .titlepane-bg {
     -fx-background-color: white;
 }
+
+.spinner {
+    -fx-background-color: '#FFFFFF';
+    -fx-border-color: '#e9ebee';
+    -fx-border-width: 1;
+    -fx-background-radius: 3;
+}
+
+.spinner .increment-arrow-button {
+    -fx-background-color: '#FFFFFF';
+    -fx-border-color: '#e9ebee';
+}
+
+.spinner .decrement-arrow-button {
+    -fx-background-color: '#FFFFFF';
+    -fx-border-color: '#e9ebee';
+}
+
+.spinner .increment-arrow-button: pressed {
+    -fx-background-color: '#e9ebee';
+}
+
+.spinner .decrement-arrow-button: pressed {
+    -fx-background-color: '#e9ebee';
+}
+
