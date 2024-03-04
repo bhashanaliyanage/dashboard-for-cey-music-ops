@@ -3,12 +3,11 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Model.FUGAReport;
 import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -16,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -158,24 +156,18 @@ public class DatabaseMySQL {
              CallableStatement cs = db.prepareCall("{call insert_report_new(?,?,?,?,?)}")) {
 
             cs.setString(1, report.getAssetISRC());
-           cs.setDouble(2,report.getReportedRoyalty());
+            cs.setDouble(2, report.getReportedRoyalty());
             cs.setString(3, report.getTerritory());
-            cs.setString(4,report.getSaleStartDate());
+            cs.setString(4, report.getSaleStartDate());
             cs.setString(5, report.getDsp());
 
             return cs.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             throw e;
-
-
-        }
-        finally {
-
         }
 
     }
-
 
 
     public static ResultSet getTop5StreamedAssets() throws SQLException, ClassNotFoundException {
@@ -409,11 +401,6 @@ public class DatabaseMySQL {
         PreparedStatement preparedStatement = db.prepareStatement("SELECT PAYEE FROM `isrc_payees` GROUP BY PAYEE ORDER BY PAYEE ASC;");
 
         return preparedStatement.executeQuery();
-    }
-
-    public static void main(String[] args) throws SQLException, ClassNotFoundException, CsvValidationException, IOException {
-        ArrayList<Double> gross = getPayeeGrossRev("Ajantha Ranasinghe");
-        System.out.println("gross = " + gross);
     }
 
     static ArrayList<Double> getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
@@ -707,5 +694,77 @@ public class DatabaseMySQL {
         }
 
         return artistName != null;
+    }
+
+    public static ArrayList<String> getArtistList() throws SQLException, ClassNotFoundException {
+        Connection con = getConn();
+        ArrayList<String> artistNames = new ArrayList<>();
+
+        PreparedStatement ps = con.prepareStatement("SELECT * FROM `artist_validation`");
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            artistNames.add(rs.getString(1));
+        }
+
+        return artistNames;
+    }
+
+
+    public static void registerNewCeyMusicArtist(String artist01) throws SQLException, ClassNotFoundException {
+        Connection con = getConn();
+
+        PreparedStatement ps = con.prepareStatement("INSERT INTO artists (artist_name) VALUES (?);");
+        PreparedStatement ps2 = con.prepareStatement("INSERT INTO artist_validation (name) VALUES (?);");
+
+        ps.setString(1, artist01);
+        ps2.setString(1, artist01);
+
+        ps.executeUpdate();
+        ps2.executeUpdate();
+    }
+
+    public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+        File csv = new File("src/main/resources/com/example/song_finder_fx/Catalog Numbers List.csv");
+        CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).build();
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("UPDATE artists\n" +
+                "SET LAST_CAT_NO = ?\n" +
+                "WHERE ARTIST_NAME = ?;");
+
+        String[] record;
+        while ((record = csvReader.readNext()) != null) {
+            System.out.println(record[1] + ": " + record[0]);
+            ps.setString(1, record[0]);
+            ps.setString(2, record[1]);
+            ps.executeUpdate();
+        }
+
+        csvReader.close();
+    }
+
+    public static String getCatNoFor(String mainArtist) throws SQLException, ClassNotFoundException {
+        String finalCatNo = null;
+        ResultSet rs;
+
+        Connection con = getConn();
+
+        PreparedStatement ps = con.prepareStatement("SELECT `last_cat_no` FROM `artists` WHERE `ARTIST_NAME` = ?;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ps.setString(1, mainArtist);
+        rs = ps.executeQuery();
+
+        // rs.first();
+
+        if (rs.next()) {
+            String lastCatNo = rs.getString(1);
+            if (!Objects.equals(lastCatNo, "")) {
+                String prefix = lastCatNo.substring(0, 8);
+                int number = Integer.parseInt(lastCatNo.substring(8));
+                number++;
+                finalCatNo = prefix + String.format("%03d", number);
+            }
+        }
+
+        return finalCatNo;
     }
 }

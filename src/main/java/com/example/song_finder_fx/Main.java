@@ -25,7 +25,7 @@ public class Main extends Application {
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion(23.05);
+    public static ProductVersion versionInfo = new ProductVersion(23.06);
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
@@ -188,6 +188,7 @@ public class Main extends Application {
 // TODO: Offer cancel method after proceed button clicked
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
 // TODO: 2/8/2024 System Tray
+// TODO: 2/14/2024 Make it play FLACs
 
 // Performance
 // TODO: If copy to button clicked and user not chose any location the application starts to search
