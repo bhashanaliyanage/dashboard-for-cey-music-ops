@@ -236,3 +236,50 @@
     -fx-border-style: hidden hidden hidden solid;
     -fx-border-width: 1;
 }
+
+.titled-pane > .title {
+    -fx-background-color: white;
+    -fx-border-color: '#e9ebee';
+}
+
+.titled-pane .content {
+    -fx-border-color: '#e9ebee';
+}
+
+.titled-pane:expanded .content {
+    -fx-border-color: '#e9ebee';
+}
+
+.titled-pane:focused > .title > .arrow-button > .arrow {
+    -fx-background-insets: 0;
+}
+
+.titlepane-bg {
+    -fx-background-color: white;
+}
+
+.spinner {
+    -fx-background-color: '#FFFFFF';
+    -fx-border-color: '#e9ebee';
+    -fx-border-width: 1;
+    -fx-background-radius: 3;
+}
+
+.spinner .increment-arrow-button {
+    -fx-background-color: '#FFFFFF';
+    -fx-border-color: '#e9ebee';
+}
+
+.spinner .decrement-arrow-button {
+    -fx-background-color: '#FFFFFF';
+    -fx-border-color: '#e9ebee';
+}
+
+.spinner .increment-arrow-button: pressed {
+    -fx-background-color: '#e9ebee';
+}
+
+.spinner .decrement-arrow-button: pressed {
+    -fx-background-color: '#e9ebee';
+}
+

@@ -221,7 +221,8 @@ public class DatabaseMySQL {
         /*SELECT Asset_ISRC, SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END) AS 'AU_Earnings', (SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9 AS After_GST, SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END) AS 'Other_Territories_Earnings', ((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END)) AS Reported_Royalty_After_GST, (((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS Reported_Royalty_For_CEYMUSIC FROM report GROUP BY Asset_ISRC;*/
         Connection db = DatabaseMySQL.getConn();
 
-        PreparedStatement ps = db.prepareStatement("SELECT Asset_ISRC, SUM(Reported_Royalty) AS Reported_Royalty_Summary, " +
+        PreparedStatement ps = db.prepareStatement("SELECT Asset_ISRC, " +
+                "SUM(Reported_Royalty) AS Reported_Royalty_Summary, " +
                 "SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END) AS 'AU_Earnings', " +
                 "(SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9 AS After_GST, " +
                 "SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END) AS 'Other_Territories_Earnings', " +
@@ -766,5 +767,50 @@ public class DatabaseMySQL {
         }
 
         return finalCatNo;
+    }
+
+    public static List<String> getAllSongs() throws SQLException, ClassNotFoundException {
+        List<String> songTitles = new ArrayList<>();
+
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT TRACK_TITLE FROM `songs`");
+
+        try {
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String trackTitle = rs.getString("TRACK_TITLE");
+                songTitles.add(trackTitle);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return songTitles;
+    }
+
+    public static Songs searchContributors(String songName) throws SQLException, ClassNotFoundException {
+        Connection con = getConn();
+        ResultSet rs;
+        Songs song = new Songs();
+
+        PreparedStatement ps = con.prepareStatement("SELECT LYRICIST, COMPOSER FROM `songs` WHERE TRACK_TITLE = ?");
+        ps.setString(1, songName);
+
+        rs = ps.executeQuery();
+
+        try {
+            while (rs.next()) {
+                String lyricist = rs.getString(1);
+                String composer = rs.getString(2);
+
+                song.setComposer(composer);
+                song.setLyricist(lyricist);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return song;
     }
 }

@@ -300,7 +300,8 @@ public class ControllerRevenueGenerator {
     public void onGenerateFullBreakdownBtnClick(MouseEvent mouseEvent) {
         Platform.runLater(() -> {
             try {
-                ResultSet rs = DatabaseMySQL.getFullBreakdown();
+                // ResultSet rs = DatabaseMySQL.getFullBreakdown();
+                ResultSet rs = DatabasePostgre.getFullBreakdown();
                 Path tempDir = Files.createTempDirectory("ceymusic_dashboard");
                 Path csvFile = tempDir.resolve("revenue_breakdown_full.csv");
 
@@ -326,7 +327,7 @@ public class ControllerRevenueGenerator {
                 Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
                 Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
                 System.out.println("File copied successfully to " + destinationPath);
-            } catch (SQLException | ClassNotFoundException | IOException e) {
+            } catch (SQLException | IOException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -826,6 +827,7 @@ public class ControllerRevenueGenerator {
             lblReportProgress.setVisible(true);
             imgImportCaution.setVisible(false);
 
+
             Task<Void> taskLoadReport = loadReport(report);
             Task<Void> taskCheckMissingISRCs = checkMissingISRCs();
             taskLoadReport.setOnSucceeded(event -> {
@@ -1246,6 +1248,7 @@ public class ControllerRevenueGenerator {
 
     private Task<Void> loadReport(File report) {
         Task<Void> task;
+
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {

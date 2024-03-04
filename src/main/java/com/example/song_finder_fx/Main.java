@@ -131,7 +131,7 @@ public class Main extends Application {
                 .orElse(null);
     }
 
-    public static String getDirectoryFromDB() throws SQLException, ClassNotFoundException {
+    public static String getAudioDatabaseLocation() throws SQLException, ClassNotFoundException {
         Database.createTableForAudioDatabaseLocation();
         String directoryTemp = Database.searchForAudioDB();
         selectedDirectory = new File(directoryTemp);
