@@ -38,9 +38,14 @@ shadowJar {
     }
 }
 
+//javafx {
+//    version = '21-ea+24'
+//    modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
+//}
+
 javafx {
-    version = '21-ea+24'
-    modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
+    version = "17" // Use the version that is compatible with your project
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web' ]
 }
 
 dependencies {
