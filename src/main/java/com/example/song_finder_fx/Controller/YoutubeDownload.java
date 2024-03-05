@@ -10,16 +10,16 @@ public class YoutubeDownload {
     public static void main(String[] args) {
         System.out.println("test done");
 //        String url = "https://www.youtube.com/watch?v=Z8X_1R1s4as";
-        String url ="https://www.youtube.com/watch?v=m5Lgc1upeOw";
+        String url = "https://www.youtube.com/watch?v=m5Lgc1upeOw";
 
-    String file = "test22";
-    dwnloadAudio(url,file);
+        String file = "test22";
+        dwnloadAudio(url, file);
     }
 
     public static void dwnloadAudio(String url, String file) {
         String s = "done";
         System.out.println("audio method");
-        String fileLo = "C:\\Users\\Public\\Documents\\downFile\\";
+        String fileLo = "F:\\FTP\\Downloads";
         String file1 = fileLo + file;
         try {
             System.out.println("file locaton+" + file1);
@@ -35,11 +35,11 @@ public class YoutubeDownload {
 
         System.out.println(url);
         System.out.println(file);
-       String s = "test";
+        String s = "test";
 
         try {
 
-            String nodeScriptPath = "D:\\Sudesh\\JavaScript Project\\downloadAudio.js";
+            String nodeScriptPath = "src/main/resources/com/example/song_finder_fx/libs/downloadAudio.js";
 //            String nodeScriptPath = "D:\\Sudesh\\JavaScript Project\\nn/downloadAudio.js";
 //            String nodeScriptPath = "D:\\code/downloadAudio.js";
 
@@ -51,7 +51,7 @@ public class YoutubeDownload {
             String filePath = file;
             System.out.println(url + "url of downld");
             System.out.println(file + " file location");
-            System.out.println(nodeScriptPath+"node path");
+            System.out.println(nodeScriptPath + "node path");
 
             ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, videoURL, filePath);
             Process process = processBuilder.start();
