@@ -69,7 +69,7 @@
                   <Insets bottom="20.0" left="20.0" right="20.0" />
                </VBox.margin>
             </VBox>
-            <Button mnemonicParsing="false" onAction="#onAddManualClaim" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Add Manual Claim">
+            <Button fx:id="btnAddClaim" mnemonicParsing="false" onAction="#onAddManualClaim" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Add Manual Claim">
                <VBox.margin>
                   <Insets bottom="20.0" left="20.0" right="20.0" />
                </VBox.margin>

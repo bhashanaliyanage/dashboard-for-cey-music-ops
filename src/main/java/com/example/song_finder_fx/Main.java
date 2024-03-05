@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.ProductVersion;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;

@@ -2,11 +2,10 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Model.FUGAReport;
 import com.example.song_finder_fx.Model.Songs;
-import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -27,14 +26,12 @@ public class DatabasePostgre {
         try {
             Class.forName("org.postgresql.Driver");
             conn = DriverManager.getConnection("jdbc:postgresql://192.168.1.200:5432/" + dbname, user, pass);
-
-            if (conn != null) {
-                System.out.println("Connection Established!");
-            } else {
-                System.out.println("Error Connecting to Database");
-            }
         } catch (Exception e) {
-            System.out.println("e = " + e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("An error occurred");
+            alert.setContentText(String.valueOf(e));
+            Platform.runLater(alert::showAndWait);
         }
 
         return conn;
@@ -101,4 +98,37 @@ public class DatabasePostgre {
 
         return song;
     }
+
+    public static int addManualClaim(String songName, String lyricist, String composer, String url) throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = String.format("INSERT INTO public.manual_claims (song_name, composer, lyricist, youtube_id) VALUES ('%s', '%s', '%s', '%s');", songName, composer, lyricist, url);
+        return statement.executeUpdate(query);
+    }
+
+    public static int checkPreviousClaims(String id) throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = String.format("SELECT COUNT(youtube_id) FROM public.manual_claims WHERE youtube_id = '%s';", id);
+        ResultSet rs = statement.executeQuery(query);
+        int count = 0;
+
+        while (rs.next()) {
+            count = rs.getInt(1);
+        }
+
+        return count;
+    }
+
+    /*public static String getAddedClaims(String id) throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = String.format("SELECT * FROM public.manual_claims WHERE youtube_id = '%s';", id);
+        ResultSet rs = statement.executeQuery(query);
+        if (rs.isBeforeFirst()) {
+            while (rs.next()) {
+
+            }
+        }
+    }*/
 }

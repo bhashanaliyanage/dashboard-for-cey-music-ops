@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 
 public class NotificationBuilder {
-    public void displayTrayInfo(String caption, String message) throws AWTException {
+    public static void displayTrayInfo(String caption, String message) throws AWTException {
         SystemTray tray = SystemTray.getSystemTray();
 
         Image image = new ImageIcon("com/example/song_finder_fx/icons/icon.png").getImage();
