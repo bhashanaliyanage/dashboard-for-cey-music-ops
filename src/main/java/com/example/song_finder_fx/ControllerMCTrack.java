@@ -78,7 +78,7 @@ public class ControllerMCTrack {
         TextField txtURL = (TextField) scene.lookup("#txtURL");
         VBox vboxTracks = (VBox) scene.lookup("#vboxTracks");
 
-        Node nodeTrack = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual-claims-track.fxml")));
+        Node nodeTrack = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
         String trackName = txtTrackTitle.getText();
         String lyricist = txtLyricist.getText();
         String composer = txtComposer.getText();
@@ -92,7 +92,7 @@ public class ControllerMCTrack {
         boolean ifAnyNull = checkData();
 
         if (!ifAnyNull) {
-            ManualClaimTrack track = new ManualClaimTrack(trackName, lyricist, composer, url);
+            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, url);
             ManualClaims.manualClaims.add(track);
             titledPane.setText(trackName);
             titledPane.setExpanded(false);

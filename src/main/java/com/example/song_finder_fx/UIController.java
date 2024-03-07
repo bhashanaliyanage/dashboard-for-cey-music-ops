@@ -1091,7 +1091,7 @@ public class UIController {
     public void onManualClaimsBtnClick(MouseEvent mouseEvent) throws IOException {
         changeSelectorTo(rctManualClaims);
 
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual-claims.fxml")));
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-main.fxml")));
         mainVBox.getChildren().setAll(node);
     }
 }

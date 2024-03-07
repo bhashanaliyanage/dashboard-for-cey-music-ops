@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
@@ -66,19 +67,29 @@ public class InitPreloader implements Initializable {
 
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
+            ResultSet top5Territories = null;
+            ResultSet top4DSPs = null;
+            String assetCount = null;
+            ResultSet top5StreamedAssets = null;
+            String salesDate;
+            String month = null;
             try {
-                ResultSet top5Territories = DatabaseMySQL.getTop5Territories();
-                ResultSet top4DSPs = DatabaseMySQL.getTop4DSPs();
-                String assetCount = DatabaseMySQL.getTotalAssetCount();
-                ResultSet top5StreamedAssets = DatabaseMySQL.getTop5StreamedAssets();
-                String salesDate = DatabaseMySQL.getSalesDate();
+                top5Territories = DatabasePostgre.getTop5Territories();
+                top4DSPs = DatabasePostgre.getTop4DSPs();
+                assetCount = DatabasePostgre.getTotalAssetCount();
+                top5StreamedAssets = DatabasePostgre.getTop5StreamedAssets();
+                salesDate = DatabasePostgre.getSalesDate();
                 String[] date = salesDate.split("-");
-                String month = date[1];
-
-                revenue.setValues(top5Territories, top4DSPs, assetCount, top5StreamedAssets, month);
-            } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                month = date[1];
+            } catch (SQLException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("An error occurred");
+                alert.setContentText(String.valueOf(e));
+                Platform.runLater(alert::showAndWait);
             }
+
+            revenue.setValues(top5Territories, top4DSPs, assetCount, top5StreamedAssets, month);
         });
 
         Thread updatesCheck = new Thread(() -> {

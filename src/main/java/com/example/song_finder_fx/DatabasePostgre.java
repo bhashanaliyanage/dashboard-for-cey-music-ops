@@ -1,6 +1,7 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Model.FUGAReport;
+import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
@@ -120,15 +121,78 @@ public class DatabasePostgre {
         return count;
     }
 
-    /*public static String getAddedClaims(String id) throws SQLException {
+    public static String getManualClaimCount() throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
-        String query = String.format("SELECT * FROM public.manual_claims WHERE youtube_id = '%s';", id);
+        String query = "SELECT COUNT(youtube_id) FROM public.manual_claims WHERE ingest_status = false AND archive = false;";
         ResultSet rs = statement.executeQuery(query);
-        if (rs.isBeforeFirst()) {
-            while (rs.next()) {
+        rs.next();
+        int count = rs.getInt(1);
+        return String.valueOf(count);
+    }
 
+    public static ResultSet getTop5Territories() throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        String query = "SELECT territory, SUM(reported_royalty) AS total_royalty\n" +
+                "FROM public.report GROUP BY territory ORDER BY total_royalty DESC LIMIT 5;";
+        return statement.executeQuery(query);
+    }
+
+    public static ResultSet getTop4DSPs() throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        String query = "SELECT dsp, SUM(reported_royalty) AS total_royalty\n" +
+                "FROM public.report GROUP BY dsp ORDER BY total_royalty DESC LIMIT 5;";
+        return statement.executeQuery(query);
+    }
+
+    public static String getTotalAssetCount() throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        String query = "SELECT COUNT(*) FROM (SELECT asset_isrc FROM public.report GROUP BY asset_isrc) AS subquery;";
+        ResultSet resultSet = statement.executeQuery(query);
+        resultSet.next();
+
+        return resultSet.getString(1);
+    }
+
+    public static ResultSet getTop5StreamedAssets() throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        String query = "SELECT asset_isrc, song_name, reported_royalty FROM public.song_royalty LIMIT 5;";
+        return statement.executeQuery(query);
+    }
+
+    public static String getSalesDate() throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = "SELECT sale_start_date FROM public.report LIMIT 1;";
+        ResultSet resultSet = statement.executeQuery(query);
+        resultSet.next();
+        return resultSet.getString(1);
+    }
+
+    public static List<ManualClaimTrack> getManualClaims() throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = "SELECT * FROM public.manual_claims WHERE ingest_status = false AND archive = false;";
+        ResultSet resultSet = statement.executeQuery(query);
+        List<ManualClaimTrack> manualClaims = new ArrayList<>();
+
+        if (resultSet.isBeforeFirst()) {
+            while (resultSet.next()) {
+                int id = resultSet.getInt(6);
+                String songName = resultSet.getString(1);
+                String composer = resultSet.getString(2);
+                String lyrics = resultSet.getString(3);
+                String youTubeLink = "https://www.youtube.com/watch?v=" + resultSet.getString(4);
+
+                ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink);
+                manualClaims.add(manualClaimTrack);
             }
         }
-    }*/
+
+        return manualClaims;
+    }
 }

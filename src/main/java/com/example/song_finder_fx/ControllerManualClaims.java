@@ -5,8 +5,10 @@ import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 
@@ -58,7 +60,7 @@ public class ControllerManualClaims {
 
                     ytPlayer.getEngine().load(embedID);
 
-                    Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual-claims-track.fxml")));
+                    Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
                     vboxTracks.getChildren().setAll(node);
                 } else {
                     System.out.println("No");
@@ -84,9 +86,17 @@ public class ControllerManualClaims {
                 NotificationBuilder.displayTrayError("Error!", "Error Adding Manual Claim");
             } else {
                 NotificationBuilder.displayTrayInfo("Manual Claim Added", "Your Claim for " + songName + " is successfully added");
-                Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual-claims-track.fxml")));
+                Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
                 vboxTracks.getChildren().setAll(node);
             }
         }
+    }
+
+    @FXML
+    void onGoBack(MouseEvent event) throws IOException {
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-main.fxml")));
+        Scene scene = ((Node) event.getSource()).getScene();
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+        mainVBox.getChildren().setAll(node);
     }
 }
