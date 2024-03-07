@@ -1,23 +1,35 @@
 package com.example.song_finder_fx.Controller;
 
+import com.mysql.cj.x.protobuf.MysqlxPrepare;
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.Objects;
 
 public class YoutubeDownload {
 
 
-    public static void main(String[] args) {
-        System.out.println("test done");
-//        String url = "https://www.youtube.com/watch?v=Z8X_1R1s4as";
-        String url = "https://www.youtube.com/watch?v=m5Lgc1upeOw";
+//    public static void main(String[] args) {
+//        System.out.println("test done");
+////        String url = "https://www.youtube.com/watch?v=Z8X_1R1s4as";
+//        String url = "https://www.youtube.com/watch?v=m5Lgc1upeOw";
+//
+//        String file = "test22";
+//        dwnloadAudio(url, file);
+//    }
 
-        String file = "test22";
-        dwnloadAudio(url, file);
-    }
+
 
     public static void dwnloadAudio(String url, String file) {
         String s = "done";
         System.out.println("audio method");
-        String fileLo = "F:\\FTP\\Downloads";
+        String fileLo = "D:\\Downloads\\";
         String file1 = fileLo + file;
         try {
             System.out.println("file locaton+" + file1);
@@ -37,8 +49,8 @@ public class YoutubeDownload {
 
         try {
 
-            String nodeScriptPath = "src/main/resources/com/example/song_finder_fx/libs/downloadAudio.js";
-//            String nodeScriptPath = "D:\\Sudesh\\JavaScript Project\\nn/downloadAudio.js";
+//            String nodeScriptPath = "src/main/resources/com/example/song_finder_fx/libs/downloadAudio.js";
+            String nodeScriptPath = "D:\\Sudesh\\JavaScript Project\\nn/downloadAudio.js";
 //            String nodeScriptPath = "D:\\code/downloadAudio.js";
 
 //			String videoURL = "https://www.youtube.com/watch?v=O5O3yK8DJCc";
@@ -67,5 +79,56 @@ public class YoutubeDownload {
 
 
     }
+
+
+    public static void main(String[] args) {
+        String filePath = "C:\\Users\\Public\\Documents\\downFile\\test";
+        String outputFilePath = "C:\\Users\\Public\\Documents\\downFile\\test1cut.mp3";
+        String result = "fail";
+        String  startTime = "00:01:00";
+        String endTime = "00:01:26";
+        System.out.println("method in11");
+        try {
+            cutAudio(filePath,outputFilePath,startTime,endTime);
+            result = "done";
+            System.out.println(result);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public static String cutAudio(String filePath,String outputPath,String startTime,String EndTime){
+        String s = "done";
+//        String startTime =
+        try {
+
+            String nodeScriptPPath = "D:\\code/cutAud.js";
+            System.out.println(filePath+" File path111111");
+            System.out.println(outputPath+" out path11111111");
+            System.out.println(startTime+" time2222");
+//            String nodeScriptPPath = "D:\\code/cutAud.js";
+
+            ProcessBuilder processBuilder =  new ProcessBuilder("node",nodeScriptPPath,filePath,outputPath,startTime,EndTime);
+            Process process = processBuilder.start();
+
+            int exitCode =  process.waitFor();
+
+
+            if (exitCode == 0) {
+                System.out.println("Node.js script executed successfully.");
+            } else {
+                System.out.println("Error executing Node.js script. Exit code: " + exitCode+" Check selected File Name is correct??");
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  s;
+    }
+
+
+
+
 
 }
