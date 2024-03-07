@@ -71,21 +71,21 @@ public class ControllerMCList {
     }
 
     @FXML
-    void onCheck(ActionEvent event) {
+    void onCheck() {
         for (CheckBox checkBox : checkBoxes) {
             System.out.println(checkBox.isSelected());
         }
     }
 
     @FXML
-    void onSelectNone(ActionEvent event) {
+    void onSelectNone() {
         for (CheckBox checkBox : checkBoxes) {
             checkBox.setSelected(false);
         }
     }
 
     @FXML
-    void onSelectAll(ActionEvent event) {
+    void onSelectAll() {
         for (CheckBox checkBox : checkBoxes) {
             checkBox.setSelected(true);
         }
