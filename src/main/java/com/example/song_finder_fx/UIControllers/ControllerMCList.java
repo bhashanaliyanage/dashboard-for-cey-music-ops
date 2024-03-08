@@ -4,7 +4,6 @@ import com.example.song_finder_fx.ControllerSettings;
 import com.example.song_finder_fx.DatabasePostgre;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
