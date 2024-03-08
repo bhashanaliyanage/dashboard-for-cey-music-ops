@@ -195,4 +195,12 @@ public class DatabasePostgre {
 
         return manualClaims;
     }
+
+    public static void archiveSelectedClaim(String songNo) throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = String.format("UPDATE public.manual_claims SET archive = TRUE WHERE claim_id = %s;", songNo);
+
+        statement.executeUpdate(query);
+    }
 }

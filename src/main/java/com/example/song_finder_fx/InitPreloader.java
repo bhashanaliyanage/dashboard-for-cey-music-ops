@@ -155,7 +155,7 @@ public class InitPreloader implements Initializable {
                 stage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionNumber());
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
-                stage.setWidth(1300);
+                stage.setWidth(1350);
                 stage.setHeight(900);
                 stage.setScene(scene);
                 stage.show();

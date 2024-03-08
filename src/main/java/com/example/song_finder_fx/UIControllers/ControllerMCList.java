@@ -3,11 +3,13 @@ package com.example.song_finder_fx.UIControllers;
 import com.example.song_finder_fx.ControllerSettings;
 import com.example.song_finder_fx.DatabasePostgre;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -36,6 +38,8 @@ public class ControllerMCList {
 
     public static List<HBox> hBoxes = new ArrayList<>();
 
+    public static List<Label> labelsSongNo = new ArrayList<>();
+
     @FXML
     public void initialize() throws SQLException, IOException {
         lblClaimCount.setText(DatabasePostgre.getManualClaimCount());
@@ -44,7 +48,10 @@ public class ControllerMCList {
 
         for (ManualClaimTrack claim : manualClaims) {
             Node node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../layouts/manual_claims/manual-claims-list-entry.fxml")));
+
             Label lblSongNo = (Label) node.lookup("#lblSongNo");
+            labelsSongNo.add(lblSongNo);
+
             Label lblSongName = (Label) node.lookup("#lblSongName");
             Label lblComposer = (Label) node.lookup("#lblComposer");
             Label lblLyricist = (Label) node.lookup("#lblLyricist");
@@ -92,8 +99,24 @@ public class ControllerMCList {
     }
 
     @FXML
-    void onArchiveSelected(ActionEvent event) {
-        // TODO: 3/7/2024 Implement method to loop through CheckBoxes and HBoxes
+    void onArchiveSelected() {
+        for (int i = 0; i < checkBoxes.size(); i++) {
+            if (checkBoxes.get(i).isSelected()) {
+                String songNo = labelsSongNo.get(i).getText();
+                try {
+                    DatabasePostgre.archiveSelectedClaim(songNo);
+                    hBoxes.get(i).setDisable(true);
+                } catch (SQLException e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("An error occurred");
+                    alert.setContentText(String.valueOf(e));
+                    Platform.runLater(alert::showAndWait);
+
+                    // e.printStackTrace();
+                }
+            }
+        }
     }
 
 }
