@@ -44,7 +44,10 @@ public class ControllerMCTrack {
     public void initialize() throws SQLException {
         // List<String> songTitles = DatabaseMySQL.getAllSongs();
         List<String> songTitles = DatabasePostgre.getAllSongTitles();
+        List<String> artistValidation = DatabasePostgre.getAllArtists();
         TextFields.bindAutoCompletion(txtTrackTitle, songTitles);
+        TextFields.bindAutoCompletion(txtComposer, artistValidation);
+        TextFields.bindAutoCompletion(txtLyricist, artistValidation);
 
         txtTrackTitle.setOnAction(event -> {
             Songs songs;

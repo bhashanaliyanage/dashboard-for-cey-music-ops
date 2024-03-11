@@ -39,6 +39,12 @@ public class ControllerMCList {
 
     public static List<Label> labelsSongNo = new ArrayList<>();
 
+    public static List<Label> labelsSongName = new ArrayList<>();
+
+    public static List<Label> labelsComposer = new ArrayList<>();
+
+    public static List<Label> labelsLyricist = new ArrayList<>();
+
     @FXML
     public void initialize() throws SQLException, IOException {
         lblClaimCount.setText(DatabasePostgre.getManualClaimCount());
@@ -50,11 +56,12 @@ public class ControllerMCList {
 
             Label lblSongNo = (Label) node.lookup("#lblSongNo");
             labelsSongNo.add(lblSongNo);
-
             Label lblSongName = (Label) node.lookup("#lblSongName");
+            labelsSongName.add(lblSongName);
             Label lblComposer = (Label) node.lookup("#lblComposer");
+            labelsComposer.add(lblComposer);
             Label lblLyricist = (Label) node.lookup("#lblLyricist");
-
+            labelsLyricist.add(lblLyricist);
             CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
             checkBoxes.add(checkBox);
             HBox hboxEntry = (HBox) node.lookup("#hboxEntry");

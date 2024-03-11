@@ -203,4 +203,19 @@ public class DatabasePostgre {
 
         statement.executeUpdate(query);
     }
+
+    public static List<String> getAllArtists() throws SQLException {
+        Connection conn = getConn();
+        String query = "SELECT artist_name FROM public.artists ORDER BY artist_name ASC;";
+        Statement statement = conn.createStatement();
+        List<String> artists = new ArrayList<>();
+
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            String artist = rs.getString(1);
+            artists.add(artist);
+        }
+
+        return artists;
+    }
 }

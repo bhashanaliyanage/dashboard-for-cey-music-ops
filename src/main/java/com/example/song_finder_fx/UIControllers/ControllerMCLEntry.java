@@ -34,14 +34,20 @@ public class ControllerMCLEntry {
         System.out.println("ControllerMCLEntry.onEdit");
         Scene scene = SceneController.getSceneFromEvent(event);
         VBox sideVBox = SceneController.getSideVBox(scene);
-        Node layoutNode = SceneController.loadLayout("layouts/manual_claims/manual-claims-track.fxml");
+        Node layoutNode = SceneController.loadLayout("layouts/manual_claims/sidepanel-claim-edit.fxml");
         sideVBox.getChildren().setAll(layoutNode);
 
         Label lblClaimID = SceneController.getLabelFromScene(scene, "lblClaimID");
-        Label lblSongName = SceneController.getLabelFromScene(scene, "lblSongName");
+        Label lblTrackName = SceneController.getLabelFromScene(scene, "lblTrackName");
         TextField txtSongName = SceneController.getTextFieldFromScene(scene, "txtSongName");
         TextField txtComposer = SceneController.getTextFieldFromScene(scene, "txtComposer");
         TextField txtLyricist = SceneController.getTextFieldFromScene(scene, "txtLyricist");
+
+        lblClaimID.setText(lblSongNo.getText());
+        lblTrackName.setText(lblSongName.getText());
+        txtSongName.setText(lblSongName.getText());
+        txtComposer.setText(lblComposer.getText());
+        txtLyricist.setText(lblLyricist.getText());
     }
 
 }

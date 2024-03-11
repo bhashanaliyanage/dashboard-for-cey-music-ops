@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="466.0" prefWidth="250.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefWidth="250.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIControllers.ControllerManualClaimEdit">
    <Label text="Edit Claim">
       <font>
          <Font name="Segoe UI Semibold" size="19.0" />
@@ -19,51 +19,51 @@
    </Label>
    <HBox>
       <VBox.margin>
-         <Insets left="20.0"/>
+         <Insets left="20.0" />
       </VBox.margin>
-      <Label fx:id="lblClaimID" minWidth="20.0" text="10." textFill="#656565"/>
-      <Label fx:id="lblSongName" layoutX="10.0" layoutY="10.0" minWidth="20.0" text="Song Name" textFill="#656565"/>
+      <Label fx:id="lblClaimID" text="10" textFill="#656565" />
+      <Label fx:id="lblClaimID1" layoutX="10.0" layoutY="10.0" text="." textFill="#656565" />
+      <Label fx:id="lblTrackName" layoutX="10.0" layoutY="10.0" minWidth="20.0" text="Song Name" textFill="#656565">
+         <HBox.margin>
+            <Insets left="5.0" />
+         </HBox.margin></Label>
    </HBox>
    <VBox>
       <VBox.margin>
-         <Insets left="20.0" right="20.0" top="30.0"/>
+         <Insets left="20.0" right="20.0" top="30.0" />
       </VBox.margin>
-      <Label text="Song Name"/>
+      <Label text="Song Name" />
       <TextField fx:id="txtSongName" promptText="Song Name" styleClass="textarea-bg">
          <VBox.margin>
-            <Insets top="5.0"/>
+            <Insets top="5.0" />
          </VBox.margin>
       </TextField>
    </VBox>
    <VBox layoutX="30.0" layoutY="105.0">
       <VBox.margin>
-         <Insets left="20.0" right="20.0" top="10.0"/>
+         <Insets left="20.0" right="20.0" top="10.0" />
       </VBox.margin>
-      <Label text="Composer"/>
+      <Label text="Composer" />
       <TextField fx:id="txtComposer" promptText="Composer" styleClass="textarea-bg">
          <VBox.margin>
-            <Insets top="5.0"/>
+            <Insets top="5.0" />
          </VBox.margin>
       </TextField>
    </VBox>
    <VBox layoutX="10.0" layoutY="149.0">
       <VBox.margin>
-         <Insets left="20.0" right="20.0" top="10.0"/>
+         <Insets left="20.0" right="20.0" top="10.0" />
       </VBox.margin>
-      <Label text="Lyricist"/>
+      <Label text="Lyricist" />
       <TextField fx:id="txtLyricist" promptText="Lyricist" styleClass="textarea-bg">
          <VBox.margin>
-            <Insets top="5.0"/>
+            <Insets top="5.0" />
          </VBox.margin>
       </TextField>
    </VBox>
-   <VBox alignment="BOTTOM_CENTER" VBox.vgrow="ALWAYS">
+   <Button mnemonicParsing="false" onAction="#onSave" prefHeight="27.0" prefWidth="210.0" styleClass="button-big" text="Save Changes">
       <VBox.margin>
-         <Insets left="20.0" right="20.0" top="10.0"/>
+         <Insets bottom="10.0" left="20.0" top="15.0" />
       </VBox.margin>
-      <padding>
-         <Insets bottom="20.0"/>
-      </padding>
-      <Button mnemonicParsing="false" styleClass="button-big" text="Save Changes"/>
-   </VBox>
+   </Button>
 </VBox>
