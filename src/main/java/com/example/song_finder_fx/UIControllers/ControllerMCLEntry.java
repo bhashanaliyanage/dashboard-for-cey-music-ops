@@ -27,9 +27,6 @@ public class ControllerMCLEntry {
     private Label lblSongNo;
 
     @FXML
-    private CheckBox checkBox;
-
-    @FXML
     void onEdit(MouseEvent event) throws IOException {
         System.out.println("ControllerMCLEntry.onEdit");
         Scene scene = SceneController.getSceneFromEvent(event);

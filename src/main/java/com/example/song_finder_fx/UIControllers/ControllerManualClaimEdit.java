@@ -13,12 +13,6 @@ public class ControllerManualClaimEdit {
     private Label lblClaimID;
 
     @FXML
-    private Label lblClaimID1;
-
-    @FXML
-    private Label lblTrackName;
-
-    @FXML
     private TextField txtComposer;
 
     @FXML
@@ -28,7 +22,7 @@ public class ControllerManualClaimEdit {
     private TextField txtSongName;
 
     @FXML
-    void onSave(ActionEvent event) {
+    void onSave() {
         String songID = lblClaimID.getText();
         String trackName = txtSongName.getText();
         String composer = txtComposer.getText();
