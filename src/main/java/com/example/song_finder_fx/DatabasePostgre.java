@@ -218,4 +218,11 @@ public class DatabasePostgre {
 
         return artists;
     }
+
+    public static void editManualClaim(String songID, String trackName, String composer, String lyricist) throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = String.format("UPDATE public.manual_claims SET song_name = '%s', composer = '%s', lyricist = '%s' WHERE claim_id = %s;", trackName, composer, lyricist, songID);
+        statement.executeUpdate(query);
+    }
 }

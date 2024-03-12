@@ -1,9 +1,12 @@
 package com.example.song_finder_fx.UIControllers;
 
+import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.ControllerSettings;
 import com.example.song_finder_fx.DatabasePostgre;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
+import com.opencsv.CSVWriter;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -16,7 +19,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +54,12 @@ public class ControllerMCList {
 
     @FXML
     public void initialize() throws SQLException, IOException {
+        checkBoxes.clear();
+        hBoxes.clear();
+        labelsSongNo.clear();
+        labelsSongName.clear();
+        labelsComposer.clear();
+        labelsLyricist.clear();
         lblClaimCount.setText(DatabasePostgre.getManualClaimCount());
 
         List<ManualClaimTrack> manualClaims = DatabasePostgre.getManualClaims();
@@ -84,10 +97,53 @@ public class ControllerMCList {
     }
 
     @FXML
-    void onCheck() {
-        for (CheckBox checkBox : checkBoxes) {
-            System.out.println(checkBox.isSelected());
+    void onCheck(ActionEvent event) throws IOException {
+        Node node = SceneController.loadLayout("layouts/manual_claims/manual-claims-identifiers.fxml");
+        Scene scene = SceneController.getSceneFromEvent(event);
+        VBox main = SceneController.getMainVBox(scene);
+        main.getChildren().setAll(node);
+
+        /*for (int i = 0; i < checkBoxes.size(); i++) {
+            if (checkBoxes.get(i).isSelected()) {
+                Node entry = SceneController.loadLayout("layouts/manual_claims/mci-entry.fxml");
+
+                vbClaimsList.getChildren().add(entry);
+            }
+        }*/
+
+        // CSV Process
+        /*Path tempDir = Files.createTempDirectory("ingest");
+        Path csvFile = tempDir.resolve("ingest.csv");
+        CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
+        String[] header = {"//Field name:", "Album title", "Album version", "UPC", "Catalog number",
+                "Primary artists", "Featuring artists", "Release date", "Main genre",
+                "Main subgenre", "Alternate genre", "Alternate subgenre", "Label",
+                "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory",
+                "Recording year", "Recording location", "Album format", "Number of volumes",
+                "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier",
+                "Track title", "Track version", "ISRC", "Track primary artists",
+                "Track featuring artists", "Volume number", "Track main genre",
+                "Track main subgenre", "Track alternate genre", "Track alternate subgenre",
+                "Track language (Metadata)", "Audio language", "Lyrics", "Available separately",
+                "Track parental advisory", "Preview start", "Preview length",
+                "Track recording year", "Track recording location", "Contributing artists",
+                "Composers", "Lyricists", "Remixers", "Performers", "Producers",
+                "Writers", "Publishers", "Track sequence", "Track catalog tier",
+                "Original file name", "Original release date", "Movement title",
+                "Classical key", "Classical work", "Always send display title",
+                "Movement number", "Classical catalog"};
+
+        csvWriter.writeNext(header);
+
+        for (int i = 0; i < checkBoxes.size(); i++) {
+            if (checkBoxes.get(i).isSelected()) {
+                System.out.println("labelsSongName = " + labelsSongName.get(i).getText());
+            }
         }
+
+        csvWriter.close();
+
+        System.out.println("csvFile = " + csvFile);*/
     }
 
     @FXML

@@ -1,10 +1,13 @@
 package com.example.song_finder_fx.UIControllers;
 
+import com.example.song_finder_fx.DatabaseMySQL;
+import com.example.song_finder_fx.DatabasePostgre;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class ControllerManualClaimEdit {
@@ -22,7 +25,7 @@ public class ControllerManualClaimEdit {
     private TextField txtSongName;
 
     @FXML
-    void onSave() {
+    void onSave() throws SQLException {
         String songID = lblClaimID.getText();
         String trackName = txtSongName.getText();
         String composer = txtComposer.getText();
@@ -30,6 +33,8 @@ public class ControllerManualClaimEdit {
 
         for (int i = 0; i < ControllerMCList.labelsSongNo.size(); i++) {
             if (Objects.equals(ControllerMCList.labelsSongNo.get(i).getText(), songID)) {
+                DatabasePostgre.editManualClaim(songID, trackName, composer, lyricist);
+
                 ControllerMCList.labelsSongName.get(i).setText(trackName);
                 ControllerMCList.labelsComposer.get(i).setText(composer);
                 ControllerMCList.labelsLyricist.get(i).setText(lyricist);

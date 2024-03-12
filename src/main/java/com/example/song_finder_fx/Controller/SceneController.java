@@ -1,6 +1,7 @@
 package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.ControllerSettings;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -36,5 +37,16 @@ public class SceneController {
 
     public static TextField getTextFieldFromScene(Scene scene, String fxid) {
         return (TextField) scene.lookup("#" + fxid);
+    }
+
+    public static VBox getMainVBoxFromEvent(ActionEvent event) {
+        Scene scene = getSceneFromEvent(event);
+        assert scene != null;
+        return getMainVBox(scene);
+    }
+
+    public static Scene getSceneFromEvent(ActionEvent event) {
+        Node node = (Node) event.getSource();
+        return node.getScene();
     }
 }

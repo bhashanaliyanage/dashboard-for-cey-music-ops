@@ -868,7 +868,7 @@ public class ControllerRevenueGenerator {
      * }
      */
     public static void main(String[] args) throws IOException, CsvValidationException {
-        File csv = new File("D:\\Work\\dashboard-for-cey-music-ops\\CSV Template First.csv");
+        File csv = new File("resources/com/example/song_finder_fx/CSV Template First.csv");
         File csv1 = new File("D:\\Sudesh\\newrepo1.csv");
         int UPC = Integer.parseInt("0");
         List<CsvSong> songList = new ArrayList<>();
@@ -880,7 +880,8 @@ public class ControllerRevenueGenerator {
         String albumTitle = "Golden hits";
         songList = songlistRead1(csv);
         String PrimaryArtist = "Dharmasiri Gamage";
-        // writeCSVFile1(songList, csv1, upcArray, albumTitle, 1, catelogNum, PrimaryArtist);
+        String isrc = "LKA0W2213413";
+        writeCSVFile1(songList, csv1, upcArray, albumTitle, 1, catelogNum, PrimaryArtist, isrc);
     }
 
     //Read Csv
