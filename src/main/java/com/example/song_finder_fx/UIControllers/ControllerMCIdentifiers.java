@@ -1,14 +1,12 @@
 package com.example.song_finder_fx.UIControllers;
 
 import com.example.song_finder_fx.Controller.SceneController;
-import com.example.song_finder_fx.DatabasePostgre;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 public class ControllerMCIdentifiers {
 

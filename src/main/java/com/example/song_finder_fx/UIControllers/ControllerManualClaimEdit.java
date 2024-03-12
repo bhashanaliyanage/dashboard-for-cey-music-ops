@@ -1,8 +1,6 @@
 package com.example.song_finder_fx.UIControllers;
 
-import com.example.song_finder_fx.DatabaseMySQL;
 import com.example.song_finder_fx.DatabasePostgre;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
