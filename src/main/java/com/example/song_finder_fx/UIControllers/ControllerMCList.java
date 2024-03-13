@@ -20,9 +20,7 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ControllerMCList {
 
@@ -47,6 +45,12 @@ public class ControllerMCList {
 
     public static List<Label> labelsLyricist = new ArrayList<>();
 
+    public static List<ManualClaimTrack> manualClaims = new ArrayList<>();
+
+    public static List<ManualClaimTrack> finalManualClaims = new ArrayList<>();
+
+    public static Map<Integer, ManualClaimTrack> claimMap = new HashMap<>();
+
     @FXML
     public void initialize() throws SQLException, IOException {
         checkBoxes.clear();
@@ -55,11 +59,19 @@ public class ControllerMCList {
         labelsSongName.clear();
         labelsComposer.clear();
         labelsLyricist.clear();
+
         lblClaimCount.setText(DatabasePostgre.getManualClaimCount());
 
-        List<ManualClaimTrack> manualClaims = DatabasePostgre.getManualClaims();
+        manualClaims = DatabasePostgre.getManualClaims();
+
+
+        /*for (ManualClaimTrack claim : manualClaims) {
+            claimMap.put(claim.getId(), claim);
+        }*/
 
         for (ManualClaimTrack claim : manualClaims) {
+            claimMap.put(claim.getId(), claim);
+
             Node node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../layouts/manual_claims/manual-claims-list-entry.fxml")));
 
             Label lblSongNo = (Label) node.lookup("#lblSongNo");
@@ -79,6 +91,7 @@ public class ControllerMCList {
             lblSongName.setText(claim.getTrackName());
             lblComposer.setText(claim.getComposer());
             lblLyricist.setText(claim.getLyricist());
+
             vbClaimsList.getChildren().add(node);
         }
     }
@@ -93,18 +106,20 @@ public class ControllerMCList {
 
     @FXML
     void onCheck(ActionEvent event) throws IOException {
+        finalManualClaims.clear();
+        for (int i = 0; i < checkBoxes.size(); i++) {
+            if (checkBoxes.get(i).isSelected()) {
+                // ID, Name, Composer, Lyricist
+                int id = manualClaims.get(i).getId();
+                ManualClaimTrack claim = claimMap.get(id);
+                finalManualClaims.add(claim);
+            }
+        }
+
         Node node = SceneController.loadLayout("layouts/manual_claims/manual-claims-identifiers.fxml");
         Scene scene = SceneController.getSceneFromEvent(event);
         VBox main = SceneController.getMainVBox(scene);
         main.getChildren().setAll(node);
-
-        /*for (int i = 0; i < checkBoxes.size(); i++) {
-            if (checkBoxes.get(i).isSelected()) {
-                Node entry = SceneController.loadLayout("layouts/manual_claims/mci-entry.fxml");
-
-                vbClaimsList.getChildren().add(entry);
-            }
-        }*/
 
         // CSV Process
         /*Path tempDir = Files.createTempDirectory("ingest");

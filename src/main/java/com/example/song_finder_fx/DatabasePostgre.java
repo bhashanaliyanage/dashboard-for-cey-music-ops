@@ -22,17 +22,13 @@ public class DatabasePostgre {
     public static Connection getConn() {
         String dbname = "songdata";
         String user = "postgres";
-        String pass = "ceymusic";
+        String pass = "thusitha01";
 
         try {
             Class.forName("org.postgresql.Driver");
             conn = DriverManager.getConnection("jdbc:postgresql://192.168.1.200:5432/" + dbname, user, pass);
         } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("An error occurred");
-            alert.setContentText(String.valueOf(e));
-            Platform.runLater(alert::showAndWait);
+            e.printStackTrace();
         }
 
         return conn;
