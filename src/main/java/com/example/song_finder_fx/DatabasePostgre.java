@@ -3,8 +3,11 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Model.FUGAReport;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
+import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,7 +17,22 @@ public class DatabasePostgre {
     private static Connection conn;
 
     public static void main(String[] args) throws IOException, CsvValidationException, SQLException {
-        searchContributors("Mawathe Geethaya");
+        // searchContributors("Mawathe Geethaya");
+        File file = new File("src/main/resources/com/example/song_finder_fx/catalog_numbers.csv");
+        CSVReader reader = new CSVReader(new FileReader(file.getAbsolutePath()));
+        String[] nextLine;
+        while ((nextLine = reader.readNext()) != null) {
+            String catalogNumber = nextLine[0];
+            String artist_name = nextLine[1];
+
+            String[] parts = catalogNumber.split("-");
+            String prefix = parts[0];
+            int suffix = Integer.parseInt(parts[2]);
+            // System.out.println(artist_name + " | " + prefix + " | " + suffix);
+
+            int status = updateCatNo(artist_name, prefix, suffix);
+            System.out.println("Catalog number for " + artist_name + " " + status);
+        }
     }
 
     public static Connection getConn() {
@@ -30,6 +48,14 @@ public class DatabasePostgre {
         }
 
         return conn;
+    }
+
+    private static int updateCatNo(String artist_name, String cat_no_handler, int last_cat_no) throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = String.format("UPDATE public.artists SET cat_no_handler = '%s', last_cat_no = %s WHERE artist_name = '%s';", cat_no_handler, last_cat_no, artist_name);
+
+        return statement.executeUpdate(query);
     }
 
     public static int addRowFUGAReport(FUGAReport report, Connection conn) throws SQLException {
@@ -218,5 +244,37 @@ public class DatabasePostgre {
         Statement statement = conn.createStatement();
         String query = String.format("UPDATE public.manual_claims SET song_name = '%s', composer = '%s', lyricist = '%s' WHERE claim_id = %s;", trackName, composer, lyricist, songID);
         statement.executeUpdate(query);
+    }
+
+    public static String getCatNo(String composer, String lyricist) throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = String.format("SELECT cat_no_handler, last_cat_no FROM public.artists WHERE artist_name = '%s';", composer);
+        ResultSet rs = statement.executeQuery(query);
+
+        String result;
+
+        if (rs.isBeforeFirst()) {
+            rs.next();
+            String prefix = rs.getString(1);
+            int suffix = rs.getInt(2);
+            suffix++;
+            String formattedSuffix = String.format("%03d", suffix);
+            result = prefix + "-CEY-" + formattedSuffix;
+        } else {
+            query = String.format("SELECT cat_no_handler, last_cat_no FROM public.artists WHERE artist_name = '%s", lyricist);
+            rs = statement.executeQuery(query);
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                String prefix = rs.getString(1);
+                int suffix = rs.getInt(2);
+                suffix++;
+                String formattedSuffix = String.format("%03d", suffix);
+                result = prefix + "-CEY-" + formattedSuffix;
+            } else {
+                result = null;
+            }
+        }
+        return result;
     }
 }
