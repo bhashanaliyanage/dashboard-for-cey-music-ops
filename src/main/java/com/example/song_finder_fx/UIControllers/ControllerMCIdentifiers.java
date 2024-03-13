@@ -12,7 +12,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,7 +21,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -133,8 +131,7 @@ public class ControllerMCIdentifiers {
 
     private static String getYear(String releaseDate) {
         String[] releaseDateSplit = releaseDate.split("-");
-        String year = releaseDateSplit[0];
-        return year;
+        return releaseDateSplit[0];
     }
 
     @NotNull

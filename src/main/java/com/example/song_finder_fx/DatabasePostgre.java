@@ -44,7 +44,7 @@ public class DatabasePostgre {
             Class.forName("org.postgresql.Driver");
             conn = DriverManager.getConnection("jdbc:postgresql://192.168.1.200:5432/" + dbname, user, pass);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Error Connecting to database = " + e);
         }
 
         return conn;
