@@ -30,9 +30,6 @@ public class ControllerMCList {
     @FXML
     private VBox vbClaimsList;
 
-    @FXML
-    private ScrollPane scrlpneClaimsList;
-
     public static List<CheckBox> checkBoxes = new ArrayList<>();
 
     public static List<HBox> hBoxes = new ArrayList<>();
