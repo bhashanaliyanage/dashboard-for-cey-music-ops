@@ -726,7 +726,7 @@ public class DatabaseMySQL {
     }
 
     public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
-        File csv = new File("src/main/resources/com/example/song_finder_fx/Catalog Numbers List.csv");
+        File csv = new File("src/main/resources/com/example/song_finder_fx/catalog_numbers.csv");
         CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).build();
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement("UPDATE artists\n" +

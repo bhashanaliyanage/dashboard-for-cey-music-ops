@@ -38,7 +38,7 @@ public class DatabasePostgre {
     public static Connection getConn() {
         String dbname = "songdata";
         String user = "postgres";
-        String pass = "thusitha01";
+        String pass = "ceymusic";
 
         try {
             Class.forName("org.postgresql.Driver");
