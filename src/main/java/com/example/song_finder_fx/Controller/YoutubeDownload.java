@@ -11,14 +11,12 @@ public class YoutubeDownload {
         String url = "https://www.youtube.com/watch?v=m5Lgc1upeOw";
 
         String file = "test22";
-        dwnloadAudio(url, file);
+        // downloadAudio(url, file);
     }
 
-    public static void dwnloadAudio(String url, String file) {
-        String s = "done";
+    public static void downloadAudio(String url, String fileLocation, String fileName) {
         System.out.println("audio method");
-        String fileLo = "F:\\FTP\\Downloads";
-        String file1 = fileLo + file;
+        String file1 = fileLocation + fileName;
         try {
             System.out.println("file locaton+" + file1);
             downloadAudioOnly(url, file1);

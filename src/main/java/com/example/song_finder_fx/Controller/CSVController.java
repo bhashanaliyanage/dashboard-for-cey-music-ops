@@ -189,7 +189,7 @@ public class CSVController {
         return groupedISRCs;
     }
 
-    public void getReportedRoyalty(List<String> groupedISRCs) throws IOException, CsvValidationException {
+    public void getReportedRoyalty(List<String> groupedISRCs) {
         try {
             CSVReader reader = new CSVReader(new FileReader(csv));
             reader.readNext(); // Skip the header line

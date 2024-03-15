@@ -1,7 +1,10 @@
 package com.example.song_finder_fx.UIControllers;
 
 import com.example.song_finder_fx.Controller.SceneController;
+import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.DatabasePostgre;
+import com.example.song_finder_fx.Main;
+import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.opencsv.CSVWriter;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -13,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,6 +38,8 @@ public class ControllerMCIdentifiers {
     public static List<TextField> claimCNumbers = new ArrayList<>();
 
     public static List<TextField> claimISRCs = new ArrayList<>();
+
+    private String currentISRC;
 
     @FXML
     public void initialize() throws IOException {
@@ -57,6 +63,8 @@ public class ControllerMCIdentifiers {
             claimISRCs.add(claimISRC);
 
             vbClaimsList.getChildren().add(entry);
+
+            // currentISRC = "";
         }
     }
 
@@ -69,64 +77,154 @@ public class ControllerMCIdentifiers {
     void onGenerate(MouseEvent event) throws IOException, SQLException {
         System.out.println("ControllerMCIdentifiers.onGenerate");
 
-        Path tempDir = Files.createTempDirectory("ingest");
-        Path csvFile = tempDir.resolve("ingest.csv");
-        CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
+        File destination = Main.browseLocationNew(SceneController.getWindowFromMouseEvent(event));
+        String filePath = destination.getAbsolutePath() + "/ingest.csv";
+        File file = new File(filePath);
+        CSVWriter csvWriter = new CSVWriter(new FileWriter(file));
+
+        String[] header = getHeader();
+        csvWriter.writeNext(header);
+
+        currentISRC = "";
+
+        for (int claim = 0; claim < ControllerMCList.finalManualClaims.size(); claim++) {
+            String albumTitle = ControllerMCList.finalManualClaims.get(claim).getTrackName();
+            String upc = upcs.get(claim).getText();
+
+            if (upc.isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Missing Identifier");
+                alert.setHeaderText("Missing UPC");
+                alert.setContentText("UPC number missing for claim: " + ControllerMCList.finalManualClaims.get(claim).getTrackName());
+
+                alert.showAndWait();
+            } else {
+                String[] CSV_Row = getCSV_Row(claim, albumTitle, upc);
+                csvWriter.writeNext(CSV_Row);
+
+                File folder = new File(destination, upc);
+                String fileName = CSV_Row[55];
+
+                if (!folder.exists()) {
+                    boolean folderCreated = folder.mkdir();
+                    if (folderCreated) {
+                        System.out.println("Folder created successfully: " + folder.getAbsolutePath());
+                        downloadAudio(claim, fileName, folder);
+
+                        
+
+                    } else {
+                        System.err.println("Error creating folder: " + folder.getAbsolutePath());
+                    }
+                } else {
+                    System.out.println("Folder already exists: " + folder.getAbsolutePath());
+                    downloadAudio(claim, fileName, folder);
+                }
+            }
+        }
+
+        csvWriter.close();
+
+        System.out.println("csvFile = " + file.getAbsolutePath());
+    }
+
+    private static void downloadAudio(int claim, String fileName, File folder) {
+        String url = ControllerMCList.finalManualClaims.get(claim).getYouTubeURL();
+        String fileLocation = folder.getAbsolutePath() + "\\";
+        YoutubeDownload.downloadAudio(url, fileLocation, fileName);
+    }
+
+    @NotNull
+    private String[] getCSV_Row(int i, String albumTitle, String upc) throws SQLException {
+        String catNo = getCatNo(i);
+        String primaryArtists = getPrimaryArtists(ControllerMCList.finalManualClaims.get(i));
+        String releaseDate = getDate();
+        String year = getYear(releaseDate);
+        String isrc = getISRC(i, currentISRC);
+        String composer = ControllerMCList.finalManualClaims.get(i).getComposer();
+        String lyricist = ControllerMCList.finalManualClaims.get(i).getLyricist();
+        String writers = String.format("%s | %s", composer, lyricist);
+        String originalFileName = ControllerMCList.finalManualClaims.get(i).getYoutubeID() + ".flac";
+        // System.out.println("currentISRC = " + currentISRC);
+
+        String[] row = {"", albumTitle, "", upc, catNo,
+                primaryArtists, "", releaseDate, "Pop",
+                "", "", "", "CeyMusic Records",
+                year, "CeyMusic Publishing", year, "CeyMusic Records", "N",
+                year, "Sri Lanka", "Single", "1",
+                "World", "", "SI", "",
+                albumTitle, "", isrc, primaryArtists,
+                "", "1", "Pop",
+                "", "", "",
+                "SI", "SI", "", "Y",
+                "N", "0", "30",
+                year, "Sri Lanka", "",
+                composer, lyricist, "", "", "",
+                writers, "CeyMusic Publishing | CeyMusic Publishing", "1", "Mid",
+                originalFileName, releaseDate};
+        return row;
+    }
+
+    @NotNull
+    private static String[] getHeader() {
         String[] header = {"//Field name:", "Album title", "Album version", "UPC", "Catalog number", // Done
                 "Primary artists", "Featuring artists", "Release date", "Main genre", // Done
                 "Main subgenre", "Alternate genre", "Alternate subgenre", "Label", // Done
                 "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory", // Done
                 "Recording year", "Recording location", "Album format", "Number of volumes", // Done
                 "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier", // Done
-                "Track title", "Track version", "ISRC", "Track primary artists",
-                "Track featuring artists", "Volume number", "Track main genre",
-                "Track main subgenre", "Track alternate genre", "Track alternate subgenre",
-                "Track language (Metadata)", "Audio language", "Lyrics", "Available separately",
-                "Track parental advisory", "Preview start", "Preview length",
-                "Track recording year", "Track recording location", "Contributing artists",
-                "Composers", "Lyricists", "Remixers", "Performers", "Producers",
-                "Writers", "Publishers", "Track sequence", "Track catalog tier",
+                "Track title", "Track version", "ISRC", "Track primary artists", // Done
+                "Track featuring artists", "Volume number", "Track main genre", // Done
+                "Track main subgenre", "Track alternate genre", "Track alternate subgenre", // Done
+                "Track language (Metadata)", "Audio language", "Lyrics", "Available separately", // Done
+                "Track parental advisory", "Preview start", "Preview length", // Done
+                "Track recording year", "Track recording location", "Contributing artists", // Done
+                "Composers", "Lyricists", "Remixers", "Performers", "Producers", // Done
+                "Writers", "Publishers", "Track sequence", "Track catalog tier", // Done
                 "Original file name", "Original release date", "Movement title",
                 "Classical key", "Classical work", "Always send display title",
                 "Movement number", "Classical catalog"};
-
-        csvWriter.writeNext(header);
-
-        for (int i = 0; i < ControllerMCList.finalManualClaims.size(); i++) {
-            String albumTitle = ControllerMCList.finalManualClaims.get(i).getTrackName();
-            String upc = upcs.get(i).getText();
-
-            if (upc.isEmpty()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Missing Identifier");
-                alert.setHeaderText("Missing UPC");
-                alert.setContentText("UPC number missing for claim: " + ControllerMCList.finalManualClaims.get(i).getTrackName());
-
-                alert.showAndWait();
-            } else {
-                String catNo = getCatNo(i);
-                String primaryArtists = getPrimaryArtists();
-                String releaseDate = getDate();
-                String year = getYear(releaseDate);
-
-                String[] row = {"", albumTitle, "", upc, catNo,
-                        primaryArtists, "", releaseDate, "Pop",
-                        "", "", "", "CeyMusic Records",
-                        year, "CeyMusic Publishing", year, "CeyMusic Records", "N",
-                        year, "Sri Lanka", "Single", "1",
-                        "World", "", "SI", ""};
-
-                csvWriter.writeNext(row);
-            }
-        }
-
-        csvWriter.close();
-
-        System.out.println("csvFile = " + csvFile);
+        return header;
     }
 
-    private String getPrimaryArtists() {
-        return "";
+    private String getISRC(int i, String isrc) throws SQLException {
+        final String[] userISRC = {claimISRCs.get(i).getText()};
+        if (Objects.equals(isrc, "")) {
+            if (userISRC[0].isEmpty()) {
+                userISRC[0] = DatabasePostgre.getNewUGCISRC();
+                System.out.println("isrc[0] = " + userISRC[0]);
+            }
+
+            currentISRC = userISRC[0];
+
+            return currentISRC;
+        } else {
+            if (userISRC[0].isEmpty()) {
+                // Extract prefix (first 7 characters)
+                String prefix = currentISRC.substring(0, 7);
+
+                // Extract suffix (remaining characters)
+                String suffixStr = currentISRC.substring(7);
+                int suffix = Integer.parseInt(suffixStr);
+                suffix++;
+
+                // Format the suffix as a 5-digit integer
+                String formattedSuffix = String.format("%05d", suffix);
+
+                currentISRC = prefix + formattedSuffix;
+
+                return currentISRC;
+            } else {
+                return userISRC[0];
+            }
+        }
+    }
+
+    private String getPrimaryArtists(ManualClaimTrack manualClaimTrack) {
+        String lyricist = manualClaimTrack.getLyricist();
+        String composer = manualClaimTrack.getComposer();
+
+        return String.format("%s | %s", composer, lyricist);
     }
 
     private static String getYear(String releaseDate) {
@@ -145,13 +243,28 @@ public class ControllerMCIdentifiers {
         final String[] catNo = {claimCNumbers.get(i).getText()};
 
         if (catNo[0].isEmpty()) {
-            catNo[0] = DatabasePostgre.getCatNo(ControllerMCList.finalManualClaims.get(i).getComposer(), ControllerMCList.finalManualClaims.get(i).getLyricist());
+            String composer = ControllerMCList.finalManualClaims.get(i).getComposer();
+            System.out.println("composer = " + composer);
+            String lyricist = ControllerMCList.finalManualClaims.get(i).getLyricist();
+            System.out.println("lyricist = " + lyricist);
+            catNo[0] = DatabasePostgre.getCatNo(composer, lyricist);
+            if (catNo[0] == null) {
+                TextInputDialog inputDialog = new TextInputDialog(null);
+                inputDialog.setTitle("Cannot find Catalog Number");
+                inputDialog.setHeaderText("Enter a new catalog number for " + composer + " or " + lyricist);
+                inputDialog.setContentText("Catalog Number:");
+                inputDialog.showAndWait().ifPresent(newCatNo -> {
+                    System.out.println("New catalog number entered: " + newCatNo);
+                    catNo[0] = newCatNo;
+                });
+            }
+            assert catNo[0] != null;
             String[] parts = catNo[0].split("-");
             // TODO: 3/13/2024 Show an alert box and get the catalog number from user if no catalog number is returned from the database
             if (Objects.equals(parts[0], "null")) {
                 TextInputDialog inputDialog = new TextInputDialog(catNo[0]);
-                inputDialog.setTitle("Catalog Number");
-                inputDialog.setHeaderText("Enter a new catalog number:");
+                inputDialog.setTitle("Cannot find Catalog Number");
+                inputDialog.setHeaderText("Enter a new catalog number for " + composer + " or " + lyricist);
                 inputDialog.setContentText("Catalog Number:");
                 inputDialog.showAndWait().ifPresent(newCatNo -> {
                     System.out.println("New catalog number entered: " + newCatNo);

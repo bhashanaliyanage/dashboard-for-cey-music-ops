@@ -50,4 +50,8 @@ public class ManualClaimTrack {
     public void setStatus(boolean status) {
         this.status = status;
     }
+
+    public String getYouTubeURL() {
+        return "https://www.youtube.com/watch?v=" + youtubeID;
+    }
 }
