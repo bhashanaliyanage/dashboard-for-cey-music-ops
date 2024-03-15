@@ -19,8 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -111,7 +109,7 @@ public class ControllerMCIdentifiers {
                         System.out.println("Folder created successfully: " + folder.getAbsolutePath());
                         downloadAudio(claim, fileName, folder);
 
-                        
+
 
                     } else {
                         System.err.println("Error creating folder: " + folder.getAbsolutePath());

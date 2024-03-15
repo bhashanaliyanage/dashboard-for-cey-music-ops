@@ -4,16 +4,6 @@ import java.io.IOException;
 
 public class YoutubeDownload {
 
-
-    public static void main(String[] args) {
-        System.out.println("test done");
-//        String url = "https://www.youtube.com/watch?v=Z8X_1R1s4as";
-        String url = "https://www.youtube.com/watch?v=m5Lgc1upeOw";
-
-        String file = "test22";
-        // downloadAudio(url, file);
-    }
-
     public static void downloadAudio(String url, String fileLocation, String fileName) {
         System.out.println("audio method");
         String file1 = fileLocation + fileName;
