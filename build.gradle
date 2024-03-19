@@ -79,6 +79,14 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
     implementation 'org.postgresql:postgresql:42.7.2'
+
+    //audio cut
+    implementation files('libs/jl1.0.1.jar')
+
+
+
+
+
 }
 
 test {
