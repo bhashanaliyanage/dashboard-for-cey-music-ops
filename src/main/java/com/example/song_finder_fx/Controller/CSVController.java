@@ -81,13 +81,10 @@ public class CSVController {
         return rowcount;
     }
 
-    public boolean setFUGAReport(File report) {
-        boolean status = false;
+    public void setFUGAReport(File report) {
         if (report.canRead()) {
             this.csv = report;
-            status = true;
         }
-        return status;
     }
 
     public int loadFUGAReport(Label lblReportProgress, ImageView imgImportCaution, Label lbl_import) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
@@ -96,7 +93,8 @@ public class CSVController {
         BufferedReader bReader = new BufferedReader(new FileReader(csv));
         Connection conn = DatabasePostgre.getConn();
 
-        DatabaseMySQL.emptyReportTable();
+        // DatabaseMySQL.emptyReportTable();
+        DatabasePostgre.emptyReportTable();
 
         int totalRowCount = getReportTotalRowCount(bReader);
         int rowcount2 = 0; // While loop's row count
@@ -134,9 +132,7 @@ public class CSVController {
         long durationInNano = endTime - startTime;
         double durationInSeconds = (double) durationInNano / 1_000_000_000;
 
-        Platform.runLater(() -> {
-            System.out.println("Execution time: " + durationInSeconds + " seconds");
-        });
+        Platform.runLater(() -> System.out.println("Execution time: " + durationInSeconds + " seconds"));
 
         return status;
     }
@@ -189,34 +185,4 @@ public class CSVController {
         return groupedISRCs;
     }
 
-    public void getReportedRoyalty(List<String> groupedISRCs) {
-        try {
-            CSVReader reader = new CSVReader(new FileReader(csv));
-            reader.readNext(); // Skip the header line
-
-            for (String isrc : groupedISRCs) {
-                double totalRoyalty = 0.0;
-                String[] record;
-                while ((record = reader.readNext()) != null) {
-                    if (record[17].equals(isrc)) {
-                        if (record.length >= 27) { // Ensure the record has at least 27 columns
-                            String reportedRoyaltyStr = record[26]; // Assuming 27th column (index 26)
-                            try {
-                                double reportedRoyalty = Double.parseDouble(reportedRoyaltyStr);
-                                totalRoyalty += reportedRoyalty;
-                            } catch (NumberFormatException e) {
-                                // Handle invalid numeric values
-                            }
-                        }
-                    }
-                }
-                System.out.println("ISRC: " + isrc + ", Total reported royalty: $" + totalRoyalty);
-                reader.close(); // Close and reopen the reader for the next ISRC
-                reader = new CSVReader(new FileReader(csv));
-                reader.readNext(); // Skip the header line again
-            }
-        } catch (IOException | CsvValidationException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

@@ -303,4 +303,11 @@ public class DatabasePostgre {
 
         return "Error!";
     }
+
+    public static void emptyReportTable() throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = "DELETE FROM public.report;";
+        statement.executeUpdate(query);
+    }
 }
