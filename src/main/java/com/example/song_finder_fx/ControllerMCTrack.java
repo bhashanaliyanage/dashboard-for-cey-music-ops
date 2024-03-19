@@ -66,7 +66,8 @@ public class ControllerMCTrack {
 
         String songName = txtTrackTitle.getText();
         System.out.println("songName = " + songName);
-        Songs songs = DatabaseMySQL.searchContributors(songName);
+//        Songs songs = DatabaseMySQL.searchContributors(songName);
+        Songs songs =  DatabasePostgre.searchContributors(songName);
 
         txtComposer.setText(songs.getComposer());
         txtLyricist.setText(songs.getLyricist());

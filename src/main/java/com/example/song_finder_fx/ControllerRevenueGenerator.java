@@ -337,6 +337,8 @@ public class ControllerRevenueGenerator {
         Platform.runLater(() -> {
             try {
                 ResultSet rs = DatabaseMySQL.getBreakdownByDSP();
+//              ResultSet rs = DatabasePostgre.getBreakdownByDSP();   //Connection for Postgress
+
                 Path tempDir = Files.createTempDirectory("ceymusic_dashboard");
                 Path csvFile = tempDir.resolve("revenue_breakdown_dsp.csv");
                 CSVWriter writer = new CSVWriter(new FileWriter(csvFile.toFile()));
@@ -371,6 +373,7 @@ public class ControllerRevenueGenerator {
         Platform.runLater(() -> {
             try {
                 ResultSet rs = DatabaseMySQL.getBreakdownByTerritory();
+//                ResultSet rs = DatabasePostgre.getBreakdownByTerritory();     //Connection for Postgress
 
                 Path tempDir = Files.createTempDirectory("ceymusic_dashboard");
                 Path csvFile = tempDir.resolve("revenue_breakdown_territory.csv");
@@ -417,6 +420,7 @@ public class ControllerRevenueGenerator {
                 @Override
                 protected Void call() throws Exception {
                     boolean status = DatabaseMySQL.updateSongsTable(file, lblSongDB_Update, lblSongDB_Progress);
+//                    boolean status = DatabasePostgre.updateSongsTable(file, lblSongDB_Update, lblSongDB_Progress);        //Postgress
 
                     if (status) {
                         Platform.runLater(() -> {
@@ -451,6 +455,7 @@ public class ControllerRevenueGenerator {
                 @Override
                 protected Void call() throws Exception {
                     boolean status = DatabaseMySQL.updateSongsTable(file, lblUpdateSongsDatabase, lblUpdateSongsDatabase);
+//                    boolean status = DatabasePostgre.updateSongsTable(file, lblUpdateSongsDatabase, lblUpdateSongsDatabase);      //Postgress
 
                     if (status) {
                         Platform.runLater(() -> lblUpdateSongsDatabase.setText("Done"));
@@ -489,6 +494,8 @@ public class ControllerRevenueGenerator {
                 });
 
                 ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+//                ResultSet resultSet = DatabasePostgre.checkMissingISRCs();        //Postgress
+
                 int rowCount = 0;
 
                 while (resultSet.next()) {
@@ -515,6 +522,8 @@ public class ControllerRevenueGenerator {
                         try {
                             lblStatus.setText("Loading Payees...");
                             ResultSet rsPayees = DatabaseMySQL.getPayees();
+//                            ResultSet rsPayees = DatabasePostgre.getPayees();     //Postgress
+
                             while (rsPayees.next()) {
                                 comboPayees.getItems().add(rsPayees.getString(1));
                             }
@@ -604,6 +613,8 @@ public class ControllerRevenueGenerator {
                     protected Void call() {
                         try {
                             royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
+//                            royalty[0] = DatabasePostgre.getPayeeGrossRev(selectedItem);      //Postgress
+
                         } catch (SQLException | ClassNotFoundException e) {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Error");
@@ -650,6 +661,8 @@ public class ControllerRevenueGenerator {
                     protected Void call() throws SQLException, ClassNotFoundException {
                         // Get the co-writer name and share in EUR from the database
                         ResultSet rsCoWriterShares = DatabaseMySQL.getCoWriterShares(selectedItem);
+//                        ResultSet rsCoWriterShares = DatabasePostgre.getCoWriterShares(selectedItem);     //Postgress
+
                         int count = 0;
 
                         while (rsCoWriterShares.next()) { // Looping through writer 01 - 05
@@ -695,6 +708,8 @@ public class ControllerRevenueGenerator {
                     @Override
                     protected Void call() throws Exception {
                         ResultSet rsTopPerformingSongs = DatabaseMySQL.getTopPerformingSongsEdit(selectedItem);
+//                        ResultSet rsTopPerformingSongs = DatabasePostgre.getTopPerformingSongsEdit(selectedItem);     //Postgress
+
                         int count = 0;
 
                         while (rsTopPerformingSongs.next()) {
@@ -805,6 +820,8 @@ public class ControllerRevenueGenerator {
                     CSVReader reader = new CSVReader(new FileReader(file.getAbsolutePath()));
 
                     DatabaseMySQL.updatePayees(reader);
+//                    DatabasePostgre.updatePayees(reader);     //Postgress
+
                     return null;
                 }
             };

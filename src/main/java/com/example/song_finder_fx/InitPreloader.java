@@ -68,10 +68,21 @@ public class InitPreloader implements Initializable {
 
             try {
                 ResultSet top5Territories = DatabaseMySQL.getTop5Territories();
+//                ResultSet top5Territories = DatabasePostgre.getTop5Territories(); //Connection for Postgress
+
                 ResultSet top4DSPs = DatabaseMySQL.getTop4DSPs();
+//                ResultSet top4DSPs = DatabasePostgre.getTop4DSPs();       //Connection for Postgress
+
                 String assetCount = DatabaseMySQL.getTotalAssetCount();
+//                String assetCount = DatabasePostgre.getTotalAssetCount();     //Connection for Postgress
+
                 ResultSet top5StreamedAssets = DatabaseMySQL.getTop5StreamedAssets();
+//              ResultSet top5StreamedAssets = DatabasePostgre.getTop5StreamedAssets();     //Connection for Postgress
+
                 String salesDate = DatabaseMySQL.getSalesDate();
+//                String salesDate = DatabasePostgre.getSalesDate();        //Connection for Postgress
+
+
                 String[] date = salesDate.split("-");
                 String month = date[1];
 
@@ -88,6 +99,8 @@ public class InitPreloader implements Initializable {
 
             try {
                 ResultSet versionDetails = DatabaseMySQL.checkUpdates();
+//                ResultSet versionDetails = DatabasePostgre.checkUpdates();        //Connection for Postgress
+
                 if (versionDetails != null) {
                     versionDetails.next();
                     System.out.println("versionDetails = " + versionDetails.getDouble(1));

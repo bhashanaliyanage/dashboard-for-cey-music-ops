@@ -160,6 +160,8 @@ public class Main extends Application {
 
     public static void copyAudio(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
         DatabaseMySQL.searchAndCopySongs(isrc, directory, destination);
+//        DatabasePostgre.searchAndCopySongs(isrc, directory, destination);     //Postgress
+
     }
 
     public static File browseDestination() {

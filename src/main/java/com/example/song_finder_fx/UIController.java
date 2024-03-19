@@ -264,6 +264,7 @@ public class UIController {
                 try (Stream<Path> stream = Files.walk(start)) {
                     // Get file name to search for location from database
                     String fileName = DatabaseMySQL.searchFileName(isrc);
+//                    String fileName = DatabasePostgre.searchFileName(isrc);
                     // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
                     file[0] = stream
                             .filter(path -> path.toFile().isFile())

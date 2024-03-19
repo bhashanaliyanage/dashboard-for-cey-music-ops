@@ -97,6 +97,7 @@ public class CSVController {
         Connection conn = DatabasePostgre.getConn();
 
         DatabaseMySQL.emptyReportTable();
+//        DatabasePostgre.emptyReportTable();       //Postgress
 
         int totalRowCount = getReportTotalRowCount(bReader);
         int rowcount2 = 0; // While loop's row count
@@ -119,6 +120,7 @@ public class CSVController {
                 // status = DatabaseMySQL.addRowFUGAReport(report); // Dev Bhashana MySQL
                 // status = DatabaseMySQL.addRowFUGAReportnew(report); // Dev Sudesh MySQL SP
                 status = DatabasePostgre.addRowFUGAReport(report, conn);
+
             } catch (SQLException e) {
                 Platform.runLater(() -> {
                     lbl_import.setText("Import Error");
@@ -143,6 +145,8 @@ public class CSVController {
 
     public int writeMissingISRCs() throws SQLException, ClassNotFoundException, IOException {
         ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+//        ResultSet resultSet = DatabasePostgre.checkMissingISRCs();      //Connection for Postgress
+
         CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
         List<String[]> rows = new ArrayList<>();
 

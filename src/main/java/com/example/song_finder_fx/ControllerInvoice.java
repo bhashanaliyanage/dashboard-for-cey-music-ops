@@ -56,6 +56,7 @@ public class ControllerInvoice {
 
         // Connecting to database
         DatabaseMySQL db = new DatabaseMySQL();
+//        DatabasePostgre db =  new DatabasePostgre();      //Change database to postgress
 
         // Setting up UI
         scrlpneSongInvoice.setVisible(true);
