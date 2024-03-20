@@ -64,6 +64,18 @@ public class ControllerMCTrack {
         });
     }
 
+    public void getSongContributors(ActionEvent event) throws SQLException, ClassNotFoundException {
+        System.out.println("ControllerMCTrack.getSongContributors");
+
+        String songName = txtTrackTitle.getText();
+        System.out.println("songName = " + songName);
+//        Songs songs = DatabaseMySQL.searchContributors(songName);
+        Songs songs =  DatabasePostgre.searchContributors(songName);
+
+        txtComposer.setText(songs.getComposer());
+        txtLyricist.setText(songs.getLyricist());
+    }
+
     public void onAddTrack(ActionEvent event) throws IOException {
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();

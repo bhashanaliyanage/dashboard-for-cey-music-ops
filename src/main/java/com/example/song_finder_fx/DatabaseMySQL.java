@@ -506,12 +506,49 @@ public class DatabaseMySQL {
 
     public static void updatePayees(CSVReader reader) throws CsvValidationException, IOException, SQLException, ClassNotFoundException {
         // Getting Connection
-        Connection conn = getConn();
-        // Skipping the first line
-        reader.readNext();
-        PreparedStatement ps = conn.prepareStatement("INSERT INTO isrc_payees (ISRC, PAYEE, SHARE) " +
-                "VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE PAYEE=?, SHARE=?;");
+//        Connection conn = getConn();
 
+        //new Conn Postgre
+        System.out.println("inside update meth");
+        Connection conn = DatabasePostgre.getConn();
+        // Skipping the first line
+//        reader.readNext();
+//        PreparedStatement ps = conn.prepareStatement("INSERT INTO isrc_payees (ISRC, PAYEE, SHARE) " +
+//                "VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE PAYEE=?, SHARE=?;");
+
+
+        String sql  = "INSERT INTO isrc_payees (isrc, payee, share,payee01,payee01share,payee02,payee02share) VALUES (?,?,?,?,?,?,?)";
+
+        try {
+            String [] record;
+            while ((record = reader.readNext()) != null){
+                String isrc = record[0].trim();
+                String payee = record[1].trim();
+                String share = record[2].trim();
+
+                String payee01 = record[3].trim();
+                String payee01share  =record[4].trim();
+                String payee02 = record[5].trim();
+                String payee02share = record[6].trim();
+
+                PreparedStatement ps =  conn.prepareStatement(sql);
+                ps.setString(1,isrc);
+                ps.setString(2,payee);
+                ps.setString(3,share);
+                ps.setString(4,payee01);
+                ps.setString(5,payee01share);
+                ps.setString(6,payee02);
+                ps.setString(7,payee02share);
+                ps.executeUpdate();
+            }
+
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        /**
         String[] row;
         while ((row = reader.readNext()) != null) {
             // Assigning Variables
@@ -569,6 +606,7 @@ public class DatabaseMySQL {
                 ps.executeUpdate();
             }
         }
+        */
     }
 
     public static ResultSet getTopPerformingSongs(String selectedItem) throws SQLException, ClassNotFoundException {
@@ -728,6 +766,10 @@ public class DatabaseMySQL {
     public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
         File csv = new File("src/main/resources/com/example/song_finder_fx/catalog_numbers.csv");
         CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).build();
+        System.out.println("inside main");
+        updatePayees(csvReader);
+
+        /**
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement("UPDATE artists\n" +
                 "SET LAST_CAT_NO = ?\n" +
@@ -740,6 +782,7 @@ public class DatabaseMySQL {
             ps.setString(2, record[1]);
             ps.executeUpdate();
         }
+        */
 
         csvReader.close();
     }

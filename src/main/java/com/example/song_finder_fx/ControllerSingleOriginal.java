@@ -92,6 +92,9 @@ public class ControllerSingleOriginal {
         });
 
         ArrayList<String> artistNames = DatabaseMySQL.getArtistList();
+//        ArrayList<String> artistNames = DatabasePostgre.getArtistList();      //Postgress
+
+
         TextFields.bindAutoCompletion(txtArtist01, artistNames);
         TextFields.bindAutoCompletion(txtArtist02, artistNames);
         TextFields.bindAutoCompletion(txtArtist03, artistNames);
@@ -246,6 +249,8 @@ public class ControllerSingleOriginal {
                         System.out.println("Add artist to the database");
                         try {
                             DatabaseMySQL.registerNewCeyMusicArtist(artist);
+//                            DatabasePostgre.registerNewCeyMusicArtist(artist);        //Postgress
+
                             ingest.setArtist(artist, artistNumber);
                         } catch (SQLException | ClassNotFoundException e) {
                             Alert error = new Alert(Alert.AlertType.ERROR);
@@ -269,6 +274,9 @@ public class ControllerSingleOriginal {
             txtArtist01.setStyle("-fx-border-color: red;");
         } else {
             String catNo = DatabaseMySQL.getCatNoFor(mainArtist);
+//            String catNo = DatabasePostgre.getCatNoFor(mainArtist);       //Postgerss
+
+
             // System.out.println("catNo = " + catNo);
         if (catNo != null) {
             txtCatNo.setText(catNo);

@@ -65,6 +65,8 @@ public class ControllerSettings {
         }
     }
 
+
+    //not  use in Fxml
     public void onImportArtistsButtonClick() throws SQLException, ClassNotFoundException, IOException {
         System.out.println("ControllerSettings.onImportArtistsButtonClick");
 
@@ -76,10 +78,10 @@ public class ControllerSettings {
         btnImportArtists.setText("   " + csv.getName());
 
         // Make table
-        DatabaseMySQL.createTableArtists();
+//        DatabaseMySQL.createTableArtists();
 
         // Import to table in a separate thread
-        DatabaseMySQL.importToArtistsTable(csv);
+//        DatabaseMySQL.importToArtistsTable(csv);
 
         // Update user interface
         btnImportArtists.setText("   Execution Complete");

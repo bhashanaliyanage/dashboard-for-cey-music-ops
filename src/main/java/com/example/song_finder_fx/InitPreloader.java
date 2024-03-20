@@ -98,7 +98,9 @@ public class InitPreloader implements Initializable {
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
-                ResultSet versionDetails = DatabaseMySQL.checkUpdates();
+                // ResultSet versionDetails = DatabaseMySQL.checkUpdates();
+                ResultSet versionDetails = DatabasePostgre.checkUpdates();        //Connection for Postgress
+
                 if (versionDetails != null) {
                     versionDetails.next();
                     System.out.println("versionDetails = " + versionDetails.getDouble(1));

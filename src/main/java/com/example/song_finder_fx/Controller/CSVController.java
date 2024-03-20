@@ -138,7 +138,9 @@ public class CSVController {
     }
 
     public int writeMissingISRCs() throws SQLException, ClassNotFoundException, IOException {
-        ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+        // ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+        ResultSet resultSet = DatabasePostgre.checkMissingISRCs();      //Connection for Postgress
+
         CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
         List<String[]> rows = new ArrayList<>();
 
