@@ -64,7 +64,7 @@ public class ControllerMCTrack {
         });
     }
 
-    public void getSongContributors(ActionEvent event) throws SQLException, ClassNotFoundException {
+    public void getSongContributors() throws SQLException {
         System.out.println("ControllerMCTrack.getSongContributors");
 
         String songName = txtTrackTitle.getText();

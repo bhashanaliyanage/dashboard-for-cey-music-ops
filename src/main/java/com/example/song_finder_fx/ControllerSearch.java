@@ -2,7 +2,6 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
-import com.itextpdf.kernel.color.Lab;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;

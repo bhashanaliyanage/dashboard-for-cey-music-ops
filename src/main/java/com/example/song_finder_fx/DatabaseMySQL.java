@@ -22,7 +22,6 @@ import java.util.stream.Stream;
 
 public class DatabaseMySQL {
     private static Connection conn = null;
-    private static Connection con1 = null;
     static StringBuilder errorBuffer = new StringBuilder();
 
     public static Connection getConn() throws ClassNotFoundException, SQLException {
