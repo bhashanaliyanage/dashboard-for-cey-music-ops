@@ -1,7 +1,7 @@
 package com.example.song_finder_fx.UIControllers;
 
 import com.example.song_finder_fx.ControllerSettings;
-import com.example.song_finder_fx.DatabasePostgre;
+import com.example.song_finder_fx.DatabasePostgres;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -21,7 +21,7 @@ public class ControllerManualClaimsMain {
 
     @FXML
     public void initialize() throws SQLException {
-        lblClaimCount.setText(DatabasePostgre.getManualClaimCount());
+        lblClaimCount.setText(DatabasePostgres.getManualClaimCount());
     }
 
     @FXML

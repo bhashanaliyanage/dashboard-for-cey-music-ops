@@ -4,15 +4,12 @@ import com.example.song_finder_fx.Model.FUGAReport;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
-import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -27,16 +24,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class DatabasePostgre {
+public class DatabasePostgres {
 
     static StringBuilder errorBuffer = new StringBuilder();
     private static Connection conn;
 
-    /**
-     * public static void main(String[] args) throws IOException, CsvValidationException, SQLException {
-     * searchContributors("Mawathe Geethaya");
-     * }
-     */
     public static Connection getConn() {
         String dbname = "songdata";
         String user = "postgres";
@@ -313,15 +305,15 @@ public class DatabasePostgre {
         statement.executeUpdate(query);
     }
 
-    public static String searchFileName(String isrc) throws SQLException, ClassNotFoundException {
+    public static String searchFileName(String isrc) throws SQLException {
         Connection db = getConn();
         ResultSet rs;
         String filename = null;
+        Statement statement = db.createStatement();
 
-        PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME FROM songs WHERE ISRC = '?'");
-        ps.setString(1, isrc);
+        String query = String.format("SELECT FILE_NAME FROM songs WHERE ISRC = '%s'", isrc);
 
-        rs = ps.executeQuery();
+        rs = statement.executeQuery(query);
 
         while (rs.next()) {
             filename = rs.getString(1);
@@ -367,24 +359,6 @@ public class DatabasePostgre {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
 
-
-    public static int addRowFUGAReportnew(FUGAReport report) throws SQLException, ClassNotFoundException {
-        try (Connection db = DatabaseMySQL.getConntest();
-             CallableStatement cs = db.prepareCall("{call insert_report_new(?,?,?,?,?)}")) {
-
-            cs.setString(1, report.getAssetISRC());
-            cs.setDouble(2, report.getReportedRoyalty());
-            cs.setString(3, report.getTerritory());
-            cs.setString(4, report.getSaleStartDate());
-            cs.setString(5, report.getDsp());
-
-            return cs.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }
-
-    }
 
     /*public static ResultSet getTop5StreamedAssets() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
@@ -727,7 +701,7 @@ public class DatabasePostgre {
 
         //new Conn Postgre
         System.out.println("inside update meth");
-        Connection conn = DatabasePostgre.getConn();
+        Connection conn = DatabasePostgres.getConn();
         // Skipping the first line
 //        reader.readNext();
 //        PreparedStatement ps = conn.prepareStatement("INSERT INTO isrc_payees (ISRC, PAYEE, SHARE) " +

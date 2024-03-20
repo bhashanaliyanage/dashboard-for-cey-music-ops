@@ -263,8 +263,8 @@ public class UIController {
             protected Void call() throws Exception {
                 try (Stream<Path> stream = Files.walk(start)) {
                     // Get file name to search for location from database
-                    String fileName = DatabaseMySQL.searchFileName(isrc);
-//                    String fileName = DatabasePostgre.searchFileName(isrc);
+                    // String fileName = DatabaseMySQL.searchFileName(isrc);
+                    String fileName = DatabasePostgres.searchFileName(isrc);
                     // Copy the code from SearchSongsFromDB method in DatabaseMySQL.java
                     file[0] = stream
                             .filter(path -> path.toFile().isFile())
@@ -290,7 +290,7 @@ public class UIController {
                         });
                         System.out.println("File not found on audio database");
                     }
-                } catch (SQLException | ClassNotFoundException e) {
+                } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
                 return null;
@@ -351,7 +351,8 @@ public class UIController {
             @Override
             protected Void call() throws Exception {
                 try (Stream<Path> stream = Files.walk(start)) {
-                    String fileName = DatabaseMySQL.searchFileName(isrc);
+                    // String fileName = DatabaseMySQL.searchFileName(isrc);
+                    String fileName = DatabasePostgres.searchFileName(isrc);
                     Path file = stream
                             .filter(path -> path.toFile().isFile())
                             .filter(path -> path.getFileName().toString().equals(fileName))
@@ -381,7 +382,7 @@ public class UIController {
                         });
                         System.out.println("File not found on audio database");
                     }
-                } catch (SQLException | ClassNotFoundException e) {
+                } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
 

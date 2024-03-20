@@ -2,7 +2,7 @@ package com.example.song_finder_fx.UIControllers;
 
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.ControllerSettings;
-import com.example.song_finder_fx.DatabasePostgre;
+import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -56,9 +56,9 @@ public class ControllerMCList {
         labelsComposer.clear();
         labelsLyricist.clear();
 
-        lblClaimCount.setText(DatabasePostgre.getManualClaimCount());
+        lblClaimCount.setText(DatabasePostgres.getManualClaimCount());
 
-        manualClaims = DatabasePostgre.getManualClaims();
+        manualClaims = DatabasePostgres.getManualClaims();
 
 
         /*for (ManualClaimTrack claim : manualClaims) {
@@ -172,7 +172,7 @@ public class ControllerMCList {
             if (checkBoxes.get(i).isSelected()) {
                 String songNo = labelsSongNo.get(i).getText();
                 try {
-                    DatabasePostgre.archiveSelectedClaim(songNo);
+                    DatabasePostgres.archiveSelectedClaim(songNo);
                     hBoxes.get(i).setDisable(true);
                 } catch (SQLException e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);

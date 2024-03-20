@@ -1,7 +1,7 @@
 package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.DatabaseMySQL;
-import com.example.song_finder_fx.DatabasePostgre;
+import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.FUGAReport;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -91,10 +91,10 @@ public class CSVController {
         int status = 0;
         CSVReader reader = new CSVReader(new FileReader(csv.getAbsolutePath()));
         BufferedReader bReader = new BufferedReader(new FileReader(csv));
-        Connection conn = DatabasePostgre.getConn();
+        Connection conn = DatabasePostgres.getConn();
 
         // DatabaseMySQL.emptyReportTable();
-        DatabasePostgre.emptyReportTable();
+        DatabasePostgres.emptyReportTable();
 
         int totalRowCount = getReportTotalRowCount(bReader);
         int rowcount2 = 0; // While loop's row count
@@ -116,7 +116,7 @@ public class CSVController {
             try {
                 // status = DatabaseMySQL.addRowFUGAReport(report); // Dev Bhashana MySQL
                 // status = DatabaseMySQL.addRowFUGAReportnew(report); // Dev Sudesh MySQL SP
-                status = DatabasePostgre.addRowFUGAReport(report, conn);
+                status = DatabasePostgres.addRowFUGAReport(report, conn);
             } catch (SQLException e) {
                 Platform.runLater(() -> {
                     lbl_import.setText("Import Error");
@@ -138,8 +138,8 @@ public class CSVController {
     }
 
     public int writeMissingISRCs() throws SQLException, ClassNotFoundException, IOException {
-        // ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
-        ResultSet resultSet = DatabasePostgre.checkMissingISRCs();      //Connection for Postgress
+        ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+        // ResultSet resultSet = DatabasePostgres.checkMissingISRCs();      //Connection for Postgress
 
         CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
         List<String[]> rows = new ArrayList<>();

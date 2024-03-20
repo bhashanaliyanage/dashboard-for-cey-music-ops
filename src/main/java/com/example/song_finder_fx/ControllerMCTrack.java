@@ -43,8 +43,8 @@ public class ControllerMCTrack {
     @FXML
     public void initialize() throws SQLException {
         // List<String> songTitles = DatabaseMySQL.getAllSongs();
-        List<String> songTitles = DatabasePostgre.getAllSongTitles();
-        List<String> artistValidation = DatabasePostgre.getAllArtists();
+        List<String> songTitles = DatabasePostgres.getAllSongTitles();
+        List<String> artistValidation = DatabasePostgres.getAllArtists();
         TextFields.bindAutoCompletion(txtTrackTitle, songTitles);
         TextFields.bindAutoCompletion(txtComposer, artistValidation);
         TextFields.bindAutoCompletion(txtLyricist, artistValidation);
@@ -54,7 +54,7 @@ public class ControllerMCTrack {
             String songName = txtTrackTitle.getText();
             // System.out.println("songName = " + songName);
             try {
-                songs = DatabasePostgre.searchContributors(songName);
+                songs = DatabasePostgres.searchContributors(songName);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -70,7 +70,7 @@ public class ControllerMCTrack {
         String songName = txtTrackTitle.getText();
         System.out.println("songName = " + songName);
 //        Songs songs = DatabaseMySQL.searchContributors(songName);
-        Songs songs =  DatabasePostgre.searchContributors(songName);
+        Songs songs =  DatabasePostgres.searchContributors(songName);
 
         txtComposer.setText(songs.getComposer());
         txtLyricist.setText(songs.getLyricist());

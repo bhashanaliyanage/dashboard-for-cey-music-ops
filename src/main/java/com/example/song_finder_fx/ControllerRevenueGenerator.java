@@ -301,7 +301,7 @@ public class ControllerRevenueGenerator {
         Platform.runLater(() -> {
             try {
                 // ResultSet rs = DatabaseMySQL.getFullBreakdown();
-                ResultSet rs = DatabasePostgre.getFullBreakdown();
+                ResultSet rs = DatabasePostgres.getFullBreakdown();
                 Path tempDir = Files.createTempDirectory("ceymusic_dashboard");
                 Path csvFile = tempDir.resolve("revenue_breakdown_full.csv");
 

@@ -1,6 +1,6 @@
 package com.example.song_finder_fx.UIControllers;
 
-import com.example.song_finder_fx.DatabasePostgre;
+import com.example.song_finder_fx.DatabasePostgres;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -31,7 +31,7 @@ public class ControllerManualClaimEdit {
 
         for (int i = 0; i < ControllerMCList.labelsSongNo.size(); i++) {
             if (Objects.equals(ControllerMCList.labelsSongNo.get(i).getText(), songID)) {
-                DatabasePostgre.editManualClaim(songID, trackName, composer, lyricist);
+                DatabasePostgres.editManualClaim(songID, trackName, composer, lyricist);
 
                 ControllerMCList.labelsSongName.get(i).setText(trackName);
                 ControllerMCList.labelsComposer.get(i).setText(composer);

@@ -2,7 +2,7 @@ package com.example.song_finder_fx.UIControllers;
 
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
-import com.example.song_finder_fx.DatabasePostgre;
+import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Main;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.opencsv.CSVWriter;
@@ -189,7 +189,7 @@ public class ControllerMCIdentifiers {
         final String[] userISRC = {claimISRCs.get(i).getText()};
         if (Objects.equals(isrc, "")) {
             if (userISRC[0].isEmpty()) {
-                userISRC[0] = DatabasePostgre.getNewUGCISRC();
+                userISRC[0] = DatabasePostgres.getNewUGCISRC();
                 System.out.println("isrc[0] = " + userISRC[0]);
             }
 
@@ -245,7 +245,7 @@ public class ControllerMCIdentifiers {
             System.out.println("composer = " + composer);
             String lyricist = ControllerMCList.finalManualClaims.get(i).getLyricist();
             System.out.println("lyricist = " + lyricist);
-            catNo[0] = DatabasePostgre.getCatNo(composer, lyricist);
+            catNo[0] = DatabasePostgres.getCatNo(composer, lyricist);
             if (catNo[0] == null) {
                 TextInputDialog inputDialog = new TextInputDialog(null);
                 inputDialog.setTitle("Cannot find Catalog Number");

@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.UserSettingsManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class ControllerSettings {
     private UIController mainUIController = null;
@@ -88,12 +90,23 @@ public class ControllerSettings {
     }
 
     public void onSaveButtonClicked() throws SQLException, ClassNotFoundException {
-        System.out.println("Save Button Clicked");
+        // System.out.println("Save Button Clicked");
         File directory = Main.getSelectedDirectory();
 
-        if (directory != null) {
-            String directoryString = directory.getAbsolutePath();
-            Boolean status = Database.saveDirectory(directoryString);
+        if (Main.selectedDirectory.exists()) { // check if the directory exists
+            if (Main.selectedDirectory.isDirectory()) { // check if the directory is a directory
+                if (Main.selectedDirectory.canWrite()) {
+                    String directoryString = directory.getAbsolutePath();
+                    Properties settings = new Properties();
+                    settings.setProperty("adb", directoryString);
+                    UserSettingsManager.saveUserSettings(settings);
+                    btnSave.setText("Saved");
+                }
+            }
+        }
+
+        /*if (directory.isDirectory()) {
+            // Boolean status = Database.saveDirectory(directoryString);
 
             if (status) {
                 btnSave.setText("Saved");
@@ -104,7 +117,7 @@ public class ControllerSettings {
             }
         } else {
             System.out.println("Selected Directory is Null");
-        }
+        }*/
     }
 
     public void loadAbout(Node aboutView) throws IOException {

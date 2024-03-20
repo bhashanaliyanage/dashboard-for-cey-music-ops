@@ -44,7 +44,7 @@ public class ControllerManualClaims {
                     String ID = URL.substring(32);
 
                     // If this ID is in the manual claims database, show an alert.
-                    int previousClaims = DatabasePostgre.checkPreviousClaims(ID);
+                    int previousClaims = DatabasePostgres.checkPreviousClaims(ID);
                     if (previousClaims > 0) {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Previous Added Claims Found");
@@ -81,7 +81,7 @@ public class ControllerManualClaims {
             String lyricist = claim.getLyricist();
             String composer = claim.getComposer();
             String id = claim.getYoutubeID();
-            int status = DatabasePostgre.addManualClaim(songName, lyricist, composer, id);
+            int status = DatabasePostgres.addManualClaim(songName, lyricist, composer, id);
             if (status < 1) {
                 NotificationBuilder.displayTrayError("Error!", "Error Adding Manual Claim");
             } else {

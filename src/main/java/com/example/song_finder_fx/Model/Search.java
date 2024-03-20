@@ -1,7 +1,6 @@
 package com.example.song_finder_fx.Model;
 
 import com.example.song_finder_fx.DatabaseMySQL;
-import com.example.song_finder_fx.DatabasePostgre;
 
 import java.sql.SQLException;
 import java.util.List;

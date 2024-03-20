@@ -37,19 +37,6 @@ public class DatabaseMySQL {
     }
 
 
-    //new meth for testdb
-    public static Connection getConntest() throws ClassNotFoundException, SQLException {
-        Connection con1 = null;
-
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        String url = "jdbc:mysql://192.168.1.200/testdb";
-        String username = "ceymusic";
-        String password = "ceymusic";
-        con1 = DriverManager.getConnection(url, username, password);
-
-        return con1;
-    }
-
     public static String searchFileName(String isrc) throws SQLException, ClassNotFoundException {
         Connection db = getConn();
         ResultSet rs;
@@ -147,26 +134,6 @@ public class DatabaseMySQL {
                 "Converted_Gross_Income, Contract_deal_term, Reported_Royalty, Currency, Report_Run_ID, Report_ID, " +
                 "Sale_ID) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    }
-
-
-    //new 01/02/2023
-    public static int addRowFUGAReportnew(FUGAReport report) throws SQLException, ClassNotFoundException {
-        try (Connection db = DatabaseMySQL.getConntest();
-             CallableStatement cs = db.prepareCall("{call insert_report_new(?,?,?,?,?)}")) {
-
-            cs.setString(1, report.getAssetISRC());
-            cs.setDouble(2, report.getReportedRoyalty());
-            cs.setString(3, report.getTerritory());
-            cs.setString(4, report.getSaleStartDate());
-            cs.setString(5, report.getDsp());
-
-            return cs.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }
-
     }
 
 
@@ -510,7 +477,7 @@ public class DatabaseMySQL {
 
         //new Conn Postgre
         System.out.println("inside update meth");
-        Connection conn = DatabasePostgre.getConn();
+        Connection conn = DatabasePostgres.getConn();
         // Skipping the first line
 //        reader.readNext();
 //        PreparedStatement ps = conn.prepareStatement("INSERT INTO isrc_payees (ISRC, PAYEE, SHARE) " +

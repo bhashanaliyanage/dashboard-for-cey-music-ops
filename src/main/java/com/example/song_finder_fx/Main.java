@@ -1,8 +1,10 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.UserSettingsManager;
 import com.example.song_finder_fx.Model.ProductVersion;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -92,27 +94,30 @@ public class Main extends Application {
         return selectedDirectory;
     }
 
-    static boolean playAudio(Path start, String isrc) throws IOException {
+    static boolean playAudio(Path searchPath, String isrc) throws IOException {
         File file = null;
-        try (Stream<Path> stream = Files.walk(start)) {
+        System.out.println("searchPath = " + searchPath.toString());
+        try (Stream<Path> stream = Files.walk(searchPath)) {
+            Platform.runLater(() -> System.out.println("After walking..."));
             Path path = getFileByISRC(isrc, stream);
 
             if (path != null) {
                 file = new File(path.toUri());
-
                 AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
                 clip = AudioSystem.getClip();
                 clip.open(audioInputStream);
+                Platform.runLater(() -> System.out.println("Starting Audio..."));
                 clip.start();
                 return true;
             } else {
-                System.out.println("Cannot load file!");
+                Platform.runLater(() -> System.out.println("Cannot load file!"));
                 return false;
             }
 
         } catch (SQLException | ClassNotFoundException | LineUnavailableException e) {
-            // return false;
-            throw new RuntimeException(e);
+            Platform.runLater(() -> {
+                throw new RuntimeException(e);
+            });
         } catch (UnsupportedAudioFileException e) {
             System.out.println("Unsupported audio");
             if (Desktop.isDesktopSupported()) {
@@ -123,7 +128,7 @@ public class Main extends Application {
     }
 
     private static Path getFileByISRC(String isrc, Stream<Path> stream) throws SQLException, ClassNotFoundException {
-        String fileName = DatabaseMySQL.searchFileName(isrc);
+        String fileName = DatabasePostgres.searchFileName(isrc);
         return stream
                 .filter(path -> path.toFile().isFile())
                 .filter(path -> path.getFileName().toString().equals(fileName))
@@ -132,8 +137,9 @@ public class Main extends Application {
     }
 
     public static String getAudioDatabaseLocation() throws SQLException, ClassNotFoundException {
-        Database.createTableForAudioDatabaseLocation();
-        String directoryTemp = Database.searchForAudioDB();
+        UserSettingsManager userSettingsManager = new UserSettingsManager();
+        // Database.createTableForAudioDatabaseLocation();
+        String directoryTemp = userSettingsManager.getADB();
         selectedDirectory = new File(directoryTemp);
         return directoryTemp;
     }

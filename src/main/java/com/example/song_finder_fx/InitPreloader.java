@@ -74,11 +74,11 @@ public class InitPreloader implements Initializable {
             String salesDate;
             String month = null;
             try {
-                top5Territories = DatabasePostgre.getTop5Territories();
-                top4DSPs = DatabasePostgre.getTop4DSPs();
-                assetCount = DatabasePostgre.getTotalAssetCount();
-                top5StreamedAssets = DatabasePostgre.getTop5StreamedAssets();
-                salesDate = DatabasePostgre.getSalesDate();
+                top5Territories = DatabasePostgres.getTop5Territories();
+                top4DSPs = DatabasePostgres.getTop4DSPs();
+                assetCount = DatabasePostgres.getTotalAssetCount();
+                top5StreamedAssets = DatabasePostgres.getTop5StreamedAssets();
+                salesDate = DatabasePostgres.getSalesDate();
                 String[] date = salesDate.split("-");
                 month = date[1];
             } catch (SQLException e) {
@@ -98,8 +98,8 @@ public class InitPreloader implements Initializable {
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
-                // ResultSet versionDetails = DatabaseMySQL.checkUpdates();
-                ResultSet versionDetails = DatabasePostgre.checkUpdates();        //Connection for Postgress
+                ResultSet versionDetails = DatabaseMySQL.checkUpdates();
+                // ResultSet versionDetails = DatabasePostgres.checkUpdates();        //Connection for Postgress
 
                 if (versionDetails != null) {
                     versionDetails.next();
@@ -227,7 +227,7 @@ public class InitPreloader implements Initializable {
         Connection con;
         String message;
 
-        con = DatabasePostgre.getConn();
+        con = DatabasePostgres.getConn();
 
         if (con != null) {
             message = "Connection Succeed";
