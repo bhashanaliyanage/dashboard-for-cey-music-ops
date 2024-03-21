@@ -1,16 +1,6 @@
 package com.example.song_finder_fx.Controller;
 
-import com.mysql.cj.x.protobuf.MysqlxPrepare;
-
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.Objects;
 
 public class YoutubeDownload {
 

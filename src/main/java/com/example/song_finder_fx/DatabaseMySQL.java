@@ -36,7 +36,7 @@ public class DatabaseMySQL {
     }
 
 
-    public static String searchFileName(String isrc) throws SQLException, ClassNotFoundException {
+    /*public static String searchFileName(String isrc) throws SQLException, ClassNotFoundException {
         Connection db = getConn();
         ResultSet rs;
         String filename = null;
@@ -51,7 +51,7 @@ public class DatabaseMySQL {
         }
 
         return filename;
-    }
+    }*/
 
     public static void createTableArtists() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();

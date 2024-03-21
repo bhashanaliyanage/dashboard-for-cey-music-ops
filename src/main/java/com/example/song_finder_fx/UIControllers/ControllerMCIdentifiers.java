@@ -2,7 +2,6 @@ package com.example.song_finder_fx.UIControllers;
 
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
-import com.example.song_finder_fx.DatabaseMySQL;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Main;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
