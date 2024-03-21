@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -322,6 +323,72 @@ public class DatabasePostgres {
         return filename;
     }
 
+    public static int addIngest(LocalDate date, String userName, String filePath, String ingestFileName) throws SQLException {
+        Connection db = getConn();
+        String query = String.format("INSERT INTO public.ingests(ingest_date, user_name_note, root_folder, csv_filename) VALUES ('%s', '%s', '%s', '%s') RETURNING ingest_id;", date, userName, filePath, ingestFileName);
+        Statement statement = db.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        int id = 0;
+
+        if (rs.isBeforeFirst()) {
+            rs.next();
+            id = rs.getInt(1);
+            return id;
+        }
+
+        return id;
+    }
+
+    public static void addIngestProduct(int ingestID, String upc, String albumTitle, String s, String composer, String lyricist, String originalFileName) {
+        Connection db = getConn();
+
+    }
+
+    public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+        File csv = new File("src/main/resources/com/example/song_finder_fx/CeyMusic Song Database  - Song Artist DB Import - 03.csv");
+        CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).build();
+        // System.out.println("inside main");
+
+        insertSongArtists(csvReader);
+
+        csvReader.close();
+    }
+
+    private static void insertSongArtists(CSVReader csvReader) throws SQLException, IOException, CsvValidationException {
+        Connection db = getConn();
+        Statement statement = db.createStatement();
+        String isrc;
+        String artist;
+        String artist_type;
+        String[] line;
+
+        csvReader.readNext();
+
+        while ((line = csvReader.readNext()) != null) {
+            isrc = line[0];
+            artist_type = line[1];
+            artist = line[2];
+
+            // System.out.println("isrc = " + isrc);
+
+            String query = String.format("INSERT INTO public.song_artist (song_isrc, artist_id, artist_type) " +
+                    "VALUES ('%s', (SELECT artist_id FROM public.artists WHERE artist_name = '%s' LIMIT 1), '%s') " +
+                    "ON CONFLICT (song_isrc, artist_id, artist_type) DO UPDATE SET artist_type = EXCLUDED.artist_type;",
+                    isrc, artist, artist_type);
+
+            try {
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                String query2 = String.format("INSERT INTO public.artists(artist_name, status) VALUES ('%s', 3);", artist);
+                statement.executeUpdate(query2);
+                statement.executeUpdate(query);
+                System.out.println("isrc = " + isrc);
+                System.out.println("artist = " + artist);
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     public static void importToArtistsTable(File csv) throws SQLException, ClassNotFoundException, IOException {
         Connection db = DatabaseMySQL.getConn();
@@ -407,7 +474,7 @@ public class DatabasePostgres {
         return rs.getString(1);
     }*/
 
-//    public static ResultSet getFullBreakdown() throws SQLException, ClassNotFoundException {
+    //    public static ResultSet getFullBreakdown() throws SQLException, ClassNotFoundException {
 //        /*SELECT Asset_ISRC, SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END) AS 'AU_Earnings', (SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9 AS After_GST, SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END) AS 'Other_Territories_Earnings', ((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END)) AS Reported_Royalty_After_GST, (((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85 AS Reported_Royalty_For_CEYMUSIC FROM report GROUP BY Asset_ISRC;*/
 //        Connection db = DatabaseMySQL.getConn();
 //
@@ -694,7 +761,6 @@ public class DatabasePostgres {
         alert.showAndWait();
     }
 
-
     public static void updatePayees(CSVReader reader) throws CsvValidationException, IOException, SQLException, ClassNotFoundException {
         // Getting Connection
 //        Connection conn = getConn();
@@ -807,13 +873,6 @@ public class DatabasePostgres {
         return songs;
     }
 
-    /*public static void emptyReportTable() throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
-
-        PreparedStatement emptyTable = db.prepareStatement("DELETE FROM report;");
-        emptyTable.executeUpdate();
-    }*/
-
     public static Songs searchSongDetails(String isrc) throws SQLException, ClassNotFoundException {
         Songs song = new Songs();
         ResultSet rs;
@@ -890,15 +949,6 @@ public class DatabasePostgres {
 
         ps.executeUpdate();
         ps2.executeUpdate();
-    }
-
-    public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
-        File csv = new File("src/main/resources/com/example/song_finder_fx/Revenue Splits Export - August Revenue Report 2023.csv");
-        CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).build();
-        System.out.println("inside main");
-        updatePayees(csvReader);
-
-        csvReader.close();
     }
 
     public static String getCatNoFor(String mainArtist) throws SQLException, ClassNotFoundException {

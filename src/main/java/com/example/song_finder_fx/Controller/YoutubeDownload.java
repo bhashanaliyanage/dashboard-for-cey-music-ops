@@ -15,12 +15,11 @@ import java.util.Objects;
 public class YoutubeDownload {
 
     public static void downloadAudio(String url, String fileLocation, String fileName) {
-        System.out.println("audio method");
-        String file1 = fileLocation + fileName;
+        System.out.println("YoutubeDownload.downloadAudio");
+        String file = fileLocation + fileName;
         try {
-            System.out.println("file locaton+" + file1);
-            downloadAudioOnly(url, file1);
-            System.out.println("inside method");
+            System.out.println("file = " + file);
+            downloadAudioOnly(url, file);
         } catch (Exception e) {
             e.printStackTrace();
         }

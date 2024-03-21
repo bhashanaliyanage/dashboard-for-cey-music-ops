@@ -60,11 +60,6 @@ public class ControllerMCList {
 
         manualClaims = DatabasePostgres.getManualClaims();
 
-
-        /*for (ManualClaimTrack claim : manualClaims) {
-            claimMap.put(claim.getId(), claim);
-        }*/
-
         for (ManualClaimTrack claim : manualClaims) {
             claimMap.put(claim.getId(), claim);
 

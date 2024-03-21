@@ -2,6 +2,7 @@ package com.example.song_finder_fx.UIControllers;
 
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
+import com.example.song_finder_fx.DatabaseMySQL;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Main;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -72,51 +73,58 @@ public class ControllerMCIdentifiers {
     }
 
     @FXML
-    void onGenerate(MouseEvent event) throws IOException, SQLException {
+    void onGenerate(MouseEvent event) throws IOException, SQLException, ClassNotFoundException {
         System.out.println("ControllerMCIdentifiers.onGenerate");
 
         File destination = Main.browseLocationNew(SceneController.getWindowFromMouseEvent(event));
         String filePath = destination.getAbsolutePath() + "/ingest.csv";
         File file = new File(filePath);
         CSVWriter csvWriter = new CSVWriter(new FileWriter(file));
-
         String[] header = getHeader();
+        currentISRC = "";
+        LocalDate date = LocalDate.now();
+        String userName = System.getProperty("user.name");
+
         csvWriter.writeNext(header);
 
-        currentISRC = "";
+        int ingestID = DatabasePostgres.addIngest(date, userName, destination.getAbsolutePath(), "ingest.csv");
 
-        for (int claim = 0; claim < ControllerMCList.finalManualClaims.size(); claim++) {
-            String albumTitle = ControllerMCList.finalManualClaims.get(claim).getTrackName();
-            String upc = upcs.get(claim).getText();
+        if (ingestID > 0) {
+            for (int claim = 0; claim < ControllerMCList.finalManualClaims.size(); claim++) {
+                String albumTitle = ControllerMCList.finalManualClaims.get(claim).getTrackName();
+                String upc = upcs.get(claim).getText();
+                String composer = ControllerMCList.finalManualClaims.get(claim).getComposer();
+                String lyricist = ControllerMCList.finalManualClaims.get(claim).getLyricist();
+                String originalFileName = ControllerMCList.finalManualClaims.get(claim).getYoutubeID() + ".flac";
 
-            if (upc.isEmpty()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Missing Identifier");
-                alert.setHeaderText("Missing UPC");
-                alert.setContentText("UPC number missing for claim: " + ControllerMCList.finalManualClaims.get(claim).getTrackName());
+                if (upc.isEmpty()) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Missing Identifier");
+                    alert.setHeaderText("Missing UPC");
+                    alert.setContentText("UPC number missing for claim: " + ControllerMCList.finalManualClaims.get(claim).getTrackName());
 
-                alert.showAndWait();
-            } else {
-                String[] CSV_Row = getCSV_Row(claim, albumTitle, upc);
-                csvWriter.writeNext(CSV_Row);
-
-                File folder = new File(destination, upc);
-                String fileName = CSV_Row[55];
-
-                if (!folder.exists()) {
-                    boolean folderCreated = folder.mkdir();
-                    if (folderCreated) {
-                        System.out.println("Folder created successfully: " + folder.getAbsolutePath());
-                        downloadAudio(claim, fileName, folder);
-
-
-
-                    } else {
-                        System.err.println("Error creating folder: " + folder.getAbsolutePath());
-                    }
+                    alert.showAndWait();
                 } else {
-                    System.out.println("Folder already exists: " + folder.getAbsolutePath());
-                    downloadAudio(claim, fileName, folder);
+                    String[] CSV_Row = getCSV_Row(claim, albumTitle, upc, composer, lyricist, originalFileName);
+                    File folder = new File(destination, upc);
+                    String fileName = CSV_Row[55];
+
+                    csvWriter.writeNext(CSV_Row);
+
+                    if (!folder.exists()) {
+                        boolean folderCreated = folder.mkdir();
+
+                        if (folderCreated) {
+                            System.out.println("Folder created successfully: " + folder.getAbsolutePath());
+                            downloadAudio(claim, fileName, folder);
+                            DatabasePostgres.addIngestProduct(ingestID, upc, albumTitle, CSV_Row[28], composer, lyricist, originalFileName);
+                        } else {
+                            System.err.println("Error creating folder: " + folder.getAbsolutePath());
+                        }
+                    } else {
+                        System.out.println("Folder already exists: " + folder.getAbsolutePath());
+                        downloadAudio(claim, fileName, folder);
+                    }
                 }
             }
         }
@@ -133,19 +141,16 @@ public class ControllerMCIdentifiers {
     }
 
     @NotNull
-    private String[] getCSV_Row(int i, String albumTitle, String upc) throws SQLException {
+    private String[] getCSV_Row(int i, String albumTitle, String upc, String composer, String lyricist, String originalFileName) throws SQLException {
         String catNo = getCatNo(i);
         String primaryArtists = getPrimaryArtists(ControllerMCList.finalManualClaims.get(i));
         String releaseDate = getDate();
         String year = getYear(releaseDate);
         String isrc = getISRC(i, currentISRC);
-        String composer = ControllerMCList.finalManualClaims.get(i).getComposer();
-        String lyricist = ControllerMCList.finalManualClaims.get(i).getLyricist();
         String writers = String.format("%s | %s", composer, lyricist);
-        String originalFileName = ControllerMCList.finalManualClaims.get(i).getYoutubeID() + ".flac";
         // System.out.println("currentISRC = " + currentISRC);
 
-        String[] row = {"", albumTitle, "", upc, catNo,
+        return new String[]{"", albumTitle, "", upc, catNo,
                 primaryArtists, "", releaseDate, "Pop",
                 "", "", "", "CeyMusic Records",
                 year, "CeyMusic Publishing", year, "CeyMusic Records", "N",
@@ -160,7 +165,6 @@ public class ControllerMCIdentifiers {
                 composer, lyricist, "", "", "",
                 writers, "CeyMusic Publishing | CeyMusic Publishing", "1", "Mid",
                 originalFileName, releaseDate};
-        return row;
     }
 
     @NotNull
