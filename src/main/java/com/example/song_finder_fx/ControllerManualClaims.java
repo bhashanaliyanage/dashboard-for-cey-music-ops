@@ -81,7 +81,11 @@ public class ControllerManualClaims {
             String lyricist = claim.getLyricist();
             String composer = claim.getComposer();
             String id = claim.getYoutubeID();
-            int status = DatabasePostgres.addManualClaim(songName, lyricist, composer, id);
+            String trimStart = claim.getTrimStart();
+            String trimEnd = claim.getTrimEnd();
+
+            int status = DatabasePostgres.addManualClaim(claim);
+
             if (status < 1) {
                 NotificationBuilder.displayTrayError("Error!", "Error Adding Manual Claim");
             } else {

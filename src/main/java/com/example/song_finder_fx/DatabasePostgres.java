@@ -115,10 +115,10 @@ public class DatabasePostgres {
         return song;
     }
 
-    public static int addManualClaim(String songName, String lyricist, String composer, String url) throws SQLException {
+    public static int addManualClaim(String songName, String lyricist, String composer, String url, String trimStart, String trimEnd) throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
-        String query = String.format("INSERT INTO public.manual_claims (song_name, composer, lyricist, youtube_id) VALUES ('%s', '%s', '%s', '%s');", songName, composer, lyricist, url);
+        String query = String.format("INSERT INTO public.manual_claims (song_name, composer, lyricist, youtube_id, trim_start, trim_end) VALUES ('%s', '%s', '%s', '%s', '%s', '%s');", songName, composer, lyricist, url, trimStart, trimEnd);
         return statement.executeUpdate(query);
     }
 
@@ -191,7 +191,7 @@ public class DatabasePostgres {
     public static List<ManualClaimTrack> getManualClaims() throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
-        String query = "SELECT * FROM public.manual_claims WHERE ingest_status = false AND archive = false;";
+        String query = "SELECT * FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY public.manual_claims.claim_id ASC;";
         ResultSet resultSet = statement.executeQuery(query);
         List<ManualClaimTrack> manualClaims = new ArrayList<>();
 
@@ -202,8 +202,15 @@ public class DatabasePostgres {
                 String composer = resultSet.getString(2);
                 String lyrics = resultSet.getString(3);
                 String youTubeLink = "https://www.youtube.com/watch?v=" + resultSet.getString(4);
+                String trimStart = resultSet.getString(8);
+                String trimEnd = resultSet.getString(9);
 
                 ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink);
+
+                if (trimStart != null && trimEnd != null) {
+                    manualClaimTrack.addTrimTime(trimStart, trimEnd);
+                }
+
                 manualClaims.add(manualClaimTrack);
             }
         }
@@ -339,9 +346,14 @@ public class DatabasePostgres {
         return id;
     }
 
-    public static void addIngestProduct(int ingestID, String upc, String albumTitle, String s, String composer, String lyricist, String originalFileName) {
+    public static void addIngestProduct(int ingestID, String upc, String albumTitle, String s, String composer, String lyricist, String originalFileName) throws SQLException {
         Connection db = getConn();
-
+        String query = String.format("INSERT INTO " +
+                "public.ingest_products(ingest_id, upc, song_name, isrc, composer, lyricist, file_name) " +
+                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');",
+                ingestID, upc, albumTitle, s, composer, lyricist, originalFileName);
+        Statement statement = db.createStatement();
+        statement.executeUpdate(query);
     }
 
     public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
@@ -389,6 +401,20 @@ public class DatabasePostgres {
         }
     }
 
+    public static int addManualClaim(ManualClaimTrack claim) throws SQLException {
+        Connection conn = getConn();
+        Statement statement = conn.createStatement();
+        String query = String.format("INSERT INTO public.manual_claims " +
+                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end) " +
+                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');",
+                claim.getTrackName(),
+                claim.getComposer(),
+                claim.getLyricist(),
+                claim.getYoutubeID(),
+                claim.getTrimStart(),
+                claim.getTrimEnd());
+        return statement.executeUpdate(query);
+    }
 
     public static void importToArtistsTable(File csv) throws SQLException, ClassNotFoundException, IOException {
         Connection db = DatabaseMySQL.getConn();

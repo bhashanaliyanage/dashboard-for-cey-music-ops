@@ -7,6 +7,8 @@ public class ManualClaimTrack {
     private final String composer;
     private final String youtubeID;
     private boolean status = false;
+    private String trimStart;
+    private String trimEnd;
 
     /*public ManualClaimTrack(String trackName, String lyricist, String composer, String url) {
         this.trackName = trackName;
@@ -53,5 +55,18 @@ public class ManualClaimTrack {
 
     public String getYouTubeURL() {
         return "https://www.youtube.com/watch?v=" + youtubeID;
+    }
+
+    public void addTrimTime(String trimStart, String trimEnd) {
+        this.trimStart = trimStart;
+        this.trimEnd = trimEnd;
+    }
+
+    public String getTrimStart() {
+        return trimStart;
+    }
+
+    public String getTrimEnd() {
+        return trimEnd;
     }
 }

@@ -19,6 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -73,7 +76,7 @@ public class ControllerMCIdentifiers {
 
     @FXML
     void onGenerate(MouseEvent event) throws IOException, SQLException, ClassNotFoundException {
-        System.out.println("ControllerMCIdentifiers.onGenerate");
+        // System.out.println("ControllerMCIdentifiers.onGenerate");
 
         File destination = Main.browseLocationNew(SceneController.getWindowFromMouseEvent(event));
         String filePath = destination.getAbsolutePath() + "/ingest.csv";
@@ -115,14 +118,31 @@ public class ControllerMCIdentifiers {
 
                         if (folderCreated) {
                             System.out.println("Folder created successfully: " + folder.getAbsolutePath());
-                            downloadAudio(claim, fileName, folder);
+
+                            String fileLocation = downloadAudio(claim, fileName);
+
+                            if (ControllerMCList.finalManualClaims.get(claim).getTrimStart() != null) {
+                                trimAudio(claim, fileName, folder, fileLocation);
+                            } else {
+                                copyAudio(fileLocation, fileName, folder);
+                            }
+
                             DatabasePostgres.addIngestProduct(ingestID, upc, albumTitle, CSV_Row[28], composer, lyricist, originalFileName);
                         } else {
                             System.err.println("Error creating folder: " + folder.getAbsolutePath());
                         }
                     } else {
                         System.out.println("Folder already exists: " + folder.getAbsolutePath());
-                        downloadAudio(claim, fileName, folder);
+
+                        String fileLocation = downloadAudio(claim, fileName);
+
+                        if (ControllerMCList.finalManualClaims.get(claim).getTrimStart() != null) {
+                            trimAudio(claim, fileName, folder, fileLocation);
+                        } else {
+                            copyAudio(fileLocation, fileName, folder);
+                        }
+
+                        DatabasePostgres.addIngestProduct(ingestID, upc, albumTitle, CSV_Row[28], composer, lyricist, originalFileName);
                     }
                 }
             }
@@ -133,10 +153,35 @@ public class ControllerMCIdentifiers {
         System.out.println("csvFile = " + file.getAbsolutePath());
     }
 
-    private static void downloadAudio(int claim, String fileName, File folder) {
+    private static void copyAudio(String fileLocation, String fileName, File folder) throws IOException {
+        String sourceFilePath = fileLocation + "\\" + fileName;
+        Path sourcePath = Paths.get(sourceFilePath);
+        Path destinationPath = Paths.get(folder.getAbsolutePath(), fileName);
+
+        System.out.println("sourcePath = " + sourcePath);
+        System.out.println("destinationPath = " + destinationPath);
+
+        Files.copy(sourcePath, destinationPath);
+    }
+
+    private String trimAudio(int claim, String fileName, File folder, String fileLocation) throws IOException {
+        String trimStart = ControllerMCList.finalManualClaims.get(claim).getTrimStart();
+        String trimEnd = ControllerMCList.finalManualClaims.get(claim).getTrimEnd();
+        String sourceFilePath = fileLocation + "\\" + fileName;
+        // Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audiotrim");
+        String outputPath = folder.getAbsolutePath();
+        // String outputPath = folder.getAbsolutePath() + "\\" + fileName;
+        YoutubeDownload.cutAudio(sourceFilePath, outputPath, trimStart, trimEnd);
+        return outputPath;
+    }
+
+    private static String downloadAudio(int claim, String fileName) throws IOException {
         String url = ControllerMCList.finalManualClaims.get(claim).getYouTubeURL();
-        String fileLocation = folder.getAbsolutePath() + "\\";
+        Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audio");
+        // String fileLocation = folder.getAbsolutePath() + "\\";
+        String fileLocation = tempDir.toString();
         YoutubeDownload.downloadAudio(url, fileLocation, fileName);
+        return fileLocation;
     }
 
     @NotNull

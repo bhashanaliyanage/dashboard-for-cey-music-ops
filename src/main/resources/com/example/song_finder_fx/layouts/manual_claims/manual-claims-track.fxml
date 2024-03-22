@@ -4,7 +4,6 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.HBox?>
@@ -39,9 +38,9 @@
                <VBox.margin>
                   <Insets top="5.0" />
                </VBox.margin>
-               <Spinner fx:id="spinnerStart" disable="true" editable="true" />
+               <TextField fx:id="spinnerStart" promptText="00:00:00" styleClass="textarea-bg" />
                <Label text="-" textFill="#656565" />
-               <Spinner fx:id="spinnerEnd" disable="true" editable="true" />
+               <TextField fx:id="spinnerEnd" promptText="00:00:00" styleClass="textarea-bg" />
             </HBox>
          </VBox>
       </HBox>

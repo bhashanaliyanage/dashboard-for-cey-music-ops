@@ -9,7 +9,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
@@ -22,8 +21,11 @@ import java.util.Objects;
 
 public class ControllerMCTrack {
 
-    public Spinner spinnerStart;
-    public Spinner spinnerEnd;
+    @FXML
+    public TextField spinnerStart;
+
+    @FXML
+    public TextField spinnerEnd;
 
     @FXML
     private TextField txtTrackTitle;
@@ -70,7 +72,7 @@ public class ControllerMCTrack {
         String songName = txtTrackTitle.getText();
         System.out.println("songName = " + songName);
 //        Songs songs = DatabaseMySQL.searchContributors(songName);
-        Songs songs =  DatabasePostgres.searchContributors(songName);
+        Songs songs = DatabasePostgres.searchContributors(songName);
 
         txtComposer.setText(songs.getComposer());
         txtLyricist.setText(songs.getLyricist());
@@ -86,8 +88,8 @@ public class ControllerMCTrack {
         String trackName = txtTrackTitle.getText();
         String lyricist = txtLyricist.getText();
         String composer = txtComposer.getText();
-        // String trimStart = spinnerStart.get();
-        // String trimEnd = spinnerEnd.get();
+        String trimStart = spinnerStart.getText();
+        String trimEnd = spinnerEnd.getText();
 
         String url = txtURL.getText();
         System.out.println(url);
@@ -97,10 +99,17 @@ public class ControllerMCTrack {
 
         if (!ifAnyNull) {
             ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, url);
+
+            if (!trimStart.isEmpty() && !trimEnd.isEmpty()) {
+                track.addTrimTime(trimStart, trimEnd);
+            }
+
             ManualClaims.manualClaims.add(track);
+
             titledPane.setText(trackName);
             titledPane.setExpanded(false);
             btnAddTrack.setDisable(true);
+
             vboxTracks.getChildren().add(nodeTrack);
         }
     }
@@ -110,6 +119,8 @@ public class ControllerMCTrack {
         String trackName = txtTrackTitle.getText();
         String lyricist = txtLyricist.getText();
         String composer = txtComposer.getText();
+String trimStart = spinnerStart.getText();
+String trimEnd = spinnerEnd.getText();
 
         if (trackName.isEmpty()) {
             status = true;
@@ -132,6 +143,46 @@ public class ControllerMCTrack {
             txtComposer.setStyle("-fx-border-color: '#e9ebee';");
         }
 
+        if (!trimStart.isEmpty()) {
+            if (isNotValidTimeFormat(trimStart)) {
+                status = true;
+                spinnerStart.setStyle("-fx-border-color: red;");
+            } else {
+                spinnerStart.setStyle("-fx-border-color: '#e9ebee';");
+            }
+        }
+
+        if (!trimEnd.isEmpty()) {
+            if (isNotValidTimeFormat(trimStart)) {
+                status = true;
+                spinnerEnd.setStyle("-fx-border-color: red;");
+            } else {
+                spinnerEnd.setStyle("-fx-border-color: '#e9ebee';");
+            }
+        }
+
         return status;
+    }
+
+    private boolean isNotValidTimeFormat(String timeText) {
+        String[] parts = timeText.split(":");
+        if (parts.length != 3) {
+            return true; // Not in HH:MM:SS format
+        }
+
+        try {
+            int hours = Integer.parseInt(parts[0]);
+            int minutes = Integer.parseInt(parts[1]);
+            int seconds = Integer.parseInt(parts[2]);
+
+            // Validate ranges
+            if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59) {
+                return true; // Out of valid range
+            }
+        } catch (NumberFormatException e) {
+            return true; // Not numeric values
+        }
+
+        return false; // Valid HH:MM:SS format
     }
 }
