@@ -1,8 +1,10 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.UserSettingsManager;
 import com.example.song_finder_fx.Model.ProductVersion;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -25,7 +27,7 @@ public class Main extends Application {
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion(23.05);
+    public static ProductVersion versionInfo = new ProductVersion(23.06);
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
@@ -92,27 +94,30 @@ public class Main extends Application {
         return selectedDirectory;
     }
 
-    static boolean playAudio(Path start, String isrc) throws IOException {
+    static boolean playAudio(Path searchPath, String isrc) throws IOException {
         File file = null;
-        try (Stream<Path> stream = Files.walk(start)) {
+        System.out.println("searchPath = " + searchPath.toString());
+        try (Stream<Path> stream = Files.walk(searchPath)) {
+            Platform.runLater(() -> System.out.println("After walking..."));
             Path path = getFileByISRC(isrc, stream);
 
             if (path != null) {
                 file = new File(path.toUri());
-
                 AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
                 clip = AudioSystem.getClip();
                 clip.open(audioInputStream);
+                Platform.runLater(() -> System.out.println("Starting Audio..."));
                 clip.start();
                 return true;
             } else {
-                System.out.println("Cannot load file!");
+                Platform.runLater(() -> System.out.println("Cannot load file!"));
                 return false;
             }
 
         } catch (SQLException | ClassNotFoundException | LineUnavailableException e) {
-            // return false;
-            throw new RuntimeException(e);
+            Platform.runLater(() -> {
+                throw new RuntimeException(e);
+            });
         } catch (UnsupportedAudioFileException e) {
             System.out.println("Unsupported audio");
             if (Desktop.isDesktopSupported()) {
@@ -123,7 +128,7 @@ public class Main extends Application {
     }
 
     private static Path getFileByISRC(String isrc, Stream<Path> stream) throws SQLException, ClassNotFoundException {
-        String fileName = DatabaseMySQL.searchFileName(isrc);
+        String fileName = DatabasePostgres.searchFileName(isrc);
         return stream
                 .filter(path -> path.toFile().isFile())
                 .filter(path -> path.getFileName().toString().equals(fileName))
@@ -131,9 +136,10 @@ public class Main extends Application {
                 .orElse(null);
     }
 
-    public static String getDirectoryFromDB() throws SQLException, ClassNotFoundException {
-        Database.createTableForAudioDatabaseLocation();
-        String directoryTemp = Database.searchForAudioDB();
+    public static String getAudioDatabaseLocation() throws SQLException, ClassNotFoundException {
+        UserSettingsManager userSettingsManager = new UserSettingsManager();
+        // Database.createTableForAudioDatabaseLocation();
+        String directoryTemp = userSettingsManager.getADB();
         selectedDirectory = new File(directoryTemp);
         return directoryTemp;
     }
@@ -160,6 +166,8 @@ public class Main extends Application {
 
     public static void copyAudio(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
         DatabaseMySQL.searchAndCopySongs(isrc, directory, destination);
+//        DatabasePostgre.searchAndCopySongs(isrc, directory, destination);     //Postgress
+
     }
 
     public static File browseDestination() {
@@ -188,6 +196,7 @@ public class Main extends Application {
 // TODO: Offer cancel method after proceed button clicked
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
 // TODO: 2/8/2024 System Tray
+// TODO: 2/14/2024 Make it play FLACs
 
 // Performance
 // TODO: If copy to button clicked and user not chose any location the application starts to search

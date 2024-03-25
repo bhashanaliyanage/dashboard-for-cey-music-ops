@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
@@ -15,7 +16,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -56,10 +56,7 @@ public class InitPreloader implements Initializable {
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
-                /*Platform.runLater(() -> {
-                    System.out.println("Here!");
-                });*/
-                Main.getDirectoryFromDB();
+                Main.getAudioDatabaseLocation();
             } catch (SQLException | ClassNotFoundException e) {
                 Platform.runLater(() -> System.out.println("Cannot get audio database directory"));
             }
@@ -70,19 +67,29 @@ public class InitPreloader implements Initializable {
 
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
+            ResultSet top5Territories = null;
+            ResultSet top4DSPs = null;
+            String assetCount = null;
+            ResultSet top5StreamedAssets = null;
+            String salesDate;
+            String month = null;
             try {
-                ResultSet top5Territories = DatabaseMySQL.getTop5Territories();
-                ResultSet top4DSPs = DatabaseMySQL.getTop4DSPs();
-                String assetCount = DatabaseMySQL.getTotalAssetCount();
-                ResultSet top5StreamedAssets = DatabaseMySQL.getTop5StreamedAssets();
-                String salesDate = DatabaseMySQL.getSalesDate();
+                top5Territories = DatabasePostgres.getTop5Territories();
+                top4DSPs = DatabasePostgres.getTop4DSPs();
+                assetCount = DatabasePostgres.getTotalAssetCount();
+                top5StreamedAssets = DatabasePostgres.getTop5StreamedAssets();
+                salesDate = DatabasePostgres.getSalesDate();
                 String[] date = salesDate.split("-");
-                String month = date[1];
-
-                revenue.setValues(top5Territories, top4DSPs, assetCount, top5StreamedAssets, month);
-            } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                month = date[1];
+            } catch (SQLException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("An error occurred");
+                alert.setContentText(String.valueOf(e));
+                Platform.runLater(alert::showAndWait);
             }
+
+            revenue.setValues(top5Territories, top4DSPs, assetCount, top5StreamedAssets, month);
         });
 
         Thread updatesCheck = new Thread(() -> {
@@ -92,6 +99,8 @@ public class InitPreloader implements Initializable {
 
             try {
                 ResultSet versionDetails = DatabaseMySQL.checkUpdates();
+                // ResultSet versionDetails = DatabasePostgres.checkUpdates();        //Connection for Postgress
+
                 if (versionDetails != null) {
                     versionDetails.next();
                     System.out.println("versionDetails = " + versionDetails.getDouble(1));
@@ -114,7 +123,6 @@ public class InitPreloader implements Initializable {
                 throw new RuntimeException(e);
             }
         });
-
 
         Thread mainWindow = new Thread(() -> Platform.runLater(() -> {
             try {
@@ -149,8 +157,8 @@ public class InitPreloader implements Initializable {
                 stage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionNumber());
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
-                stage.setWidth(1300);
-                stage.setHeight(800);
+                stage.setWidth(1350);
+                stage.setHeight(900);
                 stage.setScene(scene);
                 stage.show();
 
@@ -217,25 +225,15 @@ public class InitPreloader implements Initializable {
 
     private String checkDatabaseConnection() {
         Connection con;
-        String message = null;
+        String message;
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            String url = "jdbc:mysql://192.168.1.200/songData";
-            String username = "ceymusic";
-            String password = "ceymusic";
-            con = DriverManager.getConnection(url, username, password);
+        con = DatabasePostgres.getConn();
 
-            if (con != null) {
-                message = "Connection Succeed";
-                return message;
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            Platform.runLater(e::printStackTrace);
+        if (con != null) {
+            message = "Connection Succeed";
+        } else {
             message = "Connection Error";
-            return message;
         }
-
         return message;
     }
 

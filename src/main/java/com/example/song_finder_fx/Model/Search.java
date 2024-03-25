@@ -14,5 +14,6 @@ public class Search {
 
     public List<Songs> search(String text) throws SQLException, ClassNotFoundException {
         return DatabaseMySQL.searchSongDetailsBySearchType(text, searchType);
+//        return DatabasePostgre.searchSongDetailsBySearchType(text, searchType);       //Postgress
     }
 }

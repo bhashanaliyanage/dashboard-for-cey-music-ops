@@ -38,12 +38,18 @@ shadowJar {
     }
 }
 
+//javafx {
+//    version = '21-ea+24'
+//    modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
+//}
+
 javafx {
-    version = '21-ea+24'
-    modules = ['javafx.controls', 'javafx.fxml']
+    version = "17" // Use the version that is compatible with your project
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web' ]
 }
 
 dependencies {
+    implementation 'org.jetbrains:annotations:24.0.0'
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
@@ -59,21 +65,27 @@ dependencies {
     // https://mvnrepository.com/artifact/org.openjfx/javafx-media
     implementation 'org.openjfx:javafx-media:21'
 
-    implementation 'com.google.api-client:google-api-client:2.0.0'
-    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.34.1'
-    implementation 'com.google.apis:google-api-services-sheets:v4-rev20220927-2.0.0'
-    // https://mvnrepository.com/artifact/com.google.http-client/google-http-client-jackson2
-    implementation 'com.google.http-client:google-http-client-jackson2:1.43.3'
-    implementation 'com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0'
-    // https://mvnrepository.com/artifact/com.google.auth/google-auth-library-oauth2-http
-    implementation 'com.google.auth:google-auth-library-oauth2-http:1.20.0'
-
-
     // https://mvnrepository.com/artifact/com.itextpdf/itext7-core
     implementation 'com.itextpdf:itext7-core:7.0.4'
 
     // https://mvnrepository.com/artifact/com.opencsv/opencsv
     implementation 'com.opencsv:opencsv:5.7.1'
+
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+    implementation 'org.jsoup:jsoup:1.15.3'
+
+    // https://mvnrepository.com/artifact/io.helidon.webclient/helidon-webclient
+    testImplementation 'io.helidon.webclient:helidon-webclient:4.0.5'
+
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    implementation 'org.postgresql:postgresql:42.7.2'
+
+    //audio cut
+    implementation files('libs/jl1.0.1.jar')
+
+
+
+
 
 }
 

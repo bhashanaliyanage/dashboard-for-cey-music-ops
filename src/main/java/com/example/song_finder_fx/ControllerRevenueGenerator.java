@@ -180,31 +180,31 @@ public class ControllerRevenueGenerator {
             rs.next();
             lblCountry01.setText(itemSwitcher.setCountry(rs.getString(1)));
             revenue = rs.getDouble(2);
-            currency = rs.getString(3);
+            currency = "EUR";
             lblCountry01Streams.setText(currency + " " + df.format(revenue));
 
             rs.next();
             lblCountry02.setText(itemSwitcher.setCountry(rs.getString(1)));
             revenue = rs.getDouble(2);
-            currency = rs.getString(3);
+            currency = "EUR";
             lblCountry02Streams.setText(currency + " " + df.format(revenue));
 
             rs.next();
             lblCountry03.setText(itemSwitcher.setCountry(rs.getString(1)));
             revenue = rs.getDouble(2);
-            currency = rs.getString(3);
+            currency = "EUR";
             lblCountry03Streams.setText(currency + " " + df.format(revenue));
 
             rs.next();
             lblCountry04.setText(itemSwitcher.setCountry(rs.getString(1)));
             revenue = rs.getDouble(2);
-            currency = rs.getString(3);
+            currency = "EUR";
             lblCountry04Streams.setText(currency + " " + df.format(revenue));
 
             rs.next();
             lblCountry05.setText(itemSwitcher.setCountry(rs.getString(1)));
             revenue = rs.getDouble(2);
-            currency = rs.getString(3);
+            currency = "EUR";
             lblCountry05Streams.setText(currency + " " + df.format(revenue));
         }
     }
@@ -220,28 +220,28 @@ public class ControllerRevenueGenerator {
             rs.next();
             lblDSP01.setText(rs.getString(1));
             revenue = rs.getDouble(2);
-            currency = rs.getString(3);
+            currency = "EUR";
             lblAmountDSP01.setText(currency + " " + df.format(revenue));
             imgDSP01.setImage(itemSwitcher.setImage(rs.getString(1)));
 
             rs.next();
             lblDSP02.setText(rs.getString(1));
             revenue = rs.getDouble(2);
-            currency = rs.getString(3);
+            currency = "EUR";
             lblAmountDSP02.setText(currency + " " + df.format(revenue));
             imgDSP02.setImage(itemSwitcher.setImage(rs.getString(1)));
 
             rs.next();
             lblDSP03.setText(rs.getString(1));
             revenue = rs.getDouble(2);
-            currency = rs.getString(3);
+            currency = "EUR";
             lblAmountDSP03.setText(currency + " " + df.format(revenue));
             imgDSP03.setImage(itemSwitcher.setImage(rs.getString(1)));
 
             rs.next();
             lblDSP04.setText(rs.getString(1));
             revenue = rs.getDouble(2);
-            currency = rs.getString(3);
+            currency = "EUR";
             lblAmountDSP04.setText(currency + " " + df.format(revenue));
             imgDSP04.setImage(itemSwitcher.setImage(rs.getString(1)));
         }
@@ -257,31 +257,31 @@ public class ControllerRevenueGenerator {
             rs.next();
             lblAsset01.setText(rs.getString(2));
             revenue = rs.getDouble(3);
-            currency = rs.getString(4);
+            currency = "EUR";
             lblAsset01Streams.setText(currency + " " + df.format(revenue));
 
             rs.next();
             lblAsset02.setText(rs.getString(2));
             revenue = rs.getDouble(3);
-            currency = rs.getString(4);
+            currency = "EUR";
             lblAsset02Streams.setText(currency + " " + df.format(revenue));
 
             rs.next();
             lblAsset03.setText(rs.getString(2));
             revenue = rs.getDouble(3);
-            currency = rs.getString(4);
+            currency = "EUR";
             lblAsset03Streams.setText(currency + " " + df.format(revenue));
 
             rs.next();
             lblAsset04.setText(rs.getString(2));
             revenue = rs.getDouble(3);
-            currency = rs.getString(4);
+            currency = "EUR";
             lblAsset04Streams.setText(currency + " " + df.format(revenue));
 
             rs.next();
             lblAsset05.setText(rs.getString(2));
             revenue = rs.getDouble(3);
-            currency = rs.getString(4);
+            currency = "EUR";
             lblAsset05Streams.setText(currency + " " + df.format(revenue));
         }
     }
@@ -300,7 +300,8 @@ public class ControllerRevenueGenerator {
     public void onGenerateFullBreakdownBtnClick(MouseEvent mouseEvent) {
         Platform.runLater(() -> {
             try {
-                ResultSet rs = DatabaseMySQL.getFullBreakdown();
+                // ResultSet rs = DatabaseMySQL.getFullBreakdown();
+                ResultSet rs = DatabasePostgres.getFullBreakdown();
                 Path tempDir = Files.createTempDirectory("ceymusic_dashboard");
                 Path csvFile = tempDir.resolve("revenue_breakdown_full.csv");
 
@@ -326,7 +327,7 @@ public class ControllerRevenueGenerator {
                 Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
                 Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
                 System.out.println("File copied successfully to " + destinationPath);
-            } catch (SQLException | ClassNotFoundException | IOException e) {
+            } catch (SQLException | IOException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -336,6 +337,8 @@ public class ControllerRevenueGenerator {
         Platform.runLater(() -> {
             try {
                 ResultSet rs = DatabaseMySQL.getBreakdownByDSP();
+//              ResultSet rs = DatabasePostgre.getBreakdownByDSP();   //Connection for Postgress
+
                 Path tempDir = Files.createTempDirectory("ceymusic_dashboard");
                 Path csvFile = tempDir.resolve("revenue_breakdown_dsp.csv");
                 CSVWriter writer = new CSVWriter(new FileWriter(csvFile.toFile()));
@@ -370,6 +373,7 @@ public class ControllerRevenueGenerator {
         Platform.runLater(() -> {
             try {
                 ResultSet rs = DatabaseMySQL.getBreakdownByTerritory();
+//                ResultSet rs = DatabasePostgre.getBreakdownByTerritory();     //Connection for Postgress
 
                 Path tempDir = Files.createTempDirectory("ceymusic_dashboard");
                 Path csvFile = tempDir.resolve("revenue_breakdown_territory.csv");
@@ -416,6 +420,7 @@ public class ControllerRevenueGenerator {
                 @Override
                 protected Void call() throws Exception {
                     boolean status = DatabaseMySQL.updateSongsTable(file, lblSongDB_Update, lblSongDB_Progress);
+//                    boolean status = DatabasePostgre.updateSongsTable(file, lblSongDB_Update, lblSongDB_Progress);        //Postgress
 
                     if (status) {
                         Platform.runLater(() -> {
@@ -450,6 +455,7 @@ public class ControllerRevenueGenerator {
                 @Override
                 protected Void call() throws Exception {
                     boolean status = DatabaseMySQL.updateSongsTable(file, lblUpdateSongsDatabase, lblUpdateSongsDatabase);
+//                    boolean status = DatabasePostgre.updateSongsTable(file, lblUpdateSongsDatabase, lblUpdateSongsDatabase);      //Postgress
 
                     if (status) {
                         Platform.runLater(() -> lblUpdateSongsDatabase.setText("Done"));
@@ -488,6 +494,8 @@ public class ControllerRevenueGenerator {
                 });
 
                 ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+//                ResultSet resultSet = DatabasePostgre.checkMissingISRCs();        //Postgress
+
                 int rowCount = 0;
 
                 while (resultSet.next()) {
@@ -514,6 +522,8 @@ public class ControllerRevenueGenerator {
                         try {
                             lblStatus.setText("Loading Payees...");
                             ResultSet rsPayees = DatabaseMySQL.getPayees();
+//                            ResultSet rsPayees = DatabasePostgre.getPayees();     //Postgress
+
                             while (rsPayees.next()) {
                                 comboPayees.getItems().add(rsPayees.getString(1));
                             }
@@ -603,6 +613,8 @@ public class ControllerRevenueGenerator {
                     protected Void call() {
                         try {
                             royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
+//                            royalty[0] = DatabasePostgre.getPayeeGrossRev(selectedItem);      //Postgress
+
                         } catch (SQLException | ClassNotFoundException e) {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Error");
@@ -649,6 +661,8 @@ public class ControllerRevenueGenerator {
                     protected Void call() throws SQLException, ClassNotFoundException {
                         // Get the co-writer name and share in EUR from the database
                         ResultSet rsCoWriterShares = DatabaseMySQL.getCoWriterShares(selectedItem);
+//                        ResultSet rsCoWriterShares = DatabasePostgre.getCoWriterShares(selectedItem);     //Postgress
+
                         int count = 0;
 
                         while (rsCoWriterShares.next()) { // Looping through writer 01 - 05
@@ -694,6 +708,8 @@ public class ControllerRevenueGenerator {
                     @Override
                     protected Void call() throws Exception {
                         ResultSet rsTopPerformingSongs = DatabaseMySQL.getTopPerformingSongsEdit(selectedItem);
+//                        ResultSet rsTopPerformingSongs = DatabasePostgre.getTopPerformingSongsEdit(selectedItem);     //Postgress
+
                         int count = 0;
 
                         while (rsTopPerformingSongs.next()) {
@@ -804,6 +820,8 @@ public class ControllerRevenueGenerator {
                     CSVReader reader = new CSVReader(new FileReader(file.getAbsolutePath()));
 
                     DatabaseMySQL.updatePayees(reader);
+//                    DatabasePostgre.updatePayees(reader);     //Postgress
+
                     return null;
                 }
             };
@@ -825,6 +843,7 @@ public class ControllerRevenueGenerator {
             lbl_import.setStyle("-fx-text-fill: '#000000'");
             lblReportProgress.setVisible(true);
             imgImportCaution.setVisible(false);
+
 
             Task<Void> taskLoadReport = loadReport(report);
             Task<Void> taskCheckMissingISRCs = checkMissingISRCs();
@@ -866,7 +885,7 @@ public class ControllerRevenueGenerator {
      * }
      */
     public static void main(String[] args) throws IOException, CsvValidationException {
-        File csv = new File("D:\\Work\\dashboard-for-cey-music-ops\\CSV Template First.csv");
+        File csv = new File("resources/com/example/song_finder_fx/CSV Template First.csv");
         File csv1 = new File("D:\\Sudesh\\newrepo1.csv");
         int UPC = Integer.parseInt("0");
         List<CsvSong> songList = new ArrayList<>();
@@ -878,7 +897,8 @@ public class ControllerRevenueGenerator {
         String albumTitle = "Golden hits";
         songList = songlistRead1(csv);
         String PrimaryArtist = "Dharmasiri Gamage";
-        // writeCSVFile1(songList, csv1, upcArray, albumTitle, 1, catelogNum, PrimaryArtist);
+        String isrc = "LKA0W2213413";
+        writeCSVFile1(songList, csv1, upcArray, albumTitle, 1, catelogNum, PrimaryArtist, isrc);
     }
 
     //Read Csv
@@ -1246,6 +1266,7 @@ public class ControllerRevenueGenerator {
 
     private Task<Void> loadReport(File report) {
         Task<Void> task;
+
         task = new Task<>() {
             @Override
             protected Void call() throws Exception {

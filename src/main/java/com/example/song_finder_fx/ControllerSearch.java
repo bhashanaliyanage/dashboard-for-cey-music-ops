@@ -2,7 +2,6 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
-import com.itextpdf.kernel.color.Lab;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -209,7 +208,7 @@ public class ControllerSearch {
 
     @FXML
     void onBtnPlayClicked(MouseEvent mouseEvent) {
-        Image img = new Image("com/example/song_finder_fx/images/icon _timer.png");
+        Image imgTimer = new Image("com/example/song_finder_fx/images/icon _timer.png");
         String isrc;
 
         Main.directoryCheck();
@@ -224,12 +223,7 @@ public class ControllerSearch {
 
         song.setTrackTitle(songName.getText());
         song.setSinger(songSinger.getText());
-
-        try {
-            isrc = searchResultISRC.getText();
-        } catch (Exception e) {
-            isrc = searchResultISRC.getText();
-        }
+        isrc = searchResultISRC.getText();
 
         Task<Void> task;
         Path start = Paths.get(Main.selectedDirectory.toURI());
@@ -237,7 +231,7 @@ public class ControllerSearch {
 
         lblPlayerSongName.setText("Loading audio");
         lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
-        imgMediaPico.setImage(img);
+        imgMediaPico.setImage(imgTimer);
 
         String finalIsrc = isrc;
         task = new Task<>() {
@@ -247,6 +241,7 @@ public class ControllerSearch {
                 if (clip != null) {
                     clip.stop();
                 }
+                Platform.runLater(() -> System.out.println("Preparing to play audio..."));
                 status[0] = Main.playAudio(start, finalIsrc);
                 return null;
             }

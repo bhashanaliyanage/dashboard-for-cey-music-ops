@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<TitledPane fx:id="titledPane" prefWidth="600.0" stylesheets="@../../styles.css" text="Song Name" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCTrack">
+   <font>
+      <Font size="14.0" />
+   </font>
+   <VBox prefWidth="100.0" styleClass="titlepane-bg">
+      <HBox prefWidth="200.0" spacing="10.0">
+         <VBox HBox.hgrow="ALWAYS">
+            <Label text="Song" textFill="#656565">
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+            </Label>
+            <TextField fx:id="txtTrackTitle" prefHeight="30.0" prefWidth="320.0" promptText="Song" styleClass="textarea-bg">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </TextField>
+         </VBox>
+         <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+            <Label text="Timestamp (Leave empty to download full video)" textFill="#656565">
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+            </Label>
+            <HBox alignment="CENTER_LEFT" spacing="5.0">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+               <TextField fx:id="spinnerStart" promptText="00:00:00" styleClass="textarea-bg" />
+               <Label text="-" textFill="#656565" />
+               <TextField fx:id="spinnerEnd" promptText="00:00:00" styleClass="textarea-bg" />
+            </HBox>
+         </VBox>
+      </HBox>
+      <HBox layoutX="21.0" layoutY="21.0" prefWidth="200.0" spacing="10.0">
+         <children>
+            <VBox HBox.hgrow="ALWAYS">
+               <children>
+                  <Label text="Lyricist" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <TextField fx:id="txtLyricist" prefHeight="30.0" promptText="Lyricist" styleClass="textarea-bg">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+               </children>
+            </VBox>
+            <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label text="Composer" textFill="#656565">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+                  <HBox alignment="CENTER_LEFT" spacing="5.0">
+                     <children>
+                        <TextField fx:id="txtComposer" prefHeight="30.0" promptText="Composer" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox layoutX="21.0" layoutY="83.0" prefWidth="200.0" spacing="10.0">
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+         <children>
+            <Button fx:id="btnAddTrack" mnemonicParsing="false" onAction="#onAddTrack" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Add Track" />
+         </children>
+      </HBox>
+   </VBox>
+</TitledPane>
