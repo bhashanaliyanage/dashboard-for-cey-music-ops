@@ -2,7 +2,6 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.CSVController;
 import com.example.song_finder_fx.Controller.ItemSwitcher;
-import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Model.ArtistReport;
 import com.example.song_finder_fx.Model.CsvSong;
@@ -29,8 +28,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
-import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;

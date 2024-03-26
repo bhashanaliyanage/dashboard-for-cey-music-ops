@@ -1,7 +1,5 @@
 package com.example.song_finder_fx.Model;
 
-import com.example.song_finder_fx.Controller.TextFormatter;
-
 public class ManualClaimTrack {
     private final int id;
     private final String trackName;
