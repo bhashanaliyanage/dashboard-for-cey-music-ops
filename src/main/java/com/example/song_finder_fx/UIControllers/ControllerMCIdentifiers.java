@@ -4,7 +4,6 @@ import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.ControllerSettings;
 import com.example.song_finder_fx.DatabasePostgres;
-import com.example.song_finder_fx.InitPreloader;
 import com.example.song_finder_fx.Main;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.opencsv.CSVWriter;
@@ -14,10 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.jetbrains.annotations.NotNull;
@@ -83,7 +79,7 @@ public class ControllerMCIdentifiers {
     }
 
     @FXML
-    void onGenerate(MouseEvent event) throws IOException, SQLException, InterruptedException {
+    void onGenerate(MouseEvent event) throws IOException, SQLException {
         Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests/generate_ingest.fxml")));
         Scene scene = SceneController.getSceneFromEvent(event);
         VBox vBox = SceneController.getMainVBox(scene);
@@ -91,6 +87,7 @@ public class ControllerMCIdentifiers {
 
         Label lblIngestID = (Label) scene.lookup("#lblIngestID");
         Label lblProcess = (Label) scene.lookup("#lblProcess");
+        ProgressBar progressBar = (ProgressBar) scene.lookup("#progressBar");
 
         File destination = Main.browseLocationNew(scene.getWindow());
         String filePath = destination.getAbsolutePath() + "/ingest.csv";
@@ -108,7 +105,119 @@ public class ControllerMCIdentifiers {
         if (ingestID > 0) {
             lblIngestID.setText(String.valueOf(ingestID));
 
-            for (int claimID = 0; claimID < ControllerMCList.finalManualClaims.size(); claimID++) {
+            int totalClaims = ControllerMCList.finalManualClaims.size();
+
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    for (int claimID = 0; claimID < totalClaims; claimID++) {
+                        // Platform.runLater(() -> System.out.println("Test"));
+                        double progress = (double) (claimID + 1) / totalClaims;
+
+                        String albumTitle = ControllerMCList.finalManualClaims.get(claimID).getTrackName();
+                        String upc = upcs.get(claimID).getText();
+
+                        String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
+                        String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
+                        String originalFileName = ControllerMCList.finalManualClaims.get(claimID).getYoutubeID() + ".flac";
+
+                        if (upc.isEmpty()) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Missing Identifier");
+                            alert.setHeaderText("Missing UPC");
+                            alert.setContentText("UPC number missing for claim: " + ControllerMCList.finalManualClaims.get(claimID).getTrackName());
+
+                            Platform.runLater(alert::showAndWait);
+                        } else {
+                            String[] CSV_Row = getCSV_Row(claimID, albumTitle, upc, composer, lyricist, originalFileName);
+                            File folder = new File(destination, upc);
+                            String fileName = CSV_Row[55];
+
+                            csvWriter.writeNext(CSV_Row);
+
+                            if (!folder.exists()) {
+                                boolean folderCreated = folder.mkdir();
+
+                                if (folderCreated) {
+                                    System.out.println("Folder created successfully: " + folder.getAbsolutePath());
+                                } else {
+                                    System.err.println("Error creating folder: " + folder.getAbsolutePath());
+                                }
+                            } else {
+                                System.out.println("Folder already exists: " + folder.getAbsolutePath());
+                            }
+
+                            final String[] fileLocation = new String[1];
+
+                            Platform.runLater(() -> lblProcess.setText("Downloading Audio for: " + albumTitle));
+
+                            try {
+                                String url = ControllerMCList.finalManualClaims.get(claimID).getYouTubeURL();
+                                Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audio");
+                                String fileLocation1 = tempDir.toString();
+                                YoutubeDownload.downloadAudio(url, fileLocation1, fileName);
+                                fileLocation[0] = fileLocation1;
+                            } catch (IOException e1) {
+                                Platform.runLater(() -> {
+                                    Alert alert1 = new Alert(Alert.AlertType.ERROR);
+                                    alert1.setTitle("Error");
+                                    alert1.setHeaderText("An error occurred");
+                                    alert1.setContentText(String.valueOf(e1));
+                                    Platform.runLater(alert1::showAndWait);
+                                });
+                            }
+
+                            if (!Objects.equals(ControllerMCList.finalManualClaims.get(claimID).getTrimStart(), "null")) {
+
+                                Platform.runLater(() -> lblProcess.setText("Trimming Audio for: " + albumTitle));
+
+                                String trimStart = ControllerMCList.finalManualClaims.get(claimID).getTrimStart();
+                                String trimEnd = ControllerMCList.finalManualClaims.get(claimID).getTrimEnd();
+
+                                String sourceFilePath = fileLocation[0] + "\\" + fileName;
+                                String outputPath = folder.getAbsolutePath() + "\\" + fileName;
+                                try {
+                                    YoutubeDownload.trimAudio(sourceFilePath, outputPath, trimStart, trimEnd);
+                                    Platform.runLater(() -> lblProcess.setText("Done"));
+                                } catch (IOException | InterruptedException exception) {
+                                    Platform.runLater(() -> {
+                                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                                        alert.setTitle("Error");
+                                        alert.setHeaderText("An error occurred");
+                                        alert.setContentText(String.valueOf(exception));
+                                        Platform.runLater(alert::showAndWait);
+                                        Platform.runLater(() -> lblProcess.setText("Error"));
+                                    });
+                                }
+                            } else {
+                                Platform.runLater(() -> lblProcess.setText("Copying Audio for: " + albumTitle));
+                                String sourceFilePath = fileLocation[0] + "\\" + fileName;
+                                Path sourcePath = Paths.get(sourceFilePath);
+                                Path destinationPath = Paths.get(folder.getAbsolutePath(), fileName);
+
+                                System.out.println("sourcePath = " + sourcePath);
+                                System.out.println("destinationPath = " + destinationPath);
+
+                                Files.copy(sourcePath, destinationPath);
+                            }
+                        }
+
+                        Platform.runLater(() -> progressBar.setProgress(progress));
+                    }
+
+                    Platform.runLater(() -> lblProcess.setText("Done"));
+                    return null;
+                }
+            };
+
+            Thread thread = new Thread(task);
+            thread.start();
+
+            /*for (int claimID = 0; claimID < totalClaims; claimID++) {
+                double progress = (double) (claimID + 1) / totalClaims;
+
+                // Platform.runLater(() -> System.out.println("progress = " + progress));
+
                 String albumTitle = ControllerMCList.finalManualClaims.get(claimID).getTrackName();
                 String upc = upcs.get(claimID).getText();
 
@@ -172,7 +281,7 @@ public class ControllerMCIdentifiers {
 
                     int finalClaimID2 = claimID;
                     taskDownloadAudio.setOnSucceeded(e -> {
-                        if (ControllerMCList.finalManualClaims.get(finalClaimID2).getTrimStart() != null) {
+                        if (!Objects.equals(ControllerMCList.finalManualClaims.get(finalClaimID2).getTrimStart(), "null")) {
 
                             Platform.runLater(() -> lblProcess.setText("Trimming Audio for: " + albumTitle));
 
@@ -210,8 +319,8 @@ public class ControllerMCIdentifiers {
                         } else {
                             Platform.runLater(() -> lblProcess.setText("Copying Audio for: " + albumTitle));
                             Thread copyAudio = getCopyAudio(fileLocation, fileName, folder);
-                            copyAudio.start();
                             try {
+                                copyAudio.start();
                                 copyAudio.join();
                                 Platform.runLater(() -> lblProcess.setText("Done"));
                             } catch (InterruptedException ex) {
@@ -229,10 +338,13 @@ public class ControllerMCIdentifiers {
                     Thread downloadAudio = new Thread(taskDownloadAudio);
 
                     downloadAudio.start();
+                    // downloadAudio.join();
 
                     DatabasePostgres.addIngestProduct(ingestID, upc, albumTitle, CSV_Row[28], composer, lyricist, originalFileName);
                 }
-            }
+
+                // Platform.runLater(() -> progressBar.setProgress(progress));
+            }*/
         } else {
             lblIngestID.setText("Error Getting Ingest ID");
             lblIngestID.setStyle("-fx-text-fill: red");
@@ -245,7 +357,7 @@ public class ControllerMCIdentifiers {
 
     @NotNull
     private static Thread getCopyAudio(String[] fileLocation, String fileName, File folder) {
-        Thread copyAudio = new Thread(() -> {
+        return new Thread(() -> {
             try {
                 String sourceFilePath = fileLocation[0] + "\\" + fileName;
                 Path sourcePath = Paths.get(sourceFilePath);
@@ -265,8 +377,6 @@ public class ControllerMCIdentifiers {
                 });
             }
         });
-        copyAudio.start();
-        return copyAudio;
     }
 
     @NotNull

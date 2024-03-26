@@ -283,3 +283,14 @@
     -fx-background-color: '#e9ebee';
 }
 
+.progress-bar .track {
+    -fx-background-color: '#e9ebee';
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+}
+
+.progress-bar .bar {
+    -fx-background-color: '#49a078';
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+}
