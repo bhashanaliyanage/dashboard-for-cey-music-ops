@@ -59,7 +59,7 @@
             </VBox>
             <HBox prefWidth="200.0">
                <VBox.margin>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
+                  <Insets left="20.0" right="20.0" top="30.0" />
                </VBox.margin>
                <TextField fx:id="txtURL" prefHeight="30.0" promptText="https://www.youtube.com/watch?v=&lt;id&gt;" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
                <Button fx:id="btnAddToList" minHeight="30.0" mnemonicParsing="false" onAction="#onCheckBtnClicked" prefHeight="30.0" styleClass="button_inside" stylesheets="@../../styles.css">
@@ -70,6 +70,17 @@
                   </graphic>
                </Button>
             </HBox>
+            <Label text="*The video preview will be unavailable if the target video is already copyrighted" textFill="#ff050580">
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="21.0" top="5.0" />
+               </VBox.margin>
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+            </Label>
             <WebView fx:id="ytPlayer" prefHeight="370.0" prefWidth="200.0">
                <VBox.margin>
                   <Insets bottom="20.0" left="20.0" right="20.0" />

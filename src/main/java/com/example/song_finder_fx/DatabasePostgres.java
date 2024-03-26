@@ -413,6 +413,10 @@ public class DatabasePostgres {
                 claim.getYoutubeID(),
                 claim.getTrimStart(),
                 claim.getTrimEnd());
+
+        /*System.out.println("Trim Start = " + claim.getTrimStart());
+        System.out.println("Trim End = " + claim.getTrimEnd());*/
+
         return statement.executeUpdate(query);
     }
 
@@ -688,7 +692,7 @@ public class DatabasePostgres {
     }
 
     static ArrayList<Double> getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
-        Connection connection = DatabaseMySQL.getConn();
+        Connection connection = getConn();
         ArrayList<Double> royalty = new ArrayList<>();
 
         PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +

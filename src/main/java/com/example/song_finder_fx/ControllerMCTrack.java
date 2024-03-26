@@ -1,6 +1,7 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.ManualClaims;
+import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
 import javafx.event.ActionEvent;
@@ -63,6 +64,8 @@ public class ControllerMCTrack {
 
             txtComposer.setText(songs.getComposer());
             txtLyricist.setText(songs.getLyricist());
+
+            spinnerStart.requestFocus();
         });
     }
 
@@ -71,7 +74,7 @@ public class ControllerMCTrack {
 
         String songName = txtTrackTitle.getText();
         System.out.println("songName = " + songName);
-//        Songs songs = DatabaseMySQL.searchContributors(songName);
+        // Songs songs = DatabaseMySQL.searchContributors(songName);
         Songs songs = DatabasePostgres.searchContributors(songName);
 
         txtComposer.setText(songs.getComposer());
@@ -101,10 +104,13 @@ public class ControllerMCTrack {
             ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, url);
 
             if (!trimStart.isEmpty() && !trimEnd.isEmpty()) {
+                /*System.out.println("trimStart = " + trimStart);
+                System.out.println("trimEnd = " + trimEnd);*/
                 track.addTrimTime(trimStart, trimEnd);
             }
 
             ManualClaims.manualClaims.add(track);
+
 
             titledPane.setText(trackName);
             titledPane.setExpanded(false);
@@ -119,8 +125,8 @@ public class ControllerMCTrack {
         String trackName = txtTrackTitle.getText();
         String lyricist = txtLyricist.getText();
         String composer = txtComposer.getText();
-String trimStart = spinnerStart.getText();
-String trimEnd = spinnerEnd.getText();
+        String trimStart = spinnerStart.getText();
+        String trimEnd = spinnerEnd.getText();
 
         if (trackName.isEmpty()) {
             status = true;
@@ -184,5 +190,23 @@ String trimEnd = spinnerEnd.getText();
         }
 
         return false; // Valid HH:MM:SS format
+    }
+
+    public void formatStartTime(ActionEvent event) {
+        String time = spinnerStart.getText();
+        String formattedTime = TextFormatter.formatTime(time);
+        spinnerStart.setText(formattedTime);
+        spinnerEnd.requestFocus();
+    }
+
+    public void formatEndTime(ActionEvent event) {
+        String time = spinnerEnd.getText();
+        String formattedTime = TextFormatter.formatTime(time);
+        spinnerEnd.setText(formattedTime);
+        txtLyricist.requestFocus();
+    }
+
+    public void onLyricistAction(ActionEvent event) {
+        txtComposer.requestFocus();
     }
 }

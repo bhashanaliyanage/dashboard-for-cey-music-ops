@@ -53,9 +53,7 @@ public class SceneController {
         return node.getScene();
     }
 
-    public static Window getWindowFromMouseEvent(MouseEvent event) {
-        Scene scene = ((Button) event.getSource()).getScene();
-        Stage stage = (Stage) scene.getWindow();
-        return stage;
+    public static Window getWindowFromScene(Scene scene) {
+        return scene.getWindow();
     }
 }

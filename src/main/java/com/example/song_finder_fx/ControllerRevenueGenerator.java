@@ -493,48 +493,35 @@ public class ControllerRevenueGenerator {
                     comboPayees.setDisable(true);
                 });
 
-                ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
+                // ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
 //                ResultSet resultSet = DatabasePostgre.checkMissingISRCs();        //Postgress
 
                 int rowCount = 0;
 
-                while (resultSet.next()) {
-                    if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
-                        rowCount++;
-                    }
-                }
+//                while (resultSet.next()) {
+//                    if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
+//                        rowCount++;
+//                    }
+//                }
 
                 System.out.println("rowCount = " + rowCount);
 
-                if (rowCount > 0) {
-                    Platform.runLater(() -> {
-                        lblStatus.setVisible(false);
-                        imgLoading.setVisible(false);
-                        vbArtistReports.setDisable(true);
-                        try {
-                            NotificationBuilder.displayTrayError("ISRC Sync Error", "Please Update Missing ISRCs in Song Database to Sync Payee List");
-                        } catch (AWTException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                        try {
-                            lblStatus.setText("Loading Payees...");
-                            ResultSet rsPayees = DatabaseMySQL.getPayees();
+                Platform.runLater(() -> {
+                    try {
+                        lblStatus.setText("Loading Payees...");
+                        ResultSet rsPayees = DatabaseMySQL.getPayees();
 //                            ResultSet rsPayees = DatabasePostgre.getPayees();     //Postgress
 
-                            while (rsPayees.next()) {
-                                comboPayees.getItems().add(rsPayees.getString(1));
-                            }
-                            lblStatus.setVisible(false);
-                            imgLoading.setVisible(false);
-                            comboPayees.setDisable(false);
-                        } catch (SQLException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
+                        while (rsPayees.next()) {
+                            comboPayees.getItems().add(rsPayees.getString(1));
                         }
-                    });
-                }
+                        lblStatus.setVisible(false);
+                        imgLoading.setVisible(false);
+                        comboPayees.setDisable(false);
+                    } catch (SQLException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
                 return null;
             }
@@ -612,8 +599,8 @@ public class ControllerRevenueGenerator {
                     @Override
                     protected Void call() {
                         try {
-                            royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
-//                            royalty[0] = DatabasePostgre.getPayeeGrossRev(selectedItem);      //Postgress
+//                            royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
+                            royalty[0] = DatabasePostgres.getPayeeGrossRev(selectedItem);      //Postgress
 
                         } catch (SQLException | ClassNotFoundException e) {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
