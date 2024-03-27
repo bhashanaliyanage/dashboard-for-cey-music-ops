@@ -82,47 +82,54 @@ public class ControllerMCIdentifiers {
 
     @FXML
     void onGenerate(MouseEvent event) throws IOException, SQLException {
+        currentISRC = "";
+        LocalDate date = LocalDate.now();
+        String userName = System.getProperty("user.name");
+
+        // Switching scenes
         Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests/generate_ingest.fxml")));
         Scene scene = SceneController.getSceneFromEvent(event);
         VBox vBox = SceneController.getMainVBox(scene);
         vBox.getChildren().setAll(node);
 
+        // Getting scene objects
         Label lblIngestID = (Label) scene.lookup("#lblIngestID");
         Label lblProcess = (Label) scene.lookup("#lblProcess");
         ProgressBar progressBar = (ProgressBar) scene.lookup("#progressBar");
 
+        // Requesting file location from user
         File destination = Main.browseLocationNew(scene.getWindow());
-        String filePath = destination.getAbsolutePath() + "/ingest.csv";
-        File file = new File(filePath);
-        CsvListWriter csvWriter = new CsvListWriter(new FileWriter(filePath), CsvPreference.STANDARD_PREFERENCE);
-        List<String> header = getHeader();
-        currentISRC = "";
-        LocalDate date = LocalDate.now();
-        String userName = System.getProperty("user.name");
 
-        csvWriter.write(header);
+        // Create ingest CSV and get writer object
+        CsvListWriter csvWriter = getCsvListWriter(destination);
 
+        // Creating entry in ingests database and getting ingest ID
         int ingestID = DatabasePostgres.addIngest(date, userName, destination.getAbsolutePath(), "ingest.csv");
 
         if (ingestID > 0) {
+            // Updating UI with ingest ID
             lblIngestID.setText(String.valueOf(ingestID));
 
+            // Getting total claims for the loop
             int totalClaims = ControllerMCList.finalManualClaims.size();
 
+            // Executing rest of the tasks as a background task
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
+                    // Looping through claims
                     for (int claimID = 0; claimID < totalClaims; claimID++) {
-                        // Platform.runLater(() -> System.out.println("Test"));
+                        // Getting progress
                         double progress = (double) (claimID + 1) / totalClaims;
 
+                        // Getting ingest details
                         String albumTitle = ControllerMCList.finalManualClaims.get(claimID).getTrackName();
                         String upc = upcs.get(claimID).getText();
-
                         String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
                         String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
                         String originalFileName = ControllerMCList.finalManualClaims.get(claimID).getYoutubeID() + ".flac";
 
+                        // Alerting user if UPC not exists
                         if (upc.isEmpty()) {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Missing Identifier");
@@ -131,78 +138,23 @@ public class ControllerMCIdentifiers {
 
                             Platform.runLater(alert::showAndWait);
                         } else {
+                            // Writing CSV row
                             List<String> CSV_Row = getCSV_Row(claimID, albumTitle, upc, composer, lyricist, originalFileName);
-
-                            File folder = new File(destination, upc);
-                            String fileName = CSV_Row.get(55);
-
                             csvWriter.write(CSV_Row);
 
-                            if (!folder.exists()) {
-                                boolean folderCreated = folder.mkdir();
+                            // Creating sub-folders by UPC
+                            File folder = createSubFolder(upc, destination);
 
-                                if (folderCreated) {
-                                    System.out.println("Folder created successfully: " + folder.getAbsolutePath());
-                                } else {
-                                    System.err.println("Error creating folder: " + folder.getAbsolutePath());
-                                }
-                            } else {
-                                System.out.println("Folder already exists: " + folder.getAbsolutePath());
-                            }
-
-                            final String[] fileLocation = new String[1];
-
+                            // Updating UI with the current task
                             Platform.runLater(() -> lblProcess.setText("Downloading Audio for: " + albumTitle));
 
-                            try {
-                                String url = ControllerMCList.finalManualClaims.get(claimID).getYouTubeURL();
-                                Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audio");
-                                String fileLocation1 = tempDir.toString();
-                                YoutubeDownload.downloadAudio(url, fileLocation1, fileName);
-                                fileLocation[0] = fileLocation1;
-                            } catch (IOException e1) {
-                                Platform.runLater(() -> {
-                                    Alert alert1 = new Alert(Alert.AlertType.ERROR);
-                                    alert1.setTitle("Error");
-                                    alert1.setHeaderText("An error occurred");
-                                    alert1.setContentText(String.valueOf(e1));
-                                    Platform.runLater(alert1::showAndWait);
-                                });
-                            }
+                            // Downloading audio to a temporary directory
+                            final String[] fileLocation = new String[1];
+                            String fileName = CSV_Row.get(55);
+                            downloadAudio(claimID, fileName, fileLocation);
 
-                            if (!Objects.equals(ControllerMCList.finalManualClaims.get(claimID).getTrimStart(), "null")) {
-
-                                Platform.runLater(() -> lblProcess.setText("Trimming Audio for: " + albumTitle));
-
-                                String trimStart = ControllerMCList.finalManualClaims.get(claimID).getTrimStart();
-                                String trimEnd = ControllerMCList.finalManualClaims.get(claimID).getTrimEnd();
-
-                                String sourceFilePath = fileLocation[0] + "\\" + fileName;
-                                String outputPath = folder.getAbsolutePath() + "\\" + fileName;
-                                try {
-                                    YoutubeDownload.trimAudio(sourceFilePath, outputPath, trimStart, trimEnd);
-                                    Platform.runLater(() -> lblProcess.setText("Done"));
-                                } catch (IOException | InterruptedException exception) {
-                                    Platform.runLater(() -> {
-                                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                                        alert.setTitle("Error");
-                                        alert.setHeaderText("An error occurred");
-                                        alert.setContentText(String.valueOf(exception));
-                                        Platform.runLater(alert::showAndWait);
-                                        Platform.runLater(() -> lblProcess.setText("Error"));
-                                    });
-                                }
-                            } else {
-                                Platform.runLater(() -> lblProcess.setText("Copying Audio for: " + albumTitle));
-                                String sourceFilePath = fileLocation[0] + "\\" + fileName;
-                                Path sourcePath = Paths.get(sourceFilePath);
-                                Path destinationPath = Paths.get(folder.getAbsolutePath(), fileName);
-
-                                System.out.println("sourcePath = " + sourcePath);
-                                System.out.println("destinationPath = " + destinationPath);
-
-                                Files.copy(sourcePath, destinationPath);
-                            }
+                            // Trimming audio if needed and copying it to the sub-folder created
+                            trimAndCopyAudio(claimID, albumTitle, fileLocation, fileName, folder, lblProcess);
                         }
 
                         Platform.runLater(() -> progressBar.setProgress(progress));
@@ -220,8 +172,90 @@ public class ControllerMCIdentifiers {
             lblIngestID.setText("Error Getting Ingest ID");
             lblIngestID.setStyle("-fx-text-fill: red");
         }
+    }
 
-        System.out.println("csvFile = " + file.getAbsolutePath());
+    private static void trimAndCopyAudio(int claimID, String albumTitle, String[] fileLocation, String fileName, File folder, Label lblProcess) throws IOException {
+        if (!Objects.equals(ControllerMCList.finalManualClaims.get(claimID).getTrimStart(), "null")) {
+
+            Platform.runLater(() -> lblProcess.setText("Trimming Audio for: " + albumTitle));
+
+            String trimStart = ControllerMCList.finalManualClaims.get(claimID).getTrimStart();
+            String trimEnd = ControllerMCList.finalManualClaims.get(claimID).getTrimEnd();
+
+            String sourceFilePath = fileLocation[0] + "\\" + fileName;
+            String outputPath = folder.getAbsolutePath() + "\\" + fileName;
+            try {
+                YoutubeDownload.trimAudio(sourceFilePath, outputPath, trimStart, trimEnd);
+                Platform.runLater(() -> lblProcess.setText("Done"));
+            } catch (IOException | InterruptedException exception) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("An error occurred");
+                    alert.setContentText(String.valueOf(exception));
+                    Platform.runLater(alert::showAndWait);
+                    Platform.runLater(() -> lblProcess.setText("Error"));
+                });
+            }
+        } else {
+            Platform.runLater(() -> lblProcess.setText("Copying Audio for: " + albumTitle));
+            String sourceFilePath = fileLocation[0] + "\\" + fileName;
+            Path sourcePath = Paths.get(sourceFilePath);
+            Path destinationPath = Paths.get(folder.getAbsolutePath(), fileName);
+
+            System.out.println("sourcePath = " + sourcePath);
+            System.out.println("destinationPath = " + destinationPath);
+
+            Files.copy(sourcePath, destinationPath);
+        }
+    }
+
+    private static void downloadAudio(int claimID, String fileName, String[] fileLocation) {
+        try {
+            String url = ControllerMCList.finalManualClaims.get(claimID).getYouTubeURL();
+            Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audio");
+            String fileLocation1 = tempDir.toString();
+            YoutubeDownload.downloadAudio(url, fileLocation1, fileName);
+            fileLocation[0] = fileLocation1;
+        } catch (IOException e1) {
+            Platform.runLater(() -> {
+                Alert alert1 = new Alert(Alert.AlertType.ERROR);
+                alert1.setTitle("Error");
+                alert1.setHeaderText("An error occurred");
+                alert1.setContentText(String.valueOf(e1));
+                Platform.runLater(alert1::showAndWait);
+            });
+        }
+    }
+
+    @NotNull
+    private static File createSubFolder(String upc, File destination) {
+        File folder = new File(destination, upc);
+        if (!folder.exists()) {
+            boolean folderCreated = folder.mkdir();
+
+            if (folderCreated) {
+                System.out.println("Folder created successfully: " + folder.getAbsolutePath());
+            } else {
+                System.err.println("Error creating folder: " + folder.getAbsolutePath());
+            }
+        } else {
+            System.out.println("Folder already exists: " + folder.getAbsolutePath());
+        }
+        return folder;
+    }
+
+    @NotNull
+    private static CsvListWriter getCsvListWriter(File destination) throws IOException {
+        // Creating ingest file inside the location given by user
+        String filePath = destination.getAbsolutePath() + "/ingest.csv";
+        new File(filePath);
+        CsvListWriter csvWriter = new CsvListWriter(new FileWriter(filePath), CsvPreference.STANDARD_PREFERENCE);
+
+        // Writing header
+        List<String> header = getHeader();
+        csvWriter.write(header);
+        return csvWriter;
     }
 
     @NotNull
