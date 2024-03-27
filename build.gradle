@@ -83,10 +83,8 @@ dependencies {
     //audio cut
     implementation files('libs/jl1.0.1.jar')
 
-
-
-
-
+    // https://mvnrepository.com/artifact/net.sf.supercsv/super-csv
+    implementation 'net.sf.supercsv:super-csv:2.4.0'
 }
 
 test {

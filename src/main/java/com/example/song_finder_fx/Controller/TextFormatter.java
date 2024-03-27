@@ -31,8 +31,8 @@ public class TextFormatter {
                 return time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
             }
         } catch (DateTimeParseException | ArrayIndexOutOfBoundsException e) {
-            return "Invalid input format";
+            return "";
         }
-        return "Invalid input format";
+        return "";
     }
 }

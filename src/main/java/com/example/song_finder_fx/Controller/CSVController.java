@@ -10,6 +10,8 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import org.supercsv.io.CsvListWriter;
+import org.supercsv.prefs.CsvPreference;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -20,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +31,33 @@ public class CSVController {
     private static final DecimalFormat df = new DecimalFormat("0.00");
     private final Path tempDir = Files.createTempDirectory("missing_isrcs");
     private final Path csvFile = tempDir.resolve("missing_isrcs.csv");
+
+    public static void main(String[] args) {
+        String filePath = "C:\\Users\\bhash\\Documents\\Test\\test.csv";
+
+        // Sample data (replace with your actual data)
+        String claimID = "123";
+        String albumTitle = "My Album";
+        String upc = "987654321";
+        String composer = "John Doe";
+        String lyricist = "Jane Smith";
+        String originalFileName = "song.mp3";
+
+        try (CsvListWriter csvWriter = new CsvListWriter(new FileWriter(filePath), CsvPreference.STANDARD_PREFERENCE)) {
+            // Write the header (optional)
+            csvWriter.writeHeader("Claim ID", "Album Title", "UPC", "Composer", "Lyricist", "Original File Name");
+
+            // Create a list for the row
+            List<String> csvRow = Arrays.asList(claimID, albumTitle, upc, composer, lyricist, originalFileName);
+
+            // Write the row
+            csvWriter.write(csvRow);
+
+            System.out.println("Data written successfully to " + filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public CSVController() throws IOException {
 
