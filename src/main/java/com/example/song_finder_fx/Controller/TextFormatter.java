@@ -6,9 +6,6 @@ import java.time.format.DateTimeParseException;
 
 public class TextFormatter {
     public static void main(String[] args) {
-        String input1 = "0.5.2"; // Example input
-        String input2 = "5.2";   // Example input
-
         System.out.println("Formatted start time: " + formatTime("input1"));
     }
 

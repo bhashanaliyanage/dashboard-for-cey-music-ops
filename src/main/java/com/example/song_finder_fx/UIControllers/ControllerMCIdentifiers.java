@@ -1,13 +1,11 @@
 package com.example.song_finder_fx.UIControllers;
 
-import com.example.song_finder_fx.Controller.ManualClaims;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.ControllerSettings;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Main;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
-import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -224,83 +222,6 @@ public class ControllerMCIdentifiers {
         }
 
         System.out.println("csvFile = " + file.getAbsolutePath());
-    }
-
-    @NotNull
-    private static Thread getCopyAudio(String[] fileLocation, String fileName, File folder) {
-        return new Thread(() -> {
-            try {
-                String sourceFilePath = fileLocation[0] + "\\" + fileName;
-                Path sourcePath = Paths.get(sourceFilePath);
-                Path destinationPath = Paths.get(folder.getAbsolutePath(), fileName);
-
-                System.out.println("sourcePath = " + sourcePath);
-                System.out.println("destinationPath = " + destinationPath);
-
-                Files.copy(sourcePath, destinationPath);
-            } catch (IOException e) {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("An error occurred");
-                    alert.setContentText(String.valueOf(e));
-                    Platform.runLater(alert::showAndWait);
-                });
-            }
-        });
-    }
-
-    @NotNull
-    private static Thread getDownloadAudio(int claimID, String[] fileLocation, String fileName) {
-        return new Thread(() -> {
-            try {
-                String url = ControllerMCList.finalManualClaims.get(claimID).getYouTubeURL();
-                Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audio");
-                String fileLocation1 = tempDir.toString();
-                YoutubeDownload.downloadAudio(url, fileLocation1, fileName);
-                fileLocation[0] = fileLocation1;
-            } catch (IOException e) {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("An error occurred");
-                    alert.setContentText(String.valueOf(e));
-                    Platform.runLater(alert::showAndWait);
-                });
-            }
-        });
-    }
-
-    private static void copyAudio(String fileLocation, String fileName, File folder) throws IOException {
-        String sourceFilePath = fileLocation + "\\" + fileName;
-        Path sourcePath = Paths.get(sourceFilePath);
-        Path destinationPath = Paths.get(folder.getAbsolutePath(), fileName);
-
-        System.out.println("sourcePath = " + sourcePath);
-        System.out.println("destinationPath = " + destinationPath);
-
-        Files.copy(sourcePath, destinationPath);
-    }
-
-    private void trimAudio(int claim, String fileName, File folder, String fileLocation) throws IOException, InterruptedException {
-        String trimStart = ControllerMCList.finalManualClaims.get(claim).getTrimStart();
-        String trimEnd = ControllerMCList.finalManualClaims.get(claim).getTrimEnd();
-
-        /*trimStart = TextFormatter.formatTime(trimStart);
-        trimEnd = TextFormatter.formatTime(trimEnd);*/
-
-        String sourceFilePath = fileLocation + "\\" + fileName;
-        String outputPath = folder.getAbsolutePath();
-        YoutubeDownload.trimAudio(sourceFilePath, outputPath, trimStart, trimEnd);
-    }
-
-    private static String downloadAudio(int claim, String fileName) throws IOException {
-        String url = ControllerMCList.finalManualClaims.get(claim).getYouTubeURL();
-        Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audio");
-        // String fileLocation = folder.getAbsolutePath() + "\\";
-        String fileLocation = tempDir.toString();
-        YoutubeDownload.downloadAudio(url, fileLocation, fileName);
-        return fileLocation;
     }
 
     @NotNull

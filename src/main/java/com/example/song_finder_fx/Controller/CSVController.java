@@ -117,7 +117,7 @@ public class CSVController {
         }
     }
 
-    public int loadFUGAReport(Label lblReportProgress, ImageView imgImportCaution, Label lbl_import) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+    public int loadFUGAReport(Label lblReportProgress, ImageView imgImportCaution, Label lbl_import) throws IOException, CsvValidationException, SQLException {
         int status = 0;
         CSVReader reader = new CSVReader(new FileReader(csv.getAbsolutePath()));
         BufferedReader bReader = new BufferedReader(new FileReader(csv));
@@ -192,29 +192,6 @@ public class CSVController {
     public void copyMissingISRCList(File destination) throws IOException {
         Path destinationPath = destination.toPath().resolve(csvFile.getFileName());
         Files.copy(csvFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    public List<String> getUniqueISRCs() throws IOException, CsvValidationException {
-        CSVReader reader = new CSVReader(new FileReader(csv));
-        List<String> groupedISRCs = new ArrayList<>();
-        int totalRows = 0;
-
-        String[] record;
-        reader.readNext();
-        while ((record = reader.readNext()) != null) {
-            String isrc = record[17];
-
-            if (!groupedISRCs.contains(isrc)) {
-                groupedISRCs.add(isrc);
-            }
-
-            totalRows++;
-        }
-
-        System.out.println("groupedISRCs.size() = " + groupedISRCs.size());
-        System.out.println("totalRows = " + totalRows);
-
-        return groupedISRCs;
     }
 
 }
