@@ -553,9 +553,13 @@ public class UIController {
                     Label lblArtist = (Label) nodes[i].lookup("#songSinger");
                     Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
                     Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
+
                     lblSongName.setText(songList.get(i).getTrackTitle());
+//                    lblSongName.setText("test art");
                     lblISRC.setText(songList.get(i).getISRC().trim());
+
                     lblArtist.setText(songList.get(i).getSinger().trim());
+//                        lblArtist.setText("test name");
                     lblComposer.setText(songList.get(i).getComposer().trim());
                     lblLyricist.setText(songList.get(i).getLyricist().trim());
                     vboxSong.getChildren().add(nodes[i]);

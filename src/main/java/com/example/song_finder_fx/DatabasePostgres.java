@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Model.FUGAReport;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
+import com.example.song_finder_fx.Model.report;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
@@ -14,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+//import java.lang.foreign.SegmentAllocator;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +23,7 @@ import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -69,6 +72,64 @@ public class DatabasePostgres {
         }
         return 0;
     }
+
+
+    //Existing main meth in 405 line
+
+
+      public static void main(String[] args) throws SQLException {
+        List<report> sList = new ArrayList<>();
+        String s = "LKA0U2302779";
+       sList=reporLi(Collections.singletonList(s));
+       for(report r :sList){
+
+           System.out.println(r.getReportedRoyaltyForCeyMusic());
+           System.out.println(r.getReportedRoyaltyAfterGST());
+           System.out.println(r.getOtherTerritoryEarnnings());
+           System.out.println(r.getAfterGST());
+           System.out.println(r.getEuEaring());
+           System.out.println(r.getReportedSummary());
+            double d=r.getReportedRoyaltyForCeyMusic();
+
+           System.out.println(sList+"report list111111111111");
+       }
+
+
+
+     }
+
+
+
+    public static List<report> reporLi(List<String> isrcList) {
+        List<report> repoList = new ArrayList<>();
+        String sql = "SELECT reported_royalty_for_ceymusic,reported_royalty_after_gst,other_territories_earnings,after_gst,au_earnings,reported_royalty_summary,asset_isrc " +
+                "FROM public.\"reportViewSummary1\" WHERE asset_isrc = ?";
+        Connection con = getConn();
+        try {
+        PreparedStatement ps = con.prepareStatement(sql);
+        for(String s :isrcList){
+            ps.setString(1,s);
+            ResultSet rs =ps.executeQuery();
+            while(rs.next()){
+                report rp = new report();
+                rp.setReportedRoyaltyForCeyMusic(rs.getDouble(1));
+                rp.setReportedRoyaltyAfterGST(rs.getDouble(2));
+                rp.setOtherTerritoryEarnnings(rs.getDouble(3));
+                rp.setAfterGST(rs.getDouble(4));
+                rp.setEuEaring(rs.getDouble(5));
+                rp.setReportedSummary(rs.getDouble(6));
+                repoList.add(rp);
+
+            }
+        }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return repoList;
+    }
+
 
     public static ResultSet getFullBreakdown() throws SQLException {
         Connection conn = getConn();
@@ -349,13 +410,14 @@ public class DatabasePostgres {
     public static void addIngestProduct(int ingestID, String upc, String albumTitle, String s, String composer, String lyricist, String originalFileName) throws SQLException {
         Connection db = getConn();
         String query = String.format("INSERT INTO " +
-                "public.ingest_products(ingest_id, upc, song_name, isrc, composer, lyricist, file_name) " +
-                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');",
+                        "public.ingest_products(ingest_id, upc, song_name, isrc, composer, lyricist, file_name) " +
+                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');",
                 ingestID, upc, albumTitle, s, composer, lyricist, originalFileName);
         Statement statement = db.createStatement();
         statement.executeUpdate(query);
     }
 
+    /**
     public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
         File csv = new File("src/main/resources/com/example/song_finder_fx/CeyMusic Song Database  - Song Artist DB Import - 03.csv");
         CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).build();
@@ -365,6 +427,8 @@ public class DatabasePostgres {
 
         csvReader.close();
     }
+*/
+
 
     private static void insertSongArtists(CSVReader csvReader) throws SQLException, IOException, CsvValidationException {
         Connection db = getConn();
@@ -384,8 +448,8 @@ public class DatabasePostgres {
             // System.out.println("isrc = " + isrc);
 
             String query = String.format("INSERT INTO public.song_artist (song_isrc, artist_id, artist_type) " +
-                    "VALUES ('%s', (SELECT artist_id FROM public.artists WHERE artist_name = '%s' LIMIT 1), '%s') " +
-                    "ON CONFLICT (song_isrc, artist_id, artist_type) DO UPDATE SET artist_type = EXCLUDED.artist_type;",
+                            "VALUES ('%s', (SELECT artist_id FROM public.artists WHERE artist_name = '%s' LIMIT 1), '%s') " +
+                            "ON CONFLICT (song_isrc, artist_id, artist_type) DO UPDATE SET artist_type = EXCLUDED.artist_type;",
                     isrc, artist, artist_type);
 
             try {
@@ -688,7 +752,8 @@ public class DatabasePostgres {
     }
 
     static ArrayList<Double> getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
-        Connection connection = DatabaseMySQL.getConn();
+//        Connection connection = DatabaseMySQL.getConn();
+        Connection connection = DatabasePostgres.getConn();
         ArrayList<Double> royalty = new ArrayList<>();
 
         PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +
@@ -869,30 +934,64 @@ public class DatabasePostgres {
 
         Connection conn = getConn();
 
-        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER, COMPOSER, LYRICIST " +
-                "FROM songs WHERE " + searchType + " LIKE ? LIMIT 15");
-        ps.setString(1, searchText + "%");
-        rs = ps.executeQuery();
+//        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER, COMPOSER, LYRICIST " +
+//                "FROM songs WHERE " + searchType + " LIKE ? LIMIT 15");
 
-        while (rs.next()) {
-            songs.add(new Songs(
-                    rs.getString(1), // TRACK_TITLE
-                    rs.getString(2), // ISRC
-                    rs.getString(3), // SINGER
-                    rs.getString(4), // COMPOSER
-                    rs.getString(5) // LYRICIST
-            ));
+        Platform.runLater(() -> {
+            System.out.println(searchType + "search type11111");
+            System.out.println("searchText = " + searchText);
+        });
+
+//        String query = String.format("SELECT song_metadata.isrc, song_metadata.song_name, song_metadata.upc, song_metadata.artist, song_metadata.artist_type " +
+//                "FROM song_metadata WHERE song_metadata.%s LIKE '%s' Limit 15", searchType, searchText + "%");
+
+
+//        Statement statement = conn.createStatement();
+
+        PreparedStatement ps = conn.prepareStatement("SELECT song_metadata.isrc, song_metadata.song_name, song_metadata.upc," +
+                "song_metadata.artist, song_metadata.artist_type FROM song_metadata " +
+                "WHERE song_metadata." + searchType + " ILIKE ? Limit 15");
+
+        Platform.runLater(() -> {
+            System.out.println("ps = " + ps);
+        });
+
+
+        ps.setString(1, searchText + "%");
+        try {
+            rs = ps.executeQuery();
+//            rs = statement.executeQuery(query);
+
+            while (rs.next()) {
+                songs.add(new Songs(
+                        rs.getString(1), // TRACK_TITLE
+                        rs.getString(2),// ISRC
+                        rs.getString(3), // SINGER
+                        rs.getString(4), // COMPOSER
+                        rs.getString(5) // LYRICIST
+                ));
+            }
+        } catch (Exception e) {
+            Platform.runLater(() -> {
+                e.printStackTrace();
+            });
         }
+
+        // rs = ps.executeQuery();
+
 
         try {
             // Printing Searched Content
             System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getTrackTitle() + " | " + songs.get(0).getSinger());
             System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getTrackTitle() + " | " + songs.get(1).getSinger());
             System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getTrackTitle() + " | " + songs.get(2).getSinger());
-
+//            String s =;
             // Printing new line
             System.out.println("================");
         } catch (IndexOutOfBoundsException e) {
+            Platform.runLater(() -> {
+                e.printStackTrace();
+            });
             System.out.println("End of results");
         }
 

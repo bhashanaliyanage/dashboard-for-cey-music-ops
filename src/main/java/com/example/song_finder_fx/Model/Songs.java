@@ -19,6 +19,9 @@ public class Songs {
     private String percentage = "";
     private String copyrightOwner = "";
 
+    private String song_name;
+
+
     public void setTrackTitle(String trackTitle) {
         this.trackTitle = trackTitle;
     }
@@ -51,6 +54,11 @@ public class Songs {
         this.singer = singer;
         this.composer = composer;
         this.lyricist = lyricist;
+    }
+
+    public Songs(String isrc, String song_name) {
+        this.isrc = isrc;
+        this.song_name = song_name;
     }
 
     public void setIsrc(String isrc) {
