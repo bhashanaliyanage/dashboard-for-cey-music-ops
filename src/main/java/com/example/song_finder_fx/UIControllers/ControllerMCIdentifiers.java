@@ -121,6 +121,7 @@ public class ControllerMCIdentifiers {
                 }
 
                 // Request catalog number if it is not recognizable
+                assert catNo[0] != null;
                 String[] parts = catNo[0].split("-");
                 if (Objects.equals(parts[0], "null")) {
                     requestCatNo(composer, lyricist, claimID);
