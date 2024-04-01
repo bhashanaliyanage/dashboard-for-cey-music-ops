@@ -3,6 +3,8 @@ package com.example.song_finder_fx.Controller;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TextFormatter {
     public static void main(String[] args) {
@@ -31,5 +33,20 @@ public class TextFormatter {
             return "";
         }
         return "";
+    }
+
+    // Extract YouTube ID from URL
+    public static String extractYoutubeID(String url) {
+        // Regular expression to match YouTube video URLs
+        String pattern = "^https?://(?:www\\.|m\\.)?(?:youtube\\.com|youtu\\.be)/(?:watch\\?v=|embed/|v/|watch\\?.*v=|)([^&?/]+).*";
+
+        Pattern compiledPattern = Pattern.compile(pattern);
+        Matcher matcher = compiledPattern.matcher(url);
+
+        if (matcher.find()) {
+            return matcher.group(1); // Extract the video ID
+        } else {
+            return null; // No valid video ID found
+        }
     }
 }

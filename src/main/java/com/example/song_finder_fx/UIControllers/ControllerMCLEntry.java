@@ -27,6 +27,14 @@ public class ControllerMCLEntry {
     private Label lblSongNo;
 
     @FXML
+    private CheckBox checkBox;
+
+    @FXML
+    public void initialize() {
+        System.out.println("Manual Claims List Entry " + lblSongNo.getText());
+    }
+
+    @FXML
     void onEdit(MouseEvent event) throws IOException {
         System.out.println("ControllerMCLEntry.onEdit");
         Scene scene = SceneController.getSceneFromEvent(event);
@@ -45,6 +53,12 @@ public class ControllerMCLEntry {
         txtSongName.setText(lblSongName.getText());
         txtComposer.setText(lblComposer.getText());
         txtLyricist.setText(lblLyricist.getText());
+    }
+
+    @FXML
+    void onSongClick() {
+        boolean isSelected = checkBox.isSelected();
+        checkBox.setSelected(!isSelected);
     }
 
 }

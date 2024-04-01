@@ -201,7 +201,7 @@ public class DatabasePostgres {
                 String songName = resultSet.getString(1);
                 String composer = resultSet.getString(2);
                 String lyrics = resultSet.getString(3);
-                String youTubeLink = "https://www.youtube.com/watch?v=" + resultSet.getString(4);
+                String youTubeLink = resultSet.getString(4);
                 String trimStart = resultSet.getString(8);
                 String trimEnd = resultSet.getString(9);
 

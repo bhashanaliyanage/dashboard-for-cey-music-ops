@@ -1,9 +1,11 @@
 package com.example.song_finder_fx.UIControllers;
 
+import com.example.song_finder_fx.Controller.ImageProcessor;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.ControllerSettings;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
+// import com.google.protobuf.AbstractProtobufList;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,13 +15,25 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class ControllerMCList {
 
@@ -47,6 +61,8 @@ public class ControllerMCList {
 
     public static Map<Integer, ManualClaimTrack> claimMap = new HashMap<>();
 
+    private final Executor imageDownloadExecutor = Executors.newFixedThreadPool(5);
+
     @FXML
     public void initialize() throws SQLException, IOException {
         checkBoxes.clear();
@@ -60,31 +76,73 @@ public class ControllerMCList {
 
         manualClaims = DatabasePostgres.getManualClaims();
 
+        List<CompletableFuture<Void>> downloadFutures = manualClaims.stream()
+                .map(this::downloadImageAsync)
+                .toList();
+
+        CompletableFuture<Void> allDownloads = CompletableFuture.allOf(downloadFutures.toArray(new CompletableFuture[0]));
+
+        allDownloads.thenRun(() -> {
+            // All images downloaded, update UI
+            Platform.runLater(this::updateUI);
+        });
+    }
+
+    private void updateUI() {
         for (ManualClaimTrack claim : manualClaims) {
             claimMap.put(claim.getId(), claim);
 
-            Node node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../layouts/manual_claims/manual-claims-list-entry.fxml")));
+            Node node;
+            try {
+                node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../layouts/manual_claims/manual-claims-list-entry.fxml")));
+                Label lblSongNo = (Label) node.lookup("#lblSongNo");
+                labelsSongNo.add(lblSongNo);
+                Label lblSongName = (Label) node.lookup("#lblSongName");
+                labelsSongName.add(lblSongName);
+                Label lblComposer = (Label) node.lookup("#lblComposer");
+                labelsComposer.add(lblComposer);
+                Label lblLyricist = (Label) node.lookup("#lblLyricist");
+                labelsLyricist.add(lblLyricist);
+                CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
+                checkBoxes.add(checkBox);
+                HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
+                hBoxes.add(hboxEntry);
+                ImageView image = (ImageView) node.lookup("#image");
+                image.setImage(claim.getImage());
 
-            Label lblSongNo = (Label) node.lookup("#lblSongNo");
-            labelsSongNo.add(lblSongNo);
-            Label lblSongName = (Label) node.lookup("#lblSongName");
-            labelsSongName.add(lblSongName);
-            Label lblComposer = (Label) node.lookup("#lblComposer");
-            labelsComposer.add(lblComposer);
-            Label lblLyricist = (Label) node.lookup("#lblLyricist");
-            labelsLyricist.add(lblLyricist);
-            CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
-            checkBoxes.add(checkBox);
-            HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
-            hBoxes.add(hboxEntry);
+                lblSongNo.setText(String.valueOf(claim.getId()));
+                lblSongName.setText(claim.getTrackName());
+                lblComposer.setText(claim.getComposer());
+                lblLyricist.setText(claim.getLyricist());
 
-            lblSongNo.setText(String.valueOf(claim.getId()));
-            lblSongName.setText(claim.getTrackName());
-            lblComposer.setText(claim.getComposer());
-            lblLyricist.setText(claim.getLyricist());
+                vbClaimsList.getChildren().add(node);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-            vbClaimsList.getChildren().add(node);
         }
+    }
+
+    private CompletableFuture<Void> downloadImageAsync(ManualClaimTrack claim) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String youtubeID = claim.getYoutubeID();
+                String url = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
+                BufferedImage image = ImageProcessor.getDownloadedImage(url);
+                image = ImageProcessor.cropImage(image);
+                image = ImageProcessor.resizeImage(90, 90, image);
+                claim.setImage(image); // Store the image in your claim object
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("An error occurred");
+                alert.setContentText(String.valueOf(e));
+                Platform.runLater(alert::showAndWait);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        }, imageDownloadExecutor);
     }
 
     @FXML
@@ -104,6 +162,7 @@ public class ControllerMCList {
                 int id = manualClaims.get(i).getId();
                 ManualClaimTrack claim = claimMap.get(id);
                 finalManualClaims.add(claim);
+                // finalSongNames.add(labelsSongName.get(i).getText());
             }
         }
 
@@ -111,40 +170,6 @@ public class ControllerMCList {
         Scene scene = SceneController.getSceneFromEvent(event);
         VBox main = SceneController.getMainVBox(scene);
         main.getChildren().setAll(node);
-
-        // CSV Process
-        /*Path tempDir = Files.createTempDirectory("ingest");
-        Path csvFile = tempDir.resolve("ingest.csv");
-        CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
-        String[] header = {"//Field name:", "Album title", "Album version", "UPC", "Catalog number",
-                "Primary artists", "Featuring artists", "Release date", "Main genre",
-                "Main subgenre", "Alternate genre", "Alternate subgenre", "Label",
-                "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory",
-                "Recording year", "Recording location", "Album format", "Number of volumes",
-                "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier",
-                "Track title", "Track version", "ISRC", "Track primary artists",
-                "Track featuring artists", "Volume number", "Track main genre",
-                "Track main subgenre", "Track alternate genre", "Track alternate subgenre",
-                "Track language (Metadata)", "Audio language", "Lyrics", "Available separately",
-                "Track parental advisory", "Preview start", "Preview length",
-                "Track recording year", "Track recording location", "Contributing artists",
-                "Composers", "Lyricists", "Remixers", "Performers", "Producers",
-                "Writers", "Publishers", "Track sequence", "Track catalog tier",
-                "Original file name", "Original release date", "Movement title",
-                "Classical key", "Classical work", "Always send display title",
-                "Movement number", "Classical catalog"};
-
-        csvWriter.writeNext(header);
-
-        for (int i = 0; i < checkBoxes.size(); i++) {
-            if (checkBoxes.get(i).isSelected()) {
-                System.out.println("labelsSongName = " + labelsSongName.get(i).getText());
-            }
-        }
-
-        csvWriter.close();
-
-        System.out.println("csvFile = " + csvFile);*/
     }
 
     @FXML

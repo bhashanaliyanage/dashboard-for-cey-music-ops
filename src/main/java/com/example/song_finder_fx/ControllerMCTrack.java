@@ -82,6 +82,7 @@ public class ControllerMCTrack {
     }
 
     public void onAddTrack(ActionEvent event) throws IOException {
+        // Getting Parent Object References
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
         TextField txtURL = (TextField) scene.lookup("#txtURL");
@@ -101,7 +102,9 @@ public class ControllerMCTrack {
         boolean ifAnyNull = checkData();
 
         if (!ifAnyNull) {
-            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, url);
+            String youtubeID = TextFormatter.extractYoutubeID(url);
+            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID);
+            // track.setImage();
 
             if (!trimStart.isEmpty() && !trimEnd.isEmpty()) {
                 /*System.out.println("trimStart = " + trimStart);
@@ -110,7 +113,6 @@ public class ControllerMCTrack {
             }
 
             ManualClaims.manualClaims.add(track);
-
 
             titledPane.setText(trackName);
             titledPane.setExpanded(false);

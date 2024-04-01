@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class YoutubeDownload {
 
@@ -70,10 +71,13 @@ public class YoutubeDownload {
 
     public static void trimAudio(String filePath, String outputPath, String startTime, String EndTime) throws IOException, InterruptedException {
         String nodeScriptPPath = "src/main/resources/com/example/song_finder_fx/libs/cutAud.js";
-        System.out.println("filePath = " + filePath);
-        System.out.println("outputPath = " + outputPath);
-        System.out.println("startTime = " + startTime);
-        System.out.println("EndTime = " + EndTime);
+
+        Platform.runLater(() -> {
+            System.out.println("filePath = " + filePath);
+            System.out.println("outputPath = " + outputPath);
+            System.out.println("startTime = " + startTime);
+            System.out.println("EndTime = " + EndTime);
+        });
 
 
         ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPPath, filePath, outputPath, startTime, EndTime);
@@ -86,14 +90,37 @@ public class YoutubeDownload {
         } else {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("An error occurred");
-                alert.setContentText("Error Trimming Audio");
+                alert.setTitle("Error Trimming Audio");
+                alert.setHeaderText("An error occurred while trimming audio");
+                String message = String.format("""
+                        File Path: '%s'
+                        
+                        Output Path: '%s'
+                        
+                        Trim Start: '%s'
+                        
+                        Trim End: '%s'
+                        """, filePath, outputPath, startTime, EndTime);
+                alert.setContentText(message);
                 Platform.runLater(alert::showAndWait);
             });
         }
-
     }
 
 
+    public static void convertAudio(Path sourcePath, Path destinationPath) throws IOException, InterruptedException {
+        String nodeScriptPPath = "src/main/resources/com/example/song_finder_fx/libs/convertAudio.js";
+
+        System.out.println("sourcePath = " + sourcePath);
+        System.out.println("destinationPath = " + destinationPath);
+
+        ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPPath, sourcePath.toString(), destinationPath.toString());
+        Process process = processBuilder.start();
+
+        int exitCode = process.waitFor();
+
+        if (exitCode == 0) {
+            System.out.println("Node.js script executed successfully.");
+        }
+    }
 }

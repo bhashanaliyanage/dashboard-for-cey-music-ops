@@ -56,13 +56,16 @@ public class ControllerMCIdentifiers {
             vbClaimsList.getChildren().add(entry);
 
             Label claimID = (Label) entry.lookup("#claimID");
-            claimID.setText(String.valueOf(ControllerMCList.finalManualClaims.get(i).getId()));
+            String claimIDString = String.valueOf(ControllerMCList.finalManualClaims.get(i).getId());
+            System.out.println("claimIDString = " + claimIDString);
+            claimID.setText(claimIDString);
 
             Label claimName = (Label) entry.lookup("#claimName");
-            claimName.setText(ControllerMCList.labelsSongName.get(i).getText());
+            String claimNameText = ControllerMCList.finalManualClaims.get(i).getTrackName();
+            System.out.println("claimNameText = " + claimNameText);
+            claimName.setText(claimNameText);
 
             TextField claimUPC = (TextField) entry.lookup("#claimUPC");
-            // System.out.println("claimUPC.getText() = " + claimUPC.getText());
             upcs.add(claimUPC);
 
             TextField claimCNumber = (TextField) entry.lookup("#claimCNumber");
@@ -70,8 +73,6 @@ public class ControllerMCIdentifiers {
 
             TextField claimISRC = (TextField) entry.lookup("#claimISRC");
             claimISRCs.add(claimISRC);
-
-            // currentISRC = "";
         }
     }
 
@@ -85,6 +86,48 @@ public class ControllerMCIdentifiers {
         currentISRC = "";
         LocalDate date = LocalDate.now();
         String userName = System.getProperty("user.name");
+
+        // Getting total claims for the loop
+        int totalClaims = ControllerMCList.finalManualClaims.size();
+
+        // Front End Validation
+        for (int claimID = 0; claimID < totalClaims; claimID++) {
+            final String[] upc = {upcs.get(claimID).getText()};
+            final String[] catNo = {claimCNumbers.get(claimID).getText()};
+
+            // Validating UPCs
+            if (upc[0].isEmpty()) {
+                TextInputDialog inputDialog = new TextInputDialog(null);
+                inputDialog.setTitle("Invalid UPC");
+                inputDialog.setHeaderText("Enter a UPC number for " + ControllerMCList.finalManualClaims.get(claimID).getTrackName());
+                inputDialog.setContentText("UPC: ");
+                int finalClaimID = claimID;
+                inputDialog.showAndWait().ifPresent(newUPC -> {
+                    upcs.get(finalClaimID).setText(newUPC);
+                    System.out.println("New UPC entered: " + newUPC);
+                });
+            }
+
+            // Validating Catalog Numbers
+            if (catNo[0].isEmpty()) {
+                // Check catalog numbers from database if no user input available
+                String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
+                String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
+                catNo[0] = DatabasePostgres.getCatNo(composer, lyricist);
+
+                // Request catalog number from user if there are no catalog numbers available in the database
+                if (catNo[0] == null) {
+                    requestCatNo(composer, lyricist, claimID);
+                }
+
+                // Request catalog number if it is not recognizable
+                String[] parts = catNo[0].split("-");
+                if (Objects.equals(parts[0], "null")) {
+                    requestCatNo(composer, lyricist, claimID);
+                }
+            }
+
+        }
 
         // Switching scenes
         Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests/generate_ingest.fxml")));
@@ -110,9 +153,6 @@ public class ControllerMCIdentifiers {
             // Updating UI with ingest ID
             lblIngestID.setText(String.valueOf(ingestID));
 
-            // Getting total claims for the loop
-            int totalClaims = ControllerMCList.finalManualClaims.size();
-
             // Executing rest of the tasks as a background task
             Task<Void> task = new Task<>() {
                 @Override
@@ -124,38 +164,28 @@ public class ControllerMCIdentifiers {
 
                         // Getting ingest details
                         String albumTitle = ControllerMCList.finalManualClaims.get(claimID).getTrackName();
-                        String upc = upcs.get(claimID).getText();
+                        final String[] upc = {upcs.get(claimID).getText()};
                         String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
                         String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
                         String originalFileName = ControllerMCList.finalManualClaims.get(claimID).getYoutubeID() + ".flac";
 
-                        // Alerting user if UPC not exists
-                        if (upc.isEmpty()) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Missing Identifier");
-                            alert.setHeaderText("Missing UPC");
-                            alert.setContentText("UPC number missing for claim: " + ControllerMCList.finalManualClaims.get(claimID).getTrackName());
+                        // Writing CSV row
+                        List<String> CSV_Row = getCSV_Row(claimID, albumTitle, upc[0], composer, lyricist, originalFileName);
+                        csvWriter.write(CSV_Row);
 
-                            Platform.runLater(alert::showAndWait);
-                        } else {
-                            // Writing CSV row
-                            List<String> CSV_Row = getCSV_Row(claimID, albumTitle, upc, composer, lyricist, originalFileName);
-                            csvWriter.write(CSV_Row);
+                        // Creating sub-folders by UPC
+                        File folder = createSubFolder(upc[0], destination);
 
-                            // Creating sub-folders by UPC
-                            File folder = createSubFolder(upc, destination);
+                        // Updating UI with the current task
+                        Platform.runLater(() -> lblProcess.setText("Downloading Audio for: " + albumTitle));
 
-                            // Updating UI with the current task
-                            Platform.runLater(() -> lblProcess.setText("Downloading Audio for: " + albumTitle));
+                        // Downloading audio to a temporary directory
+                        final String[] fileLocation = new String[1];
+                        String fileName = CSV_Row.get(55);
+                        downloadAudio(claimID, fileName, fileLocation);
 
-                            // Downloading audio to a temporary directory
-                            final String[] fileLocation = new String[1];
-                            String fileName = CSV_Row.get(55);
-                            downloadAudio(claimID, fileName, fileLocation);
-
-                            // Trimming audio if needed and copying it to the sub-folder created
-                            trimAndCopyAudio(claimID, albumTitle, fileLocation, fileName, folder, lblProcess);
-                        }
+                        // Trimming audio if needed and copying it to the sub-folder created
+                        trimAndCopyAudio(claimID, albumTitle, fileLocation, fileName, folder, lblProcess);
 
                         Platform.runLater(() -> progressBar.setProgress(progress));
                     }
@@ -174,7 +204,18 @@ public class ControllerMCIdentifiers {
         }
     }
 
-    private static void trimAndCopyAudio(int claimID, String albumTitle, String[] fileLocation, String fileName, File folder, Label lblProcess) throws IOException {
+    private static void requestCatNo(String composer, String lyricist, int claimID) {
+        TextInputDialog inputDialog = new TextInputDialog(null);
+        inputDialog.setTitle("Cannot find Catalog Number");
+        inputDialog.setHeaderText("Enter a new catalog number for " + composer + " or " + lyricist);
+        inputDialog.setContentText("Catalog Number:");
+        inputDialog.showAndWait().ifPresent(newCatNo -> {
+            claimCNumbers.get(claimID).setText(newCatNo);
+            System.out.println("New catalog number entered: " + newCatNo);
+        });
+    }
+
+    private static void trimAndCopyAudio(int claimID, String albumTitle, String[] fileLocation, String fileName, File folder, Label lblProcess) throws IOException, InterruptedException {
         if (!Objects.equals(ControllerMCList.finalManualClaims.get(claimID).getTrimStart(), "null")) {
 
             Platform.runLater(() -> lblProcess.setText("Trimming Audio for: " + albumTitle));
@@ -206,9 +247,14 @@ public class ControllerMCIdentifiers {
             System.out.println("sourcePath = " + sourcePath);
             System.out.println("destinationPath = " + destinationPath);
 
-            Files.copy(sourcePath, destinationPath);
+            // Files.copy(sourcePath, destinationPath);
+            YoutubeDownload.convertAudio(sourcePath, destinationPath);
         }
     }
+
+//    private static void convertAudio(Path sourcePath, Path destinationPath) {
+//
+//    }
 
     private static void downloadAudio(int claimID, String fileName, String[] fileLocation) {
         try {
@@ -405,39 +451,40 @@ public class ControllerMCIdentifiers {
     }
 
     private static @NotNull String getCatNo(int i) throws SQLException {
+        // Get catalog numbers from user input
         final String[] catNo = {claimCNumbers.get(i).getText()};
 
         if (catNo[0].isEmpty()) {
+            // Check catalog numbers from database if no user input available
             String composer = ControllerMCList.finalManualClaims.get(i).getComposer();
-            System.out.println("composer = " + composer);
             String lyricist = ControllerMCList.finalManualClaims.get(i).getLyricist();
-            System.out.println("lyricist = " + lyricist);
             catNo[0] = DatabasePostgres.getCatNo(composer, lyricist);
+
+            // Request catalog number from user if there are no catalog numbers available in the database
             if (catNo[0] == null) {
-                TextInputDialog inputDialog = new TextInputDialog(null);
-                inputDialog.setTitle("Cannot find Catalog Number");
-                inputDialog.setHeaderText("Enter a new catalog number for " + composer + " or " + lyricist);
-                inputDialog.setContentText("Catalog Number:");
-                inputDialog.showAndWait().ifPresent(newCatNo -> {
-                    System.out.println("New catalog number entered: " + newCatNo);
-                    catNo[0] = newCatNo;
-                });
+                requestCatalogNumber(composer, lyricist, catNo);
             }
-            assert catNo[0] != null;
+
+            // Request catalog number if it is not recognizable
             String[] parts = catNo[0].split("-");
-            // TODO: 3/13/2024 Show an alert box and get the catalog number from user if no catalog number is returned from the database
             if (Objects.equals(parts[0], "null")) {
-                TextInputDialog inputDialog = new TextInputDialog(catNo[0]);
-                inputDialog.setTitle("Cannot find Catalog Number");
-                inputDialog.setHeaderText("Enter a new catalog number for " + composer + " or " + lyricist);
-                inputDialog.setContentText("Catalog Number:");
-                inputDialog.showAndWait().ifPresent(newCatNo -> {
-                    System.out.println("New catalog number entered: " + newCatNo);
-                    catNo[0] = newCatNo;
-                });
+                requestCatalogNumber(composer, lyricist, catNo);
             }
         }
         return catNo[0];
+    }
+
+    private static void requestCatalogNumber(String composer, String lyricist, String[] catNo) {
+        Platform.runLater(() -> {
+            TextInputDialog inputDialog = new TextInputDialog(null);
+            inputDialog.setTitle("Cannot find Catalog Number");
+            inputDialog.setHeaderText("Enter a new catalog number for " + composer + " or " + lyricist);
+            inputDialog.setContentText("Catalog Number:");
+            inputDialog.showAndWait().ifPresent(newCatNo -> {
+                System.out.println("New catalog number entered: " + newCatNo);
+                catNo[0] = newCatNo;
+            });
+        });
     }
 
     @FXML
