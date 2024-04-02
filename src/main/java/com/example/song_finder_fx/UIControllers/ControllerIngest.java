@@ -14,25 +14,7 @@ import java.nio.file.Path;
 public class ControllerIngest {
 
     @FXML
-    private Button btnOpen;
-
-    @FXML
-    private Label lblIngestID;
-
-    @FXML
     private Label lblLocation;
-
-    @FXML
-    private Label lblPercentage;
-
-    @FXML
-    private Label lblProcess;
-
-    @FXML
-    private ProgressBar progressBar;
-
-    @FXML
-    private VBox vboxTracks;
 
     @FXML
     void onGoBack(MouseEvent event) {

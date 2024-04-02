@@ -2,8 +2,8 @@ package com.example.song_finder_fx.Model;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 
 public class ManualClaimTrack {
     private final int id;
