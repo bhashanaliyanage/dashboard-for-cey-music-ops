@@ -10,10 +10,9 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -188,24 +187,40 @@ public class DatabasePostgres {
         return resultSet.getString(1);
     }
 
-    public static List<ManualClaimTrack> getManualClaims() throws SQLException {
+    public static List<ManualClaimTrack> getManualClaims() throws SQLException, IOException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
-        String query = "SELECT * FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY public.manual_claims.claim_id ASC;";
+        String query = "SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY public.manual_claims.claim_id ASC;";
         ResultSet resultSet = statement.executeQuery(query);
         List<ManualClaimTrack> manualClaims = new ArrayList<>();
 
         if (resultSet.isBeforeFirst()) {
             while (resultSet.next()) {
-                int id = resultSet.getInt(6);
-                String songName = resultSet.getString(1);
-                String composer = resultSet.getString(2);
-                String lyrics = resultSet.getString(3);
-                String youTubeLink = resultSet.getString(4);
-                String trimStart = resultSet.getString(8);
-                String trimEnd = resultSet.getString(9);
+                int id = resultSet.getInt(1);
+                String songName = resultSet.getString(2);
+                String composer = resultSet.getString(3);
+                String lyrics = resultSet.getString(4);
+                String youTubeLink = resultSet.getString(5);
+                String trimStart = resultSet.getString(6);
+                String trimEnd = resultSet.getString(7);
+                byte[] previewImageBytes = resultSet.getBytes(8);
+                byte[] artworkImageBytes = resultSet.getBytes(9);
 
                 ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink);
+
+                // Set the images to model
+                try {
+                    ByteArrayInputStream previewImageInputStream = new ByteArrayInputStream(previewImageBytes);
+                    ByteArrayInputStream artworkImageInputStream = new ByteArrayInputStream(artworkImageBytes);
+                    manualClaimTrack.setPreviewImage(ImageIO.read(previewImageInputStream));
+                    manualClaimTrack.setImage(ImageIO.read(artworkImageInputStream));
+                } catch (IOException e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error loading one or more images");
+                    alert.setContentText(String.valueOf(e));
+                    Platform.runLater(alert::showAndWait);
+                }
 
                 if (trimStart != null && trimEnd != null) {
                     manualClaimTrack.addTrimTime(trimStart, trimEnd);
@@ -349,8 +364,8 @@ public class DatabasePostgres {
     public static void addIngestProduct(int ingestID, String upc, String albumTitle, String s, String composer, String lyricist, String originalFileName) throws SQLException {
         Connection db = getConn();
         String query = String.format("INSERT INTO " +
-                "public.ingest_products(ingest_id, upc, song_name, isrc, composer, lyricist, file_name) " +
-                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');",
+                        "public.ingest_products(ingest_id, upc, song_name, isrc, composer, lyricist, file_name) " +
+                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');",
                 ingestID, upc, albumTitle, s, composer, lyricist, originalFileName);
         Statement statement = db.createStatement();
         statement.executeUpdate(query);
@@ -384,8 +399,8 @@ public class DatabasePostgres {
             // System.out.println("isrc = " + isrc);
 
             String query = String.format("INSERT INTO public.song_artist (song_isrc, artist_id, artist_type) " +
-                    "VALUES ('%s', (SELECT artist_id FROM public.artists WHERE artist_name = '%s' LIMIT 1), '%s') " +
-                    "ON CONFLICT (song_isrc, artist_id, artist_type) DO UPDATE SET artist_type = EXCLUDED.artist_type;",
+                            "VALUES ('%s', (SELECT artist_id FROM public.artists WHERE artist_name = '%s' LIMIT 1), '%s') " +
+                            "ON CONFLICT (song_isrc, artist_id, artist_type) DO UPDATE SET artist_type = EXCLUDED.artist_type;",
                     isrc, artist, artist_type);
 
             try {
@@ -401,11 +416,18 @@ public class DatabasePostgres {
         }
     }
 
-    public static int addManualClaim(ManualClaimTrack claim) throws SQLException {
+    /*public static int addManualClaim(ManualClaimTrack claim) throws SQLException, IOException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
+
+        // Convert BufferedImage to byte array
+        BufferedImage bufferedImage = claim.getBufferedImage();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, "jpg", baos);
+        byte[] imageBytes = baos.toByteArray();
+
         String query = String.format("INSERT INTO public.manual_claims " +
-                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end) " +
+                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, artwork) " +
                         "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');",
                 claim.getTrackName(),
                 claim.getComposer(),
@@ -414,10 +436,38 @@ public class DatabasePostgres {
                 claim.getTrimStart(),
                 claim.getTrimEnd());
 
-        /*System.out.println("Trim Start = " + claim.getTrimStart());
-        System.out.println("Trim End = " + claim.getTrimEnd());*/
-
         return statement.executeUpdate(query);
+    }*/
+
+    public static int addManualClaim(ManualClaimTrack claim) throws SQLException, IOException {
+        Connection conn = getConn();
+        PreparedStatement preparedStatement = conn.prepareStatement(
+                "INSERT INTO public.manual_claims " +
+                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, artwork, preview_image) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        );
+
+        // Get artwork
+        ByteArrayOutputStream binaryData = new ByteArrayOutputStream();
+        ImageIO.write(claim.getBufferedImage(), "jpg", binaryData);
+        byte[] artwork = binaryData.toByteArray();
+
+        // Get previewImage
+        ImageIO.write(claim.getBufferedPreviewImage(), "jpg", binaryData);
+        byte[] previewImage = binaryData.toByteArray();
+
+        // Set values for the prepared statement
+        preparedStatement.setString(1, claim.getTrackName());
+        preparedStatement.setString(2, claim.getComposer());
+        preparedStatement.setString(3, claim.getLyricist());
+        preparedStatement.setString(4, claim.getYoutubeID());
+        preparedStatement.setString(5, claim.getTrimStart());
+        preparedStatement.setString(6, claim.getTrimEnd());
+        preparedStatement.setBytes(7, artwork);
+        preparedStatement.setBytes(8, previewImage);
+
+        // Execute the prepared statement
+        return preparedStatement.executeUpdate();
     }
 
     public static void importToArtistsTable(File csv) throws SQLException, ClassNotFoundException, IOException {

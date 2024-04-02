@@ -69,7 +69,7 @@ public class ControllerMCList {
 
         manualClaims = DatabasePostgres.getManualClaims();
 
-        List<CompletableFuture<Void>> downloadFutures = manualClaims.stream()
+        /*List<CompletableFuture<Void>> downloadFutures = manualClaims.stream()
                 .map(this::downloadImageAsync)
                 .toList();
 
@@ -78,7 +78,48 @@ public class ControllerMCList {
         allDownloads.thenRun(() -> {
             // All images downloaded, update UI
             Platform.runLater(this::updateUI);
-        });
+        });*/
+
+        for (ManualClaimTrack claim : manualClaims) {
+            claimMap.put(claim.getId(), claim);
+
+            Node node;
+            try {
+                node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../layouts/manual_claims/manual-claims-list-entry.fxml")));
+                Label lblSongNo = (Label) node.lookup("#lblSongNo");
+                labelsSongNo.add(lblSongNo);
+                Label lblSongName = (Label) node.lookup("#lblSongName");
+                labelsSongName.add(lblSongName);
+                Label lblComposer = (Label) node.lookup("#lblComposer");
+                labelsComposer.add(lblComposer);
+                Label lblLyricist = (Label) node.lookup("#lblLyricist");
+                labelsLyricist.add(lblLyricist);
+                CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
+                checkBoxes.add(checkBox);
+                HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
+                hBoxes.add(hboxEntry);
+                ImageView image = (ImageView) node.lookup("#image");
+                try {
+                    image.setImage(claim.getPreviewImage());
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error Loading Preview Image");
+                    alert.setContentText(String.valueOf(e));
+                    Platform.runLater(alert::showAndWait);
+                }
+
+                lblSongNo.setText(String.valueOf(claim.getId()));
+                lblSongName.setText(claim.getTrackName());
+                lblComposer.setText(claim.getComposer());
+                lblLyricist.setText(claim.getLyricist());
+
+                vbClaimsList.getChildren().add(node);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     }
 
     private void updateUI() {
@@ -154,6 +195,7 @@ public class ControllerMCList {
                 // ID, Name, Composer, Lyricist
                 int id = manualClaims.get(i).getId();
                 ManualClaimTrack claim = claimMap.get(id);
+                System.out.println("claim.getBufferedImage() = " + claim.getBufferedImage());
                 finalManualClaims.add(claim);
                 // finalSongNames.add(labelsSongName.get(i).getText());
             }

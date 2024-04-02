@@ -3,6 +3,7 @@ package com.example.song_finder_fx.Model;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 
 public class ManualClaimTrack {
     private final int id;
@@ -14,6 +15,7 @@ public class ManualClaimTrack {
     private String trimStart;
     private String trimEnd;
     private BufferedImage image;
+    private BufferedImage previewImage;
 
     /*public ManualClaimTrack(String trackName, String lyricist, String composer, String url) {
         this.trackName = trackName;
@@ -81,5 +83,21 @@ public class ManualClaimTrack {
 
     public Image getImage() {
         return SwingFXUtils.toFXImage(image, null);
+    }
+
+    public void setPreviewImage(BufferedImage image) {
+        this.previewImage = image;
+    }
+
+    public Image getPreviewImage() {
+        return SwingFXUtils.toFXImage(previewImage, null);
+    }
+
+    public BufferedImage getBufferedImage() {
+        return image;
+    }
+
+    public BufferedImage getBufferedPreviewImage() {
+        return previewImage;
     }
 }

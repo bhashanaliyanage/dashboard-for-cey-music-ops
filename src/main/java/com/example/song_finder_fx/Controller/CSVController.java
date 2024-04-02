@@ -107,7 +107,7 @@ public class CSVController {
         while ((bReader.readLine()) != null) {
             rowcount++;
         }
-        System.out.println("rowcount = " + rowcount);
+        // System.out.println("rowcount = " + rowcount);
         return rowcount;
     }
 

@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.ImageProcessor;
 import com.example.song_finder_fx.Controller.ManualClaims;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -15,7 +16,9 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.textfield.TextFields;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -81,7 +84,7 @@ public class ControllerMCTrack {
         txtLyricist.setText(songs.getLyricist());
     }
 
-    public void onAddTrack(ActionEvent event) throws IOException {
+    public void onAddTrack(ActionEvent event) throws IOException, URISyntaxException {
         // Getting Parent Object References
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
@@ -104,11 +107,14 @@ public class ControllerMCTrack {
         if (!ifAnyNull) {
             String youtubeID = TextFormatter.extractYoutubeID(url);
             ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID);
-            // track.setImage();
+            String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
+            BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
+            image = ImageProcessor.cropImage(image);
+            track.setPreviewImage(image);
+            image = ImageProcessor.resizeImage(1400, 1400, image);
+            track.setImage(image);
 
             if (!trimStart.isEmpty() && !trimEnd.isEmpty()) {
-                /*System.out.println("trimStart = " + trimStart);
-                System.out.println("trimEnd = " + trimEnd);*/
                 track.addTrimTime(trimStart, trimEnd);
             }
 

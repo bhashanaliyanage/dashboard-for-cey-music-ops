@@ -19,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -139,10 +141,14 @@ public class ControllerMCIdentifiers {
         // Getting scene objects
         Label lblIngestID = (Label) scene.lookup("#lblIngestID");
         Label lblProcess = (Label) scene.lookup("#lblProcess");
+        Label lblLocation = (Label) scene.lookup("#lblLocation");
         ProgressBar progressBar = (ProgressBar) scene.lookup("#progressBar");
 
         // Requesting file location from user
         File destination = Main.browseLocationNew(scene.getWindow());
+
+        // Setting file location in the UI
+        lblLocation.setText(destination.getAbsolutePath());
 
         // Create ingest CSV and get writer object
         CsvListWriter csvWriter = getCsvListWriter(destination);
@@ -177,10 +183,19 @@ public class ControllerMCIdentifiers {
                         // Creating sub-folders by UPC
                         File folder = createSubFolder(upc[0], destination);
 
-                        // Updating UI with the current task
-                        Platform.runLater(() -> lblProcess.setText("Downloading Audio for: " + albumTitle));
+                        // Getting the artwork from database, saving it to created subfolder
+                        Platform.runLater(() -> lblProcess.setText("Getting Artwork for: " + albumTitle));
+                        try {
+                            BufferedImage artwork = ControllerMCList.finalManualClaims.get(claimID).getBufferedImage();
+                            String outputPath = folder.getAbsolutePath() + "\\" + upc[0] + ".jpg";
+                            Platform.runLater(() -> System.out.println("outputPath = " + outputPath));
+                            ImageIO.write(artwork, "jpg", new File(outputPath));
+                        } catch (IOException e) {
+                            Platform.runLater(e::printStackTrace);
+                        }
 
                         // Downloading audio to a temporary directory
+                        Platform.runLater(() -> lblProcess.setText("Downloading Audio for: " + albumTitle));
                         final String[] fileLocation = new String[1];
                         String fileName = CSV_Row.get(55);
                         downloadAudio(claimID, fileName, fileLocation);
@@ -217,8 +232,8 @@ public class ControllerMCIdentifiers {
     }
 
     private static void trimAndCopyAudio(int claimID, String albumTitle, String[] fileLocation, String fileName, File folder, Label lblProcess) throws IOException, InterruptedException {
-        if (!Objects.equals(ControllerMCList.finalManualClaims.get(claimID).getTrimStart(), "null")) {
-
+        if (ControllerMCList.finalManualClaims.get(claimID).getTrimStart() != null) {
+            System.out.println("Trim Start: " + ControllerMCList.finalManualClaims.get(claimID).getTrimStart());
             Platform.runLater(() -> lblProcess.setText("Trimming Audio for: " + albumTitle));
 
             String trimStart = ControllerMCList.finalManualClaims.get(claimID).getTrimStart();
@@ -252,10 +267,6 @@ public class ControllerMCIdentifiers {
             YoutubeDownload.convertAudio(sourcePath, destinationPath);
         }
     }
-
-//    private static void convertAudio(Path sourcePath, Path destinationPath) {
-//
-//    }
 
     private static void downloadAudio(int claimID, String fileName, String[] fileLocation) {
         try {

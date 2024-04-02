@@ -479,7 +479,7 @@ public class ControllerRevenueGenerator {
         Parent newContentMain = loaderMain.load();
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
-        System.out.println("Here!");
+        // System.out.println("Here!");
 
         /*Scene scene = mainUIController.mainVBox.getScene();
         vbArtistReports = (VBox) scene.lookup("#vbArtistReports");*/
@@ -581,9 +581,7 @@ public class ControllerRevenueGenerator {
         String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
         DecimalFormat df = new DecimalFormat("0.00");
 
-        final ArrayList<Double>[] royalty = new ArrayList[]{
-                new ArrayList<Double>()
-        };
+        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
 
         final double[] tax = {0};
         final double[] amountPayable = new double[1];
@@ -925,23 +923,18 @@ public class ControllerRevenueGenerator {
     }
 
     //Write Csv file
-    public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath, String[] upcArray, String albumTitle, int startNum, String catelog, String PrimaryArtist,String ISRC) {
+    public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath, String[] upcArray, String albumTitle, int startNum, String catelog, String PrimaryArtist, String ISRC) {
 
         String UPC1 = null;
         String titl = null;
         int UPC = 0;
-        String s= ISRC.substring(7);
+        String s = ISRC.substring(7);
         int isr = Integer.parseInt(s);
-        String isrcName = ISRC.substring(0,8);
+        String isrcName = ISRC.substring(0, 8);
 
         System.out.println("write method");
         try (CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFilePath))) {
-            String[] headerRecord = {"Fname", "Album title", "Album version", "UPC", "Catalog number", "Primary Artists", "Featuring artists", "Release date", "Main genre", "Main subgenre", "Alternate genre", "Alternate subgenre",
-                    "Label", "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory", "Recording year", "Recording location", "Album format", "Number of volumes",
-                    "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier", "Track title", "Track version", "ISRC", "Track primary artists", "Featuring artists",
-                    "Volume number", "Track main genre", "Track main subgenre", "Track alternate genre", "Track alternate subgenre", "Track language (Metadata)", "Audio language", "Lyrics", "Available separately",
-                    "Track parental advisory", "Preview start", "Preview length", "Track recording year", "Track recording location", "Contributing artists", "Composer", "Lyrics", "Remixers",
-                    "Performers", "Producers", "Writers", "Publishers", "Track sequence", "Track catalog tier", "Original file name", "Original release date"}; // CSV Head
+            String[] headerRecord = {"Fname", "Album title", "Album version", "UPC", "Catalog number", "Primary Artists", "Featuring artists", "Release date", "Main genre", "Main subgenre", "Alternate genre", "Alternate subgenre", "Label", "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory", "Recording year", "Recording location", "Album format", "Number of volumes", "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier", "Track title", "Track version", "ISRC", "Track primary artists", "Featuring artists", "Volume number", "Track main genre", "Track main subgenre", "Track alternate genre", "Track alternate subgenre", "Track language (Metadata)", "Audio language", "Lyrics", "Available separately", "Track parental advisory", "Preview start", "Preview length", "Track recording year", "Track recording location", "Contributing artists", "Composer", "Lyrics", "Remixers", "Performers", "Producers", "Writers", "Publishers", "Track sequence", "Track catalog tier", "Original file name", "Original release date"}; // CSV Head
             csvWriter.writeNext(headerRecord);
             int count = 0;
             int titlenum1 = startNum;
@@ -953,26 +946,26 @@ public class ControllerRevenueGenerator {
                 String ly = cs.getLyrics();
                 String com = cs.getComposer();
                 String artist = null;
-                if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist))  {
+                if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist) && sg.equalsIgnoreCase(PrimaryArtist)) {
                     artist = PrimaryArtist;
 //                    System.out.println(artist+"1");
                 } else if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)) {
-                    artist = ly+"|"+com+"|"+sg;
+                    artist = ly + "|" + com + "|" + sg;
 //                    System.out.println(artist+"2");
-                } else if(sg.equalsIgnoreCase(PrimaryArtist) && ly.equalsIgnoreCase(PrimaryArtist)){
+                } else if (sg.equalsIgnoreCase(PrimaryArtist) && ly.equalsIgnoreCase(PrimaryArtist)) {
 
-                    artist = ly + "|"  + sg+"|"+com;
+                    artist = ly + "|" + sg + "|" + com;
 //                    System.out.println(artist+"3");
-                }else if(com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist)){
-                    artist = com+"|"+sg+"|"+ly;
-                }else if(com.equalsIgnoreCase(PrimaryArtist)){
-                    artist=com+"|"+sg+"|"+ly;
-                }else if(ly.equalsIgnoreCase(PrimaryArtist)){
-                    artist=ly+"|"+sg+"|"+com;
-                }else if(sg.equalsIgnoreCase(PrimaryArtist)){
-                    artist=sg+"|"+ly+"|"+com;
-                }else{
-                    artist=null;
+                } else if (com.equalsIgnoreCase(PrimaryArtist) && sg.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = com + "|" + sg + "|" + ly;
+                } else if (com.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = com + "|" + sg + "|" + ly;
+                } else if (ly.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = ly + "|" + sg + "|" + com;
+                } else if (sg.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = sg + "|" + ly + "|" + com;
+                } else {
+                    artist = null;
                 }
                 //add UPC
 //                UPC1 = String.valueOf(u);
@@ -995,7 +988,7 @@ public class ControllerRevenueGenerator {
 //                int isr = Integer.parseInt(s);
 //                String isrcName = ISRC.substring(0,7);
 
-                String isrc = isrcName+isr;
+                String isrc = isrcName + isr;
 
                 String trackPrimaryArtist = ly + " | " + sg + " | " + com;
                 String compoNlyrics = com + " | " + ly;
@@ -1005,12 +998,7 @@ public class ControllerRevenueGenerator {
 //                    albumTitle1 = albumTitle+". Vol. "+titl;
                 }
 
-                String[] dataRecord = {"", albumTitle1, "", UPC1, catelog, PrimaryArtist, "", releasedate, "pop", "", "", "",
-                        "CeyMusic Records", curruntYear, "CeyMusic Publishing", curruntYear, "CeyMusic Records", "N", curruntYear, "Sri Lanka", "Album", "1",
-                        "World", "", "Si", "", cs.getSongTitle(), "", isrc, trackPrimaryArtist, cs.getSinger(),
-                        "1", "pop", "", "", "", "SI", "SI", "", "Y",
-                        "N", "0", "120", curruntYear, "Sri Lanka", "", cs.getComposer(), cs.getLyrics(), "",
-                        "", "", compoNlyrics, "CeyMusic Publishing", String.valueOf(count), "Mid", cs.getFileName(), releasedate};
+                String[] dataRecord = {"", albumTitle1, "", UPC1, catelog, PrimaryArtist, "", releasedate, "pop", "", "", "", "CeyMusic Records", curruntYear, "CeyMusic Publishing", curruntYear, "CeyMusic Records", "N", curruntYear, "Sri Lanka", "Album", "1", "World", "", "Si", "", cs.getSongTitle(), "", isrc, trackPrimaryArtist, cs.getSinger(), "1", "pop", "", "", "", "SI", "SI", "", "Y", "N", "0", "120", curruntYear, "Sri Lanka", "", cs.getComposer(), cs.getLyrics(), "", "", "", compoNlyrics, "CeyMusic Publishing", String.valueOf(count), "Mid", cs.getFileName(), releasedate};
                 csvWriter.writeNext(dataRecord);
 
 //COMMENTED FOR TEST WORKING CODE

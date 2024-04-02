@@ -31,7 +31,7 @@ public class ControllerMCLEntry {
 
     @FXML
     public void initialize() {
-        System.out.println("Manual Claims List Entry " + lblSongNo.getText());
+        // System.out.println("Manual Claims List Entry " + lblSongNo.getText());
     }
 
     @FXML
