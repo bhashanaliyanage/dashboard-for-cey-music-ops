@@ -756,12 +756,25 @@ public class DatabasePostgres {
         Connection connection = DatabasePostgres.getConn();
         ArrayList<Double> royalty = new ArrayList<>();
 
+        /**
         PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +
                 "((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY, " +
                 "(((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
                 "FROM `report` " +
                 "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
                 "ORDER BY `REPORTED_ROYALTY` DESC;");
+        */
+
+
+        PreparedStatement psGetGross = connection.prepareStatement("SELECT report.asset_isrc, " +
+                "       ((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * isrc_payees.SHARE/100 AS REPORTED_ROYALTY, " +
+                "       (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
+                "FROM report " +
+                "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND isrc_payees.PAYEE = ? " +
+                "GROUP BY report.asset_isrc, isrc_payees.SHARE" +
+                "ORDER BY REPORTED_ROYALTY DESC;");
+
+
         psGetGross.setString(1, artistName);
         ResultSet rsGross = psGetGross.executeQuery();
         rsGross.next();
@@ -904,12 +917,31 @@ public class DatabasePostgres {
         LIMIT 5;*/
         Connection connection = getConn();
 
+        String sql = "   SELECT r.* FROM public.report AS r" +
+                "JOIN ( SELECT asset_isrc, MAX(reported_royalty) AS max_royalty FROM public.report WHERE asset_isrc IN (" +
+                "        SELECT isrc FROM public.isrc_payees " +
+                "        WHERE payee01 = ? " +
+                "           OR payee = ? " +
+                "           OR payee02 = ? )" +
+                "    GROUP BY asset_isrc) AS max_royalties ON r.asset_isrc = max_royalties.asset_isrc" +
+                "AND r.reported_royalty = max_royalties.max_royalty" +
+                "ORDER BY r.reported_royalty DESC" +
+                "LIMIT 5";
+
+        /**
+         *
         PreparedStatement ps = connection.prepareStatement("SELECT `report`.`Asset_Title`, (((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY " +
                 "FROM `report` JOIN `isrc_payees` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC` " +
                 "WHERE `report`.`Asset_ISRC` IN (SELECT `isrc_payees`.`ISRC` WHERE `isrc_payees`.`PAYEE` = ?) " +
                 "GROUP BY `report`.`Asset_ISRC` " +
                 "LIMIT 5;");
+        */
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+
         ps.setString(1, selectedItem);
+        ps.setString(2,selectedItem);
+        ps.setString(3,selectedItem);
 
         return ps.executeQuery();
     }
