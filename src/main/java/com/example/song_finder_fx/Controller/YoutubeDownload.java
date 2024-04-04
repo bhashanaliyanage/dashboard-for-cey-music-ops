@@ -76,6 +76,14 @@ public class YoutubeDownload {
         ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPPath, filePath, outputPath, startTime, EndTime);
         Process process = processBuilder.start();
 
+        // Read and print output
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String finalLine = line;
+            Platform.runLater(() -> System.out.println(finalLine));
+        }
+
         int exitCode = process.waitFor();
 
         if (exitCode == 0) {

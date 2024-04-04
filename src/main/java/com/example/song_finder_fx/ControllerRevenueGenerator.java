@@ -52,7 +52,6 @@ public class ControllerRevenueGenerator {
 
     //<editor-fold desc="Labels">
     public Label lblUpdateSongsDatabase;
-    public Label lblStatus;
     public Label lblWriter01;
     public Label lblWriter02;
     public Label lblWriter03;
@@ -479,57 +478,6 @@ public class ControllerRevenueGenerator {
         Parent newContentMain = loaderMain.load();
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
-        // System.out.println("Here!");
-
-        /*Scene scene = mainUIController.mainVBox.getScene();
-        vbArtistReports = (VBox) scene.lookup("#vbArtistReports");*/
-
-        Task<Void> task;
-
-        task = new Task<>() {
-            @Override
-            protected Void call() throws SQLException, ClassNotFoundException {
-                Platform.runLater(() -> {
-                    lblStatus.setText("> Checking ISRC Sync...");
-                    comboPayees.setDisable(true);
-                });
-
-                // ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
-//                ResultSet resultSet = DatabasePostgre.checkMissingISRCs();        //Postgress
-
-                int rowCount = 0;
-
-//                while (resultSet.next()) {
-//                    if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
-//                        rowCount++;
-//                    }
-//                }
-
-                System.out.println("rowCount = " + rowCount);
-
-                Platform.runLater(() -> {
-                    try {
-                        lblStatus.setText("Loading Payees...");
-                        ResultSet rsPayees = DatabaseMySQL.getPayees();
-//                            ResultSet rsPayees = DatabasePostgre.getPayees();     //Postgress
-
-                        while (rsPayees.next()) {
-                            comboPayees.getItems().add(rsPayees.getString(1));
-                        }
-                        lblStatus.setVisible(false);
-                        imgLoading.setVisible(false);
-                        comboPayees.setDisable(false);
-                    } catch (SQLException | ClassNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-
-                return null;
-            }
-        };
-
-        Thread t = new Thread(task);
-        t.start();
     }
 
     public void onSidePanelAddNewReportBtnClick() throws IOException {

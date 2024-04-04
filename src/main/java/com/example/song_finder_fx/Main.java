@@ -220,3 +220,8 @@ public class Main extends Application {
 
 // Ingests
 // TODO: 3/26/2024 Debug Ingest CSV
+
+// Manual Claims
+// TODO: 4/4/2024 Check and format time input before inserting it into database
+// TODO: 4/4/2024 Check for folders with spaces in names before sending it into node script
+

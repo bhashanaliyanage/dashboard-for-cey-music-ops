@@ -2,19 +2,14 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Model.FUGAReport;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
+import com.example.song_finder_fx.Model.Report;
 import com.example.song_finder_fx.Model.Songs;
-import com.example.song_finder_fx.Model.report;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-//import java.lang.foreign.SegmentAllocator;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -25,7 +20,6 @@ import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -79,51 +73,47 @@ public class DatabasePostgres {
     //Existing main meth in 405 line
 
 
-      public static void main(String[] args) throws SQLException {
-        List<report> sList = new ArrayList<>();
+    public static void main(String[] args) throws SQLException {
+        /*List<Report> sList;
         String s = "LKA0U2302779";
-       sList=reporLi(Collections.singletonList(s));
-       for(report r :sList){
+        sList = reporLi(Collections.singletonList(s));
+        for (Report r : sList) {
+            System.out.println(r.getReportedRoyaltyForCeyMusic());
+            System.out.println(r.getReportedRoyaltyAfterGST());
+            System.out.println(r.getOtherTerritoryEarnnings());
+            System.out.println(r.getAfterGST());
+            System.out.println(r.getEuEaring());
+            System.out.println(r.getReportedSummary());
 
-           System.out.println(r.getReportedRoyaltyForCeyMusic());
-           System.out.println(r.getReportedRoyaltyAfterGST());
-           System.out.println(r.getOtherTerritoryEarnnings());
-           System.out.println(r.getAfterGST());
-           System.out.println(r.getEuEaring());
-           System.out.println(r.getReportedSummary());
-            double d=r.getReportedRoyaltyForCeyMusic();
-
-           System.out.println(sList+"report list111111111111");
-       }
+            System.out.println(sList + "report list111111111111");
+        }*/
 
 
-
-     }
-
+    }
 
 
-    public static List<report> reporLi(List<String> isrcList) {
-        List<report> repoList = new ArrayList<>();
+    public static List<Report> reporLi(List<String> isrcList) {
+        List<Report> repoList = new ArrayList<>();
         String sql = "SELECT reported_royalty_for_ceymusic,reported_royalty_after_gst,other_territories_earnings,after_gst,au_earnings,reported_royalty_summary,asset_isrc " +
                 "FROM public.\"reportViewSummary1\" WHERE asset_isrc = ?";
         Connection con = getConn();
         try {
-        PreparedStatement ps = con.prepareStatement(sql);
-        for(String s :isrcList){
-            ps.setString(1,s);
-            ResultSet rs =ps.executeQuery();
-            while(rs.next()){
-                report rp = new report();
-                rp.setReportedRoyaltyForCeyMusic(rs.getDouble(1));
-                rp.setReportedRoyaltyAfterGST(rs.getDouble(2));
-                rp.setOtherTerritoryEarnnings(rs.getDouble(3));
-                rp.setAfterGST(rs.getDouble(4));
-                rp.setEuEaring(rs.getDouble(5));
-                rp.setReportedSummary(rs.getDouble(6));
-                repoList.add(rp);
+            PreparedStatement ps = con.prepareStatement(sql);
+            for (String s : isrcList) {
+                ps.setString(1, s);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    Report rp = new Report();
+                    rp.setReportedRoyaltyForCeyMusic(rs.getDouble(1));
+                    rp.setReportedRoyaltyAfterGST(rs.getDouble(2));
+                    rp.setOtherTerritoryEarnnings(rs.getDouble(3));
+                    rp.setAfterGST(rs.getDouble(4));
+                    rp.setEuEaring(rs.getDouble(5));
+                    rp.setReportedSummary(rs.getDouble(6));
+                    repoList.add(rp);
 
+                }
             }
-        }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -438,25 +428,25 @@ public class DatabasePostgres {
     }
 
     /**
-    public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
-        List<ManualClaimTrack> manualClaims = getManualClaims();
-        System.out.println("manualClaims.size() = " + manualClaims.size());
-        for (ManualClaimTrack claim : manualClaims) {
-            BufferedImage image = claim.getBufferedImage();
-            if (image != null) {
-                // Check if the image is complete (all pixels loaded)
-                boolean isComplete = image.getData().getDataBuffer().getNumBanks() > 0;
-                if (isComplete) {
-                    System.out.println("Image is fully loaded.");
-                } else {
-                    System.out.println("Image is not fully loaded.");
-                }
-            } else {
-                System.out.println("Image is null. There was an issue loading the image.");
-            }
-        }
-    }
-*/
+     * public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
+     * List<ManualClaimTrack> manualClaims = getManualClaims();
+     * System.out.println("manualClaims.size() = " + manualClaims.size());
+     * for (ManualClaimTrack claim : manualClaims) {
+     * BufferedImage image = claim.getBufferedImage();
+     * if (image != null) {
+     * // Check if the image is complete (all pixels loaded)
+     * boolean isComplete = image.getData().getDataBuffer().getNumBanks() > 0;
+     * if (isComplete) {
+     * System.out.println("Image is fully loaded.");
+     * } else {
+     * System.out.println("Image is not fully loaded.");
+     * }
+     * } else {
+     * System.out.println("Image is null. There was an issue loading the image.");
+     * }
+     * }
+     * }
+     */
 
 
     private static void insertSongArtists(CSVReader csvReader) throws SQLException, IOException, CsvValidationException {
@@ -845,13 +835,13 @@ public class DatabasePostgres {
         ArrayList<Double> royalty = new ArrayList<>();
 
         /**
-        PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +
-                "((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY, " +
-                "(((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
-                "FROM `report` " +
-                "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
-                "ORDER BY `REPORTED_ROYALTY` DESC;");
-        */
+         PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +
+         "((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY, " +
+         "(((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
+         "FROM `report` " +
+         "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
+         "ORDER BY `REPORTED_ROYALTY` DESC;");
+         */
 
 
         PreparedStatement psGetGross = connection.prepareStatement("SELECT report.asset_isrc, " +
@@ -1018,18 +1008,18 @@ public class DatabasePostgres {
 
         /**
          *
-        PreparedStatement ps = connection.prepareStatement("SELECT `report`.`Asset_Title`, (((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY " +
-                "FROM `report` JOIN `isrc_payees` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC` " +
-                "WHERE `report`.`Asset_ISRC` IN (SELECT `isrc_payees`.`ISRC` WHERE `isrc_payees`.`PAYEE` = ?) " +
-                "GROUP BY `report`.`Asset_ISRC` " +
-                "LIMIT 5;");
-        */
+         PreparedStatement ps = connection.prepareStatement("SELECT `report`.`Asset_Title`, (((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY " +
+         "FROM `report` JOIN `isrc_payees` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC` " +
+         "WHERE `report`.`Asset_ISRC` IN (SELECT `isrc_payees`.`ISRC` WHERE `isrc_payees`.`PAYEE` = ?) " +
+         "GROUP BY `report`.`Asset_ISRC` " +
+         "LIMIT 5;");
+         */
 
         PreparedStatement ps = conn.prepareStatement(sql);
 
         ps.setString(1, selectedItem);
-        ps.setString(2,selectedItem);
-        ps.setString(3,selectedItem);
+        ps.setString(2, selectedItem);
+        ps.setString(3, selectedItem);
 
         return ps.executeQuery();
     }

@@ -35,6 +35,6 @@ function parseTime(timeStr) {
 
 // Example usage
 const [inputFile, outputFile, startTime, endTime] = process.argv.slice(2);
-// console.log(startTime);
-// console.log(endTime);
+console.log(startTime);
+console.log(endTime);
 cutMP3(inputFile, outputFile, startTime, endTime);
