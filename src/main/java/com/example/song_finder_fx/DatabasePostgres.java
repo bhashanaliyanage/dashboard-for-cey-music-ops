@@ -11,6 +11,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -212,7 +213,9 @@ public class DatabasePostgres {
                     ByteArrayInputStream previewImageInputStream = new ByteArrayInputStream(previewImageBytes);
                     ByteArrayInputStream artworkImageInputStream = new ByteArrayInputStream(artworkImageBytes);
                     manualClaimTrack.setPreviewImage(ImageIO.read(previewImageInputStream));
+                    System.out.println("ImageIO.read(previewImageInputStream) = " + ImageIO.read(previewImageInputStream));
                     manualClaimTrack.setImage(ImageIO.read(artworkImageInputStream));
+                    System.out.println("ImageIO.read(artworkImageInputStream) = " + ImageIO.read(artworkImageInputStream));
                 } catch (IOException e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
@@ -371,13 +374,22 @@ public class DatabasePostgres {
     }
 
     public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
-        File csv = new File("src/main/resources/com/example/song_finder_fx/CeyMusic Song Database  - Song Artist DB Import - 03.csv");
-        CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).build();
-        // System.out.println("inside main");
-
-        insertSongArtists(csvReader);
-
-        csvReader.close();
+        List<ManualClaimTrack> manualClaims = getManualClaims();
+        System.out.println("manualClaims.size() = " + manualClaims.size());
+        for (ManualClaimTrack claim : manualClaims) {
+            BufferedImage image = claim.getBufferedImage();
+            if (image != null) {
+                // Check if the image is complete (all pixels loaded)
+                boolean isComplete = image.getData().getDataBuffer().getNumBanks() > 0;
+                if (isComplete) {
+                    System.out.println("Image is fully loaded.");
+                } else {
+                    System.out.println("Image is not fully loaded.");
+                }
+            } else {
+                System.out.println("Image is null. There was an issue loading the image.");
+            }
+        }
     }
 
     private static void insertSongArtists(CSVReader csvReader) throws SQLException, IOException, CsvValidationException {
@@ -466,6 +478,27 @@ public class DatabasePostgres {
         preparedStatement.setBytes(8, previewImage);
 
         // Execute the prepared statement
+        return preparedStatement.executeUpdate();
+    }
+
+    public static int updateClaimArtwork(String claimID, BufferedImage bufferedImageArtwork, BufferedImage bufferedImagePreview) throws SQLException, IOException {
+        Connection conn = getConn();
+        PreparedStatement preparedStatement = conn.prepareStatement("UPDATE public.manual_claims SET artwork = ?, preview_image = ? WHERE claim_id = ?;");
+
+        // Converting artwork to bytea
+        ByteArrayOutputStream binaryDataArtwork = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImageArtwork, "jpg", binaryDataArtwork);
+        byte[] artwork = binaryDataArtwork.toByteArray();
+
+        // Converting preview image to bytea
+        ByteArrayOutputStream binaryDataPI = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImagePreview, "jpg", binaryDataPI);
+        byte[] previewImage = binaryDataPI.toByteArray();
+
+        preparedStatement.setBytes(1, artwork);
+        preparedStatement.setBytes(2, previewImage);
+        preparedStatement.setInt(3, Integer.parseInt(claimID));
+
         return preparedStatement.executeUpdate();
     }
 

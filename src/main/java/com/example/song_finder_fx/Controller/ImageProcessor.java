@@ -43,14 +43,24 @@ public class ImageProcessor {
         return ImageIO.read(url);
     }
 
-    @NotNull
-    public static BufferedImage resizeImage(int targetWidth, int targetHeight, BufferedImage croppedImage) {
-        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(croppedImage, 0, 0, targetWidth, targetHeight, null);
-        graphics2D.dispose();
-        return resizedImage;
-    }
+@NotNull
+public static BufferedImage resizeImage(int targetWidth, int targetHeight, BufferedImage image) {
+    BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+    Graphics2D graphics2D = resizedImage.createGraphics();
+
+    // graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    // graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    // graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+    // Create a new resized image with the calculated dimensions
+    Image scaledImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+    graphics2D.drawImage(scaledImage, 0, 0, null);
+    graphics2D.dispose();
+
+    // graphics2D.drawImage(image, 0, 0, targetWidth, targetHeight, null);
+    // graphics2D.dispose();
+    return resizedImage;
+}
 
     public static BufferedImage cropImage(BufferedImage image) throws IOException {
         // BufferedImage originalImage = ImageIO.read(new File(imageLocation));

@@ -3,7 +3,9 @@ package com.example.song_finder_fx.Controller;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 
 public class YoutubeDownload {
@@ -21,13 +23,21 @@ public class YoutubeDownload {
     public static void downloadAudioOnly(String url, String file) {
         try {
 
-            String nodeScriptPath = "src/main/resources/com/example/song_finder_fx/libs/downloadAudio.js";
+            String nodeScriptPath = "libs/downloadAudio.js";
 
             System.out.println("url = " + url);
             System.out.println("file = " + file);
 
             ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
             Process process = processBuilder.start();
+
+            // Read and print output
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String finalLine = line;
+                Platform.runLater(() -> System.out.println(finalLine));
+            }
 
             int exitCode = process.waitFor();
 
@@ -45,32 +55,15 @@ public class YoutubeDownload {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-
-
     }
 
 
     public static void main(String[] args) {
-        String filePath = "C:\\Users\\bhash\\AppData\\Local\\Temp\\ceymusic_dashboard_audio7170319083164155368\\YIAzSvDzwLE.flac";
-        String outputFilePath = "C:\\Users\\bhash\\Documents\\Test\\TestIngestFolders\\123";
-        String result = "fail";
-        String startTime = "00:01:00";
-        String endTime = "00:01:26";
-
-        // System.out.println("method in11");
-
-        try {
-            trimAudio(filePath, outputFilePath, startTime, endTime);
-            result = "done";
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("result = " + result);
+        downloadAudio("hjk", "hjk", "hjk");
     }
 
     public static void trimAudio(String filePath, String outputPath, String startTime, String EndTime) throws IOException, InterruptedException {
-        String nodeScriptPPath = "src/main/resources/com/example/song_finder_fx/libs/cutAud.js";
+        String nodeScriptPPath = "libs/cutAud.js";
 
         Platform.runLater(() -> {
             System.out.println("filePath = " + filePath);
@@ -94,11 +87,11 @@ public class YoutubeDownload {
                 alert.setHeaderText("An error occurred while trimming audio");
                 String message = String.format("""
                         File Path: '%s'
-                        
+                                                
                         Output Path: '%s'
-                        
+                                                
                         Trim Start: '%s'
-                        
+                                                
                         Trim End: '%s'
                         """, filePath, outputPath, startTime, EndTime);
                 alert.setContentText(message);
@@ -109,7 +102,7 @@ public class YoutubeDownload {
 
 
     public static void convertAudio(Path sourcePath, Path destinationPath) throws IOException, InterruptedException {
-        String nodeScriptPPath = "src/main/resources/com/example/song_finder_fx/libs/convertAudio.js";
+        String nodeScriptPPath = "libs/convertAudio.js";
 
         System.out.println("sourcePath = " + sourcePath);
         System.out.println("destinationPath = " + destinationPath);

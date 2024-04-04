@@ -74,25 +74,30 @@
 }
 
 .button_inside:selected {
-    -fx-background-color: '#6D676E';
-    -fx-border-width: 1;
+    -fx-background-color: '#2E6070';
+    -fx-border-color: '#2E6070';
     -fx-text-fill: '#FFFFFF';
 }
 
 .button_inside_brown {
-    -fx-background-color: '#6D676E';
+    -fx-background-color: '#2E6070';
     -fx-text-fill: '#FFFFFF';
-    -fx-border-color: '#6D676E';
+    -fx-border-color: '#2E6070';
     -fx-border-width: 1;
     -fx-border-radius: 3;
+    -fx-background-radius: 3;
 }
 
 .button_inside_brown:hover {
-    -fx-background-color: '#928a94';
+    -fx-background-color: '#3D8096';
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
 }
 
 .button_inside_brown:pressed {
-    -fx-background-color: '#3a373b';
+    -fx-background-color: '#19343C';
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
 }
 
 .button_brown_invoice {
@@ -118,6 +123,7 @@
     -fx-border-color: '#e9ebee';
     -fx-border-width: 1;
     -fx-background-radius: 3;
+    -fx-font-family: 'Helvetica', Arial, sans-serif;
 }
 
 .button-big:hover {

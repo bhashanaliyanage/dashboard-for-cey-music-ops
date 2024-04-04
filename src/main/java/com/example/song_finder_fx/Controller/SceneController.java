@@ -54,4 +54,5 @@ public class SceneController {
     public static Window getWindowFromScene(Scene scene) {
         return scene.getWindow();
     }
+
 }

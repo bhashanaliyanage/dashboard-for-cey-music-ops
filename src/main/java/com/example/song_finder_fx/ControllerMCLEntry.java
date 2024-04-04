@@ -1,4 +1,4 @@
-package com.example.song_finder_fx.UIControllers;
+package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.SceneController;
 import javafx.fxml.FXML;
@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
@@ -30,6 +31,9 @@ public class ControllerMCLEntry {
     private CheckBox checkBox;
 
     @FXML
+    private ImageView image;
+
+    @FXML
     public void initialize() {
         // System.out.println("Manual Claims List Entry " + lblSongNo.getText());
     }
@@ -47,7 +51,9 @@ public class ControllerMCLEntry {
         TextField txtSongName = SceneController.getTextFieldFromScene(scene, "txtSongName");
         TextField txtComposer = SceneController.getTextFieldFromScene(scene, "txtComposer");
         TextField txtLyricist = SceneController.getTextFieldFromScene(scene, "txtLyricist");
+        ImageView imgPreview = (ImageView) scene.lookup("#imgPreview");
 
+        imgPreview.setImage(image.getImage());
         lblClaimID.setText(lblSongNo.getText());
         lblTrackName.setText(lblSongName.getText());
         txtSongName.setText(lblSongName.getText());

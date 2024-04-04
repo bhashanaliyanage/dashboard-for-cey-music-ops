@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER_LEFT" prefWidth="650.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIControllers.ControllerMCLEntry">
+<VBox alignment="CENTER_LEFT" prefWidth="650.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCLEntry">
    <HBox>
       <children>
          <HBox fx:id="hbox2" alignment="CENTER_LEFT" onMouseClicked="#onSongClick" prefWidth="512.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">

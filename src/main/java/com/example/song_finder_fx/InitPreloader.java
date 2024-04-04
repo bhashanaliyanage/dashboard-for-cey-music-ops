@@ -2,6 +2,7 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Model.Revenue;
 import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -22,15 +23,27 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class InitPreloader implements Initializable {
+    @FXML
     public Label lblLoading;
+
+    @FXML
+    private Label lblBuildNumber;
+
     public static Label lblLoadingg;
+
+    public static Label lblBuildNumberr;
+
     public static boolean starting;
+
     public static String updateLocation;
+
     public static Revenue revenue = new Revenue();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         lblLoadingg = lblLoading;
+        lblBuildNumberr = lblBuildNumber;
+        lblBuildNumberr.setText(Main.versionInfo.getCurrentVersionInfo());
     }
 
     public void checkFunctions() throws InterruptedException {
@@ -154,7 +167,7 @@ public class InitPreloader implements Initializable {
 
                 main.getChildren().add(UIController.mainNodes[2]);
 
-                stage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionNumber());
+                stage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionNumber() + " (beta)");
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
                 stage.getIcons().add(image);
                 stage.setWidth(1350);

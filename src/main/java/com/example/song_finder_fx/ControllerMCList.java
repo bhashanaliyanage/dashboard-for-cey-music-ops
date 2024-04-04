@@ -1,4 +1,4 @@
-package com.example.song_finder_fx.UIControllers;
+package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.ImageProcessor;
 import com.example.song_finder_fx.Controller.SceneController;
@@ -44,6 +44,8 @@ public class ControllerMCList {
 
     public static List<Label> labelsSongName = new ArrayList<>();
 
+    public static List<ImageView> ivArtworks = new ArrayList<>();
+
     public static List<Label> labelsComposer = new ArrayList<>();
 
     public static List<Label> labelsLyricist = new ArrayList<>();
@@ -85,7 +87,7 @@ public class ControllerMCList {
 
             Node node;
             try {
-                node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../layouts/manual_claims/manual-claims-list-entry.fxml")));
+                node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/manual_claims/manual-claims-list-entry.fxml")));
                 Label lblSongNo = (Label) node.lookup("#lblSongNo");
                 labelsSongNo.add(lblSongNo);
                 Label lblSongName = (Label) node.lookup("#lblSongName");
@@ -99,6 +101,7 @@ public class ControllerMCList {
                 HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
                 hBoxes.add(hboxEntry);
                 ImageView image = (ImageView) node.lookup("#image");
+                ivArtworks.add(image);
                 try {
                     image.setImage(claim.getPreviewImage());
                 } catch (Exception e) {
@@ -195,7 +198,7 @@ public class ControllerMCList {
                 // ID, Name, Composer, Lyricist
                 int id = manualClaims.get(i).getId();
                 ManualClaimTrack claim = claimMap.get(id);
-                System.out.println("claim.getBufferedImage() = " + claim.getBufferedImage());
+                System.out.println("claim.getBufferedImage() = " + manualClaims.get(i).getBufferedImage());
                 finalManualClaims.add(claim);
                 // finalSongNames.add(labelsSongName.get(i).getText());
             }

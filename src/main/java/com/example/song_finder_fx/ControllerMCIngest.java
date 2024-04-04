@@ -1,17 +1,14 @@
-package com.example.song_finder_fx.UIControllers;
+package com.example.song_finder_fx;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
 
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class ControllerIngest {
+public class ControllerMCIngest {
 
     @FXML
     private Label lblLocation;

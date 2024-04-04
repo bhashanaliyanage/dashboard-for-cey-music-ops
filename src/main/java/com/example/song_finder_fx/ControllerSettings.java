@@ -1,6 +1,10 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.UserSettingsManager;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -10,11 +14,14 @@ import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 
 public class ControllerSettings {
@@ -144,8 +151,27 @@ public class ControllerSettings {
         lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
     }
 
-    public void onUpdateBtnClick() throws IOException, URISyntaxException {
-        File updateFile = Main.versionInfo.getUpdate();
-        Desktop.getDesktop().open(updateFile);
+    public void onUpdateBtnClick(ActionEvent event) throws IOException, URISyntaxException {
+        Scene scene = SceneController.getSceneFromEvent(event);
+        Button btnUpdate = (Button) scene.lookup("#btnUpdate");
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Platform.runLater(() -> btnUpdate.setText("Downloading"));
+                File updateFile = Main.versionInfo.getUpdate();
+                Platform.runLater(() -> {
+                    try {
+                        Desktop.getDesktop().open(updateFile);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                Platform.runLater(() -> btnUpdate.setText("Installing..."));
+                return null;
+            }
+        };
+
+        Thread thread = new Thread(task);
+        thread.start();
     }
 }

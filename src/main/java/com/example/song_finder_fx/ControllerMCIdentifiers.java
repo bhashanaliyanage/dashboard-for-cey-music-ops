@@ -1,10 +1,7 @@
-package com.example.song_finder_fx.UIControllers;
+package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
-import com.example.song_finder_fx.ControllerSettings;
-import com.example.song_finder_fx.DatabasePostgres;
-import com.example.song_finder_fx.Main;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -184,14 +181,19 @@ public class ControllerMCIdentifiers {
                         File folder = createSubFolder(upc[0], destination);
 
                         // Getting the artwork from database, saving it to created subfolder
-                        Platform.runLater(() -> lblProcess.setText("Getting Artwork for: " + albumTitle));
-                        try {
-                            BufferedImage artwork = ControllerMCList.finalManualClaims.get(claimID).getBufferedImage();
-                            String outputPath = folder.getAbsolutePath() + "\\" + upc[0] + ".jpg";
-                            Platform.runLater(() -> System.out.println("outputPath = " + outputPath));
-                            ImageIO.write(artwork, "jpg", new File(outputPath));
-                        } catch (IOException e) {
-                            Platform.runLater(e::printStackTrace);
+                        if (ControllerMCList.finalManualClaims.get(claimID).getBufferedImage() != null) {
+                            Platform.runLater(() -> lblProcess.setText("Getting Artwork for: " + albumTitle));
+                            try {
+                                BufferedImage artwork = ControllerMCList.finalManualClaims.get(claimID).getBufferedImage();
+                                String outputPath = folder.getAbsolutePath() + "\\" + upc[0] + ".jpg";
+                                Platform.runLater(() -> System.out.println("outputPath = " + outputPath));
+                                ImageIO.write(artwork, "jpg", new File(outputPath));
+                            } catch (IOException e) {
+                                Platform.runLater(e::printStackTrace);
+                            }
+                        } else {
+                            Platform.runLater(() -> lblProcess.setText("Error Getting Artwork"));
+                            break;
                         }
 
                         // Downloading audio to a temporary directory
@@ -204,10 +206,10 @@ public class ControllerMCIdentifiers {
                         trimAndCopyAudio(claimID, albumTitle, fileLocation, fileName, folder, lblProcess);
 
                         Platform.runLater(() -> progressBar.setProgress(progress));
+                        Platform.runLater(() -> lblProcess.setText("Done"));
                     }
 
                     csvWriter.close();
-                    Platform.runLater(() -> lblProcess.setText("Done"));
                     return null;
                 }
             };
