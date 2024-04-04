@@ -2,8 +2,6 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.ImageProcessor;
 import com.example.song_finder_fx.Controller.SceneController;
-import com.example.song_finder_fx.ControllerSettings;
-import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
