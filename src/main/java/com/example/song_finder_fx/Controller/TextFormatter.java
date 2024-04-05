@@ -8,7 +8,19 @@ import java.util.regex.Pattern;
 
 public class TextFormatter {
     public static void main(String[] args) {
-        System.out.println("Formatted start time: " + formatTime("input1"));
+        // System.out.println("Formatted start time: " + formatTime("00:02:00"));
+        boolean status = validateTime("05:20:00");
+        System.out.println("status = " + status);
+    }
+
+    public static boolean validateTime(String input) {
+        try {
+            // Parse the input string as a LocalTime using the "HH:mm:ss" format
+            LocalTime.parse(input);
+            return true; // Valid time format
+        } catch (DateTimeParseException e) {
+            return false; // Invalid time format
+        }
     }
 
     public static String formatTime(String input) {
@@ -48,5 +60,9 @@ public class TextFormatter {
         } else {
             return null; // No valid video ID found
         }
+    }
+
+    public static boolean validateTrimTimes(String trimStart, String trimEnd) {
+        return validateTime(trimStart) && validateTime(trimEnd);
     }
 }

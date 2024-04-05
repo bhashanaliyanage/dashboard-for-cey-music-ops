@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -72,18 +73,6 @@ public class ControllerMCTrack {
         });
     }
 
-    public void getSongContributors() throws SQLException {
-        System.out.println("ControllerMCTrack.getSongContributors");
-
-        String songName = txtTrackTitle.getText();
-        System.out.println("songName = " + songName);
-        // Songs songs = DatabaseMySQL.searchContributors(songName);
-        Songs songs = DatabasePostgres.searchContributors(songName);
-
-        txtComposer.setText(songs.getComposer());
-        txtLyricist.setText(songs.getLyricist());
-    }
-
     public void onAddTrack(ActionEvent event) throws IOException, URISyntaxException {
         // Getting Parent Object References
         Node node = (Node) event.getSource();
@@ -92,39 +81,61 @@ public class ControllerMCTrack {
         VBox vboxTracks = (VBox) scene.lookup("#vboxTracks");
 
         Node nodeTrack = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
+
+        // Fetching user values
         String trackName = txtTrackTitle.getText();
         String lyricist = txtLyricist.getText();
         String composer = txtComposer.getText();
         String trimStart = spinnerStart.getText();
         String trimEnd = spinnerEnd.getText();
-
         String url = txtURL.getText();
-        System.out.println(url);
+        // System.out.println(url);
 
         // Front-End validation
         boolean ifAnyNull = checkData();
 
         if (!ifAnyNull) {
+            // Fetching YouTube ID
             String youtubeID = TextFormatter.extractYoutubeID(url);
-            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID);
+            // Fetching Thumbnail
             String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
             BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
             image = ImageProcessor.cropImage(image);
+
+            // Creating track model
+            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID);
+
+            // Setting Thumbnail and Preview Images to the model
             track.setPreviewImage(image);
             image = ImageProcessor.resizeImage(1400, 1400, image);
             track.setImage(image);
 
+            boolean claimValidation = true;
+
+            // Checking trim times
             if (!trimStart.isEmpty() && !trimEnd.isEmpty()) {
-                track.addTrimTime(trimStart, trimEnd);
+                // Validating trim times
+                boolean status = TextFormatter.validateTrimTimes(trimStart, trimEnd);
+                if (status) {
+                    // Adding trim times to model
+                    track.addTrimTime(trimStart, trimEnd);
+                } else {
+                    claimValidation = false;
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setContentText("Error Parsing Time");
+                    alert.showAndWait();
+                }
             }
 
-            ManualClaims.manualClaims.add(track);
+            if (claimValidation) {
+                ManualClaims.manualClaims.add(track);
+                titledPane.setText(trackName);
+                titledPane.setExpanded(false);
+                btnAddTrack.setDisable(true);
 
-            titledPane.setText(trackName);
-            titledPane.setExpanded(false);
-            btnAddTrack.setDisable(true);
-
-            vboxTracks.getChildren().add(nodeTrack);
+                vboxTracks.getChildren().add(nodeTrack);
+            }
         }
     }
 
@@ -200,21 +211,21 @@ public class ControllerMCTrack {
         return false; // Valid HH:MM:SS format
     }
 
-    public void formatStartTime(ActionEvent event) {
+    public void formatStartTime() {
         String time = spinnerStart.getText();
         String formattedTime = TextFormatter.formatTime(time);
         spinnerStart.setText(formattedTime);
         spinnerEnd.requestFocus();
     }
 
-    public void formatEndTime(ActionEvent event) {
+    public void formatEndTime() {
         String time = spinnerEnd.getText();
         String formattedTime = TextFormatter.formatTime(time);
         spinnerEnd.setText(formattedTime);
         txtLyricist.requestFocus();
     }
 
-    public void onLyricistAction(ActionEvent event) {
+    public void onLyricistAction() {
         txtComposer.requestFocus();
     }
 }
