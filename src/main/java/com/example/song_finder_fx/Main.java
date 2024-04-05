@@ -214,9 +214,12 @@ public class Main extends Application {
 
 // Revenue Analysis
 // TODO: 12/9/2023 Sub views of revenue analysis UI
+// TODO: Retrieve artist names from Postgres
+// TODO: A view to edit payee list
 
 // Search
 // TODO: 2/8/2024 Edit Song Details
+// TODO: Change song list retrieval process to Postgres
 
 // Ingests
 // TODO: 3/26/2024 Debug Ingest CSV
@@ -224,4 +227,6 @@ public class Main extends Application {
 // Manual Claims
 // TODO: 4/4/2024 Check and format time input before inserting it into database
 // TODO: 4/4/2024 Check for folders with spaces in names before sending it into node script
-
+// TODO: Revise ingest CSV and audio file naming
+// TODO: Change the progress bar color to red if any error happens to give user a feedback
+// TODO: A view to view created ingests

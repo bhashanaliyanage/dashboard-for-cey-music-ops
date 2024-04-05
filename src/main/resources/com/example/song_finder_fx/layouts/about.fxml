@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox fx:id="mainVBox" prefWidth="750.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerSettings">
+<VBox prefWidth="750.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerSettings">
    <Label text="About">
       <font>
          <Font name="Segoe UI Semibold" size="28.0" />
@@ -34,14 +33,6 @@
          </font>
          <VBox.margin>
             <Insets top="3.0" />
-         </VBox.margin>
-      </Label>
-      <Label layoutX="265.0" layoutY="378.0" text="bhashanaliyanage@gmail.com">
-         <font>
-            <Font size="13.0" />
-         </font>
-         <VBox.margin>
-            <Insets top="1.0" />
          </VBox.margin>
       </Label>
    </VBox>

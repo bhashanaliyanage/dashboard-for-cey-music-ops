@@ -24,7 +24,7 @@ public class ProductVersion {
     }
 
     public String getCurrentVersionInfo() {
-        return "Build " + currentVersion + " by Bhashana Liyanage";
+        return "Build " + currentVersion;
     }
 
     public double getCurrentVersionNumber() {

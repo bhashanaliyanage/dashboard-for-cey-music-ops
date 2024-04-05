@@ -478,6 +478,30 @@ public class ControllerRevenueGenerator {
         Parent newContentMain = loaderMain.load();
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
+
+        Task<Void> task;
+
+        task = new Task<>() {
+            @Override
+            protected Void call() throws SQLException, ClassNotFoundException {
+                // lblStatus.setText("Loading Payees...");
+                // ResultSet rsPayees = DatabaseMySQL.getPayees();
+                // ResultSet rsPayees = DatabasePostgres.getPayees(); // Postgres
+                List<String> payees = DatabasePostgres.getPayees();
+
+                /*while (rsPayees.next()) {
+                    comboPayees.getItems().add(rsPayees.getString(1));
+                }
+                lblStatus.setVisible(false);
+                imgLoading.setVisible(false);
+                comboPayees.setDisable(false);*/
+
+                return null;
+            }
+        };
+
+        Thread t = new Thread(task);
+        t.start();
     }
 
     public void onSidePanelAddNewReportBtnClick() throws IOException {
