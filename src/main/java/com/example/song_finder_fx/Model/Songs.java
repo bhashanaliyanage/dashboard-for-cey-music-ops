@@ -20,6 +20,7 @@ public class Songs {
     private String copyrightOwner = "";
 
     private String song_name;
+    private String fileName;
 
 
     public void setTrackTitle(String trackTitle) {
@@ -176,5 +177,13 @@ public class Songs {
                 }
             }
         }
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setUPC(String upc) {
+        this.upc = upc;
     }
 }

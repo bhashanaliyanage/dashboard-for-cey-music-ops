@@ -1,8 +1,6 @@
 package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.Model.ArtistReport;
-import com.itextpdf.kernel.color.Color;
-import com.itextpdf.kernel.color.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.border.Border;
@@ -23,13 +21,7 @@ import java.util.ArrayList;
 import static com.example.song_finder_fx.Controller.Invoice.loadAutoScaledImage;
 import static com.example.song_finder_fx.Controller.Invoice.loadFont;
 
-public class ReportPDF {
-    private static final Color INVOICE_LIGHT_BLUE = new DeviceRgb(232, 243, 251);
-    private static final Color INVOICE_BLUE = new DeviceRgb(136, 193, 232);
-    private static final Color INVOICE_WHITE = new DeviceRgb(255, 255, 255);
-    private static final Color INVOICE_BLACK = new DeviceRgb(25, 23, 22);
-    private static final Color INVOICE_RED = new DeviceRgb(178, 110, 99);
-    private static final Color INVOICE_GRAY = new DeviceRgb(205, 205, 205);
+public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
     private static final Border BLUE_BORDER = new SolidBorder(INVOICE_BLUE, 0.5f);
     private static final Border BLACK_BORDER = new SolidBorder(INVOICE_BLACK, 0.5f);
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
