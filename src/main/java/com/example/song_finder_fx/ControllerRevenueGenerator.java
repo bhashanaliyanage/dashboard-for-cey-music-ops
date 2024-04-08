@@ -496,6 +496,9 @@ public class ControllerRevenueGenerator {
                 imgLoading.setVisible(false);
                 comboPayees.setDisable(false);*/
 
+                // Temporary for testing
+                comboPayees.getItems().add("Rohana Weerasinghe");
+
                 return null;
             }
         };
@@ -547,32 +550,41 @@ public class ControllerRevenueGenerator {
     }
 
     public void onLoadReportBtnClick() {
+        // Clearing Report Model
         report.clear();
+
+        // Getting Currency Rate
         String userInputRate = txtRate.getText();
-        double doubleConvertedRate;
         String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
+
+        double doubleConvertedRate;
         DecimalFormat df = new DecimalFormat("0.00");
-
         final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
-
         final double[] tax = {0};
         final double[] amountPayable = new double[1];
 
         if (!Objects.equals(selectedItem, null)) {
+            // Resetting ComboBox border
             comboPayees.setStyle("-fx-border-color: '#e9ebee';");
 
+            // Check if the user input is only numbers
             if (userInputRate.matches("\\d+(\\.\\d+)?")) {
-                // When user input is only numbers
                 initializeArtistReportUILabels();
 
+                // Convert user input rate to a double
                 doubleConvertedRate = Double.parseDouble(userInputRate);
+
                 Task<Void> taskGrossRevenue = new Task<>() {
                     @Override
                     protected Void call() {
                         try {
-//                            royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
+                            Platform.runLater(() -> {
+                                System.out.println("Calculating Gross Revenue...");
+                            });
+
                             royalty[0] = DatabasePostgres.getPayeeGrossRev(selectedItem);      //Postgress
 
+                            Platform.runLater(() -> System.out.println("Gorss Rev: " + royalty[0].getFirst()));
                         } catch (SQLException | ClassNotFoundException e) {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Error");

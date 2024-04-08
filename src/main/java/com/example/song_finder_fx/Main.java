@@ -225,8 +225,8 @@ public class Main extends Application {
 // TODO: 3/26/2024 Debug Ingest CSV
 
 // Manual Claims
-// TODO: 4/4/2024 Check and format time input before inserting it into database
 // TODO: 4/4/2024 Check for folders with spaces in names before sending it into node script
 // TODO: Revise ingest CSV and audio file naming
+// TODO: Store ingest file in a blob
 // TODO: Change the progress bar color to red if any error happens to give user a feedback
 // TODO: A view to view created ingests

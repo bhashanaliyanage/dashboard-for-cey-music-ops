@@ -826,42 +826,50 @@ public class DatabasePostgres {
     public static List<String> getPayees() throws SQLException, ClassNotFoundException {
         Connection db = DatabaseMySQL.getConn();
         PreparedStatement preparedStatement = db.prepareStatement("SELECT PAYEE FROM `isrc_payees` GROUP BY PAYEE ORDER BY PAYEE ASC;");
-        List<String> payees = new ArrayList<>();
 
-
-
-        return payees;
+        return new ArrayList<>();
     }
 
     static ArrayList<Double> getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
         Connection connection = getConn();
         ArrayList<Double> royalty = new ArrayList<>();
 
-        /*
-         PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +
-         "((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY, " +
-         "(((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
-         "FROM `report` " +
-         "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
-         "ORDER BY `REPORTED_ROYALTY` DESC;");
-         */
+    /*
+     PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +
+     "((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY, " +
+     "(((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
+     "FROM `report` " +
+     "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
+     "ORDER BY `REPORTED_ROYALTY` DESC;");
+     */
 
 
-        PreparedStatement psGetGross = connection.prepareStatement("SELECT report.asset_isrc, " +
-                "       ((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * isrc_payees.SHARE/100 AS REPORTED_ROYALTY, " +
-                "       (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
-                "FROM report " +
-                "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND isrc_payees.PAYEE = ? " +
-                "GROUP BY report.asset_isrc, isrc_payees.SHARE" +
-                "ORDER BY REPORTED_ROYALTY DESC;");
+        try {
+            PreparedStatement psGetGross = connection.prepareStatement("SELECT report.asset_isrc, " +
+                    "       ((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * isrc_payees.SHARE/100 AS REPORTED_ROYALTY, " +
+                    "       (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
+                    "FROM report " +
+                    "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND isrc_payees.PAYEE = ? " +
+                    "GROUP BY report.asset_isrc, isrc_payees.SHARE " +
+                    "ORDER BY REPORTED_ROYALTY DESC;");
 
 
-        psGetGross.setString(1, artistName);
-        ResultSet rsGross = psGetGross.executeQuery();
-        rsGross.next();
-
-        royalty.add(rsGross.getDouble(2));
-        royalty.add(rsGross.getDouble(3));
+            psGetGross.setString(1, artistName);
+            ResultSet rsGross = psGetGross.executeQuery();
+            if (rsGross.next()) {
+                royalty.add(rsGross.getDouble(2));
+                royalty.add(rsGross.getDouble(3));
+            } else {
+                royalty.add(0.0);
+                royalty.add(0.0);
+            }
+        } catch (SQLException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("An error occurred while retrieving artist gross revenue");
+            alert.setContentText(String.valueOf(e));
+            Platform.runLater(alert::showAndWait);
+        }
 
         return royalty;
     }
@@ -1077,8 +1085,8 @@ public class DatabasePostgres {
 
             while (rs.next()) {
                 songs.add(new Songs(
-                        rs.getString(1), // TRACK_TITLE
-                        rs.getString(2),// ISRC
+                        rs.getString(2), // TRACK_TITLE
+                        rs.getString(1),// ISRC
                         rs.getString(3), // SINGER
                         rs.getString(4), // COMPOSER
                         rs.getString(5) // LYRICIST
