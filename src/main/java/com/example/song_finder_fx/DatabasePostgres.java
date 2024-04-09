@@ -834,41 +834,43 @@ public class DatabasePostgres {
         Connection connection = getConn();
         ArrayList<Double> royalty = new ArrayList<>();
 
-    /*
-     PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +
-     "((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY, " +
-     "(((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
-     "FROM `report` " +
-     "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
-     "ORDER BY `REPORTED_ROYALTY` DESC;");
-     */
-
-
         try {
-            PreparedStatement psGetGross = connection.prepareStatement("SELECT report.asset_isrc, " +
-                    "       ((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * isrc_payees.SHARE/100 AS REPORTED_ROYALTY, " +
-                    "       (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
-                    "FROM report " +
-                    "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND isrc_payees.PAYEE = ? " +
-                    "GROUP BY report.asset_isrc, isrc_payees.SHARE " +
-                    "ORDER BY REPORTED_ROYALTY DESC;");
+            /*PreparedStatement psGetGross = connection.prepareStatement("""
+                    SELECT SUM(REPORTED_ROYALTY) AS Total_Reported_Royalty,
+                    SUM(PARTNER_SHARE) AS Total_Partner_Share
+                    FROM (SELECT report.asset_isrc,\s
+                          ((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * isrc_payees.SHARE/100 AS REPORTED_ROYALTY,
+                          (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE\s
+                          FROM report\s
+                          JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND isrc_payees.PAYEE = ?\s
+                          GROUP BY report.asset_isrc, isrc_payees.SHARE\s
+                    \t ) AS subquery;""");*/
+
+            PreparedStatement psGetGross = connection.prepareStatement("""
+                    SELECT SUM(REPORTED_ROYALTY) AS Total_Reported_Royalty,
+                    SUM(PARTNER_SHARE) AS Total_Partner_Share
+                    FROM (SELECT "reportViewSummary1".asset_isrc,\s
+                          "reportViewSummary1".reported_royalty_for_ceymusic * isrc_payees.SHARE/100 AS REPORTED_ROYALTY,
+                          (("reportViewSummary1".reported_royalty_for_ceymusic * isrc_payees.SHARE/100) * 0.9) AS PARTNER_SHARE\s
+                          FROM "reportViewSummary1"\s
+                          JOIN isrc_payees ON isrc_payees.ISRC = "reportViewSummary1".asset_isrc AND isrc_payees.PAYEE = ?\s
+                          GROUP BY "reportViewSummary1".asset_isrc, isrc_payees.SHARE, "reportViewSummary1".reported_royalty_for_ceymusic\s
+                    \t ) AS subquery;""");
 
 
             psGetGross.setString(1, artistName);
             ResultSet rsGross = psGetGross.executeQuery();
             if (rsGross.next()) {
+                royalty.add(rsGross.getDouble(1));
                 royalty.add(rsGross.getDouble(2));
-                royalty.add(rsGross.getDouble(3));
             } else {
                 royalty.add(0.0);
                 royalty.add(0.0);
             }
         } catch (SQLException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("An error occurred while retrieving artist gross revenue");
-            alert.setContentText(String.valueOf(e));
-            Platform.runLater(alert::showAndWait);
+            Platform.runLater(() -> {
+                e.printStackTrace();
+            });
         }
 
         return royalty;

@@ -1,7 +1,9 @@
 package com.example.song_finder_fx.Model;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class ArtistReport {
     private String payee = "";
@@ -27,8 +29,9 @@ public class ArtistReport {
 
     public void setGrossRevenue(String selectedItem, double grossRevenueInLKR, double partnerShareInLKR, double tax, double amountPayable, String month) {
         this.payee = selectedItem;
-        this.grossRevenueInLKR = df.format(grossRevenueInLKR);
-        this.partnerShareInLKR = df.format(partnerShareInLKR);
+        NumberFormat formatter = NumberFormat.getInstance(Locale.US);
+        this.grossRevenueInLKR = formatter.format(grossRevenueInLKR);
+        this.partnerShareInLKR = formatter.format(partnerShareInLKR);
         this.taxAmount = df.format(tax);
         this.amountPayable = df.format(amountPayable);
         this.month = month;

@@ -7,6 +7,10 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) {
+        // testSearch();
+    }
+
+    private static void testSearch() {
         DatabaseHandler databaseHandler = new DatabaseHandler();
         SongSearch songSearch = new SongSearch(databaseHandler);
 
