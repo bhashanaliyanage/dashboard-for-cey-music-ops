@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class ArtistReport {
+    private Artist artist = null;
+    private int conversionRate = 0;
     private String payee = "";
     private String grossRevenueInLKR = "";
     private String partnerShareInLKR = "";
@@ -14,15 +16,27 @@ public class ArtistReport {
     private String month = "";
     private final DecimalFormat df = new DecimalFormat("0.00");
     private final ArrayList<String> coWriters = new ArrayList<>();
-    private final ArrayList<String> topPerformingSongs = new ArrayList<>();
+    private final ArrayList<String> topPerformingSongNames = new ArrayList<>();
     private final ArrayList<String> topPerformingSongPayees = new ArrayList<>();
     private final ArrayList<String> topPerformingSongPayeeShare = new ArrayList<>();
     private final ArrayList<String> coWriterShare = new ArrayList<>();
+    private Double grossRevenue;
+    private Double partnerShare;
+    private ArrayList<Songs> topPerformingSongs;
+
+    public ArtistReport(Artist artist, int conversionRate) {
+        this.artist = artist;
+        this.conversionRate = conversionRate;
+    }
+
+    public ArtistReport() {
+
+    }
 
     public void clear() {
         coWriters.clear();
         coWriterShare.clear();
-        topPerformingSongs.clear();
+        topPerformingSongNames.clear();
         topPerformingSongPayees.clear();
         topPerformingSongPayeeShare.clear();
     }
@@ -37,12 +51,12 @@ public class ArtistReport {
         this.month = month;
     }
 
-    public String getGrossRevenueInLKR() {
-        return "LKR " + grossRevenueInLKR;
+    public double getGrossRevenueInLKR() {
+        return grossRevenue * conversionRate;
     }
 
-    public String getPartnerShareInLKR() {
-        return "LKR " + partnerShareInLKR;
+    public double getPartnerShareInLKR() {
+        return partnerShare * conversionRate;
     }
 
     public String getTaxAmount() {
@@ -70,12 +84,12 @@ public class ArtistReport {
     }
 
     public void setTopPerformingSongDetails(String assetTitle, String payee, String reportedRoyalty) {
-        topPerformingSongs.add(assetTitle);
+        topPerformingSongNames.add(assetTitle);
         topPerformingSongPayees.add(payee);
         topPerformingSongPayeeShare.add("Rs. " + reportedRoyalty);
     }
-    public ArrayList<String> getTopPerformingSongs() {
-        return topPerformingSongs;
+    public ArrayList<String> getTopPerformingSongNames() {
+        return topPerformingSongNames;
     }
 
     public ArrayList<String> getTopPerformingSongPayees() {
@@ -92,5 +106,52 @@ public class ArtistReport {
 
     public ArrayList<String> getCoWriterShare() {
         return coWriterShare;
+    }
+
+    public Artist getArtist() {
+        return artist;
+    }
+
+    public void setArtist(Artist artist) {
+        this.artist = artist;
+    }
+
+    public int getConversionRate() {
+        return conversionRate;
+    }
+
+    public void setConversionRate(int conversionRate) {
+        this.conversionRate = conversionRate;
+    }
+
+    public void setGrossRevenue(Double grossRevenue) {
+        this.grossRevenue = grossRevenue;
+    }
+
+    public Double getGrossRevenue() {
+        return grossRevenue;
+    }
+
+    public void setPartnerShare(Double partnerShare) {
+        this.partnerShare = partnerShare;
+    }
+
+    public Double getPartnerShare() {
+        return partnerShare;
+    }
+
+    public String getDate() {
+        // Get the current date
+        java.time.LocalDate currentDate = java.time.LocalDate.now();
+        // Format the date as a string
+        return currentDate.toString();
+    }
+
+    public void setTopPerformingSongs(ArrayList<Songs> topPSongs) {
+        this.topPerformingSongs = topPSongs;
+    }
+
+    public ArrayList<Songs> getTopPerformingSongs() {
+        return topPerformingSongs;
     }
 }

@@ -69,7 +69,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         table.setMarginRight(20f);
         table.setMarginTop(10f);
 
-        ArrayList<String> topPerformingSongs = report.getTopPerformingSongs();
+        ArrayList<String> topPerformingSongs = report.getTopPerformingSongNames();
         ArrayList<String> topPerformingSongPayees = report.getTopPerformingSongPayees();
         ArrayList<String> topPerformingSongPayeeShares = report.getTopPerformingSongPayeeShare();
         int songCount = topPerformingSongs.size();
@@ -199,7 +199,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                 .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_RED).setBorder(BLACK_BORDER));
 
         // Row 02
-        table.addCell(new Cell().add(new Paragraph(report.getPartnerShareInLKR()).setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph("LKR " + report.getPartnerShareInLKR()).setFont(FONT_POPPINS))
                 .setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBorder(BLACK_BORDER));
         table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));
         table.addCell(new Cell().add(new Paragraph(report.getAmountPayable()).setFont(FONT_POPPINS))
@@ -230,7 +230,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                 .setBorder(Border.NO_BORDER));
         table.addCell(new Cell().add(new Paragraph("Gross Revenue Produced").setFont(FONT_POPPINS))
                 .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setFontSize(10f).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().add(new Paragraph(report.getGrossRevenueInLKR()).setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph("LKR " + report.getGrossRevenueInLKR()).setFont(FONT_POPPINS))
                 .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setFontSize(10f).setBorder(BLUE_BORDER));
 
         // Row 02

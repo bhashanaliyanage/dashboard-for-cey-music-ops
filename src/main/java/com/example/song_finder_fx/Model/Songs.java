@@ -21,6 +21,7 @@ public class Songs {
 
     private String song_name;
     private String fileName;
+    private double royalty;
 
 
     public void setTrackTitle(String trackTitle) {
@@ -185,5 +186,21 @@ public class Songs {
 
     public void setUPC(String upc) {
         this.upc = upc;
+    }
+
+    public void setRoyalty(double royalty) {
+        this.royalty = royalty;
+    }
+
+    public double getRoyalty() {
+        return royalty;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setSong_name(String song_name) {
+        this.song_name = song_name;
     }
 }

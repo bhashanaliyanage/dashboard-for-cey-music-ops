@@ -32,7 +32,7 @@ public class DatabasePostgres {
     public static Connection getConn() {
         String dbname = "songdata";
         String user = "postgres";
-        String pass = "ceymusic";
+        String pass = "thusitha01";
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -830,7 +830,7 @@ public class DatabasePostgres {
         return new ArrayList<>();
     }
 
-    static ArrayList<Double> getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
+    public static ArrayList<Double> getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
         Connection connection = getConn();
         ArrayList<Double> royalty = new ArrayList<>();
 
@@ -1000,7 +1000,7 @@ public class DatabasePostgres {
         }
     }
 
-    public static ResultSet getTopPerformingSongs(String selectedItem) throws SQLException, ClassNotFoundException {
+    public static ArrayList<Songs> getTopPerformingSongs(String selectedItem) throws SQLException, ClassNotFoundException {
         /*SELECT `report`.`Asset_Title`, (((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY
         FROM `report` JOIN `isrc_payees` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC`
         WHERE `report`.`Asset_ISRC` IN (SELECT `isrc_payees`.`ISRC` WHERE `isrc_payees`.`PAYEE` = 'Sarath De Alwis')
@@ -1008,16 +1008,7 @@ public class DatabasePostgres {
         LIMIT 5;*/
         Connection connection = getConn();
 
-        String sql = "   SELECT r.* FROM public.report AS r" +
-                "JOIN ( SELECT asset_isrc, MAX(reported_royalty) AS max_royalty FROM public.report WHERE asset_isrc IN (" +
-                "        SELECT isrc FROM public.isrc_payees " +
-                "        WHERE payee01 = ? " +
-                "           OR payee = ? " +
-                "           OR payee02 = ? )" +
-                "    GROUP BY asset_isrc) AS max_royalties ON r.asset_isrc = max_royalties.asset_isrc" +
-                "AND r.reported_royalty = max_royalties.max_royalty" +
-                "ORDER BY r.reported_royalty DESC" +
-                "LIMIT 5";
+        String sql = "SELECT r.* FROM public.report AS r JOIN (SELECT asset_isrc, MAX(reported_royalty) AS max_royalty FROM public.report WHERE asset_isrc IN (SELECT isrc FROM public.isrc_payees WHERE payee01 = ? OR payee = ? OR payee02 = ? ) GROUP BY asset_isrc) AS max_royalties ON r.asset_isrc = max_royalties.asset_isrc AND r.reported_royalty = max_royalties.max_royalty ORDER BY r.reported_royalty DESC LIMIT 5;";
 
         /**
          *
@@ -1034,7 +1025,20 @@ public class DatabasePostgres {
         ps.setString(2, selectedItem);
         ps.setString(3, selectedItem);
 
-        return ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Songs> songs = new ArrayList<>();
+
+        if (rs.isBeforeFirst()) {
+            while (rs.next()) {
+                Songs song = new Songs();
+                song.setIsrc(rs.getString(1));
+                song.setRoyalty(rs.getDouble(2));
+                songs.add(song);
+            }
+        }
+
+        return songs;
     }
 
     public static ResultSet getTopPerformingSongsEdit(String selectedItem) throws SQLException, ClassNotFoundException {
@@ -1242,5 +1246,18 @@ public class DatabasePostgres {
         }
 
         return songTitles;
+    }
+
+    public static String getArtistName(int id) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT artist_name FROM public.artists WHERE artist_id = ?;");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        String artistName = null;
+        if (rs.isBeforeFirst()) {
+            rs.next();
+            artistName = rs.getString(1);
+        }
+        return artistName;
     }
 }

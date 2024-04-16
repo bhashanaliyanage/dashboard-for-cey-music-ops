@@ -617,8 +617,8 @@ public class ControllerRevenueGenerator {
 
                         // Update UI
                         Platform.runLater(() -> {
-                            lblGross.setText(report.getGrossRevenueInLKR());
-                            lblP_Share.setText(report.getPartnerShareInLKR());
+                            lblGross.setText("LKR " + report.getGrossRevenueInLKR());
+                            lblP_Share.setText("LKR " + report.getPartnerShareInLKR());
                             lblTax.setText(report.getTaxAmount());
                             lblAmtPayable.setText(report.getAmountPayable());
                         });
