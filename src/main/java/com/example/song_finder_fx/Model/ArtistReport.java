@@ -9,8 +9,6 @@ public class ArtistReport {
     private Artist artist = null;
     private int conversionRate = 0;
     private String payee = "";
-    private String grossRevenueInLKR = "";
-    private String partnerShareInLKR = "";
     private String taxAmount = "0";
     private String amountPayable = "";
     private String month = "";
@@ -44,8 +42,6 @@ public class ArtistReport {
     public void setGrossRevenue(String selectedItem, double grossRevenueInLKR, double partnerShareInLKR, double tax, double amountPayable, String month) {
         this.payee = selectedItem;
         NumberFormat formatter = NumberFormat.getInstance(Locale.US);
-        this.grossRevenueInLKR = formatter.format(grossRevenueInLKR);
-        this.partnerShareInLKR = formatter.format(partnerShareInLKR);
         this.taxAmount = df.format(tax);
         this.amountPayable = df.format(amountPayable);
         this.month = month;
@@ -153,5 +149,11 @@ public class ArtistReport {
 
     public ArrayList<Songs> getTopPerformingSongs() {
         return topPerformingSongs;
+    }
+
+    public void setGrossRevenueInLKR(String grossRevenueInLKR) {
+    }
+
+    public void setPartnerShareInLKR(String partnerShareInLKR) {
     }
 }

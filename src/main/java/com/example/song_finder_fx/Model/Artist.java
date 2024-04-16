@@ -1,7 +1,5 @@
 package com.example.song_finder_fx.Model;
 
-import com.example.song_finder_fx.DatabasePostgres;
-
 public class Artist {
     private final int artistID;
 

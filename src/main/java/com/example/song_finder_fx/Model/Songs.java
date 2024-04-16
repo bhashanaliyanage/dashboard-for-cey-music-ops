@@ -19,7 +19,6 @@ public class Songs {
     private String percentage = "";
     private String copyrightOwner = "";
 
-    private String song_name;
     private String fileName;
     private double royalty;
 
@@ -60,7 +59,6 @@ public class Songs {
 
     public Songs(String isrc, String song_name) {
         this.isrc = isrc;
-        this.song_name = song_name;
     }
 
     public void setIsrc(String isrc) {
@@ -201,6 +199,5 @@ public class Songs {
     }
 
     public void setSong_name(String song_name) {
-        this.song_name = song_name;
     }
 }
