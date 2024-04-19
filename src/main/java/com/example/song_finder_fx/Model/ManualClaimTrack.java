@@ -4,7 +4,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import java.awt.image.BufferedImage;
-import java.sql.Date;
 import java.time.LocalDate;
 
 public class ManualClaimTrack {
