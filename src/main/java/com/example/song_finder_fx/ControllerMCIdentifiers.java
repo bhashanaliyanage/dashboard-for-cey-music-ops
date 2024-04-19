@@ -449,7 +449,11 @@ public class ControllerMCIdentifiers {
         String lyricist = manualClaimTrack.getLyricist();
         String composer = manualClaimTrack.getComposer();
 
-        return String.format("%s | %s", composer, lyricist);
+        if (Objects.equals(lyricist, composer)) {
+            return composer;
+        } else {
+            return String.format("%s | %s", composer, lyricist);
+        }
     }
 
     private static String getYear(String releaseDate) {

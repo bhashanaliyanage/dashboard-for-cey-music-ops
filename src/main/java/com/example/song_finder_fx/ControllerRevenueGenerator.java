@@ -3,8 +3,11 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.CSVController;
 import com.example.song_finder_fx.Controller.ItemSwitcher;
 import com.example.song_finder_fx.Controller.ReportPDF;
+import com.example.song_finder_fx.Controller.RevenueReportController;
+import com.example.song_finder_fx.Model.Artist;
 import com.example.song_finder_fx.Model.ArtistReport;
 import com.example.song_finder_fx.Model.CsvSong;
+import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
@@ -70,7 +73,6 @@ public class ControllerRevenueGenerator {
     public Label lblISRC_Check;
     public Label lblGross;
     public Label lblP_Share;
-    public Label lblTax;
     public Label lblAmtPayable;
     public Label lblAsset01;
     public Label lblAsset02;
@@ -549,7 +551,7 @@ public class ControllerRevenueGenerator {
         return null;
     }
 
-    public void onLoadReportBtnClick() {
+    /*public void onLoadReportBtnClick() {
         // Clearing Report Model
         report.clear();
 
@@ -744,6 +746,288 @@ public class ControllerRevenueGenerator {
             // If no Payee Selected
             comboPayees.setStyle("-fx-border-color: red;");
         }
+    }*/
+
+    public void onLoadReportBtnClick() throws SQLException, ClassNotFoundException {
+        // Clearing Report Model
+        report.clear();
+
+        // Getting Currency Rate
+        String userInputRate = txtRate.getText();
+        String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
+
+        DecimalFormat df = new DecimalFormat("0.00");
+        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
+        final double[] tax = {0};
+        final double[] amountPayable = new double[1];
+
+        if (!Objects.equals(selectedItem, null)) {
+            // Resetting ComboBox border
+            comboPayees.setStyle("-fx-border-color: '#e9ebee';");
+
+            // Check if the user input is only numbers
+            if (userInputRate.matches("\\d+(\\.\\d+)?")) {
+                initializeArtistReportUILabels();
+
+                // Convert user input rate to a double
+                double convertedRate = Double.parseDouble(userInputRate);
+
+                // Getting artist ID
+                int artistID = DatabasePostgres.fetchArtistID(selectedItem);
+
+                // Creating artist model by passing artistID
+                ArtistReport report = getArtistReport(artistID, convertedRate);
+
+                /*Task<Void> taskGrossRevenue = new Task<>() {
+                    @Override
+                    protected Void call() {
+                        try {
+                            Platform.runLater(() -> {
+                                System.out.println("Calculating Gross Revenue...");
+                            });
+
+                            royalty[0] = DatabasePostgres.getPayeeGrossRev(selectedItem);      //Postgress
+
+                            Platform.runLater(() -> System.out.println("Gorss Rev: " + royalty[0].getFirst()));
+                        } catch (SQLException | ClassNotFoundException e) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setHeaderText("An error occurred");
+                            alert.setContentText(String.valueOf(e));
+                            Platform.runLater(alert::showAndWait);
+                        }
+
+                        // Converting to LKR
+                        double grossRevenueInLKR = royalty[0].getFirst() * doubleConvertedRate;
+                        double partnerShareInLKR = royalty[0].get(1) * doubleConvertedRate;
+
+                        if (grossRevenueInLKR > 100000.00) {
+                            tax[0] = grossRevenueInLKR * 0.14;
+                        }
+
+                        // Calculating amount payable
+                        amountPayable[0] = grossRevenueInLKR - tax[0];
+
+                        // Testing values before assigning
+                        Platform.runLater(() -> {
+                            System.out.println("selectedItem = " + selectedItem);
+                            System.out.println("grossRevenueInLKR = " + grossRevenueInLKR);
+                            System.out.println("partnerShareInLKR = " + partnerShareInLKR);
+                            System.out.println("tax[0] = " + tax[0]);
+                            System.out.println("amountPayable[0] = " + amountPayable[0]);
+                            System.out.println("InitPreloader.revenue.getMonth() = " + InitPreloader.revenue.getMonth());
+                        });
+                        report.setGrossRevenue(selectedItem, grossRevenueInLKR, partnerShareInLKR, tax[0], amountPayable[0], InitPreloader.revenue.getMonth());
+
+                        // Update UI
+                        Platform.runLater(() -> {
+                            lblGross.setText("LKR " + report.getGrossRevenueInLKR());
+                            lblP_Share.setText("LKR " + report.getPartnerShareInLKR());
+                            lblTax.setText(report.getTaxAmount());
+                            lblAmtPayable.setText(report.getAmountPayable());
+                        });
+                        return null;
+                    }
+                };
+
+                Task<Void> taskCoWriterShare = new Task<>() {
+                    @Override
+                    protected Void call() throws SQLException, ClassNotFoundException {
+                        // Get the co-writer name and share in EUR from the database
+                        ResultSet rsCoWriterShares = DatabaseMySQL.getCoWriterShares(selectedItem);
+//                        ResultSet rsCoWriterShares = DatabasePostgre.getCoWriterShares(selectedItem);     //Postgress
+
+                        int count = 0;
+
+                        while (rsCoWriterShares.next()) { // Looping through writer 01 - 05
+                            count++;
+                            String artist = rsCoWriterShares.getString(1);
+                            double share = rsCoWriterShares.getDouble(2) * doubleConvertedRate;
+                            report.addCoWriter(artist);
+                            report.addCoWriterShare(share);
+
+                            if (count == 1) {
+                                Platform.runLater(() -> {
+                                    lblWriter01.setText(artist);
+                                    lblWriter01Streams.setText(df.format(share));
+                                });
+                            } else if (count == 2) {
+                                Platform.runLater(() -> {
+                                    lblWriter02.setText(artist);
+                                    lblWriter02Streams.setText(df.format(share));
+                                });
+                            } else if (count == 3) {
+                                Platform.runLater(() -> {
+                                    lblWriter03.setText(artist);
+                                    lblWriter03Streams.setText(df.format(share));
+                                });
+                            } else if (count == 4) {
+                                Platform.runLater(() -> {
+                                    lblWriter04.setText(artist);
+                                    lblWriter04Streams.setText(df.format(share));
+                                });
+                            } else if (count == 5) {
+                                Platform.runLater(() -> {
+                                    lblWriter05.setText(artist);
+                                    lblWriter05Streams.setText(df.format(share));
+                                });
+                            }
+                        }
+
+                        return null;
+                    }
+                };
+
+                Task<Void> taskTopPerformingSongs = new Task<>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        ResultSet rsTopPerformingSongs = DatabaseMySQL.getTopPerformingSongsEdit(selectedItem);
+//                        ResultSet rsTopPerformingSongs = DatabasePostgre.getTopPerformingSongsEdit(selectedItem);     //Postgress
+
+                        int count = 0;
+
+                        while (rsTopPerformingSongs.next()) {
+                            count++;
+
+                            String assetTitle = rsTopPerformingSongs.getString(1);
+                            String payee = rsTopPerformingSongs.getString(2);
+                            double reportedRoyalty = rsTopPerformingSongs.getDouble(4);
+
+                            report.setTopPerformingSongDetails(assetTitle, payee, df.format(reportedRoyalty * doubleConvertedRate));
+
+                            if (count == 1) {
+                                Platform.runLater(() -> {
+                                    lblAsset01.setText(assetTitle + " (" + payee + ")");
+                                    lblAsset01Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
+                                });
+                            } else if (count == 2) {
+                                Platform.runLater(() -> {
+                                    lblAsset02.setText(assetTitle + " (" + payee + ")");
+                                    lblAsset02Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
+                                });
+                            } else if (count == 3) {
+                                Platform.runLater(() -> {
+                                    lblAsset03.setText(assetTitle + " (" + payee + ")");
+                                    lblAsset03Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
+                                });
+                            } else if (count == 4) {
+                                Platform.runLater(() -> {
+                                    lblAsset04.setText(assetTitle + " (" + payee + ")");
+                                    lblAsset04Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
+                                });
+                            } else if (count == 5) {
+                                Platform.runLater(() -> {
+                                    lblAsset05.setText(assetTitle + " (" + payee + ")");
+                                    lblAsset05Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
+                                });
+                            }
+                        }
+
+                        return null;
+                    }
+                };
+
+                taskCoWriterShare.setOnSucceeded(event -> {
+                    Thread threadTopPerformingSongs = new Thread(taskTopPerformingSongs);
+                    threadTopPerformingSongs.start();
+                });
+
+                taskGrossRevenue.setOnSucceeded(event -> {
+                    Thread threadCoWriterShare = new Thread(taskCoWriterShare);
+                    threadCoWriterShare.start();
+                });
+
+                Thread threadGrossRevenue = new Thread(taskGrossRevenue);
+                threadGrossRevenue.start();*/
+
+                // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
+                double grossRevenue = report.getGrossRevenue();
+                double partnerShare = report.getPartnerShare();
+                double partnerShareInLKR = report.getPartnerShareInLKR();
+                ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
+
+                // Printing calculated values
+                {
+                    System.out.println("Calculated Details for Selected Artist");
+                    System.out.println("========");
+
+                    System.out.println("Artist: " + report.getArtist().getName());
+                    System.out.println("EUR to LKR Conversion Rate: " + report.getConversionRate());
+                    System.out.println("Date: " + report.getDate());
+                    System.out.println("========");
+
+                    System.out.println("Gross Revenue: EUR " + grossRevenue);
+                    System.out.println("Partner Share: EUR " + partnerShare);
+                    System.out.println("Partner Share: LKR " + partnerShareInLKR);
+                    System.out.println("========");
+
+                    System.out.println("Top Performing Songs");
+                    for (Songs song : topPerformingSongs) {
+                        System.out.println(song.getISRC() + " | " + song.getRoyalty() * convertedRate);
+                    }
+                }
+
+                int count = 0;
+
+                for (Songs song : topPerformingSongs) {
+                    count++;
+
+                    String assetTitle = song.getTrackTitle();
+                    double reportedRoyalty = song.getRoyalty();
+
+                    if (count == 1) {
+                        Platform.runLater(() -> {
+                            lblAsset01.setText(assetTitle);
+                            lblAsset01Streams.setText(df.format(reportedRoyalty));
+                        });
+                    } else if (count == 2) {
+                        Platform.runLater(() -> {
+                            lblAsset02.setText(assetTitle);
+                            lblAsset02Streams.setText(df.format(reportedRoyalty));
+                        });
+                    } else if (count == 3) {
+                        Platform.runLater(() -> {
+                            lblAsset03.setText(assetTitle);
+                            lblAsset03Streams.setText(df.format(reportedRoyalty));
+                        });
+                    } else if (count == 4) {
+                        Platform.runLater(() -> {
+                            lblAsset04.setText(assetTitle);
+                            lblAsset04Streams.setText(df.format(reportedRoyalty));
+                        });
+                    } else if (count == 5) {
+                        Platform.runLater(() -> {
+                            lblAsset05.setText(assetTitle);
+                            lblAsset05Streams.setText(df.format(reportedRoyalty));
+                        });
+                    }
+                }
+
+                lblGross.setText("EUR " + df.format(grossRevenue));
+                lblP_Share.setText("EUR " + df.format(partnerShare));
+                lblAmtPayable.setText("LKR " + df.format(partnerShareInLKR));
+            } else {
+                // When User Input Contains Texts
+                txtRate.setStyle("-fx-border-color: red;");
+            }
+        } else {
+            // If no Payee Selected
+            comboPayees.setStyle("-fx-border-color: red;");
+        }
+    }
+
+    private static ArtistReport getArtistReport(int artistID, double convertedRate) throws SQLException, ClassNotFoundException {
+        Artist artist = new Artist(artistID);
+
+        // Creating revenue report model by passing artist object and conversion rate
+        ArtistReport report = new ArtistReport(artist, convertedRate);
+
+        // Creating revenue report controller object
+        RevenueReportController revenueReportController = new RevenueReportController(report);
+
+        // Revenue report controller will have a method called calculate revenue (inputs report object and returns gross revenue, partner share, conversion rate, date, co-writer payment summary via report object)
+        report = revenueReportController.calculateRevenue();
+        return report;
     }
 
     private void initializeArtistReportUILabels() {
@@ -751,7 +1035,6 @@ public class ControllerRevenueGenerator {
         txtRate.setStyle("-fx-border-color: '#e9ebee';");
         lblGross.setText("Loading...");
         lblP_Share.setText("Loading...");
-        lblTax.setText("Loading...");
         lblAmtPayable.setText("Loading...");
 
         // Co-Writer labels

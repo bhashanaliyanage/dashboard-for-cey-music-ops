@@ -7,16 +7,7 @@ import com.example.song_finder_fx.Model.Songs;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class RevenueReportController {
-    private final ArtistReport report;
-
-    public RevenueReportController(ArtistReport report) {
-        this.report = report;
-    }
-
-    public ArtistReport getReport() {
-        return report;
-    }
+public record RevenueReportController(ArtistReport report) {
 
     public ArtistReport calculateRevenue() throws SQLException, ClassNotFoundException {
         // Getting artist name

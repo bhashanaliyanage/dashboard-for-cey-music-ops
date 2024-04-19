@@ -28,6 +28,9 @@ public class ControllerMCLEntry {
     private Label lblSongNo;
 
     @FXML
+    private Label lblDate;
+
+    @FXML
     private CheckBox checkBox;
 
     @FXML

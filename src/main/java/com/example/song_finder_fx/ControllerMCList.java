@@ -2,6 +2,7 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.ImageProcessor;
 import com.example.song_finder_fx.Controller.SceneController;
+import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -94,6 +95,7 @@ public class ControllerMCList {
                 labelsComposer.add(lblComposer);
                 Label lblLyricist = (Label) node.lookup("#lblLyricist");
                 labelsLyricist.add(lblLyricist);
+                Label lblDate = (Label) node.lookup("#lblDate");
                 CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
                 checkBoxes.add(checkBox);
                 HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
@@ -114,6 +116,7 @@ public class ControllerMCList {
                 lblSongName.setText(claim.getTrackName());
                 lblComposer.setText(claim.getComposer());
                 lblLyricist.setText(claim.getLyricist());
+                lblDate.setText(TextFormatter.getDaysAgo(claim.getDate()));
 
                 vbClaimsList.getChildren().add(node);
             } catch (IOException e) {

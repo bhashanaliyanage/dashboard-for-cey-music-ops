@@ -7,7 +7,7 @@ import java.util.Locale;
 
 public class ArtistReport {
     private Artist artist = null;
-    private int conversionRate = 0;
+    private double conversionRate = 0;
     private String payee = "";
     private String taxAmount = "0";
     private String amountPayable = "";
@@ -22,7 +22,7 @@ public class ArtistReport {
     private Double partnerShare;
     private ArrayList<Songs> topPerformingSongs;
 
-    public ArtistReport(Artist artist, int conversionRate) {
+    public ArtistReport(Artist artist, double conversionRate) {
         this.artist = artist;
         this.conversionRate = conversionRate;
     }
@@ -112,7 +112,7 @@ public class ArtistReport {
         this.artist = artist;
     }
 
-    public int getConversionRate() {
+    public double getConversionRate() {
         return conversionRate;
     }
 

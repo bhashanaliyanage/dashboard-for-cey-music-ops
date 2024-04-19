@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class DatabasePostgres {
@@ -32,7 +33,7 @@ public class DatabasePostgres {
     public static Connection getConn() {
         String dbname = "songdata";
         String user = "postgres";
-        String pass = "thusitha01";
+        String pass = "ceymusic";
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -168,13 +169,6 @@ public class DatabasePostgres {
         return song;
     }
 
-    public static int addManualClaim(String songName, String lyricist, String composer, String url, String trimStart, String trimEnd) throws SQLException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
-        String query = String.format("INSERT INTO public.manual_claims (song_name, composer, lyricist, youtube_id, trim_start, trim_end) VALUES ('%s', '%s', '%s', '%s', '%s', '%s');", songName, composer, lyricist, url, trimStart, trimEnd);
-        return statement.executeUpdate(query);
-    }
-
     public static int checkPreviousClaims(String id) throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
@@ -241,10 +235,16 @@ public class DatabasePostgres {
         return resultSet.getString(1);
     }
 
-    public static List<ManualClaimTrack> getManualClaims() throws SQLException, IOException {
+    public static LocalDate convertToEntityAttribute(Date date) {
+        return Optional.ofNullable(date)
+                .map(Date::toLocalDate)
+                .orElse(null);
+    }
+
+    public static List<ManualClaimTrack> getManualClaims() throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
-        String query = "SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY public.manual_claims.claim_id ASC;";
+        String query = "SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork, date FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY public.manual_claims.claim_id ASC;";
         ResultSet resultSet = statement.executeQuery(query);
         List<ManualClaimTrack> manualClaims = new ArrayList<>();
 
@@ -259,8 +259,10 @@ public class DatabasePostgres {
                 String trimEnd = resultSet.getString(7);
                 byte[] previewImageBytes = resultSet.getBytes(8);
                 byte[] artworkImageBytes = resultSet.getBytes(9);
+                Date date = resultSet.getDate(10);
+                LocalDate localDate = convertToEntityAttribute(date);
 
-                ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink);
+                ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink, localDate);
 
                 // Set the images to model
                 try {
@@ -484,35 +486,12 @@ public class DatabasePostgres {
         }
     }
 
-    /*public static int addManualClaim(ManualClaimTrack claim) throws SQLException, IOException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
-
-        // Convert BufferedImage to byte array
-        BufferedImage bufferedImage = claim.getBufferedImage();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "jpg", baos);
-        byte[] imageBytes = baos.toByteArray();
-
-        String query = String.format("INSERT INTO public.manual_claims " +
-                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, artwork) " +
-                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');",
-                claim.getTrackName(),
-                claim.getComposer(),
-                claim.getLyricist(),
-                claim.getYoutubeID(),
-                claim.getTrimStart(),
-                claim.getTrimEnd());
-
-        return statement.executeUpdate(query);
-    }*/
-
     public static int addManualClaim(ManualClaimTrack claim) throws SQLException, IOException {
         Connection conn = getConn();
         PreparedStatement preparedStatement = conn.prepareStatement(
                 "INSERT INTO public.manual_claims " +
-                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, artwork, preview_image) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, artwork, preview_image, date) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         // Get artwork
@@ -533,6 +512,7 @@ public class DatabasePostgres {
         preparedStatement.setString(6, claim.getTrimEnd());
         preparedStatement.setBytes(7, artwork);
         preparedStatement.setBytes(8, previewImage);
+        preparedStatement.setDate(9, Date.valueOf(claim.getDate()));
 
         // Execute the prepared statement
         return preparedStatement.executeUpdate();
@@ -855,7 +835,8 @@ public class DatabasePostgres {
                           FROM "reportViewSummary1"\s
                           JOIN isrc_payees ON isrc_payees.ISRC = "reportViewSummary1".asset_isrc AND isrc_payees.PAYEE = ?\s
                           GROUP BY "reportViewSummary1".asset_isrc, isrc_payees.SHARE, "reportViewSummary1".reported_royalty_for_ceymusic\s
-                    \t ) AS subquery;""");
+                    \t ) AS subquery;
+                    """);
 
 
             psGetGross.setString(1, artistName);
@@ -1259,5 +1240,18 @@ public class DatabasePostgres {
             artistName = rs.getString(1);
         }
         return artistName;
+    }
+
+    public static int fetchArtistID(String name) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT artist_id FROM public.artists WHERE artist_name = ?;");
+        ps.setString(1, name);
+        ResultSet rs = ps.executeQuery();
+        int artistID = 0;
+        if (rs.isBeforeFirst()) {
+            rs.next();
+            artistID = rs.getInt(1);
+        }
+        return artistID;
     }
 }

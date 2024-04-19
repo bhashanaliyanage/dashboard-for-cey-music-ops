@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -97,13 +98,17 @@ public class ControllerMCTrack {
         if (!ifAnyNull) {
             // Fetching YouTube ID
             String youtubeID = TextFormatter.extractYoutubeID(url);
+
             // Fetching Thumbnail
             String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
             BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
             image = ImageProcessor.cropImage(image);
 
+            // Getting Date
+            LocalDate date = LocalDate.now();
+
             // Creating track model
-            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID);
+            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID, date);
 
             // Setting Thumbnail and Preview Images to the model
             track.setPreviewImage(image);

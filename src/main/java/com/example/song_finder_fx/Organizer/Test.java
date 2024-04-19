@@ -2,16 +2,31 @@ package com.example.song_finder_fx.Organizer;
 
 import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.RevenueReportController;
+import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.Artist;
 import com.example.song_finder_fx.Model.ArtistReport;
 import com.example.song_finder_fx.Model.Songs;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        // testArtistReports();
+
+        // Assume you have a LocalDate variable named "localDate" (replace with your actual variable)
+        // For demonstration purposes, let's set it to a specific date (e.g., 2023-01-05)
+        LocalDate localDate = LocalDate.of(2024, 4, 1);
+
+        String label = TextFormatter.getDaysAgo(localDate);
+
+        // Print the result
+        System.out.println(label);
+    }
+
+    private static void testArtistReports() throws SQLException, ClassNotFoundException {
         int artistID = 80;
         int conversionRate = 320;
 
@@ -19,7 +34,7 @@ public class Test {
         Artist artist = new Artist(artistID);
 
         // Creating revenue report model by passing artist object and conversion rate
-        ArtistReport report = new ArtistReport(artist, 320);
+        ArtistReport report = new ArtistReport(artist, conversionRate);
 
         // Creating revenue report controller object
         RevenueReportController revenueReportController = new RevenueReportController(report);
