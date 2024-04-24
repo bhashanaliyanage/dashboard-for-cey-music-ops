@@ -1,6 +1,5 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.ImageProcessor;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -18,12 +17,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -70,17 +66,6 @@ public class ControllerMCList {
 
         manualClaims = DatabasePostgres.getManualClaims();
 
-        /*List<CompletableFuture<Void>> downloadFutures = manualClaims.stream()
-                .map(this::downloadImageAsync)
-                .toList();
-
-        CompletableFuture<Void> allDownloads = CompletableFuture.allOf(downloadFutures.toArray(new CompletableFuture[0]));
-
-        allDownloads.thenRun(() -> {
-            // All images downloaded, update UI
-            Platform.runLater(this::updateUI);
-        });*/
-
         for (ManualClaimTrack claim : manualClaims) {
             claimMap.put(claim.getId(), claim);
 
@@ -124,63 +109,6 @@ public class ControllerMCList {
             }
 
         }
-    }
-
-    private void updateUI() {
-        for (ManualClaimTrack claim : manualClaims) {
-            claimMap.put(claim.getId(), claim);
-
-            Node node;
-            try {
-                node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../layouts/manual_claims/manual-claims-list-entry.fxml")));
-                Label lblSongNo = (Label) node.lookup("#lblSongNo");
-                labelsSongNo.add(lblSongNo);
-                Label lblSongName = (Label) node.lookup("#lblSongName");
-                labelsSongName.add(lblSongName);
-                Label lblComposer = (Label) node.lookup("#lblComposer");
-                labelsComposer.add(lblComposer);
-                Label lblLyricist = (Label) node.lookup("#lblLyricist");
-                labelsLyricist.add(lblLyricist);
-                CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
-                checkBoxes.add(checkBox);
-                HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
-                hBoxes.add(hboxEntry);
-                ImageView image = (ImageView) node.lookup("#image");
-                image.setImage(claim.getImage());
-
-                lblSongNo.setText(String.valueOf(claim.getId()));
-                lblSongName.setText(claim.getTrackName());
-                lblComposer.setText(claim.getComposer());
-                lblLyricist.setText(claim.getLyricist());
-
-                vbClaimsList.getChildren().add(node);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-    }
-
-    private CompletableFuture<Void> downloadImageAsync(ManualClaimTrack claim) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                String youtubeID = claim.getYoutubeID();
-                String url = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
-                BufferedImage image = ImageProcessor.getDownloadedImage(url);
-                image = ImageProcessor.cropImage(image);
-                image = ImageProcessor.resizeImage(90, 90, image);
-                claim.setImage(image); // Store the image in your claim object
-            } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("An error occurred");
-                alert.setContentText(String.valueOf(e));
-                Platform.runLater(alert::showAndWait);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-            return null;
-        }, imageDownloadExecutor);
     }
 
     @FXML

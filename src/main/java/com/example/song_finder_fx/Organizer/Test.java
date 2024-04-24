@@ -14,16 +14,7 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        // testArtistReports();
-
-        // Assume you have a LocalDate variable named "localDate" (replace with your actual variable)
-        // For demonstration purposes, let's set it to a specific date (e.g., 2023-01-05)
-        LocalDate localDate = LocalDate.of(2024, 4, 1);
-
-        String label = TextFormatter.getDaysAgo(localDate);
-
-        // Print the result
-        System.out.println(label);
+        testSearch();
     }
 
     private static void testArtistReports() throws SQLException, ClassNotFoundException {
@@ -74,6 +65,8 @@ public class Test {
 
         for (Songs song : songs) {
             System.out.println(song.getTrackTitle());
+            System.out.println(song.getComposer());
+            System.out.println(song.getLyricist());
         }
     }
 }

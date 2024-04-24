@@ -1254,4 +1254,12 @@ public class DatabasePostgres {
         }
         return artistID;
     }
+
+    public static void addIngestCSV(byte[] byteArray, int ingestID) throws SQLException {
+        Connection conn = getConn();
+        PreparedStatement preparedStatement = conn.prepareStatement("UPDATE public.ingests SET ingest=? WHERE ingest_id = ?;");
+        preparedStatement.setBytes(1, byteArray);
+        preparedStatement.setInt(2, ingestID);
+        preparedStatement.executeUpdate();
+    }
 }

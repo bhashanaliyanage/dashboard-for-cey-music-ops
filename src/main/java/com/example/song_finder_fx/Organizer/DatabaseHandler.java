@@ -1,5 +1,6 @@
 package com.example.song_finder_fx.Organizer;
 
+import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.Songs;
 
 import java.sql.*;
@@ -7,43 +8,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHandler {
-    // JDBC connection parameters
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/songdata";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "thusitha01";
-
     // Database connection
-    private Connection connection;
+    private final Connection connection;
 
     public DatabaseHandler() {
-        try {
-            // Initialize the database connection
-            connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
-        } catch (SQLException e) {
-            System.out.println("Error Connecting to Database: " + e);
-        }
+        // Initialize the database connection
+        connection = DatabasePostgres.getConn();
     }
 
-public List<Songs> searchSongsByTitle(String criteria) {
-    List<Songs> searchResults = new ArrayList<>();
-    try {
-        PreparedStatement statement = connection.prepareStatement("SELECT isrc, song_name, file_name, upc FROM public.songs WHERE song_name LIKE ? LIMIT 15");
-        statement.setString(1, "%" + criteria + "%");
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            // Create Song objects from the ResultSet and add them to the searchResults list
-            Songs song = new Songs();
-            song.setIsrc(resultSet.getString(1));
-            song.setTrackTitle(resultSet.getString(2));
-            song.setFileName(resultSet.getString(3));
-            song.setUPC(resultSet.getString(4));
-            searchResults.add(song);
+    public List<Songs> searchSongsByTitle(String criteria) {
+        List<Songs> searchResults = new ArrayList<>();
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT isrc, song_name, file_name, upc, composer, lyricist, singer FROM public.\"song_metadata_new\" WHERE song_name LIKE ? LIMIT 15");
+            statement.setString(1, criteria + "%");
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                // Create Song objects from the ResultSet and add them to the searchResults list
+                Songs song = new Songs();
+                song.setIsrc(resultSet.getString(1));
+                song.setTrackTitle(resultSet.getString(2));
+                song.setFileName(resultSet.getString(3));
+                song.setUPC(resultSet.getString(4));
+                song.setComposer(resultSet.getString(5));
+                song.setLyricist(resultSet.getString(6));
+                song.setSinger(resultSet.getString(7));
+                searchResults.add(song);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return searchResults;
     }
-    return searchResults;
-}
 
     public List<Songs> searchSongsByISRC(String criteria) {
         return null;

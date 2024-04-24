@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
+import com.itextpdf.kernel.color.Lab;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -21,6 +22,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,19 +52,31 @@ public class ControllerMCIdentifiers {
         vbClaimsList.getChildren().clear();
         upcs.clear();
         for (int i = 0; i < ControllerMCList.finalManualClaims.size(); i++) {
+            ManualClaimTrack claim = ControllerMCList.finalManualClaims.get(i);
+
             Node entry = SceneController.loadLayout("layouts/manual_claims/mci-entry.fxml");
 
             vbClaimsList.getChildren().add(entry);
 
             Label claimID = (Label) entry.lookup("#claimID");
-            String claimIDString = String.valueOf(ControllerMCList.finalManualClaims.get(i).getId());
+            String claimIDString = String.valueOf(claim.getId());
             System.out.println("claimIDString = " + claimIDString);
             claimID.setText(claimIDString);
 
             Label claimName = (Label) entry.lookup("#claimName");
-            String claimNameText = ControllerMCList.finalManualClaims.get(i).getTrackName();
+            String claimNameText = claim.getTrackName();
             System.out.println("claimNameText = " + claimNameText);
             claimName.setText(claimNameText);
+
+            Label lblComposer = (Label) entry.lookup("#lblComposer");
+            String composer = claim.getComposer();
+            System.out.println("composer = " + composer);
+            lblComposer.setText(composer);
+
+            Label lblLyricist = (Label) entry.lookup("#lblLyricist");
+            String lyricist = claim.getLyricist();
+            System.out.println("lyricist = " + lyricist);
+            lblLyricist.setText(lyricist);
 
             TextField claimUPC = (TextField) entry.lookup("#claimUPC");
             upcs.add(claimUPC);
@@ -207,6 +221,16 @@ public class ControllerMCIdentifiers {
 
                         Platform.runLater(() -> progressBar.setProgress(progress));
                         Platform.runLater(() -> lblProcess.setText("Done"));
+                    }
+
+                    // Converting CSV to a byte array to store it in the database
+                    String csvContent = csvWriter.toString();
+                    byte[] byteArray = csvContent.getBytes(StandardCharsets.UTF_8);
+
+                    try {
+                        DatabasePostgres.addIngestCSV(byteArray, ingestID);
+                    } catch (SQLException e) {
+                        Platform.runLater(e::printStackTrace);
                     }
 
                     csvWriter.close();
