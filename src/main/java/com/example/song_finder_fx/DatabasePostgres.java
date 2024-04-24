@@ -1,9 +1,6 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Model.FUGAReport;
-import com.example.song_finder_fx.Model.ManualClaimTrack;
-import com.example.song_finder_fx.Model.Report;
-import com.example.song_finder_fx.Model.Songs;
+import com.example.song_finder_fx.Model.*;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
@@ -13,6 +10,7 @@ import javafx.scene.control.Label;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,6 +42,14 @@ public class DatabasePostgres {
         return conn;
     }
 
+    public static void closeConnection(Connection con) {
+        try {
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private static int updateCatNo(String artist_name, String cat_no_handler, int last_cat_no) throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
@@ -73,7 +79,7 @@ public class DatabasePostgres {
     //Existing main meth in 405 line
 
 
-    public static void main(String[] args) throws SQLException {
+//    public static void main(String[] args) throws SQLException {
         /*List<Report> sList;
         String s = "LKA0U2302779";
         sList = reporLi(Collections.singletonList(s));
@@ -89,7 +95,7 @@ public class DatabasePostgres {
         }*/
 
 
-    }
+//    }
 
 
     public static List<Report> reporLi(List<String> isrcList) {
@@ -833,6 +839,7 @@ public class DatabasePostgres {
         return payees;
     }
 
+
     static ArrayList<Double> getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
         Connection connection = getConn();
         ArrayList<Double> royalty = new ArrayList<>();
@@ -866,6 +873,146 @@ public class DatabasePostgres {
         return royalty;
     }
 
+
+    //GET  REVN REPORT 24/04/2024
+    public RevenueReport getPayeeGrossRev1( String name) {
+//		System.out.println("call this");
+        RevenueReport rReport = new RevenueReport();
+        try {
+            rReport.setAfterDeductionRoyalty(getTotalRoyalty(name));
+
+            rReport.setReportedRoyalty(getTotalRoyalty1(name));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rReport;
+
+    }
+
+    public double getTotalRoyalty1( String name) {
+        double d = 0.0;
+        try {
+            List<PayeeForReport> pr = new ArrayList<PayeeForReport>();
+            pr = getPayeRepot1(name);
+
+            for (int i = 0; i < pr.size(); i++) {
+                PayeeForReport dd = pr.get(i);
+                d = d + dd.getValue();
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return d;
+
+    }
+
+    public double getTotalRoyalty( String name) {
+        double d = 0.0;
+        try {
+            List<PayeeForReport> pr = new ArrayList<PayeeForReport>();
+            pr = getPayeRepot(name);
+
+            for (int i = 0; i < pr.size(); i++) {
+                PayeeForReport dd = pr.get(i);
+                d = d + dd.getValue();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return d;
+
+    }
+
+    public List<PayeeForReport> getPayeRepot1( String name) {
+        System.out.println("oaye repot 1");
+        String artName = name;
+        String sql = "   SELECT ip.isrc," + "       SUM(  CASE    WHEN ip.payee ='\" + arname + \"' THEN ip.share"
+                + "               WHEN ip.payee01 = '\" + arname + \"' THEN ip.payee01share"
+                + "               ELSE ip.payee02share  END ) AS total_payee_share, SUM( rv.reported_royalty_for_ceymusic / 100 * CASE "
+                + "               WHEN ip.payee = ? THEN ip.share\r\n"
+                + "               WHEN ip.payee01 = ? THEN ip.payee01share\r\n" + "               ELSE ip.payee02share"
+                + "           END ) AS total_calculated_royalty" + " FROM isrc_payees  ip "
+                + " JOIN \"reportViewSummary1\" rv ON ip.isrc = rv.asset_isrc"
+                + " WHERE ip.payee =?  OR ip.payee01 =?   OR ip.payee02 =  ? " + "GROUP BY ip.isrc ";
+        List<PayeeForReport> pReport = new ArrayList<PayeeForReport>();
+        Connection con = getConn();
+
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+//			System.out.println("here");
+            ps.setString(1, name);
+            ps.setString(2, name);
+            ps.setString(3, name);
+            ps.setString(4, name);
+            ps.setString(5, name);
+//			ps.setString(6, name);
+//			ps.setString(7, name);
+            System.out.println();
+//			System.out.println(ps);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                PayeeForReport pr = new PayeeForReport();
+                pr.setIsrc(rs.getString(1));
+                pr.setShare(rs.getInt(2));
+                pr.setValue(rs.getDouble(3));
+                pReport.add(pr);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+           closeConnection(con);
+        }
+
+        return pReport;
+
+    }
+
+    public List<PayeeForReport> getPayeRepot( String name) {
+        String sql = "   SELECT ip.isrc," + "       SUM(  CASE    WHEN ip.payee = ? THEN ip.share"
+                + "               WHEN ip.payee01 = ? THEN ip.payee01share"
+                + "               ELSE ip.payee02share  END ) AS total_payee_share, SUM( rv.after_deduction_royalty / 100 * CASE "
+                + "               WHEN ip.payee = ? THEN ip.share\r\n"
+                + "               WHEN ip.payee01 = ? THEN ip.payee01share\r\n" + "               ELSE ip.payee02share"
+                + "           END ) AS total_calculated_royalty" + " FROM isrc_payees  ip "
+                + " JOIN \"reportViewSummary1\" rv ON ip.isrc = rv.asset_isrc"
+                + " WHERE ip.payee = ?  OR ip.payee01 = ?   OR ip.payee02 =  ? " + "GROUP BY ip.isrc ";
+        List<PayeeForReport> pReport = new ArrayList<PayeeForReport>();
+        Connection con = getConn();
+
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+//			System.out.println("here");
+            ps.setString(1, name);
+            ps.setString(2, name);
+            ps.setString(3, name);
+            ps.setString(4, name);
+            ps.setString(5, name);
+            ps.setString(6, name);
+            ps.setString(7, name);
+//			System.out.println(ps);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                PayeeForReport pr = new PayeeForReport();
+                pr.setIsrc(rs.getString(1));
+                pr.setShare(rs.getInt(2));
+                pr.setValue(rs.getDouble(3));
+                pReport.add(pr);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+           closeConnection(con);
+        }
+
+        return pReport;
+
+    }
+
     public static ResultSet getCoWriterShares(String artistName) throws SQLException, ClassNotFoundException {
         Connection connection = DatabaseMySQL.getConn();
 
@@ -881,6 +1028,153 @@ public class DatabasePostgres {
         psGetCoWriterShare.setString(2, artistName);
 
         return psGetCoWriterShare.executeQuery();
+    }
+
+    public List<Payee> check(String name) {
+//        String name = "Victor Rathnayake";
+        List<String> ssList =  new ArrayList<String>();
+        Payee py = new Payee();
+        List<Payee> pyList = new ArrayList<Payee>();
+        try {
+            List<String> sList = new ArrayList<String>();
+            sList = 	getIsrc(name);
+
+            for (int index = 0; index < sList.size(); index++) {
+                String s = sList.get(index); // Get the string at the current index
+                py = getPayeeShare(s);
+                System.out.println(s+" ISRC LLIST");
+                pyList.add(py);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+//			MySqlConnection.MANAGER.closeConnection(null);
+        }
+        return pyList;
+
+    }
+//get ISRC
+    public List<String> getIsrc( String name) {
+        System.out.println("inside"+name);
+        Connection con= getConn();
+        String sql = "SELECT isrc from isrc_payees where payee= ? or payee01= ? or payee02= ? ";
+        List<String> slist =  new ArrayList<String>();
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1,name );
+            ps.setString(2,name );
+            ps.setString(3,name );
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                String s =rs.getString(1);
+                slist.add(s);
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(con);
+        }
+        return slist;
+
+    }
+
+    public Payee getPayeeShare(String isrc) {
+
+        Connection con = getConn();
+        String sql ="SELECT payee,payee01,payee02,share,payee01share ,payee02share  from isrc_payees where isrc= ? ";
+        Payee py = new Payee();
+        double amount = 0.0;
+        try {
+            PreparedStatement  ps = con.prepareStatement(sql);
+            ps.setString(1, isrc);
+            ResultSet rs =ps.executeQuery();
+            while(rs.next()) {
+
+                py.setPayee1(rs.getString(1));
+                py.setPayee2(rs.getString(2));
+                py.setPayee03(rs.getString(3));
+                py.setShare1(rs.getString(4));
+                py.setShare2(rs.getString(5));
+                py.setShare3(rs.getString(6));
+                py.setIsrc(isrc);
+
+                if(py.getPayee1()!=null) {
+                    String amnt = getRoyaltyAmount(isrc);
+                    if(amnt.equals("")) {
+                        amount = 0.0;
+                    }
+                    else {
+                        amount =Double.parseDouble(getRoyaltyAmount(isrc));
+                    }
+
+                    py.setPayee1amount(amount);
+                }
+
+                else if(py.getPayee2()!= null && py.getPayee1()!=null) {
+                    String amnt = getRoyaltyAmount(isrc);
+
+                    if(amnt.equals("")) {
+                        amount = 0.0;
+                    }else {
+                        amount =Double.parseDouble(getRoyaltyAmount(isrc));
+                    }
+
+
+//				double amount = getRoyaltyAmount(isrc);
+
+//				py.setPayee1(sql);=amount/py.getShare1();
+                    double sh1 =Double.parseDouble(py.getShare1());
+                    if(sh1==50) {
+                        double share1 =amount/2;
+                        py.setPayee1amount(share1);
+                    }
+
+
+                    double sh2 =Double.parseDouble(py.getShare2());
+                    if(sh2==50) {
+                        double share2 =amount/2;
+                        py.setPayee2Amount(share2);
+                    }
+
+
+
+                }
+
+
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(con);
+        }
+
+        return py;
+
+    }
+
+//GET ROYALTY AMOUNT
+    public String getRoyaltyAmount(String isrc) {
+        Connection con =  getConn();
+        String sql ="SELECT reported_royalty_for_ceymusic,asset_isrc from \"reportViewSummary1\" where asset_isrc= ? ";
+        String amount = "";
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, isrc);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                amount = rs.getString(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(con);
+        }
+        return amount;
+
     }
 
     public static void searchAndCopySongs(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
@@ -1025,6 +1319,88 @@ public class DatabasePostgres {
         ps.setString(3, selectedItem);
 
         return ps.executeQuery();
+    }
+
+    public static void main(String[] args) {
+        Songs list =  new Songs();
+        list= (Songs) topPerformingSongs();
+        System.out.println(list);
+    }
+
+    public static List<Songs> topPerformingSongs(){
+        String sql ="select  asset_isrc, reported_royalty_for_ceymusic " +
+                "from public.\"reportViewSummary1\" ORDER BY  reported_royalty_for_ceymusic   DESC LIMIT 6" ;
+
+        Connection con = getConn();
+        List<Songs> sngList = new ArrayList<>();
+
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                Songs sng = new Songs();
+                Songs sn =  new Songs();
+                sn=getSongData(rs.getString(1));
+                sng.setTrackTitle(sn.getTrackTitle());
+                sng.setComposer(getArtNameById(sn.getComposer()));
+//                sng.setLyricists(getArtNameById(sn.getLyricists()));
+                sng.setLyricist(getArtNameById(sn.getLyricist()));
+                sng.setFeaturingArtist(getArtNameById(sn.getFeaturingArtist()));
+                sng.setSinger(getArtNameById(sn.getSinger()));
+                sngList.add(sn);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            closeConnection(con);
+        }
+        return sngList;
+    }
+
+    public static Songs getSongData(String isrc) {
+        String sql  = "SELECT  song_name,composer,lyricist,featuring ,singer from songs where isrc= ? ";
+        Connection con =  getConn();
+        Songs sng = new Songs();
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, isrc);
+            ResultSet  rs = ps.executeQuery();
+            while(rs.next()) {
+                sng.setTrackTitle(rs.getString(1));
+                sng.setComposer(rs.getString(2));
+                sng.setLyricist(rs.getString(3));
+                sng.setFeaturingArtist(rs.getString(4));
+                sng.setSinger(rs.getString(5));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(con);
+        }
+
+        return sng;
+
+    }
+
+    public static String getArtNameById(String id) {
+        String sql = "";
+        Connection con = getConn();
+        String name = "SELECT artist_name from artists where artist_id = ? ";
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                name=rs.getString(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(con);
+        }
+        return name;
+
     }
 
     public static ResultSet getTopPerformingSongsEdit(String selectedItem) throws SQLException, ClassNotFoundException {

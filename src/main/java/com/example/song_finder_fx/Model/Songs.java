@@ -21,6 +21,13 @@ public class Songs {
 
     private String song_name;
 
+    public String getFeaturingArtist() {
+        return featuringArtist;
+    }
+
+    public void setFeaturingArtist(String featuringArtist) {
+        this.featuringArtist = featuringArtist;
+    }
 
     public void setTrackTitle(String trackTitle) {
         this.trackTitle = trackTitle;
