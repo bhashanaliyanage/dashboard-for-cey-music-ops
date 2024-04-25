@@ -2,6 +2,7 @@ package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.ArtistReport;
+import com.example.song_finder_fx.Model.RevenueReport;
 import com.example.song_finder_fx.Model.Songs;
 
 import java.sql.SQLException;
@@ -17,9 +18,9 @@ public record RevenueReportController(ArtistReport report) {
 
         // Getting gross revenue and partner share
         // TODO: 4/16/2024 Make this checks all three columns in the database
-        ArrayList<Double> grossNPartnerShare = DatabasePostgres.getPayeeGrossRev(artistName);
-        Double grossRevenue = grossNPartnerShare.get(0);
-        Double partnerShare = grossNPartnerShare.get(1);
+        RevenueReport grossNPartnerShare = DatabasePostgres.getPayeeGrossRev1(artistName);
+        Double grossRevenue = grossNPartnerShare.getReportedRoyalty();
+        Double partnerShare = grossNPartnerShare.getAfterDeductionRoyalty();
         report.setGrossRevenue(grossRevenue);
         report.setPartnerShare(partnerShare);
 

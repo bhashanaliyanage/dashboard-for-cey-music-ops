@@ -14,11 +14,11 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        testSearch();
+        testArtistReports();
     }
 
     private static void testArtistReports() throws SQLException, ClassNotFoundException {
-        int artistID = 80;
+        int artistID = 76;
         int conversionRate = 320;
 
         // Creating artist model by passing artistID

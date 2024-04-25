@@ -76,29 +76,6 @@ public class DatabasePostgres {
         return 0;
     }
 
-
-    //Existing main meth in 405 line
-
-
-    public static void main(String[] args) throws SQLException {
-        /*List<Report> sList;
-        String s = "LKA0U2302779";
-        sList = reporLi(Collections.singletonList(s));
-        for (Report r : sList) {
-            System.out.println(r.getReportedRoyaltyForCeyMusic());
-            System.out.println(r.getReportedRoyaltyAfterGST());
-            System.out.println(r.getOtherTerritoryEarnnings());
-            System.out.println(r.getAfterGST());
-            System.out.println(r.getEuEaring());
-            System.out.println(r.getReportedSummary());
-
-            System.out.println(sList + "report list111111111111");
-        }*/
-
-
-    }
-
-
     public static List<Report> reporLi(List<String> isrcList) {
         List<Report> repoList = new ArrayList<>();
         String sql = "SELECT reported_royalty_for_ceymusic,reported_royalty_after_gst,other_territories_earnings,after_gst,au_earnings,reported_royalty_summary,asset_isrc " +
@@ -851,7 +828,7 @@ public class DatabasePostgres {
 
 
     //GET  REVN REPORT 24/04/2024
-    public RevenueReport getPayeeGrossRev1( String name) {
+    public static RevenueReport getPayeeGrossRev1(String name) {
 //		System.out.println("call this");
         RevenueReport rReport = new RevenueReport();
         try {
@@ -865,7 +842,7 @@ public class DatabasePostgres {
 
     }
 
-    public double getTotalRoyalty1( String name) {
+    public static double getTotalRoyalty1(String name) {
         double d = 0.0;
         try {
             List<PayeeForReport> pr = new ArrayList<PayeeForReport>();
@@ -884,7 +861,7 @@ public class DatabasePostgres {
 
     }
 
-    public double getTotalRoyalty( String name) {
+    public static double getTotalRoyalty(String name) {
         double d = 0.0;
         try {
             List<PayeeForReport> pr = new ArrayList<PayeeForReport>();
@@ -902,7 +879,7 @@ public class DatabasePostgres {
 
     }
 
-    public List<PayeeForReport> getPayeRepot1( String name) {
+    public static List<PayeeForReport> getPayeRepot1(String name) {
         System.out.println("oaye repot 1");
         String artName = name;
         String sql = "   SELECT ip.isrc," + "       SUM(  CASE    WHEN ip.payee ='\" + arname + \"' THEN ip.share"
@@ -947,7 +924,7 @@ public class DatabasePostgres {
 
     }
 
-    public List<PayeeForReport> getPayeRepot( String name) {
+    public static List<PayeeForReport> getPayeRepot(String name) {
         String sql = "   SELECT ip.isrc," + "       SUM(  CASE    WHEN ip.payee = ? THEN ip.share"
                 + "               WHEN ip.payee01 = ? THEN ip.payee01share"
                 + "               ELSE ip.payee02share  END ) AS total_payee_share, SUM( rv.after_deduction_royalty / 100 * CASE "
@@ -1260,24 +1237,17 @@ public class DatabasePostgres {
         }
     }
 
-    public static ArrayList<Songs> getTopPerformingSongs(String selectedItem) throws SQLException, ClassNotFoundException {
-        /*SELECT `report`.`Asset_Title`, (((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY
-        FROM `report` JOIN `isrc_payees` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC`
-        WHERE `report`.`Asset_ISRC` IN (SELECT `isrc_payees`.`ISRC` WHERE `isrc_payees`.`PAYEE` = 'Sarath De Alwis')
-        GROUP BY `report`.`Asset_ISRC`
-        LIMIT 5;*/
-        Connection connection = getConn();
-
-        String sql = "SELECT r.* FROM public.report AS r JOIN (SELECT asset_isrc, MAX(reported_royalty) AS max_royalty FROM public.report WHERE asset_isrc IN (SELECT isrc FROM public.isrc_payees WHERE payee01 = ? OR payee = ? OR payee02 = ? ) GROUP BY asset_isrc) AS max_royalties ON r.asset_isrc = max_royalties.asset_isrc AND r.reported_royalty = max_royalties.max_royalty ORDER BY r.reported_royalty DESC LIMIT 5;";
-
-        /**
-         *
-         PreparedStatement ps = connection.prepareStatement("SELECT `report`.`Asset_Title`, (((SUM(CASE WHEN `report`.`Territory` = 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END)) * 0.9) + (SUM(CASE WHEN `report`.`Territory` != 'AU' THEN `report`.`Reported_Royalty` ELSE 0 END))) * 0.85 AS REPORTED_ROYALTY " +
-         "FROM `report` JOIN `isrc_payees` ON `isrc_payees`.`ISRC` = `report`.`Asset_ISRC` " +
-         "WHERE `report`.`Asset_ISRC` IN (SELECT `isrc_payees`.`ISRC` WHERE `isrc_payees`.`PAYEE` = ?) " +
-         "GROUP BY `report`.`Asset_ISRC` " +
-         "LIMIT 5;");
-         */
+    public static ArrayList<Songs> getTopPerformingSongs(String selectedItem) throws SQLException {
+        String sql = "SELECT r.* " +
+                "FROM public.report AS r " +
+                "JOIN (SELECT asset_isrc, " +
+                "   MAX(reported_royalty) AS max_royalty " +
+                "   FROM public.report " +
+                "   WHERE asset_isrc IN (SELECT isrc FROM public.isrc_payees " +
+                "       WHERE payee01 = ? OR payee = ? OR payee02 = ? ) GROUP BY asset_isrc) AS max_royalties " +
+                "           ON r.asset_isrc = max_royalties.asset_isrc " +
+                "           AND r.reported_royalty = max_royalties.max_royalty " +
+                "ORDER BY r.reported_royalty DESC LIMIT 5;";
 
         PreparedStatement ps = conn.prepareStatement(sql);
 
