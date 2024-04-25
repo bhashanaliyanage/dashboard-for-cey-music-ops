@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public record RevenueReportController(ArtistReport report) {
 
-    public ArtistReport calculateRevenue() throws SQLException, ClassNotFoundException {
+    public ArtistReport calculateRevenue() throws SQLException {
         // Getting artist name
         ArtistController artistController = new ArtistController(report.getArtist());
         String artistName = artistController.fetchArtistName();

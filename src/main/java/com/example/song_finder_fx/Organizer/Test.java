@@ -2,13 +2,11 @@ package com.example.song_finder_fx.Organizer;
 
 import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.RevenueReportController;
-import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.Artist;
 import com.example.song_finder_fx.Model.ArtistReport;
 import com.example.song_finder_fx.Model.Songs;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
