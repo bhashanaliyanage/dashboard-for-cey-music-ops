@@ -19,7 +19,8 @@ public class Songs {
     private String percentage = "";
     private String copyrightOwner = "";
 
-    private String song_name;
+    private String fileName;
+    private double royalty;
 
     public String getFeaturingArtist() {
         return featuringArtist;
@@ -65,7 +66,6 @@ public class Songs {
 
     public Songs(String isrc, String song_name) {
         this.isrc = isrc;
-        this.song_name = song_name;
     }
 
     public void setIsrc(String isrc) {
@@ -183,5 +183,28 @@ public class Songs {
                 }
             }
         }
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setUPC(String upc) {
+        this.upc = upc;
+    }
+
+    public void setRoyalty(double royalty) {
+        this.royalty = royalty;
+    }
+
+    public double getRoyalty() {
+        return royalty;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setSong_name(String song_name) {
     }
 }

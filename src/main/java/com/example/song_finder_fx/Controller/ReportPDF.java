@@ -1,8 +1,6 @@
 package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.Model.ArtistReport;
-import com.itextpdf.kernel.color.Color;
-import com.itextpdf.kernel.color.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.border.Border;
@@ -23,13 +21,7 @@ import java.util.ArrayList;
 import static com.example.song_finder_fx.Controller.Invoice.loadAutoScaledImage;
 import static com.example.song_finder_fx.Controller.Invoice.loadFont;
 
-public class ReportPDF {
-    private static final Color INVOICE_LIGHT_BLUE = new DeviceRgb(232, 243, 251);
-    private static final Color INVOICE_BLUE = new DeviceRgb(136, 193, 232);
-    private static final Color INVOICE_WHITE = new DeviceRgb(255, 255, 255);
-    private static final Color INVOICE_BLACK = new DeviceRgb(25, 23, 22);
-    private static final Color INVOICE_RED = new DeviceRgb(178, 110, 99);
-    private static final Color INVOICE_GRAY = new DeviceRgb(205, 205, 205);
+public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
     private static final Border BLUE_BORDER = new SolidBorder(INVOICE_BLUE, 0.5f);
     private static final Border BLACK_BORDER = new SolidBorder(INVOICE_BLACK, 0.5f);
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
@@ -77,7 +69,7 @@ public class ReportPDF {
         table.setMarginRight(20f);
         table.setMarginTop(10f);
 
-        ArrayList<String> topPerformingSongs = report.getTopPerformingSongs();
+        ArrayList<String> topPerformingSongs = report.getTopPerformingSongNames();
         ArrayList<String> topPerformingSongPayees = report.getTopPerformingSongPayees();
         ArrayList<String> topPerformingSongPayeeShares = report.getTopPerformingSongPayeeShare();
         int songCount = topPerformingSongs.size();
@@ -207,7 +199,7 @@ public class ReportPDF {
                 .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_RED).setBorder(BLACK_BORDER));
 
         // Row 02
-        table.addCell(new Cell().add(new Paragraph(report.getPartnerShareInLKR()).setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph("LKR " + report.getPartnerShareInLKR()).setFont(FONT_POPPINS))
                 .setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBorder(BLACK_BORDER));
         table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));
         table.addCell(new Cell().add(new Paragraph(report.getAmountPayable()).setFont(FONT_POPPINS))
@@ -238,7 +230,7 @@ public class ReportPDF {
                 .setBorder(Border.NO_BORDER));
         table.addCell(new Cell().add(new Paragraph("Gross Revenue Produced").setFont(FONT_POPPINS))
                 .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setFontSize(10f).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().add(new Paragraph(report.getGrossRevenueInLKR()).setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph("LKR " + report.getGrossRevenueInLKR()).setFont(FONT_POPPINS))
                 .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setFontSize(10f).setBorder(BLUE_BORDER));
 
         // Row 02

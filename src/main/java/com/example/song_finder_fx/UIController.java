@@ -46,10 +46,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class UIController {
+public class UIController implements com.example.song_finder_fx.Constants.UINode {
     public VBox sideVBox;
     private final NotificationBuilder nb = new NotificationBuilder();
-    public static final Node[] mainNodes = new Node[7];
     private final Search search = new Search();
 
 

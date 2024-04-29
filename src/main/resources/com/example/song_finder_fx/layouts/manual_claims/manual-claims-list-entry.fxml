@@ -1,118 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.Cursor?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER_LEFT" prefWidth="650.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCLEntry">
+<VBox alignment="CENTER_LEFT" prefWidth="650.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCLEntry">
    <HBox>
-      <children>
-         <HBox fx:id="hbox2" alignment="CENTER_LEFT" onMouseClicked="#onSongClick" prefWidth="512.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
+      <HBox fx:id="hboxEntry" alignment="CENTER_LEFT" onMouseClicked="#onSongClick" prefWidth="512.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
+         <CheckBox fx:id="checkBox" mnemonicParsing="false">
+            <HBox.margin>
+               <Insets left="10.0" right="10.0" />
+            </HBox.margin>
+         </CheckBox>
+         <ImageView fx:id="image" fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
+            <HBox.margin>
+               <Insets right="10.0" />
+            </HBox.margin>
+            <Image url="@../../images/Green%20Gradient.jpg" />
+         </ImageView>
+         <VBox fx:id="vboxSongDetails" HBox.hgrow="ALWAYS">
+            <HBox.margin>
+               <Insets left="10.0" top="10.0" />
+            </HBox.margin>
             <children>
-               <CheckBox fx:id="checkBox" mnemonicParsing="false">
-                  <HBox.margin>
-                     <Insets left="10.0" right="10.0" />
-                  </HBox.margin>
-               </CheckBox>
-               <ImageView fx:id="image" fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
-                  <HBox.margin>
-                     <Insets right="10.0" />
-                  </HBox.margin>
-                  <image>
-                     <Image url="@../../images/Green%20Gradient.jpg" />
-                  </image>
-               </ImageView>
-               <VBox fx:id="vboxSongDetails" prefWidth="400.0">
-                  <HBox.margin>
-                     <Insets left="10.0" top="10.0" />
-                  </HBox.margin>
+               <HBox>
                   <children>
-                     <HBox>
+                     <Label fx:id="lblSongNo" layoutX="10.0" layoutY="10.0" text="30">
+                        <font>
+                           <Font name="Segoe UI Semibold" size="14.0" />
+                        </font>
+                        <HBox.margin>
+                           <Insets />
+                        </HBox.margin>
+                     </Label>
+                     <Label fx:id="lblSongNo1" layoutX="10.0" layoutY="10.0" text=".">
+                        <font>
+                           <Font name="Segoe UI Semibold" size="14.0" />
+                        </font>
+                     </Label>
+                     <Label fx:id="lblSongName" text="Song Name">
+                        <font>
+                           <Font name="Segoe UI Semibold" size="14.0" />
+                        </font>
+                        <HBox.margin>
+                           <Insets left="5.0" />
+                        </HBox.margin>
+                     </Label>
+                     <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
                         <children>
-                           <Label fx:id="lblSongNo" layoutX="10.0" layoutY="10.0" text="30">
+                           <Label fx:id="lblDate" text="Date" textFill="#656565">
                               <font>
-                                 <Font name="Segoe UI Semibold" size="14.0" />
+                                 <Font name="Segoe UI" size="12.0" />
                               </font>
-                              <HBox.margin>
-                                 <Insets />
-                              </HBox.margin>
-                           </Label>
-                           <Label fx:id="lblSongNo1" layoutX="10.0" layoutY="10.0" text=".">
-                              <font>
-                                 <Font name="Segoe UI Semibold" size="14.0" />
-                              </font>
-                           </Label>
-                           <Label fx:id="lblSongName" text="Song Name">
-                              <font>
-                                 <Font name="Segoe UI Semibold" size="14.0" />
-                              </font>
-                              <HBox.margin>
-                                 <Insets left="5.0" />
-                              </HBox.margin>
                            </Label>
                         </children>
-                     </HBox>
-                     <HBox layoutX="10.0" layoutY="49.0">
-                        <VBox.margin>
-                           <Insets top="5.0" />
-                        </VBox.margin>
-                        <children>
-                           <ImageView fitHeight="18.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                              <HBox.margin>
-                                 <Insets right="5.0" />
-                              </HBox.margin>
-                              <image>
-                                 <Image url="@../../images/music-note%201.png" />
-                              </image>
-                           </ImageView>
-                           <Label fx:id="lblComposer" text="Composer" textFill="#656565" />
-                        </children>
-                     </HBox>
-                     <HBox layoutX="10.0" layoutY="35.0">
-                        <children>
-                           <ImageView fitHeight="18.0" fitWidth="16.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
-                              <HBox.margin>
-                                 <Insets right="5.0" />
-                              </HBox.margin>
-                              <image>
-                                 <Image url="@../../images/pencil%201.png" />
-                              </image>
-                           </ImageView>
-                           <Label fx:id="lblLyricist" layoutX="10.0" layoutY="10.0" text="Lyricist" textFill="#656565" />
-                        </children>
-                        <VBox.margin>
-                           <Insets top="5.0" />
-                        </VBox.margin>
+                        <HBox.margin>
+                           <Insets right="10.0" />
+                        </HBox.margin>
                      </HBox>
                   </children>
-               </VBox>
-            </children>
-         </HBox>
-         <VBox>
-            <children>
-               <HBox alignment="CENTER_RIGHT" VBox.vgrow="ALWAYS">
+               </HBox>
+               <HBox layoutX="10.0" layoutY="49.0">
+                  <VBox.margin>
+                     <Insets top="5.0" />
+                  </VBox.margin>
                   <children>
-                     <ImageView fx:id="btnPlay" fitHeight="16.0" fitWidth="16.0" onMouseClicked="#onEdit" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-                        <cursor>
-                           <Cursor fx:constant="HAND" />
-                        </cursor>
+                     <ImageView fitHeight="18.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                         <HBox.margin>
-                           <Insets left="20.0" right="20.0" />
+                           <Insets right="5.0" />
+                        </HBox.margin>
+                        <image>
+                           <Image url="@../../images/music-note%201.png" />
+                        </image>
+                     </ImageView>
+                     <Label fx:id="lblComposer" text="Composer" textFill="#656565" />
+                  </children>
+               </HBox>
+               <HBox layoutX="10.0" layoutY="35.0">
+                  <children>
+                     <ImageView fitHeight="18.0" fitWidth="16.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                        <HBox.margin>
+                           <Insets right="5.0" />
                         </HBox.margin>
                         <image>
                            <Image url="@../../images/pencil%201.png" />
                         </image>
                      </ImageView>
+                     <Label fx:id="lblLyricist" layoutX="10.0" layoutY="10.0" text="Lyricist" textFill="#656565" />
                   </children>
+                  <VBox.margin>
+                     <Insets top="5.0" />
+                  </VBox.margin>
                </HBox>
             </children>
          </VBox>
-      </children>
+      </HBox>
+      <VBox>
+         <children>
+            <HBox alignment="CENTER_RIGHT" VBox.vgrow="ALWAYS">
+               <children>
+                  <ImageView fx:id="btnPlay" fitHeight="16.0" fitWidth="16.0" onMouseClicked="#onEdit" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <HBox.margin>
+                        <Insets left="20.0" right="20.0" />
+                     </HBox.margin>
+                     <image>
+                        <Image url="@../../images/pencil%201.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
    </HBox>
 </VBox>

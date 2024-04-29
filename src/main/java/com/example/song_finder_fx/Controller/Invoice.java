@@ -7,8 +7,6 @@ import com.itextpdf.io.font.FontProgramFactory;
 import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.kernel.color.Color;
-import com.itextpdf.kernel.color.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
@@ -35,11 +33,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Invoice {
-    private static final Color INVOICE_BLUE = new DeviceRgb(136, 193, 232);
+public class Invoice implements com.example.song_finder_fx.Constants.Colors {
+    /*private static final Color INVOICE_BLUE = new DeviceRgb(136, 193, 232);
     private static final Color INVOICE_LIGHT_BLUE = new DeviceRgb(232, 243, 251);
     private static final Color INVOICE_WHITE = new DeviceRgb(255, 255, 255);
-    private static final Color INVOICE_GRAY = new DeviceRgb(204, 204, 204);
+    private static final Color INVOICE_GRAY = new DeviceRgb(204, 204, 204);*/
     private static final DecimalFormat df = new DecimalFormat("0.00");
     private static int pageNumber = 1;
 
@@ -69,7 +67,7 @@ public class Invoice {
         // Table 01 Row 02
         table01.addCell(new Cell()
                 .add(new Paragraph(""))
-                .setBackgroundColor(Invoice.INVOICE_LIGHT_BLUE)
+                .setBackgroundColor(INVOICE_LIGHT_BLUE)
                 .setBorder(Border.NO_BORDER)
         );
         //</editor-fold>
@@ -115,7 +113,7 @@ public class Invoice {
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .setFontSize(28f)
                 .setBold()
-                .setFontColor(Invoice.INVOICE_BLUE)
+                .setFontColor(INVOICE_BLUE)
                 .setBorder(Border.NO_BORDER));
 
         // Table 02 Row 03
@@ -135,42 +133,42 @@ public class Invoice {
         table03.setMarginLeft(30f);
         table03.setMarginRight(30f);
         table03.setFixedLayout();
-        Border grayBorder = new SolidBorder(Invoice.INVOICE_GRAY, 0.5f);
+        Border grayBorder = new SolidBorder(INVOICE_GRAY, 0.5f);
 
         //<editor-fold desc="Songs Table Header">
         table03.addCell(new Cell().add(new Paragraph("SONG").setFont(font_rubik))
-                .setFontColor(Invoice.INVOICE_WHITE)
+                .setFontColor(INVOICE_WHITE)
                 .setHeight(40)
                 .setBold()
                 .setBorder(grayBorder)
-                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setBackgroundColor(INVOICE_BLUE)
                 .setFontSize(12f)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
         table03.addCell(new Cell().add(new Paragraph("CONTROL").setFont(font_rubik))
-                .setFontColor(Invoice.INVOICE_WHITE)
+                .setFontColor(INVOICE_WHITE)
                 .setHeight(40)
                 .setBold()
                 .setBorder(grayBorder)
-                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setBackgroundColor(INVOICE_BLUE)
                 .setFontSize(12f)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
         table03.addCell(new Cell().add(new Paragraph("COPYRIGHT OWNER").setFont(font_rubik))
-                .setFontColor(Invoice.INVOICE_WHITE)
+                .setFontColor(INVOICE_WHITE)
                 .setHeight(40)
                 .setBold()
                 .setBorder(grayBorder)
-                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setBackgroundColor(INVOICE_BLUE)
                 .setFontSize(12f)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
         table03.addCell(new Cell().add(new Paragraph("AMOUNT").setFont(font_rubik))
-                .setFontColor(Invoice.INVOICE_WHITE)
+                .setFontColor(INVOICE_WHITE)
                 .setHeight(40)
                 .setBold()
                 .setBorder(grayBorder)
-                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setBackgroundColor(INVOICE_BLUE)
                 .setFontSize(12f)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
@@ -188,39 +186,39 @@ public class Invoice {
 
         Table currentTable = createNewTable(); // createNewTable is a method to create a new table like table03
         currentTable.addCell(new Cell().add(new Paragraph("SONG").setFont(font_rubik))
-                .setFontColor(Invoice.INVOICE_WHITE)
+                .setFontColor(INVOICE_WHITE)
                 .setHeight(40)
                 .setBold()
                 .setBorder(grayBorder)
-                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setBackgroundColor(INVOICE_BLUE)
                 .setFontSize(12f)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
         currentTable.addCell(new Cell().add(new Paragraph("CONTROL").setFont(font_rubik))
-                .setFontColor(Invoice.INVOICE_WHITE)
+                .setFontColor(INVOICE_WHITE)
                 .setHeight(40)
                 .setBold()
                 .setBorder(grayBorder)
-                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setBackgroundColor(INVOICE_BLUE)
                 .setFontSize(12f)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
         currentTable.addCell(new Cell().add(new Paragraph("COPYRIGHT OWNER").setFont(font_rubik))
-                .setFontColor(Invoice.INVOICE_WHITE)
+                .setFontColor(INVOICE_WHITE)
                 .setHeight(40)
                 .setBold()
                 .setBorder(grayBorder)
-                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setBackgroundColor(INVOICE_BLUE)
                 .setFontSize(12f)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
         currentTable.addCell(new Cell().add(new Paragraph("AMOUNT").setFont(font_rubik))
                 .setFontSize(12f)
-                .setFontColor(Invoice.INVOICE_WHITE)
+                .setFontColor(INVOICE_WHITE)
                 .setHeight(40)
                 .setBold()
                 .setBorder(grayBorder)
-                .setBackgroundColor(Invoice.INVOICE_BLUE)
+                .setBackgroundColor(INVOICE_BLUE)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE));
 
@@ -255,7 +253,7 @@ public class Invoice {
                 .setTextAlignment(TextAlignment.RIGHT));
 
         tableTotal.addCell(new Cell(1, 2)
-                .setBackgroundColor(Invoice.INVOICE_GRAY)
+                .setBackgroundColor(INVOICE_GRAY)
                 .setBorder(Border.NO_BORDER)
                 .setHeight(1f));
 
@@ -414,7 +412,7 @@ public class Invoice {
         float[] columnWidthTableFooter = {275f, 200f, 125f};
         Table tableFooter = new Table(columnWidthTableFooter);
         tableFooter.setFixedPosition(30f, 20f, 535f);
-        tableFooter.setBackgroundColor(Invoice.INVOICE_BLUE);
+        tableFooter.setBackgroundColor(INVOICE_BLUE);
 
         float fontSize = 8f;
 
@@ -425,7 +423,7 @@ public class Invoice {
                 .setBorder(Border.NO_BORDER));
         tableForCell1.addCell(new Cell().add(new Paragraph("65/18, Sandun Gardens, Elhena Rd, Maharagama")
                         .setFont(font)
-                        .setFontColor(Invoice.INVOICE_WHITE))
+                        .setFontColor(INVOICE_WHITE))
                 .setFontSize(fontSize)
                 .setBorder(Border.NO_BORDER));
 
@@ -434,7 +432,7 @@ public class Invoice {
                 .setBorder(Border.NO_BORDER));
         tableForCell2.addCell(new Cell().add(new Paragraph("39 Annabelle View, Coombs ACT 2611")
                         .setFont(font)
-                        .setFontColor(Invoice.INVOICE_WHITE))
+                        .setFontColor(INVOICE_WHITE))
                 .setFontSize(fontSize)
                 .setBorder(Border.NO_BORDER));
 
@@ -443,7 +441,7 @@ public class Invoice {
                 .setBorder(Border.NO_BORDER));
         tableForCell3.addCell(new Cell().add(new Paragraph("www.ceymusic.com.au")
                         .setFont(font)
-                        .setFontColor(Invoice.INVOICE_WHITE))
+                        .setFontColor(INVOICE_WHITE))
                 .setFontSize(fontSize)
                 .setBorder(Border.NO_BORDER));
 
