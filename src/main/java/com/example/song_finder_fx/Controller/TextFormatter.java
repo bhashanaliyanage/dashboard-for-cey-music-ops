@@ -1,8 +1,12 @@
 package com.example.song_finder_fx.Controller;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,5 +68,25 @@ public class TextFormatter {
 
     public static boolean validateTrimTimes(String trimStart, String trimEnd) {
         return validateTime(trimStart) && validateTime(trimEnd);
+    }
+
+
+    public static @NotNull String getDaysAgo(LocalDate localDate) {
+        // Get the current system date
+        LocalDate currentDate = LocalDate.now();
+
+        // Calculate the difference in days
+        long daysDifference = ChronoUnit.DAYS.between(localDate, currentDate);
+
+        // Determine the appropriate label based on the difference
+        String label;
+        if (daysDifference == 0) {
+            label = "today";
+        } else if (daysDifference == 1) {
+            label = "yesterday";
+        } else {
+            label = Math.abs(daysDifference) + " days ago";
+        }
+        return label;
     }
 }

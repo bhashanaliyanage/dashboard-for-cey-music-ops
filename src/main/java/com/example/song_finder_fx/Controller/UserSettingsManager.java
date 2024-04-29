@@ -31,11 +31,9 @@ public class UserSettingsManager {
                     System.out.println("Created properties file: " + configFile.getAbsolutePath());
                 } else {
                     System.err.println("Failed to create properties file: " + configFile.getAbsolutePath());
-                    return;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                return;
             }
         }
     }

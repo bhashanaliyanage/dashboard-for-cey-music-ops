@@ -72,8 +72,17 @@ public class YoutubeDownload {
             System.out.println("EndTime = " + EndTime);
         });
 
+        String[] cmdArray = {
+                "node",
+                nodeScriptPPath,
+                filePath,
+                outputPath,
+                startTime,
+                EndTime
+        };
 
-        ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPPath, filePath, outputPath, startTime, EndTime);
+        // ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPPath, filePath, outputPath, startTime, EndTime);
+        ProcessBuilder processBuilder = new ProcessBuilder(cmdArray);
         Process process = processBuilder.start();
 
         // Read and print output
@@ -95,13 +104,13 @@ public class YoutubeDownload {
                 alert.setHeaderText("An error occurred while trimming audio");
                 String message = String.format("""
                         File Path: '%s'
-                                                
+                                               \s
                         Output Path: '%s'
-                                                
+                                               \s
                         Trim Start: '%s'
-                                                
+                                               \s
                         Trim End: '%s'
-                        """, filePath, outputPath, startTime, EndTime);
+                       \s""", filePath, outputPath, startTime, EndTime);
                 alert.setContentText(message);
                 Platform.runLater(alert::showAndWait);
             });
@@ -115,7 +124,14 @@ public class YoutubeDownload {
         System.out.println("sourcePath = " + sourcePath);
         System.out.println("destinationPath = " + destinationPath);
 
-        ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPPath, sourcePath.toString(), destinationPath.toString());
+        String[] cmdArray = {
+                "node",
+                nodeScriptPPath,
+                sourcePath.toString(),
+                destinationPath.toString()
+        };
+
+        ProcessBuilder processBuilder = new ProcessBuilder(cmdArray);
         Process process = processBuilder.start();
 
         int exitCode = process.waitFor();

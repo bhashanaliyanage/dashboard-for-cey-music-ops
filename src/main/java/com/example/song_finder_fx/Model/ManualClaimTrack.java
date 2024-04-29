@@ -4,6 +4,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import java.awt.image.BufferedImage;
+import java.time.LocalDate;
 
 public class ManualClaimTrack {
     private final int id;
@@ -11,6 +12,7 @@ public class ManualClaimTrack {
     private final String lyricist;
     private final String composer;
     private final String youtubeID;
+    private final LocalDate date;
     private boolean status = false;
     private String trimStart;
     private String trimEnd;
@@ -24,12 +26,13 @@ public class ManualClaimTrack {
         this.youtubeID = url.substring(32);
     }*/
 
-    public ManualClaimTrack(int id, String trackName, String lyricist, String composer, String youTubeID) {
+    public ManualClaimTrack(int id, String trackName, String lyricist, String composer, String youTubeID, LocalDate date) {
         this.id = id;
         this.trackName = trackName;
         this.lyricist = lyricist;
         this.composer = composer;
         this.youtubeID = youTubeID;
+        this.date = date;
     }
 
     public String getTrackName() {
@@ -99,5 +102,9 @@ public class ManualClaimTrack {
 
     public BufferedImage getBufferedPreviewImage() {
         return previewImage;
+    }
+
+    public LocalDate getDate() {
+        return date;
     }
 }
