@@ -232,10 +232,10 @@ public class Main extends Application {
 // TODO: A view to view created ingests
     // TODO: Update Payee table from created ingests upon request
 // TODO: Keep track of songs and artists that are not available on the database when adding manual claims
+// TODO: Tags For Manual Claims List (for Group Claims , Tv Programmes , Covers)
 // TODO: Edit details on an added manual claim in the add manual claim view
 // TODO: Remove an added manual claim in the add manual claim view
 // TODO: Reset add manual claim view after adding a manual claim
-// TODO: Tags For Manual Claims List (for Group Claims , Tv Programmes , Covers)
 // TODO: Batch Edit Artworks
 // TODO: Show artwork in identifier view
 // TODO: Batch Paste UPCs

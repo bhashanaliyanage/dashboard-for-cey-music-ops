@@ -98,6 +98,7 @@ public class ControllerMCIdentifiers {
         currentISRC = "";
         LocalDate date = LocalDate.now();
         String userName = System.getProperty("user.name");
+        final String[] ingestFileName = {"ingest.csv"};
 
         // Getting total claims for the loop
         int totalClaims = ControllerMCList.finalManualClaims.size();
@@ -140,6 +141,16 @@ public class ControllerMCIdentifiers {
                 }
             }
 
+            // Getting ingest file name
+            TextInputDialog inputIngestFileName = new TextInputDialog("ingest");
+            inputIngestFileName.setTitle("Ingest CSV File Name");
+            inputIngestFileName.setHeaderText("Enter a file name for ingest");
+            inputIngestFileName.setContentText("File Name: ");
+            inputIngestFileName.showAndWait().ifPresent(fileName -> {
+                ingestFileName[0] = fileName + ".csv";
+                System.out.println("New UPC entered: " + fileName);
+            });
+
         }
 
         // Switching scenes
@@ -161,10 +172,10 @@ public class ControllerMCIdentifiers {
         lblLocation.setText(destination.getAbsolutePath());
 
         // Create ingest CSV and get writer object
-        CsvListWriter csvWriter = getCsvListWriter(destination);
+        CsvListWriter csvWriter = getCsvListWriter(destination, ingestFileName[0]);
 
         // Creating entry in ingests database and getting ingest ID
-        int ingestID = DatabasePostgres.addIngest(date, userName, destination.getAbsolutePath(), "ingest.csv");
+        int ingestID = DatabasePostgres.addIngest(date, userName, destination.getAbsolutePath(), ingestFileName[0]);
 
         if (ingestID > 0) {
             // Updating UI with ingest ID
@@ -203,6 +214,7 @@ public class ControllerMCIdentifiers {
                                 Platform.runLater(() -> System.out.println("outputPath = " + outputPath));
                                 ImageIO.write(artwork, "jpg", new File(outputPath));
                             } catch (IOException e) {
+                                Platform.runLater(() -> progressBar.setStyle("-fx-background-color: red;"));
                                 Platform.runLater(e::printStackTrace);
                             }
                         } else {
@@ -330,9 +342,9 @@ public class ControllerMCIdentifiers {
     }
 
     @NotNull
-    private static CsvListWriter getCsvListWriter(File destination) throws IOException {
+    private static CsvListWriter getCsvListWriter(File destination, String fileName) throws IOException {
         // Creating ingest file inside the location given by user
-        String filePath = destination.getAbsolutePath() + "/ingest.csv";
+        String filePath = destination.getAbsolutePath() + "/" + fileName;
         new File(filePath);
         CsvListWriter csvWriter = new CsvListWriter(new FileWriter(filePath), CsvPreference.STANDARD_PREFERENCE);
 
