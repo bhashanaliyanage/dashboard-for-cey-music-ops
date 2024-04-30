@@ -27,7 +27,7 @@ public class Main extends Application {
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion(23.08);
+    public static ProductVersion versionInfo = new ProductVersion(23.09);
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
@@ -36,7 +36,8 @@ public class Main extends Application {
     public static File browseForCSV(Window window) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select CSV");
-        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
+        // fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
 
         return fileChooser.showOpenDialog(window);
     }
@@ -44,7 +45,8 @@ public class Main extends Application {
     public static File browseForImage(Window window) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Image");
-        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Image Files (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
+        // fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Image Files (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
 
         return fileChooser.showOpenDialog(window);
     }
@@ -225,7 +227,15 @@ public class Main extends Application {
 // TODO: 3/26/2024 Debug Ingest CSV
 
 // Manual Claims
-// TODO: Revise ingest CSV and audio file naming
-// TODO: A view to view created ingests
-// TODO: Add Ingests to database, payee
+// TODO: Revise ingest CSV file naming
 // TODO: Change the progress bar color to red if any error happens to give user a feedback
+// TODO: A view to view created ingests
+    // TODO: Update Payee table from created ingests upon request
+// TODO: Keep track of songs and artists that are not available on the database when adding manual claims
+// TODO: Edit details on an added manual claim in the add manual claim view
+// TODO: Remove an added manual claim in the add manual claim view
+// TODO: Reset add manual claim view after adding a manual claim
+// TODO: Tags For Manual Claims List (for Group Claims , Tv Programmes , Covers)
+// TODO: Batch Edit Artworks
+// TODO: Show artwork in identifier view
+// TODO: Batch Paste UPCs

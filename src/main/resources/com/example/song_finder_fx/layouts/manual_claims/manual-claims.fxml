@@ -61,7 +61,7 @@
                <VBox.margin>
                   <Insets left="20.0" right="20.0" top="30.0" />
                </VBox.margin>
-               <TextField fx:id="txtURL" prefHeight="30.0" promptText="https://www.youtube.com/watch?v=&lt;id&gt;" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
+               <TextField fx:id="txtURL" onAction="#urlOnAction" prefHeight="30.0" promptText="https://www.youtube.com/watch?v=&lt;id&gt;" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
                <Button fx:id="btnAddToList" minHeight="30.0" mnemonicParsing="false" onAction="#onCheckBtnClicked" prefHeight="30.0" styleClass="button_inside" stylesheets="@../../styles.css">
                   <graphic>
                      <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">

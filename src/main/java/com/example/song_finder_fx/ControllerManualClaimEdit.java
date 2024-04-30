@@ -76,6 +76,7 @@ public void onChangeImageClicked(MouseEvent event) throws IOException, SQLExcept
     if (file != null) {
         // Covert user input to a Java BufferedImage
         BufferedImage biArtwork = ImageIO.read(file);
+        System.out.println("biArtwork = " + biArtwork.getColorModel());
 
         // Check image dimensions
         int imageWidth = biArtwork.getWidth();
@@ -90,10 +91,8 @@ public void onChangeImageClicked(MouseEvent event) throws IOException, SQLExcept
 
             // Updating Database
             int status = DatabasePostgres.updateClaimArtwork(claimID, biArtwork, previewImage);
-            // int status = 1;
 
             if (status > 0) {
-
                 // Convert BufferedImage to JavaFX image and set it into user interface
                 Image image = SwingFXUtils.toFXImage(previewImage, null);
                 imgPreview.setImage(image);

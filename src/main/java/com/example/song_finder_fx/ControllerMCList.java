@@ -4,6 +4,7 @@ import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -62,53 +63,92 @@ public class ControllerMCList {
         labelsComposer.clear();
         labelsLyricist.clear();
 
-        lblClaimCount.setText(DatabasePostgres.getManualClaimCount());
+        lblClaimCount.setText("Loading...");
 
-        manualClaims = DatabasePostgres.getManualClaims();
 
-        for (ManualClaimTrack claim : manualClaims) {
-            claimMap.put(claim.getId(), claim);
 
-            Node node;
-            try {
-                node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/manual_claims/manual-claims-list-entry.fxml")));
-                Label lblSongNo = (Label) node.lookup("#lblSongNo");
-                labelsSongNo.add(lblSongNo);
-                Label lblSongName = (Label) node.lookup("#lblSongName");
-                labelsSongName.add(lblSongName);
-                Label lblComposer = (Label) node.lookup("#lblComposer");
-                labelsComposer.add(lblComposer);
-                Label lblLyricist = (Label) node.lookup("#lblLyricist");
-                labelsLyricist.add(lblLyricist);
-                Label lblDate = (Label) node.lookup("#lblDate");
-                CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
-                checkBoxes.add(checkBox);
-                HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
-                hBoxes.add(hboxEntry);
-                ImageView image = (ImageView) node.lookup("#image");
-                ivArtworks.add(image);
-                try {
-                    image.setImage(claim.getPreviewImage());
-                } catch (Exception e) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error Loading Preview Image");
-                    alert.setContentText(String.valueOf(e));
-                    Platform.runLater(alert::showAndWait);
+        Task<Void> taskGetManualClaims = new Task<>() {
+            @Override
+            protected Void call() throws SQLException {
+                manualClaims = DatabasePostgres.getManualClaims();
+
+                int count = 0;
+                for (ManualClaimTrack claim : manualClaims) {
+                    count++;
+                    claimMap.put(claim.getId(), claim);
+
+                    Node node;
+                    try {
+                        node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/manual_claims/manual-claims-list-entry.fxml")));
+                        Label lblSongNo = (Label) node.lookup("#lblSongNo");
+                        labelsSongNo.add(lblSongNo);
+                        Label lblSongName = (Label) node.lookup("#lblSongName");
+                        labelsSongName.add(lblSongName);
+                        Label lblComposer = (Label) node.lookup("#lblComposer");
+                        labelsComposer.add(lblComposer);
+                        Label lblLyricist = (Label) node.lookup("#lblLyricist");
+                        labelsLyricist.add(lblLyricist);
+                        Label lblDate = (Label) node.lookup("#lblDate");
+                        CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
+                        checkBoxes.add(checkBox);
+                        HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
+                        hBoxes.add(hboxEntry);
+                        ImageView image = (ImageView) node.lookup("#image");
+                        ivArtworks.add(image);
+                        try {
+                            image.setImage(claim.getPreviewImage());
+                        } catch (Exception e) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setHeaderText("Error Loading Preview Image");
+                            alert.setContentText(String.valueOf(e));
+                            Platform.runLater(alert::showAndWait);
+                        }
+
+                        lblSongNo.setText(String.valueOf(claim.getId()));
+                        lblSongName.setText(claim.getTrackName());
+                        lblComposer.setText(claim.getComposer());
+                        lblLyricist.setText(claim.getLyricist());
+                        lblDate.setText(TextFormatter.getDaysAgo(claim.getDate()));
+
+                        int finalCount = count;
+                        Platform.runLater(() -> {
+                            vbClaimsList.getChildren().add(node);
+                            lblClaimCount.setText(String.valueOf(finalCount));
+                        });
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
                 }
 
-                lblSongNo.setText(String.valueOf(claim.getId()));
-                lblSongName.setText(claim.getTrackName());
-                lblComposer.setText(claim.getComposer());
-                lblLyricist.setText(claim.getLyricist());
-                lblDate.setText(TextFormatter.getDaysAgo(claim.getDate()));
-
-                vbClaimsList.getChildren().add(node);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                Platform.runLater(() -> {
+                    try {
+                        lblClaimCount.setText(DatabasePostgres.getManualClaimCount());
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                return null;
             }
+        };
 
-        }
+        Thread threadGetManualClaims = new Thread(taskGetManualClaims);
+        threadGetManualClaims.start();
+
+
+
+        /*Task<Void> taskLoadClaims = new Task<>() {
+            @Override
+            protected Void call() {
+
+                return null;
+            }
+        };
+
+        Thread thread = new Thread(taskLoadClaims);
+        // thread.start();*/
+
     }
 
     @FXML

@@ -3,7 +3,6 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
-import com.itextpdf.kernel.color.Lab;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -90,7 +89,7 @@ public class ControllerMCIdentifiers {
     }
 
     @FXML
-    void onBack(MouseEvent event) {
+    void onBack() {
 
     }
 
@@ -185,7 +184,8 @@ public class ControllerMCIdentifiers {
                         final String[] upc = {upcs.get(claimID).getText()};
                         String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
                         String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
-                        String originalFileName = ControllerMCList.finalManualClaims.get(claimID).getYoutubeID() + ".flac";
+                        String youtubeID = ControllerMCList.finalManualClaims.get(claimID).getYoutubeID();
+                        String originalFileName = youtubeID + "-" + albumTitle + ".flac";
 
                         // Writing CSV row
                         List<String> CSV_Row = getCSV_Row(claimID, albumTitle, upc[0], composer, lyricist, originalFileName);
@@ -195,10 +195,10 @@ public class ControllerMCIdentifiers {
                         File folder = createSubFolder(upc[0], destination);
 
                         // Getting the artwork from database, saving it to created subfolder
-                        if (ControllerMCList.finalManualClaims.get(claimID).getBufferedImage() != null) {
+                        BufferedImage artwork = ControllerMCList.finalManualClaims.get(claimID).getBufferedImage();
+                        if (artwork != null) {
                             Platform.runLater(() -> lblProcess.setText("Getting Artwork for: " + albumTitle));
                             try {
-                                BufferedImage artwork = ControllerMCList.finalManualClaims.get(claimID).getBufferedImage();
                                 String outputPath = folder.getAbsolutePath() + "\\" + upc[0] + ".jpg";
                                 Platform.runLater(() -> System.out.println("outputPath = " + outputPath));
                                 ImageIO.write(artwork, "jpg", new File(outputPath));
@@ -530,7 +530,7 @@ public class ControllerMCIdentifiers {
     }
 
     @FXML
-    void toRoot(MouseEvent event) {
+    void toRoot() {
 
     }
 

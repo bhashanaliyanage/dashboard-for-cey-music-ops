@@ -250,16 +250,15 @@ public class DatabasePostgres {
                 try {
                     ByteArrayInputStream previewImageInputStream = new ByteArrayInputStream(previewImageBytes);
                     ByteArrayInputStream artworkImageInputStream = new ByteArrayInputStream(artworkImageBytes);
-                    manualClaimTrack.setPreviewImage(ImageIO.read(previewImageInputStream));
-                    System.out.println("ImageIO.read(previewImageInputStream) = " + ImageIO.read(previewImageInputStream));
-                    manualClaimTrack.setImage(ImageIO.read(artworkImageInputStream));
-                    System.out.println("ImageIO.read(artworkImageInputStream) = " + ImageIO.read(artworkImageInputStream));
+
+                    BufferedImage previewImage = ImageIO.read(previewImageInputStream);
+                    BufferedImage artwork = ImageIO.read(artworkImageInputStream);
+                    // Platform.runLater(() -> System.out.println("artwork.getColorModel() = " + artwork.getColorModel()));
+
+                    manualClaimTrack.setPreviewImage(previewImage);
+                    manualClaimTrack.setImage(artwork);
                 } catch (IOException e) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error loading one or more images");
-                    alert.setContentText(String.valueOf(e));
-                    Platform.runLater(alert::showAndWait);
+                    Platform.runLater(() -> e.printStackTrace());
                 }
 
                 if (trimStart != null && trimEnd != null) {
@@ -506,6 +505,7 @@ public class DatabasePostgres {
 
         // Converting artwork to bytea
         ByteArrayOutputStream binaryDataArtwork = new ByteArrayOutputStream();
+        // System.out.println("bufferedImageArtwork = " + bufferedImageArtwork.getColorModel());
         ImageIO.write(bufferedImageArtwork, "jpg", binaryDataArtwork);
         byte[] artwork = binaryDataArtwork.toByteArray();
 
