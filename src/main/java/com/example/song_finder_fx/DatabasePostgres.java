@@ -217,7 +217,7 @@ public class DatabasePostgres {
         return resultSet.getString(1);
     }
 
-    public static LocalDate convertToEntityAttribute(Date date) {
+    public static LocalDate sqlDateToLocalDate(Date date) {
         return Optional.ofNullable(date)
                 .map(Date::toLocalDate)
                 .orElse(null);
@@ -242,7 +242,7 @@ public class DatabasePostgres {
                 byte[] previewImageBytes = resultSet.getBytes(8);
                 byte[] artworkImageBytes = resultSet.getBytes(9);
                 Date date = resultSet.getDate(10);
-                LocalDate localDate = convertToEntityAttribute(date);
+                LocalDate localDate = sqlDateToLocalDate(date);
 
                 ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink, localDate);
 
@@ -880,7 +880,6 @@ public class DatabasePostgres {
 
     public static List<PayeeForReport> getPayeRepot1(String name) {
         System.out.println("oaye repot 1");
-        String artName = name;
         String sql = "   SELECT ip.isrc," + "       SUM(  CASE    WHEN ip.payee ='\" + arname + \"' THEN ip.share"
                 + "               WHEN ip.payee01 = '\" + arname + \"' THEN ip.payee01share"
                 + "               ELSE ip.payee02share  END ) AS total_payee_share, SUM( rv.reported_royalty_for_ceymusic / 100 * CASE "
@@ -916,7 +915,7 @@ public class DatabasePostgres {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-           closeConnection(con);
+            closeConnection(con);
         }
 
         return pReport;
@@ -958,7 +957,7 @@ public class DatabasePostgres {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-           closeConnection(con);
+            closeConnection(con);
         }
 
         return pReport;
@@ -982,51 +981,135 @@ public class DatabasePostgres {
         return psGetCoWriterShare.executeQuery();
     }
 
+    public static List<Ingest> getAllIngests() throws SQLException, IOException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT i.ingest_id, i.ingest_date, i.user_name_note, " +
+                "(SELECT COUNT(ip.upc) FROM public.ingest_products ip WHERE ip.ingest_id = i.ingest_id) AS product_count, " +
+                "i.root_folder, i.ingest FROM public.ingests i;");
+        ResultSet rs = ps.executeQuery();
+        List<Ingest> ingests = new ArrayList<>();
+        if (rs.isBeforeFirst()) {
+            while (rs.next()) {
+                Ingest ingest = new Ingest();
+
+                int ingestID = rs.getInt(1);
+                ingest.setID(ingestID);
+                // System.out.println("ingestID = " + ingestID);
+
+                Date ingestDate = rs.getDate(2);
+                ingest.setDate(ingestDate);
+
+                String user = rs.getString(3);
+                ingest.setUser(user);
+
+                int productCount = rs.getInt(4);
+                ingest.setUPCCount(productCount);
+
+                byte[] csvBytes = rs.getBytes(6);
+                if (csvBytes != null) {
+                    InputStream inputStream = new ByteArrayInputStream(csvBytes);
+                    // Create a temporary file
+                    File tempFile = File.createTempFile("temp", ".csv");
+                    // Write the data from the InputStream to the temporary file
+                    try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            fos.write(buffer, 0, bytesRead);
+                        }
+                    }
+                    ingest.setCSV(tempFile);
+                }
+
+                ingests.add(ingest);
+            }
+        }
+        return ingests;
+    }
+
+    public static boolean checkTrackExists(String trackTitle, String composer, String lyricist) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT song_name FROM public.song_metadata_new WHERE LOWER(song_name) = LOWER(?);");
+        ps.setString(1, trackTitle);
+        ResultSet rs = ps.executeQuery();
+        boolean status = false;
+        while (rs.next()) {
+            int count = rs.getInt(1);
+            if (count == 0) {
+                ps = con.prepareStatement("INSERT INTO public.temp_songs(name, composer, lyricist) VALUES (?, ?, ?);");
+                ps.setString(1, trackTitle);
+                ps.setString(2, composer);
+                ps.setString(3, lyricist);
+                int status2 = ps.executeUpdate();
+                if (status2 > 0) {
+                    status = true;
+                }
+            } else {
+                status = true;
+            }
+        }
+        return status;
+    }
+
+    public static void addTempArtist(String composer) {
+    }
+
+    public static String getClaimYouTubeID(int id) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT youtube_id FROM public.manual_claims WHERE claim_id = ?;");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.isBeforeFirst()) {
+            rs.next();
+            return rs.getString(1);
+        } else {
+            return null;
+        }
+    }
+
     public List<Payee> check(String name) {
 //        String name = "Victor Rathnayake";
-        List<String> ssList =  new ArrayList<String>();
-        Payee py = new Payee();
-        List<Payee> pyList = new ArrayList<Payee>();
+        Payee py;
+        List<Payee> pyList = new ArrayList<>();
         try {
-            List<String> sList = new ArrayList<String>();
-            sList = 	getIsrc(name);
+            List<String> sList;
+            sList = getIsrc(name);
 
             for (int index = 0; index < sList.size(); index++) {
                 String s = sList.get(index); // Get the string at the current index
                 py = getPayeeShare(s);
-                System.out.println(s+" ISRC LLIST");
+                System.out.println(s + " ISRC LLIST");
                 pyList.add(py);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-//			MySqlConnection.MANAGER.closeConnection(null);
         }
         return pyList;
 
     }
-//get ISRC
-    public List<String> getIsrc( String name) {
-        System.out.println("inside"+name);
-        Connection con= getConn();
+
+    //get ISRC
+    public List<String> getIsrc(String name) {
+        System.out.println("inside" + name);
+        Connection con = getConn();
         String sql = "SELECT isrc from isrc_payees where payee= ? or payee01= ? or payee02= ? ";
-        List<String> slist =  new ArrayList<String>();
+        List<String> slist = new ArrayList<>();
         try {
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1,name );
-            ps.setString(2,name );
-            ps.setString(3,name );
+            ps.setString(1, name);
+            ps.setString(2, name);
+            ps.setString(3, name);
             ResultSet rs = ps.executeQuery();
-            while(rs.next()) {
-                String s =rs.getString(1);
+            while (rs.next()) {
+                String s = rs.getString(1);
                 slist.add(s);
 
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             closeConnection(con);
         }
         return slist;
@@ -1036,14 +1119,14 @@ public class DatabasePostgres {
     public Payee getPayeeShare(String isrc) {
 
         Connection con = getConn();
-        String sql ="SELECT payee,payee01,payee02,share,payee01share ,payee02share  from isrc_payees where isrc= ? ";
+        String sql = "SELECT payee,payee01,payee02,share,payee01share ,payee02share  from isrc_payees where isrc= ? ";
         Payee py = new Payee();
         double amount = 0.0;
         try {
-            PreparedStatement  ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, isrc);
-            ResultSet rs =ps.executeQuery();
-            while(rs.next()) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
 
                 py.setPayee1(rs.getString(1));
                 py.setPayee2(rs.getString(2));
@@ -1053,54 +1136,49 @@ public class DatabasePostgres {
                 py.setShare3(rs.getString(6));
                 py.setIsrc(isrc);
 
-                if(py.getPayee1()!=null) {
+                if (py.getPayee1() != null) {
                     String amnt = getRoyaltyAmount(isrc);
-                    if(amnt.equals("")) {
+                    if (amnt.equals("")) {
                         amount = 0.0;
-                    }
-                    else {
-                        amount =Double.parseDouble(getRoyaltyAmount(isrc));
+                    } else {
+                        amount = Double.parseDouble(getRoyaltyAmount(isrc));
                     }
 
                     py.setPayee1amount(amount);
-                }
-
-                else if(py.getPayee2()!= null && py.getPayee1()!=null) {
+                } else if (py.getPayee2() != null && py.getPayee1() != null) {
                     String amnt = getRoyaltyAmount(isrc);
 
-                    if(amnt.equals("")) {
+                    if (amnt.equals("")) {
                         amount = 0.0;
-                    }else {
-                        amount =Double.parseDouble(getRoyaltyAmount(isrc));
+                    } else {
+                        amount = Double.parseDouble(getRoyaltyAmount(isrc));
                     }
 
 
 //				double amount = getRoyaltyAmount(isrc);
 
 //				py.setPayee1(sql);=amount/py.getShare1();
-                    double sh1 =Double.parseDouble(py.getShare1());
-                    if(sh1==50) {
-                        double share1 =amount/2;
+                    double sh1 = Double.parseDouble(py.getShare1());
+                    if (sh1 == 50) {
+                        double share1 = amount / 2;
                         py.setPayee1amount(share1);
                     }
 
 
-                    double sh2 =Double.parseDouble(py.getShare2());
-                    if(sh2==50) {
-                        double share2 =amount/2;
+                    double sh2 = Double.parseDouble(py.getShare2());
+                    if (sh2 == 50) {
+                        double share2 = amount / 2;
                         py.setPayee2Amount(share2);
                     }
-
 
 
                 }
 
 
-
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             closeConnection(con);
         }
 
@@ -1108,21 +1186,21 @@ public class DatabasePostgres {
 
     }
 
-//GET ROYALTY AMOUNT
+    //GET ROYALTY AMOUNT
     public String getRoyaltyAmount(String isrc) {
-        Connection con =  getConn();
-        String sql ="SELECT reported_royalty_for_ceymusic,asset_isrc from \"reportViewSummary1\" where asset_isrc= ? ";
+        Connection con = getConn();
+        String sql = "SELECT reported_royalty_for_ceymusic,asset_isrc from \"reportViewSummary1\" where asset_isrc= ? ";
         String amount = "";
         try {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, isrc);
             ResultSet rs = ps.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 amount = rs.getString(1);
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             closeConnection(con);
         }
         return amount;
@@ -1192,7 +1270,7 @@ public class DatabasePostgres {
         alert.showAndWait();
     }
 
-    public static void updatePayees(CSVReader reader) throws CsvValidationException, IOException, SQLException, ClassNotFoundException {
+    public static void updatePayees(CSVReader reader) {
         // Getting Connection
 //        Connection conn = getConn();
 
@@ -1237,16 +1315,26 @@ public class DatabasePostgres {
     }
 
     public static ArrayList<Songs> getTopPerformingSongs(String selectedItem) throws SQLException {
-        String sql = "SELECT r.* " +
-                "FROM public.report AS r " +
-                "JOIN (SELECT asset_isrc, " +
-                "   MAX(reported_royalty) AS max_royalty " +
-                "   FROM public.report " +
-                "   WHERE asset_isrc IN (SELECT isrc FROM public.isrc_payees " +
-                "       WHERE payee01 = ? OR payee = ? OR payee02 = ? ) GROUP BY asset_isrc) AS max_royalties " +
-                "           ON r.asset_isrc = max_royalties.asset_isrc " +
-                "           AND r.reported_royalty = max_royalties.max_royalty " +
-                "ORDER BY r.reported_royalty DESC LIMIT 5;";
+        Connection conn = getConn();
+
+        String sql = "SELECT S.SONG_NAME,\n" +
+                "\tR.REPORTED_ROYALTY\n" +
+                "FROM PUBLIC.REPORT AS R\n" +
+                "JOIN\n" +
+                "\t(SELECT ASSET_ISRC,\n" +
+                "\t\t\tMAX(REPORTED_ROYALTY) AS MAX_ROYALTY\n" +
+                "\t\tFROM PUBLIC.REPORT\n" +
+                "\t\tWHERE ASSET_ISRC IN\n" +
+                "\t\t\t\t(SELECT ISRC\n" +
+                "\t\t\t\t\tFROM PUBLIC.ISRC_PAYEES\n" +
+                "\t\t\t\t\tWHERE PAYEE01 = ?\n" +
+                "\t\t\t\t\t\tOR PAYEE = ?\n" +
+                "\t\t\t\t\t\tOR PAYEE02 = ?)\n" +
+                "\t\tGROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC\n" +
+                "AND R.REPORTED_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY\n" +
+                "LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC\n" +
+                "ORDER BY R.REPORTED_ROYALTY DESC\n" +
+                "LIMIT 5;";
 
         PreparedStatement ps = conn.prepareStatement(sql);
 
@@ -1261,7 +1349,7 @@ public class DatabasePostgres {
         if (rs.isBeforeFirst()) {
             while (rs.next()) {
                 Songs song = new Songs();
-                song.setIsrc(rs.getString(1));
+                song.setTrackTitle(rs.getString(1));
                 song.setRoyalty(rs.getDouble(2));
                 songs.add(song);
             }
@@ -1271,14 +1359,14 @@ public class DatabasePostgres {
     }
 
     public static void main(String[] args) {
-        Songs list =  new Songs();
-        list= (Songs) topPerformingSongs();
+        Songs list = new Songs();
+        list = (Songs) topPerformingSongs();
         System.out.println(list);
     }
 
-    public static List<Songs> topPerformingSongs(){
-        String sql ="select  asset_isrc, reported_royalty_for_ceymusic " +
-                "from public.\"reportViewSummary1\" ORDER BY  reported_royalty_for_ceymusic   DESC LIMIT 6" ;
+    public static List<Songs> topPerformingSongs() {
+        String sql = "select  asset_isrc, reported_royalty_for_ceymusic " +
+                "from public.\"reportViewSummary1\" ORDER BY  reported_royalty_for_ceymusic   DESC LIMIT 6";
 
         Connection con = getConn();
         List<Songs> sngList = new ArrayList<>();
@@ -1287,10 +1375,10 @@ public class DatabasePostgres {
             PreparedStatement ps = con.prepareStatement(sql);
 
             ResultSet rs = ps.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 Songs sng = new Songs();
-                Songs sn =  new Songs();
-                sn=getSongData(rs.getString(1));
+                Songs sn = new Songs();
+                sn = getSongData(rs.getString(1));
                 sng.setTrackTitle(sn.getTrackTitle());
                 sng.setComposer(getArtNameById(sn.getComposer()));
 //                sng.setLyricists(getArtNameById(sn.getLyricists()));
@@ -1299,23 +1387,23 @@ public class DatabasePostgres {
                 sng.setSinger(getArtNameById(sn.getSinger()));
                 sngList.add(sn);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             closeConnection(con);
         }
         return sngList;
     }
 
     public static Songs getSongData(String isrc) {
-        String sql  = "SELECT  song_name,composer,lyricist,featuring ,singer from songs where isrc= ? ";
-        Connection con =  getConn();
+        String sql = "SELECT  song_name,composer,lyricist,featuring ,singer from songs where isrc= ? ";
+        Connection con = getConn();
         Songs sng = new Songs();
         try {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, isrc);
-            ResultSet  rs = ps.executeQuery();
-            while(rs.next()) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
                 sng.setTrackTitle(rs.getString(1));
                 sng.setComposer(rs.getString(2));
                 sng.setLyricist(rs.getString(3));
@@ -1324,7 +1412,7 @@ public class DatabasePostgres {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             closeConnection(con);
         }
 
@@ -1340,12 +1428,12 @@ public class DatabasePostgres {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
-            while(rs.next()) {
-                name=rs.getString(1);
+            while (rs.next()) {
+                name = rs.getString(1);
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             closeConnection(con);
         }
         return name;
@@ -1471,20 +1559,25 @@ public class DatabasePostgres {
         return song;
     }
 
-    public static Boolean searchArtistTable(String artist) throws SQLException, ClassNotFoundException {
+    public static Boolean searchArtistTable(String artist) throws SQLException {
         ResultSet rs;
         Connection conn = getConn();
-        String artistName = null;
+        int artistCount;
 
-        PreparedStatement ps = conn.prepareStatement("SELECT ARTIST_NAME FROM artists WHERE ARTIST_NAME = ?");
+        PreparedStatement ps = conn.prepareStatement("SELECT COUNT(ARTIST_NAME) FROM artists WHERE ARTIST_NAME = ?;");
         ps.setString(1, artist);
         rs = ps.executeQuery();
 
+        boolean status = false;
+
         while (rs.next()) {
-            artistName = rs.getString(1);
+            artistCount = rs.getInt(1);
+            if (artistCount > 0) {
+                status = true;
+            }
         }
 
-        return artistName != null;
+        return status;
     }
 
     public static ArrayList<String> getArtistList() throws SQLException, ClassNotFoundException {

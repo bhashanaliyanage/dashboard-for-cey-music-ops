@@ -1,16 +1,11 @@
 package com.example.song_finder_fx.Model;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class ArtistReport {
     private Artist artist = null;
     private double conversionRate = 0;
-    private String payee = "";
-    private String taxAmount = "0";
-    private String amountPayable = "";
     private String month = "";
     private final DecimalFormat df = new DecimalFormat("0.00");
     private final ArrayList<String> coWriters = new ArrayList<>();
@@ -39,14 +34,6 @@ public class ArtistReport {
         topPerformingSongPayeeShare.clear();
     }
 
-    public void setGrossRevenue(String selectedItem, double grossRevenueInLKR, double partnerShareInLKR, double tax, double amountPayable, String month) {
-        this.payee = selectedItem;
-        NumberFormat formatter = NumberFormat.getInstance(Locale.US);
-        this.taxAmount = df.format(tax);
-        this.amountPayable = df.format(amountPayable);
-        this.month = month;
-    }
-
     public double getGrossRevenueInLKR() {
         return grossRevenue * conversionRate;
     }
@@ -55,20 +42,17 @@ public class ArtistReport {
         return partnerShare * conversionRate;
     }
 
-    public String getTaxAmount() {
-        return "LKR " + taxAmount;
-    }
-
-    public String getAmountPayable() {
-        return "LKR " + amountPayable;
-    }
-
     public String getPayee() {
-        return payee;
+        return artist.getName();
     }
 
     public String getMonth() {
-        return month;
+        int monthInt = Integer.parseInt(month);
+        String[] monthNames = new String[] {
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+        };
+        return monthNames[monthInt];
     }
 
     public void addCoWriter(String artist) {
@@ -155,5 +139,12 @@ public class ArtistReport {
     }
 
     public void setPartnerShareInLKR(String partnerShareInLKR) {
+    }
+
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
+    public void setPayee(String payee) {
     }
 }

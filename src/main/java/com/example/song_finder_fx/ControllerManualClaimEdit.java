@@ -17,11 +17,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.sql.SQLException;
 import java.util.Objects;
 
 public class ControllerManualClaimEdit {
 
+    public Label lblLink;
     @FXML
     private Label lblClaimID;
 
@@ -113,4 +115,16 @@ public void onChangeImageClicked(MouseEvent event) throws IOException, SQLExcept
 
     }
 }
+
+    public void onLinkClick() {
+        String link = lblLink.getText();
+        try {
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                URI uri = new URI(link);
+                Desktop.getDesktop().browse(uri);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

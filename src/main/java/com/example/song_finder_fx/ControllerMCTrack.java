@@ -1,6 +1,7 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.ImageProcessor;
+import com.example.song_finder_fx.Controller.MCTrackController;
 import com.example.song_finder_fx.Controller.ManualClaims;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -74,7 +75,7 @@ public class ControllerMCTrack {
         });
     }
 
-    public void onAddTrack(ActionEvent event) throws IOException, URISyntaxException {
+    public void onAddTrack(ActionEvent event) throws IOException, URISyntaxException, SQLException, ClassNotFoundException {
         // Getting Parent Object References
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
@@ -109,6 +110,8 @@ public class ControllerMCTrack {
 
             // Creating track model
             ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID, date);
+            MCTrackController mcTrackController = new MCTrackController(track);
+            mcTrackController.checkNew();
 
             // Setting Thumbnail and Preview Images to the model
             track.setPreviewImage(image);

@@ -103,10 +103,20 @@ public class ControllerMCIdentifiers {
         // Getting total claims for the loop
         int totalClaims = ControllerMCList.finalManualClaims.size();
 
+        // Getting ingest file name
+        TextInputDialog inputIngestFileName = new TextInputDialog("ingest");
+        inputIngestFileName.setTitle("Ingest CSV File Name");
+        inputIngestFileName.setHeaderText("Enter a file name for ingest");
+        inputIngestFileName.setContentText("File Name: ");
+        inputIngestFileName.showAndWait().ifPresent(fileName -> {
+            ingestFileName[0] = fileName + ".csv";
+            System.out.println("New UPC entered: " + fileName);
+        });
+
         // Front End Validation
         for (int claimID = 0; claimID < totalClaims; claimID++) {
             final String[] upc = {upcs.get(claimID).getText()};
-            final String[] catNo = {claimCNumbers.get(claimID).getText()};
+            String catNo = claimCNumbers.get(claimID).getText();
 
             // Validating UPCs
             if (upc[0].isEmpty()) {
@@ -122,35 +132,25 @@ public class ControllerMCIdentifiers {
             }
 
             // Validating Catalog Numbers
-            if (catNo[0].isEmpty()) {
+            if (catNo.isEmpty()) {
+                System.out.println("Catalog Number is null for Claim: " + claimID + 1);
                 // Check catalog numbers from database if no user input available
                 String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
                 String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
-                catNo[0] = DatabasePostgres.getCatNo(composer, lyricist);
+                catNo = DatabasePostgres.getCatNo(composer, lyricist);
 
                 // Request catalog number from user if there are no catalog numbers available in the database
-                if (catNo[0] == null) {
+                if (catNo == null) {
                     requestCatNo(composer, lyricist, claimID);
                 }
 
                 // Request catalog number if it is not recognizable
-                assert catNo[0] != null;
-                String[] parts = catNo[0].split("-");
+                assert catNo != null;
+                String[] parts = catNo.split("-");
                 if (Objects.equals(parts[0], "null")) {
                     requestCatNo(composer, lyricist, claimID);
                 }
             }
-
-            // Getting ingest file name
-            TextInputDialog inputIngestFileName = new TextInputDialog("ingest");
-            inputIngestFileName.setTitle("Ingest CSV File Name");
-            inputIngestFileName.setHeaderText("Enter a file name for ingest");
-            inputIngestFileName.setContentText("File Name: ");
-            inputIngestFileName.showAndWait().ifPresent(fileName -> {
-                ingestFileName[0] = fileName + ".csv";
-                System.out.println("New UPC entered: " + fileName);
-            });
-
         }
 
         // Switching scenes

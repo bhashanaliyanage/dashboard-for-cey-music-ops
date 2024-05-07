@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class ControllerMCLEntry {
 
@@ -39,7 +40,7 @@ public class ControllerMCLEntry {
     }
 
     @FXML
-    void onEdit(MouseEvent event) throws IOException {
+    void onEdit(MouseEvent event) throws IOException, SQLException {
         System.out.println("ControllerMCLEntry.onEdit");
         Scene scene = SceneController.getSceneFromEvent(event);
         VBox sideVBox = SceneController.getSideVBox(scene);
@@ -48,10 +49,15 @@ public class ControllerMCLEntry {
 
         Label lblClaimID = SceneController.getLabelFromScene(scene, "lblClaimID");
         Label lblTrackName = SceneController.getLabelFromScene(scene, "lblTrackName");
+        Label lblLink = SceneController.getLabelFromScene(scene, "lblLink");
         TextField txtSongName = SceneController.getTextFieldFromScene(scene, "txtSongName");
         TextField txtComposer = SceneController.getTextFieldFromScene(scene, "txtComposer");
         TextField txtLyricist = SceneController.getTextFieldFromScene(scene, "txtLyricist");
         ImageView imgPreview = (ImageView) scene.lookup("#imgPreview");
+
+        int claimID = Integer.parseInt(lblSongNo.getText());
+        String youtubeID = DatabasePostgres.getClaimYouTubeID(claimID);
+        String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
 
         imgPreview.setImage(image.getImage());
         lblClaimID.setText(lblSongNo.getText());
@@ -59,6 +65,7 @@ public class ControllerMCLEntry {
         txtSongName.setText(lblSongName.getText());
         txtComposer.setText(lblComposer.getText());
         txtLyricist.setText(lblLyricist.getText());
+        lblLink.setText(thumbnailURL);
     }
 
     @FXML

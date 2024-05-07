@@ -6,6 +6,8 @@ import com.example.song_finder_fx.Model.RevenueReport;
 import com.example.song_finder_fx.Model.Songs;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 
 public record RevenueReportController(ArtistReport report) {
@@ -17,7 +19,6 @@ public record RevenueReportController(ArtistReport report) {
         report.getArtist().setName(artistName);
 
         // Getting gross revenue and partner share
-        // TODO: 4/16/2024 Make this checks all three columns in the database
         RevenueReport grossNPartnerShare = DatabasePostgres.getPayeeGrossRev1(artistName);
         Double grossRevenue = grossNPartnerShare.getReportedRoyalty();
         Double partnerShare = grossNPartnerShare.getAfterDeductionRoyalty();
@@ -29,8 +30,11 @@ public record RevenueReportController(ArtistReport report) {
         ArrayList<Songs> topP_Songs = DatabasePostgres.getTopPerformingSongs(artistName); // This object only contains ISRC and Revenue for now. Need to get Song Name
         report.setTopPerformingSongs(topP_Songs);
 
-        // Co-Writer Share
-        // TODO: 4/16/2024 Get Co-Writer Payment Summary from PostgresSQL database
+        // Getting report month
+        String dateString = DatabasePostgres.getSalesDate();
+        String[] date = dateString.split("-");
+        String month = date[1];
+        report.setMonth(month);
 
         return report;
     }

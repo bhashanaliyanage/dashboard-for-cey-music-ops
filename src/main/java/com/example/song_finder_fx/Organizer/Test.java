@@ -1,29 +1,26 @@
 package com.example.song_finder_fx.Organizer;
 
 import com.example.song_finder_fx.Constants.SearchType;
+import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Controller.RevenueReportController;
-import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.Artist;
 import com.example.song_finder_fx.Model.ArtistReport;
-import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
+import com.itextpdf.layout.Document;
 
-import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Test {
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        List<ManualClaimTrack> manualClaimTracks = DatabasePostgres.getManualClaims();
-        for (ManualClaimTrack track : manualClaimTracks) {
-            int id = track.getId();
-            BufferedImage bufferedImage = track.getBufferedImage();
-
-            if (bufferedImage == null) {
-                System.out.println("Buffered Image for Claim " + id + " is null.");
-            }
-        }
+    public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
+        // IngestController ingestController = new IngestController();
+        // List<Ingest> ingests = ingestController.getCreatedIngests();
+        ArtistReport report = getArtistReport(47, 320);
+        ReportPDF pdf = new ReportPDF();
+        String path = "C:\\Users\\bhash\\Documents\\Test\\test.pdf";
+        Document document = pdf.generateReport(path, report);
     }
 
     private static void testArtistReports() throws SQLException {

@@ -12,10 +12,15 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class Ingest {
+    private int ingestID;
+    private Date ingestDate;
+    private String createdUser;
+    private int songCount;
     private File csv;
     private int upcCount;
     private File destination;
@@ -31,6 +36,9 @@ public class Ingest {
     private String artist02Type;
     private String artist03Type;
     private String artist04Type;
+
+    public Ingest() {
+    }
 
     public void setCSV(File csv) {
         this.csv = csv;
@@ -281,5 +289,17 @@ public class Ingest {
         if (artistNumber == 4) {
             this.artist04Type = type;
         }
+    }
+
+    public void setUser(String user) {
+        this.createdUser = user;
+    }
+
+    public void setDate(java.sql.Date ingestDate) {
+        this.ingestDate = ingestDate;
+    }
+
+    public void setID(int ingestID) {
+        this.ingestID = ingestID;
     }
 }
