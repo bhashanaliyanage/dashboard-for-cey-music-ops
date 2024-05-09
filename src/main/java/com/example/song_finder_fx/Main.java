@@ -2,6 +2,7 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.UserSettingsManager;
 import com.example.song_finder_fx.Model.ProductVersion;
+import com.example.song_finder_fx.Session.UserSession;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -24,6 +25,7 @@ import java.util.stream.Stream;
 
 public class Main extends Application {
     public static Stage primaryStage = null;
+    public static UserSession userSession;
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;

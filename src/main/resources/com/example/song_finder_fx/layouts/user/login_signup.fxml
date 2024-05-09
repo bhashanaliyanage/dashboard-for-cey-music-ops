@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerLogIn">
+    <HBox>
+        <VBox.margin>
+            <Insets left="30.0" top="30.0" />
+        </VBox.margin>
+      <Label layoutX="10.0" layoutY="10.0" text="Log In or Sign Up">
+         <font>
+            <Font name="Segoe UI Semibold" size="28.0" />
+         </font>
+         <HBox.margin>
+            <Insets />
+         </HBox.margin>
+      </Label>
+    </HBox>
+   <ScrollPane fx:id="scrlpneMain" hbarPolicy="NEVER" prefWidth="460.0" stylesheets="@../../styles.css" vbarPolicy="NEVER">
+      <Pane prefWidth="744.0">
+         <VBox fx:id="vBoxLogIn" layoutX="30.0" layoutY="30.0" maxWidth="688.0" prefHeight="310.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../../styles.css">
+            <VBox>
+               <Label text="Log In">
+                  <font>
+                     <Font name="Segoe UI Semibold" size="19.0" />
+                  </font>
+                  <cursor>
+                     <Cursor fx:constant="DEFAULT" />
+                  </cursor>
+               </Label>
+               <Label text="(Enter Username and Password)" textFill="#656565">
+                  <cursor>
+                     <Cursor fx:constant="DEFAULT" />
+                  </cursor>
+               </Label>
+               <VBox.margin>
+                  <Insets left="20.0" right="20.0" top="20.0" />
+               </VBox.margin>
+            </VBox>
+            <TextField fx:id="txtUsername" prefHeight="30.0" promptText="Username" styleClass="textarea-bg">
+               <VBox.margin>
+                  <Insets left="20.0" right="20.0" top="30.0" />
+               </VBox.margin>
+            </TextField>
+            <TextField fx:id="txtPassword" layoutX="31.0" layoutY="106.0" onAction="#onLogIn" prefHeight="30.0" promptText="Password" styleClass="textarea-bg">
+               <VBox.margin>
+                  <Insets left="20.0" right="20.0" top="10.0" />
+               </VBox.margin>
+            </TextField>
+            <Button fx:id="btnLogIn" mnemonicParsing="false" onAction="#onLogIn" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside" text="Log In">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="20.0" right="20.0" top="30.0" />
+               </VBox.margin>
+            </Button>
+            <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+               <children>
+                  <Label text="or">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </HBox>
+            <Button fx:id="btnSignUp" layoutX="31.0" layoutY="206.0" mnemonicParsing="false" onAction="#onSignUp" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Sign Up">
+               <VBox.margin>
+                  <Insets bottom="20.0" left="20.0" right="20.0" />
+               </VBox.margin>
+            </Button>
+         </VBox>
+         <padding>
+            <Insets bottom="20.0" />
+         </padding>
+      </Pane>
+   </ScrollPane>
+</VBox>

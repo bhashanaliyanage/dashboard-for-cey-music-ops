@@ -55,31 +55,6 @@ public class ArtistReport {
         return monthNames[monthInt];
     }
 
-    public void addCoWriter(String artist) {
-        coWriters.add(artist);
-    }
-
-    public void addCoWriterShare(double share) {
-        coWriterShare.add("Rs. " + df.format(share));
-    }
-
-    public void setTopPerformingSongDetails(String assetTitle, String payee, String reportedRoyalty) {
-        topPerformingSongNames.add(assetTitle);
-        topPerformingSongPayees.add(payee);
-        topPerformingSongPayeeShare.add("Rs. " + reportedRoyalty);
-    }
-    public ArrayList<String> getTopPerformingSongNames() {
-        return topPerformingSongNames;
-    }
-
-    public ArrayList<String> getTopPerformingSongPayees() {
-        return topPerformingSongPayees;
-    }
-
-    public ArrayList<String> getTopPerformingSongPayeeShare() {
-        return topPerformingSongPayeeShare;
-    }
-
     public ArrayList<String> getCoWriters() {
         return coWriters;
     }
@@ -98,10 +73,6 @@ public class ArtistReport {
 
     public double getConversionRate() {
         return conversionRate;
-    }
-
-    public void setConversionRate(int conversionRate) {
-        this.conversionRate = conversionRate;
     }
 
     public void setGrossRevenue(Double grossRevenue) {
@@ -133,12 +104,6 @@ public class ArtistReport {
 
     public ArrayList<Songs> getTopPerformingSongs() {
         return topPerformingSongs;
-    }
-
-    public void setGrossRevenueInLKR(String grossRevenueInLKR) {
-    }
-
-    public void setPartnerShareInLKR(String partnerShareInLKR) {
     }
 
     public void setMonth(String month) {

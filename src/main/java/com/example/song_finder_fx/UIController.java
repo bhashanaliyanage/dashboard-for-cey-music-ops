@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
+import com.example.song_finder_fx.Session.UserSession;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -64,6 +65,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Button btnOpenLocation;
     public Button btnCopyTo;
     public Button btnAudioDatabase;
+    @FXML
+    private HBox btnArtistReports;
     //</editor-fold>
 
     //<editor-fold desc="ImageView">
@@ -118,6 +121,10 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Label searchResultISRC;
     public Label songFeaturing;
     public Label songFeaturingCopied;
+    @FXML
+    private Label lblUser;
+    @FXML
+    private Label lblUserEmailAndUpdate;
     //</editor-fold>
 
     //<editor-fold desc="ScrollPane">
@@ -141,7 +148,40 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     //</editor-fold>
     //</editor-fold>
-    public UIController() throws IOException {
+
+    @FXML
+    public void initialize() throws SQLException {
+        System.out.println("Initializing UI...");
+
+        // Loading user
+        UserSession userSession = new UserSession();
+        Main.userSession = userSession;
+
+        if (userSession.isLoggedIn()) {
+            int privilegeLevel = userSession.getPrivilegeLevel();
+
+            lblUser.setText(userSession.getNickName());
+            lblUserEmailAndUpdate.setText(userSession.getEmail());
+
+            if (privilegeLevel == 3) {
+                try {
+                    btnRevenueAnalysis.setDisable(true);
+                    btnArtistReports.setDisable(true);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (privilegeLevel == 2) {
+                btnRevenueAnalysis.setDisable(false);
+                btnArtistReports.setDisable(false);
+            }
+        } else {
+            try {
+                btnRevenueAnalysis.setDisable(true);
+                btnArtistReports.setDisable(true);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public static void setAllScenes() throws IOException {
@@ -1039,8 +1079,14 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     public void onAboutButtonClicked() throws IOException {
-        ControllerSettings cs = new ControllerSettings(this);
-        cs.loadAbout(mainNodes[1]);
+        if (Main.userSession.isLoggedIn()) {
+            ControllerSettings cs = new ControllerSettings(this);
+            cs.loadAbout(mainNodes[1]);
+        } else {
+            System.out.println("Load Log In | Sign Up View...");
+            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/user/login_signup.fxml")));
+            mainVBox.getChildren().setAll(node);
+        }
     }
 
     public void onRevenueAnalysisBtnClick() throws IOException {

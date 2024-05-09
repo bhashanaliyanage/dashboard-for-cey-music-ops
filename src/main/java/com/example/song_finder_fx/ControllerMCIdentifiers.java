@@ -110,7 +110,7 @@ public class ControllerMCIdentifiers {
         inputIngestFileName.setContentText("File Name: ");
         inputIngestFileName.showAndWait().ifPresent(fileName -> {
             ingestFileName[0] = fileName + ".csv";
-            System.out.println("New UPC entered: " + fileName);
+            System.out.println("Ingest Filename Entered: " + fileName);
         });
 
         // Front End Validation
@@ -131,24 +131,27 @@ public class ControllerMCIdentifiers {
                 });
             }
 
+            System.out.println("claimID = " + (claimID + 1));
+
             // Validating Catalog Numbers
             if (catNo.isEmpty()) {
                 System.out.println("Catalog Number is null for Claim: " + claimID + 1);
                 // Check catalog numbers from database if no user input available
+                String trackTitle = ControllerMCList.finalManualClaims.get(claimID).getTrackName();
                 String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
                 String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
                 catNo = DatabasePostgres.getCatNo(composer, lyricist);
 
                 // Request catalog number from user if there are no catalog numbers available in the database
                 if (catNo == null) {
-                    requestCatNo(composer, lyricist, claimID);
+                    requestCatNo(composer, lyricist, claimID, trackTitle);
                 }
 
                 // Request catalog number if it is not recognizable
                 assert catNo != null;
                 String[] parts = catNo.split("-");
                 if (Objects.equals(parts[0], "null")) {
-                    requestCatNo(composer, lyricist, claimID);
+                    requestCatNo(composer, lyricist, claimID, trackTitle);
                 }
             }
         }
@@ -258,9 +261,9 @@ public class ControllerMCIdentifiers {
         }
     }
 
-    private static void requestCatNo(String composer, String lyricist, int claimID) {
+    private static void requestCatNo(String composer, String lyricist, int claimID, String trackTitle) {
         TextInputDialog inputDialog = new TextInputDialog(null);
-        inputDialog.setTitle("Cannot find Catalog Number");
+        inputDialog.setTitle("Cannot find Catalog Number for " + trackTitle);
         inputDialog.setHeaderText("Enter a new catalog number for " + composer + " or " + lyricist);
         inputDialog.setContentText("Catalog Number:");
         inputDialog.showAndWait().ifPresent(newCatNo -> {

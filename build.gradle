@@ -85,6 +85,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/net.sf.supercsv/super-csv
     implementation 'net.sf.supercsv:super-csv:2.4.0'
+
+    // https://mvnrepository.com/artifact/org.mindrot/jbcrypt
+    implementation 'org.mindrot:jbcrypt:0.4'
 }
 
 test {

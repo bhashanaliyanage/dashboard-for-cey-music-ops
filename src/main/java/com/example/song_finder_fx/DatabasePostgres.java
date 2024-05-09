@@ -1,6 +1,8 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Model.*;
+import com.example.song_finder_fx.Session.Hasher;
+import com.example.song_finder_fx.Session.User;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
@@ -1065,6 +1067,60 @@ public class DatabasePostgres {
         } else {
             return null;
         }
+    }
+
+    public static boolean createUser(String username, String password) throws SQLException {
+        Hasher hasher = new Hasher(username, password);
+
+        Connection con = getConn();
+
+        PreparedStatement psCheckUser = con.prepareStatement("SELECT COUNT(username) FROM public.user WHERE LOWER(username) = LOWER(?);");
+        psCheckUser.setString(1, username);
+
+        ResultSet rs = psCheckUser.executeQuery();
+        rs.next();
+        int count = rs.getInt(1);
+
+        if (count == 0) {
+            PreparedStatement ps = con.prepareStatement("INSERT INTO public.user (username, password) VALUES (?, ?);");
+
+            ps.setString(1, hasher.getUserName());
+            ps.setString(2, hasher.getHashedPass());
+
+            int status = ps.executeUpdate();
+
+            return status > 0;
+        } else {
+            return false;
+        }
+    }
+
+    public static String getHashedPW_ForUsername(String username) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT password FROM public.user WHERE LOWER(username) = LOWER(?);");
+        ps.setString(1, username);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getString(1);
+    }
+
+    public static User getUserPrivilegeLevel(String username) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT privilege_level, email, display_name FROM public.user WHERE LOWER(username) = LOWER(?);");
+        ps.setString(1, username);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+
+        int privilegeLevel = rs.getInt(1);
+        String email = rs.getString(2);
+        String nickName = rs.getString(3);
+
+        User user = new User();
+        user.setPrivilegeLevel(privilegeLevel);
+        user.setEmail(email);
+        user.setNickName(nickName);
+
+        return user;
     }
 
     public List<Payee> check(String name) {
