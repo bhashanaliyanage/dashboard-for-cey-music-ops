@@ -1743,17 +1743,17 @@ public class DatabasePostgres {
     }
 
     public static List<CowriterShare> getCoWriterSharenew(String artist){
-
+        String art = artist;
         List<CowriterShare> crLlist = new ArrayList<CowriterShare>();
         String sql = "SELECT  ip.isrc, ar.artist_name, CASE "
-                + "        WHEN ip.payee = 'Ajantha Ranasinghe' THEN ip.payee"
-                + "        WHEN ip.payee01 = 'Ajantha Ranasinghe' THEN ip.payee01"
-                + "        WHEN ip.payee02 = 'Ajantha Ranasinghe' THEN ip.payee02"
+                + "        WHEN ip.payee = "+"artist"+" THEN ip.payee"
+                + "        WHEN ip.payee01 =  "+"artist"+" THEN ip.payee01"
+                + "        WHEN ip.payee02 =  "+"artist"+" THEN ip.payee02"
                 + "    END AS payee_name,"
                 + "    CASE "
-                + "        WHEN ip.payee = 'Ajantha Ranasinghe' THEN ip.share"
-                + "        WHEN ip.payee01 = 'Ajantha Ranasinghe' THEN ip.payee01share"
-                + "        WHEN ip.payee02 = 'Ajantha Ranasinghe' THEN ip.payee02share"
+                + "        WHEN ip.payee =  "+"artist"+" THEN ip.share"
+                + "        WHEN ip.payee01 =  "+"artist"+" THEN ip.payee01share"
+                + "        WHEN ip.payee02 =  "+"artist"+" THEN ip.payee02share"
                 + "    END AS share,"
                 + "    s.type AS song_type "
                 + " FROM "
