@@ -28,27 +28,31 @@ public class TextFormatter {
     }
 
     public static String formatTime(String input) {
-        try {
-            String[] parts = input.split("\\.");
-            if (parts.length == 3) {
-                int hours = Integer.parseInt(parts[0]);
-                int minutes = Integer.parseInt(parts[1]);
-                int seconds = Integer.parseInt(parts[2]);
+        if (!validateTime(input)) {
+            try {
+                String[] parts = input.split("\\.");
+                if (parts.length == 3) {
+                    int hours = Integer.parseInt(parts[0]);
+                    int minutes = Integer.parseInt(parts[1]);
+                    int seconds = Integer.parseInt(parts[2]);
 
-                LocalTime time = LocalTime.of(hours, minutes, seconds);
-                return time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-            } else if (parts.length == 2) {
-                int hours = 0; // Default to 0 hours
-                int minutes = Integer.parseInt(parts[0]);
-                int seconds = Integer.parseInt(parts[1]);
+                    LocalTime time = LocalTime.of(hours, minutes, seconds);
+                    return time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                } else if (parts.length == 2) {
+                    int hours = 0; // Default to 0 hours
+                    int minutes = Integer.parseInt(parts[0]);
+                    int seconds = Integer.parseInt(parts[1]);
 
-                LocalTime time = LocalTime.of(hours, minutes, seconds);
-                return time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                    LocalTime time = LocalTime.of(hours, minutes, seconds);
+                    return time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                }
+            } catch (DateTimeParseException | ArrayIndexOutOfBoundsException e) {
+                return "";
             }
-        } catch (DateTimeParseException | ArrayIndexOutOfBoundsException e) {
-            return "";
+        } else {
+            return input;
         }
-        return "";
+        return input;
     }
 
     // Extract YouTube ID from URL

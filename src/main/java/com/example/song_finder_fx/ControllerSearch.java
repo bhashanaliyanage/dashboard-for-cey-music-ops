@@ -460,7 +460,7 @@ public class ControllerSearch {
         String query = searchArea.getText();
         query = query.replace(" ", "+");
         query = "https://www.google.com/search?q=" + query + "+lyrics";
-        System.out.println("query = " + query);
+        // System.out.println("query = " + query);
 
         try {
             if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {

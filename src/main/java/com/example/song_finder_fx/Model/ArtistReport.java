@@ -1,16 +1,11 @@
 package com.example.song_finder_fx.Model;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class ArtistReport {
     private Artist artist = null;
     private double conversionRate = 0;
-    private String payee = "";
-    private String taxAmount = "0";
-    private String amountPayable = "";
     private String month = "";
     private final DecimalFormat df = new DecimalFormat("0.00");
     private final ArrayList<String> coWriters = new ArrayList<>();
@@ -39,14 +34,6 @@ public class ArtistReport {
         topPerformingSongPayeeShare.clear();
     }
 
-    public void setGrossRevenue(String selectedItem, double grossRevenueInLKR, double partnerShareInLKR, double tax, double amountPayable, String month) {
-        this.payee = selectedItem;
-        NumberFormat formatter = NumberFormat.getInstance(Locale.US);
-        this.taxAmount = df.format(tax);
-        this.amountPayable = df.format(amountPayable);
-        this.month = month;
-    }
-
     public double getGrossRevenueInLKR() {
         return grossRevenue * conversionRate;
     }
@@ -55,45 +42,17 @@ public class ArtistReport {
         return partnerShare * conversionRate;
     }
 
-    public String getTaxAmount() {
-        return "LKR " + taxAmount;
-    }
-
-    public String getAmountPayable() {
-        return "LKR " + amountPayable;
-    }
-
     public String getPayee() {
-        return payee;
+        return artist.getName();
     }
 
     public String getMonth() {
-        return month;
-    }
-
-    public void addCoWriter(String artist) {
-        coWriters.add(artist);
-    }
-
-    public void addCoWriterShare(double share) {
-        coWriterShare.add("Rs. " + df.format(share));
-    }
-
-    public void setTopPerformingSongDetails(String assetTitle, String payee, String reportedRoyalty) {
-        topPerformingSongNames.add(assetTitle);
-        topPerformingSongPayees.add(payee);
-        topPerformingSongPayeeShare.add("Rs. " + reportedRoyalty);
-    }
-    public ArrayList<String> getTopPerformingSongNames() {
-        return topPerformingSongNames;
-    }
-
-    public ArrayList<String> getTopPerformingSongPayees() {
-        return topPerformingSongPayees;
-    }
-
-    public ArrayList<String> getTopPerformingSongPayeeShare() {
-        return topPerformingSongPayeeShare;
+        int monthInt = Integer.parseInt(month);
+        String[] monthNames = new String[] {
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+        };
+        return monthNames[monthInt];
     }
 
     public ArrayList<String> getCoWriters() {
@@ -114,10 +73,6 @@ public class ArtistReport {
 
     public double getConversionRate() {
         return conversionRate;
-    }
-
-    public void setConversionRate(int conversionRate) {
-        this.conversionRate = conversionRate;
     }
 
     public void setGrossRevenue(Double grossRevenue) {
@@ -151,9 +106,10 @@ public class ArtistReport {
         return topPerformingSongs;
     }
 
-    public void setGrossRevenueInLKR(String grossRevenueInLKR) {
+    public void setMonth(String month) {
+        this.month = month;
     }
 
-    public void setPartnerShareInLKR(String partnerShareInLKR) {
+    public void setPayee(String payee) {
     }
 }

@@ -2,24 +2,26 @@ package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.ArtistReport;
+import com.example.song_finder_fx.Model.RevenueReport;
 import com.example.song_finder_fx.Model.Songs;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 
 public record RevenueReportController(ArtistReport report) {
 
-    public ArtistReport calculateRevenue() throws SQLException, ClassNotFoundException {
+    public ArtistReport calculateRevenue() throws SQLException {
         // Getting artist name
         ArtistController artistController = new ArtistController(report.getArtist());
         String artistName = artistController.fetchArtistName();
         report.getArtist().setName(artistName);
 
         // Getting gross revenue and partner share
-        // TODO: 4/16/2024 Make this checks all three columns in the database
-        ArrayList<Double> grossNPartnerShare = DatabasePostgres.getPayeeGrossRev(artistName);
-        Double grossRevenue = grossNPartnerShare.get(0);
-        Double partnerShare = grossNPartnerShare.get(1);
+        RevenueReport grossNPartnerShare = DatabasePostgres.getPayeeGrossRev1(artistName);
+        Double grossRevenue = grossNPartnerShare.getReportedRoyalty();
+        Double partnerShare = grossNPartnerShare.getAfterDeductionRoyalty();
         report.setGrossRevenue(grossRevenue);
         report.setPartnerShare(partnerShare);
 
@@ -28,8 +30,11 @@ public record RevenueReportController(ArtistReport report) {
         ArrayList<Songs> topP_Songs = DatabasePostgres.getTopPerformingSongs(artistName); // This object only contains ISRC and Revenue for now. Need to get Song Name
         report.setTopPerformingSongs(topP_Songs);
 
-        // Co-Writer Share
-        // TODO: 4/16/2024 Get Co-Writer Payment Summary from PostgresSQL database
+        // Getting report month
+        String dateString = DatabasePostgres.getSalesDate();
+        String[] date = dateString.split("-");
+        String month = date[1];
+        report.setMonth(month);
 
         return report;
     }

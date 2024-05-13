@@ -33,18 +33,28 @@
    </HBox>
    <VBox layoutX="30.0" layoutY="85.0">
       <VBox.margin>
-         <Insets left="20.0" right="20.0" top="30.0" />
+         <Insets left="20.0" right="20.0" top="30.0"/>
       </VBox.margin>
-      <children>
-         <ImageView fx:id="imgPreview" fitHeight="210.0" fitWidth="210.0" onMouseClicked="#onChangeImageClicked" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@../../images/Green%20Gradient.jpg" />
-            </image>
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-         </ImageView>
-      </children>
+      <ImageView fx:id="imgPreview" fitHeight="210.0" fitWidth="210.0" onMouseClicked="#onChangeImageClicked"
+                 pickOnBounds="true" preserveRatio="true">
+         <cursor>
+            <Cursor fx:constant="HAND"/>
+         </cursor>
+         <Image url="@../../images/Green%20Gradient.jpg"/>
+      </ImageView>
+   </VBox>
+   <VBox>
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="5.0"/>
+      </VBox.margin>
+      <Label fx:id="lblLink" onMouseClicked="#onLinkClick" text="link" textFill="#656565" underline="true">
+         <font>
+            <Font name="System Italic" size="12.0"/>
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND"/>
+         </cursor>
+      </Label>
    </VBox>
    <VBox>
       <VBox.margin>

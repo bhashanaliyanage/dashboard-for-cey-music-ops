@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -34,6 +35,10 @@ public class ControllerManualClaims {
 
     @FXML
     void onCheckBtnClicked() throws IOException, SQLException {
+        loadURL();
+    }
+
+    private void loadURL() throws SQLException, IOException {
         String URL = txtURL.getText();
 
         if (!Objects.equals(URL, "")) {
@@ -92,5 +97,9 @@ public class ControllerManualClaims {
         Scene scene = ((Node) event.getSource()).getScene();
         VBox mainVBox = (VBox) scene.lookup("#mainVBox");
         mainVBox.getChildren().setAll(node);
+    }
+
+    public void urlOnAction(ActionEvent actionEvent) throws SQLException, IOException {
+        loadURL();
     }
 }

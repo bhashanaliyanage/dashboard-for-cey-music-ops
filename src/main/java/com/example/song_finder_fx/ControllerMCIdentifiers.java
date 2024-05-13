@@ -3,7 +3,6 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
-import com.itextpdf.kernel.color.Lab;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -90,7 +89,7 @@ public class ControllerMCIdentifiers {
     }
 
     @FXML
-    void onBack(MouseEvent event) {
+    void onBack() {
 
     }
 
@@ -99,14 +98,25 @@ public class ControllerMCIdentifiers {
         currentISRC = "";
         LocalDate date = LocalDate.now();
         String userName = System.getProperty("user.name");
+        final String[] ingestFileName = {"ingest.csv"};
 
         // Getting total claims for the loop
         int totalClaims = ControllerMCList.finalManualClaims.size();
 
+        // Getting ingest file name
+        TextInputDialog inputIngestFileName = new TextInputDialog("ingest");
+        inputIngestFileName.setTitle("Ingest CSV File Name");
+        inputIngestFileName.setHeaderText("Enter a file name for ingest");
+        inputIngestFileName.setContentText("File Name: ");
+        inputIngestFileName.showAndWait().ifPresent(fileName -> {
+            ingestFileName[0] = fileName + ".csv";
+            System.out.println("Ingest Filename Entered: " + fileName);
+        });
+
         // Front End Validation
         for (int claimID = 0; claimID < totalClaims; claimID++) {
             final String[] upc = {upcs.get(claimID).getText()};
-            final String[] catNo = {claimCNumbers.get(claimID).getText()};
+            String catNo = claimCNumbers.get(claimID).getText();
 
             // Validating UPCs
             if (upc[0].isEmpty()) {
@@ -121,26 +131,29 @@ public class ControllerMCIdentifiers {
                 });
             }
 
+            System.out.println("claimID = " + (claimID + 1));
+
             // Validating Catalog Numbers
-            if (catNo[0].isEmpty()) {
+            if (catNo.isEmpty()) {
+                System.out.println("Catalog Number is null for Claim: " + claimID + 1);
                 // Check catalog numbers from database if no user input available
+                String trackTitle = ControllerMCList.finalManualClaims.get(claimID).getTrackName();
                 String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
                 String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
-                catNo[0] = DatabasePostgres.getCatNo(composer, lyricist);
+                catNo = DatabasePostgres.getCatNo(composer, lyricist);
 
                 // Request catalog number from user if there are no catalog numbers available in the database
-                if (catNo[0] == null) {
-                    requestCatNo(composer, lyricist, claimID);
+                if (catNo == null) {
+                    requestCatNo(composer, lyricist, claimID, trackTitle);
                 }
 
                 // Request catalog number if it is not recognizable
-                assert catNo[0] != null;
-                String[] parts = catNo[0].split("-");
+                assert catNo != null;
+                String[] parts = catNo.split("-");
                 if (Objects.equals(parts[0], "null")) {
-                    requestCatNo(composer, lyricist, claimID);
+                    requestCatNo(composer, lyricist, claimID, trackTitle);
                 }
             }
-
         }
 
         // Switching scenes
@@ -162,10 +175,10 @@ public class ControllerMCIdentifiers {
         lblLocation.setText(destination.getAbsolutePath());
 
         // Create ingest CSV and get writer object
-        CsvListWriter csvWriter = getCsvListWriter(destination);
+        CsvListWriter csvWriter = getCsvListWriter(destination, ingestFileName[0]);
 
         // Creating entry in ingests database and getting ingest ID
-        int ingestID = DatabasePostgres.addIngest(date, userName, destination.getAbsolutePath(), "ingest.csv");
+        int ingestID = DatabasePostgres.addIngest(date, userName, destination.getAbsolutePath(), ingestFileName[0]);
 
         if (ingestID > 0) {
             // Updating UI with ingest ID
@@ -185,7 +198,8 @@ public class ControllerMCIdentifiers {
                         final String[] upc = {upcs.get(claimID).getText()};
                         String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
                         String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
-                        String originalFileName = ControllerMCList.finalManualClaims.get(claimID).getYoutubeID() + ".flac";
+                        String youtubeID = ControllerMCList.finalManualClaims.get(claimID).getYoutubeID();
+                        String originalFileName = youtubeID + "-" + albumTitle + ".flac";
 
                         // Writing CSV row
                         List<String> CSV_Row = getCSV_Row(claimID, albumTitle, upc[0], composer, lyricist, originalFileName);
@@ -195,14 +209,15 @@ public class ControllerMCIdentifiers {
                         File folder = createSubFolder(upc[0], destination);
 
                         // Getting the artwork from database, saving it to created subfolder
-                        if (ControllerMCList.finalManualClaims.get(claimID).getBufferedImage() != null) {
+                        BufferedImage artwork = ControllerMCList.finalManualClaims.get(claimID).getBufferedImage();
+                        if (artwork != null) {
                             Platform.runLater(() -> lblProcess.setText("Getting Artwork for: " + albumTitle));
                             try {
-                                BufferedImage artwork = ControllerMCList.finalManualClaims.get(claimID).getBufferedImage();
                                 String outputPath = folder.getAbsolutePath() + "\\" + upc[0] + ".jpg";
                                 Platform.runLater(() -> System.out.println("outputPath = " + outputPath));
                                 ImageIO.write(artwork, "jpg", new File(outputPath));
                             } catch (IOException e) {
+                                Platform.runLater(() -> progressBar.setStyle("-fx-background-color: red;"));
                                 Platform.runLater(e::printStackTrace);
                             }
                         } else {
@@ -246,9 +261,9 @@ public class ControllerMCIdentifiers {
         }
     }
 
-    private static void requestCatNo(String composer, String lyricist, int claimID) {
+    private static void requestCatNo(String composer, String lyricist, int claimID, String trackTitle) {
         TextInputDialog inputDialog = new TextInputDialog(null);
-        inputDialog.setTitle("Cannot find Catalog Number");
+        inputDialog.setTitle("Cannot find Catalog Number for " + trackTitle);
         inputDialog.setHeaderText("Enter a new catalog number for " + composer + " or " + lyricist);
         inputDialog.setContentText("Catalog Number:");
         inputDialog.showAndWait().ifPresent(newCatNo -> {
@@ -330,9 +345,9 @@ public class ControllerMCIdentifiers {
     }
 
     @NotNull
-    private static CsvListWriter getCsvListWriter(File destination) throws IOException {
+    private static CsvListWriter getCsvListWriter(File destination, String fileName) throws IOException {
         // Creating ingest file inside the location given by user
-        String filePath = destination.getAbsolutePath() + "/ingest.csv";
+        String filePath = destination.getAbsolutePath() + "/" + fileName;
         new File(filePath);
         CsvListWriter csvWriter = new CsvListWriter(new FileWriter(filePath), CsvPreference.STANDARD_PREFERENCE);
 
@@ -530,7 +545,7 @@ public class ControllerMCIdentifiers {
     }
 
     @FXML
-    void toRoot(MouseEvent event) {
+    void toRoot() {
 
     }
 
