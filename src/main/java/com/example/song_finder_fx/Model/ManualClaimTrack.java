@@ -19,13 +19,6 @@ public class ManualClaimTrack {
     private BufferedImage image;
     private BufferedImage previewImage;
 
-    /*public ManualClaimTrack(String trackName, String lyricist, String composer, String url) {
-        this.trackName = trackName;
-        this.lyricist = lyricist;
-        this.composer = composer;
-        this.youtubeID = url.substring(32);
-    }*/
-
     public ManualClaimTrack(int id, String trackName, String lyricist, String composer, String youTubeID, LocalDate date) {
         this.id = id;
         this.trackName = trackName;

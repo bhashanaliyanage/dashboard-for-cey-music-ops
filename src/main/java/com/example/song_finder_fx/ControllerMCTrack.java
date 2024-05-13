@@ -1,9 +1,6 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.ImageProcessor;
-import com.example.song_finder_fx.Controller.MCTrackController;
-import com.example.song_finder_fx.Controller.ManualClaims;
-import com.example.song_finder_fx.Controller.TextFormatter;
+import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
 import javafx.event.ActionEvent;
@@ -53,7 +50,8 @@ public class ControllerMCTrack {
     public void initialize() throws SQLException {
         // List<String> songTitles = DatabaseMySQL.getAllSongs();
         List<String> songTitles = DatabasePostgres.getAllSongTitles();
-        List<String> artistValidation = DatabasePostgres.getAllArtists();
+        // List<String> artistValidation = DatabasePostgres.getAllArtists();
+        List<String> artistValidation = DatabasePostgres.getAllValidatedArtists();
         TextFields.bindAutoCompletion(txtTrackTitle, songTitles);
         TextFields.bindAutoCompletion(txtComposer, artistValidation);
         TextFields.bindAutoCompletion(txtLyricist, artistValidation);
@@ -75,7 +73,7 @@ public class ControllerMCTrack {
         });
     }
 
-    public void onAddTrack(ActionEvent event) throws IOException, URISyntaxException, SQLException, ClassNotFoundException {
+    public void onAddTrack(ActionEvent event) throws IOException, URISyntaxException {
         // Getting Parent Object References
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
@@ -111,7 +109,11 @@ public class ControllerMCTrack {
             // Creating track model
             ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID, date);
             MCTrackController mcTrackController = new MCTrackController(track);
-            mcTrackController.checkNew();
+            try {
+                mcTrackController.checkNew();
+            } catch (SQLException e) {
+                ErrorDialog.showErrorDialog("Error!", "Error Adding Track Data", e.toString());
+            }
 
             // Setting Thumbnail and Preview Images to the model
             track.setPreviewImage(image);

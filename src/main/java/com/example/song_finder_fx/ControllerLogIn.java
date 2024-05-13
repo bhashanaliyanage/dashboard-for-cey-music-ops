@@ -18,15 +18,6 @@ import java.sql.SQLException;
 public class ControllerLogIn {
 
     @FXML
-    private Button btnLogIn;
-
-    @FXML
-    private Button btnSignUp;
-
-    @FXML
-    private ScrollPane scrlpneMain;
-
-    @FXML
     private TextField txtPassword;
 
     @FXML
@@ -77,7 +68,8 @@ public class ControllerLogIn {
                 hBoxArtistReports.setDisable(false);
             }
         } else {
-            // TODO: Show Error!
+            txtUsername.setStyle("-fx-border-color: red;");
+            txtPassword.setStyle("-fx-border-color: red;");
         }
     }
 

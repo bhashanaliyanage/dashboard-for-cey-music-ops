@@ -24,6 +24,14 @@ public class Hasher {
 
     public boolean validate() throws SQLException {
         String hashedPW = DatabasePostgres.getHashedPW_ForUsername(username);
-        return BCrypt.checkpw(password, hashedPW);
+        boolean status = false;
+
+        try {
+            status =  BCrypt.checkpw(password, hashedPW);
+            return status;
+        } catch (Exception e) {
+            // e.printStackTrace();
+            return status;
+        }
     }
 }

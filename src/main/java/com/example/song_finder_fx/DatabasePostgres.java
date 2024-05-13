@@ -1031,18 +1031,19 @@ public class DatabasePostgres {
 
     public static boolean checkTrackExists(String trackTitle, String composer, String lyricist) throws SQLException {
         Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement("SELECT song_name FROM public.song_metadata_new WHERE LOWER(song_name) = LOWER(?);");
+        PreparedStatement ps = con.prepareStatement("SELECT COUNT(song_name) FROM public.song_metadata_new WHERE LOWER(song_name) = LOWER(?);");
+        PreparedStatement ps2 = con.prepareStatement("INSERT INTO public.temp_songs(name, composer, lyricist) VALUES (?, ?, ?);");
         ps.setString(1, trackTitle);
         ResultSet rs = ps.executeQuery();
         boolean status = false;
         while (rs.next()) {
             int count = rs.getInt(1);
             if (count == 0) {
-                ps = con.prepareStatement("INSERT INTO public.temp_songs(name, composer, lyricist) VALUES (?, ?, ?);");
-                ps.setString(1, trackTitle);
-                ps.setString(2, composer);
-                ps.setString(3, lyricist);
-                int status2 = ps.executeUpdate();
+                // ps = con.prepareStatement("INSERT INTO public.temp_songs(name, composer, lyricist) VALUES (?, ?, ?);");
+                ps2.setString(1, trackTitle);
+                ps2.setString(2, composer);
+                ps2.setString(3, lyricist);
+                int status2 = ps2.executeUpdate();
                 if (status2 > 0) {
                     status = true;
                 }
@@ -1053,7 +1054,11 @@ public class DatabasePostgres {
         return status;
     }
 
-    public static void addTempArtist(String composer) {
+    public static void addTempArtist(String artist) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("INSERT INTO public.temp_artists(name) VALUES (?);");
+        ps.setString(1, artist);
+        ps.executeUpdate();
     }
 
     public static String getClaimYouTubeID(int id) throws SQLException {
@@ -1100,8 +1105,12 @@ public class DatabasePostgres {
         PreparedStatement ps = con.prepareStatement("SELECT password FROM public.user WHERE LOWER(username) = LOWER(?);");
         ps.setString(1, username);
         ResultSet rs = ps.executeQuery();
-        rs.next();
-        return rs.getString(1);
+        if (rs.isBeforeFirst()) {
+            rs.next();
+            return rs.getString(1);
+        } else {
+            return null;
+        }
     }
 
     public static User getUserPrivilegeLevel(String username) throws SQLException {
@@ -1121,6 +1130,21 @@ public class DatabasePostgres {
         user.setNickName(nickName);
 
         return user;
+    }
+
+    public static List<String> getAllValidatedArtists() throws SQLException {
+        Connection conn = getConn();
+        String query = "SELECT artist_name, validated FROM public.artists WHERE validated = TRUE ORDER BY artist_name ASC;";
+        Statement statement = conn.createStatement();
+        List<String> artists = new ArrayList<>();
+
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            String artist = rs.getString(1);
+            artists.add(artist);
+        }
+
+        return artists;
     }
 
     public List<Payee> check(String name) {

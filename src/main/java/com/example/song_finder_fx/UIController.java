@@ -1,6 +1,7 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.NotificationBuilder;
+import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
 import com.example.song_finder_fx.Session.UserSession;
@@ -1083,8 +1084,9 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             ControllerSettings cs = new ControllerSettings(this);
             cs.loadAbout(mainNodes[1]);
         } else {
-            System.out.println("Load Log In | Sign Up View...");
-            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/user/login_signup.fxml")));
+            // System.out.println("Load Log In | Sign Up View...");
+            // SceneController.loadLayout("layouts/user/login_signup.fxml");
+            Node node = SceneController.loadLayout("layouts/user/login_signup.fxml");
             mainVBox.getChildren().setAll(node);
         }
     }

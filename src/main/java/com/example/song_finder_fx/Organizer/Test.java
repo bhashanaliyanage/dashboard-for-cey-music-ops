@@ -6,9 +6,7 @@ import com.example.song_finder_fx.Controller.RevenueReportController;
 import com.example.song_finder_fx.Model.Artist;
 import com.example.song_finder_fx.Model.ArtistReport;
 import com.example.song_finder_fx.Model.Songs;
-import com.example.song_finder_fx.Session.UserSession;
 import com.itextpdf.layout.Document;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -17,23 +15,7 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        // IngestController ingestController = new IngestController();
-        // List<Ingest> ingests = ingestController.getCreatedIngests();
 
-        /*String password = "test";
-        String candidate = "test";
-
-        String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
-
-        if (BCrypt.checkpw(candidate, hashed)) {
-            System.out.println("Matches");
-        } else {
-            System.out.println("Not Matching");
-        }*/
-
-        UserSession userSession = new UserSession();
-        userSession.login("ceymusic", "test");
-        userSession.logout();
     }
 
     private static void testArtistReportPDF() throws SQLException, IOException {

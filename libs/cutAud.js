@@ -2,11 +2,17 @@ const ffmpeg = require('fluent-ffmpeg');
 
 async function cutMP3(inputFile, outputFile, startTime, endTime) {
     const duration = calculateDuration(startTime, endTime);
+    const fadeInDuration = 1; // Specify the duration of the fade-in effect (in seconds)
+    const fadeOutDuration = 1; // Specify the duration of the fade-out effect (in seconds)
     console.log(duration);
     return new Promise((resolve, reject) => {
         ffmpeg(inputFile)
             .setStartTime(startTime)
             .duration(duration)
+            .audioFilters([
+                `afade=t=in:ss=0:d=${fadeInDuration}`, // Fade-in effect
+                `afade=t=out:st=${duration - fadeOutDuration}:d=${fadeOutDuration}`, // Fade-out effect
+            ])
             .output(outputFile)
             .on('end', () => {
                 console.log(`Output file saved as ${outputFile}`);
