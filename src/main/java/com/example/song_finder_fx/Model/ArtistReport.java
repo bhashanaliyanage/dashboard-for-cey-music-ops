@@ -2,6 +2,7 @@ package com.example.song_finder_fx.Model;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ArtistReport {
     private Artist artist = null;
@@ -16,6 +17,16 @@ public class ArtistReport {
     private Double grossRevenue;
     private Double partnerShare;
     private ArrayList<Songs> topPerformingSongs;
+
+    private List<CowriterShare> coWritterList;
+
+    public List<CowriterShare> getCoWritterList() {
+        return coWritterList;
+    }
+
+    public void setCoWritterList(List<CowriterShare> coWritterList) {
+        this.coWritterList = coWritterList;
+    }
 
     public ArtistReport(Artist artist, double conversionRate) {
         this.artist = artist;

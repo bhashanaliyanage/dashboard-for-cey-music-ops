@@ -1765,4 +1765,58 @@ public class DatabasePostgres {
         preparedStatement.setInt(2, ingestID);
         preparedStatement.executeUpdate();
     }
+
+    public static List<CowriterShare> getCoWriterSharenew(String artist){
+        String art = artist;
+        List<CowriterShare> crLlist = new ArrayList<CowriterShare>();
+        String sql = "SELECT  ip.isrc, ar.artist_name, CASE "
+                + "        WHEN ip.payee = "+"artist"+" THEN ip.payee"
+                + "        WHEN ip.payee01 =  "+"artist"+" THEN ip.payee01"
+                + "        WHEN ip.payee02 =  "+"artist"+" THEN ip.payee02"
+                + "    END AS payee_name,"
+                + "    CASE "
+                + "        WHEN ip.payee =  "+"artist"+" THEN ip.share"
+                + "        WHEN ip.payee01 =  "+"artist"+" THEN ip.payee01share"
+                + "        WHEN ip.payee02 =  "+"artist"+" THEN ip.payee02share"
+                + "    END AS share,"
+                + "    s.type AS song_type "
+                + " FROM "
+                + "    isrc_payees ip "
+                + " JOIN "
+                + "    songs s ON ip.isrc = s.isrc"
+                + " JOIN"
+                + "    artists ar ON s.composer = ar.artist_id OR s.lyricist = ar.artist_id "
+                + " WHERE "
+                + "    (ip.payee = ? AND ip.share = 100)"
+                + "    OR (ip.payee01 = ? AND ip.payee01share = 100)"
+                + "    OR (ip.payee02 = ? AND ip.payee02share = 100)";
+
+        Connection con = getConn();
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, artist);
+            ps.setString(2, artist);
+            ps.setString(3, artist);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                CowriterShare cr = new CowriterShare();
+                cr.setIsrc(rs.getString(1));
+                cr.setArtistName(rs.getString(2));
+                cr.setPayee(rs.getString(3));
+                cr.setShare(rs.getString(4));
+                cr.setSongType(rs.getString(5));
+
+                crLlist.add(cr);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection(con);
+        }
+        return crLlist;
+
+    }
+
+
+    
 }

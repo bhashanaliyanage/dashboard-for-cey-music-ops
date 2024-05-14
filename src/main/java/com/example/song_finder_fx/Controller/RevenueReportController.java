@@ -2,6 +2,7 @@ package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.ArtistReport;
+import com.example.song_finder_fx.Model.CowriterShare;
 import com.example.song_finder_fx.Model.RevenueReport;
 import com.example.song_finder_fx.Model.Songs;
 
@@ -9,6 +10,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.List;
 
 public record RevenueReportController(ArtistReport report) {
 
@@ -16,6 +18,7 @@ public record RevenueReportController(ArtistReport report) {
         // Getting artist name
         ArtistController artistController = new ArtistController(report.getArtist());
         String artistName = artistController.fetchArtistName();
+        List<CowriterShare> cowriterList =  new ArrayList<>();
         report.getArtist().setName(artistName);
 
         // Getting gross revenue and partner share
@@ -35,6 +38,7 @@ public record RevenueReportController(ArtistReport report) {
         String[] date = dateString.split("-");
         String month = date[1];
         report.setMonth(month);
+        report.setCoWritterList(DatabasePostgres.getCoWriterSharenew(artistName));
 
         return report;
     }
