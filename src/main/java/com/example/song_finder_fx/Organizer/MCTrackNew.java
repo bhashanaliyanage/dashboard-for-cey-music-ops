@@ -7,10 +7,6 @@ public class MCTrackNew {
         return upc;
     }
 
-    public String getCatNo() {
-        return catNo;
-    }
-
     public String getTrackTitle() {
         return trackTitle;
     }

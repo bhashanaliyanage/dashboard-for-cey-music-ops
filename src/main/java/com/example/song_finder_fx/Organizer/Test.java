@@ -1,7 +1,6 @@
 package com.example.song_finder_fx.Organizer;
 
 import com.example.song_finder_fx.Constants.SearchType;
-import com.example.song_finder_fx.Controller.IngestController;
 import com.example.song_finder_fx.Controller.ManualClaimsController;
 import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Controller.RevenueReportController;
