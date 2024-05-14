@@ -50,6 +50,7 @@ public class ControllerMCIdentifiers {
     public void initialize() throws IOException {
         vbClaimsList.getChildren().clear();
         upcs.clear();
+        claimCNumbers.clear();
         for (int i = 0; i < ControllerMCList.finalManualClaims.size(); i++) {
             ManualClaimTrack claim = ControllerMCList.finalManualClaims.get(i);
 
@@ -549,4 +550,17 @@ public class ControllerMCIdentifiers {
 
     }
 
+    public void onTest(MouseEvent mouseEvent) {
+        // Getting total claims for the loop
+        int totalClaims = ControllerMCList.finalManualClaims.size();
+        System.out.println("Total Claim Count: " + totalClaims);
+
+        // Front End Validation
+        for (int claimID = 0; claimID < totalClaims; claimID++) {
+            final String[] upc = {upcs.get(claimID).getText()};
+            String catNo = claimCNumbers.get(claimID).getText();
+            final String[] userISRC = {claimISRCs.get(claimID).getText()};
+            System.out.println((claimID + 1) + " | " + upc[0] + " | " + catNo + " | " + userISRC[0]);
+        }
+    }
 }
