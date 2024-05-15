@@ -119,7 +119,7 @@ public class ControllerRevenueGenerator {
     public ComboBox<String> comboPayees;
     public TextField txtRate;
     private final UIController mainUIController;
-    private final ArtistReport report = new ArtistReport();
+    private ArtistReport report = new ArtistReport();
     CSVController csvController = new CSVController();
 
     public ControllerRevenueGenerator(UIController uiController) throws IOException {
@@ -553,7 +553,7 @@ public class ControllerRevenueGenerator {
 
     public void onLoadReportBtnClick() throws SQLException, ClassNotFoundException {
         // Clearing Report Model
-        report.clear();
+        report = new ArtistReport();
 
         // Getting Currency Rate
         String userInputRate = txtRate.getText();

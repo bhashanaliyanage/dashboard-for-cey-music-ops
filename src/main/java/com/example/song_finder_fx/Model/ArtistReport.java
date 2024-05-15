@@ -8,11 +8,10 @@ public class ArtistReport {
     private Artist artist = null;
     private double conversionRate = 0;
     private String month = "";
-    private final DecimalFormat df = new DecimalFormat("0.00");
     private final ArrayList<String> coWriters = new ArrayList<>();
-    private final ArrayList<String> topPerformingSongNames = new ArrayList<>();
+    /*private final ArrayList<String> topPerformingSongNames = new ArrayList<>();
     private final ArrayList<String> topPerformingSongPayees = new ArrayList<>();
-    private final ArrayList<String> topPerformingSongPayeeShare = new ArrayList<>();
+    private final ArrayList<String> topPerformingSongPayeeShare = new ArrayList<>();*/
     private final ArrayList<String> coWriterShare = new ArrayList<>();
     private Double grossRevenue;
     private Double partnerShare;
@@ -37,13 +36,13 @@ public class ArtistReport {
 
     }
 
-    public void clear() {
+    /*public void clear() {
         coWriters.clear();
         coWriterShare.clear();
-        topPerformingSongNames.clear();
+        *//*topPerformingSongNames.clear();
         topPerformingSongPayees.clear();
-        topPerformingSongPayeeShare.clear();
-    }
+        topPerformingSongPayeeShare.clear();*//*
+    }*/
 
     public double getGrossRevenueInLKR() {
         return grossRevenue * conversionRate;

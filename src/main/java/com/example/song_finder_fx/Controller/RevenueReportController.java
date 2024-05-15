@@ -16,7 +16,6 @@ public record RevenueReportController(ArtistReport report) {
         // Getting artist name
         ArtistController artistController = new ArtistController(report.getArtist());
         String artistName = artistController.fetchArtistName();
-        List<CoWriterShare> cowriterList =  new ArrayList<>();
         report.getArtist().setName(artistName);
 
         // Getting gross revenue and partner share
