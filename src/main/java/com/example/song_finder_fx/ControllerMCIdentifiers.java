@@ -550,7 +550,7 @@ public class ControllerMCIdentifiers {
 
     }
 
-    public void onTest(MouseEvent mouseEvent) {
+    public void onTest() {
         // Getting total claims for the loop
         int totalClaims = ControllerMCList.finalManualClaims.size();
         System.out.println("Total Claim Count: " + totalClaims);

@@ -29,7 +29,7 @@ public class Main extends Application {
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion(23.11);
+    public static ProductVersion versionInfo = new ProductVersion(23.12);
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
@@ -238,4 +238,6 @@ public class Main extends Application {
 // TODO: Batch Edit Artworks
 // TODO: Show artwork in identifier view
 // TODO: Batch Paste UPCs
-// TODO: Add a fade in, fade out for trimming tracks
+
+// User Accounts
+// TODO: Make the user experience of login and signup much better.

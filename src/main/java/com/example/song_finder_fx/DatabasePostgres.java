@@ -1766,18 +1766,18 @@ public class DatabasePostgres {
         preparedStatement.executeUpdate();
     }
 
-    public static List<CowriterShare> getCoWriterSharenew(String artist){
-        String art = artist;
-        List<CowriterShare> crLlist = new ArrayList<CowriterShare>();
+    public static List<CoWriterShare> getCoWriterSharenew(String artist) {
+        // System.out.println("art = " + art);
+        List<CoWriterShare> crLlist = new ArrayList<>();
         String sql = "SELECT  ip.isrc, ar.artist_name, CASE "
-                + "        WHEN ip.payee = "+"artist"+" THEN ip.payee"
-                + "        WHEN ip.payee01 =  "+"artist"+" THEN ip.payee01"
-                + "        WHEN ip.payee02 =  "+"artist"+" THEN ip.payee02"
+                + "        WHEN ip.payee = '" + artist + "' THEN ip.payee"
+                + "        WHEN ip.payee01 =  '" + artist + "' THEN ip.payee01"
+                + "        WHEN ip.payee02 =  '" + artist + "' THEN ip.payee02"
                 + "    END AS payee_name,"
                 + "    CASE "
-                + "        WHEN ip.payee =  "+"artist"+" THEN ip.share"
-                + "        WHEN ip.payee01 =  "+"artist"+" THEN ip.payee01share"
-                + "        WHEN ip.payee02 =  "+"artist"+" THEN ip.payee02share"
+                + "        WHEN ip.payee =  '" + artist + "' THEN ip.share"
+                + "        WHEN ip.payee01 =  '" + artist + "' THEN ip.payee01share"
+                + "        WHEN ip.payee02 =  '" + artist + "' THEN ip.payee02share"
                 + "    END AS share,"
                 + "    s.type AS song_type "
                 + " FROM "
@@ -1797,9 +1797,10 @@ public class DatabasePostgres {
             ps.setString(1, artist);
             ps.setString(2, artist);
             ps.setString(3, artist);
+            // System.out.println("ps = " + ps);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                CowriterShare cr = new CowriterShare();
+                CoWriterShare cr = new CoWriterShare();
                 cr.setIsrc(rs.getString(1));
                 cr.setArtistName(rs.getString(2));
                 cr.setPayee(rs.getString(3));
@@ -1817,6 +1818,41 @@ public class DatabasePostgres {
 
     }
 
+    public static List<CoWriterShare> getCoWriterShareNew2(String artist) throws SQLException {
+        List<CoWriterShare> crLlist = new ArrayList<>();
+        String sql = "SELECT \n" +
+                "\tip.isrc,\n" +
+                "\trep.after_deduction_royalty,\n" +
+                "\ts.song_name,\t \n" +
+                "\tip.payee, \n" +
+                "\tip.share, \n" +
+                "\tCASE \n" +
+                "\t\tWHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist)\n" +
+                "\t\tELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)\n" +
+                "\tEND AS contributor,\n" +
+                "\t(SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer, \n" +
+                "\t(SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist, s.type\n" +
+                "FROM public.isrc_payees ip\n" +
+                "JOIN SONGS S ON IP.ISRC = S.ISRC\n" +
+                "JOIN public.\"testRep1\" rep ON IP.ISRC = rep.asset_isrc\n" +
+                "WHERE (ip.payee = ? AND ip.share = 100)\n" +
+                "ORDER BY rep.after_deduction_royalty DESC LIMIT 5;";
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, artist);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            CoWriterShare cr = new CoWriterShare();
+            cr.setIsrc(rs.getString(1));
+            cr.setRoyalty(rs.getDouble(2));
+            cr.setSongName(rs.getString(3));
+            cr.setContributor(rs.getString(6));
+            cr.setComposer(rs.getString(7));
+            cr.setLyricist(rs.getString(8));
+            cr.setSongType(rs.getString(9));
+            crLlist.add(cr);
+        }
+        return crLlist;
+    }
 
-    
 }

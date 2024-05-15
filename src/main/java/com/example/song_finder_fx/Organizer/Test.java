@@ -1,7 +1,6 @@
 package com.example.song_finder_fx.Organizer;
 
 import com.example.song_finder_fx.Constants.SearchType;
-import com.example.song_finder_fx.Controller.ManualClaimsController;
 import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Controller.RevenueReportController;
 import com.example.song_finder_fx.Model.*;
@@ -9,13 +8,12 @@ import com.itextpdf.layout.Document;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        String upc = "8721093194828";
+        /*String upc = "8721093194828";
         String catNo = "KAA-CEY-031";
         String trackTitle = "Buddan Saranan Gachchami";
         String isrc = "LKA0U2401476";
@@ -42,7 +40,10 @@ public class Test {
         String path = "C:\\Users\\bhash\\Documents\\Test\\";
 
         ManualClaimsController manualClaimsController = new ManualClaimsController(claims);
-        // manualClaimsController.generateCSV(path);
+        // manualClaimsController.generateCSV(path);*/
+
+        // testArtistReports();
+        testArtistReportPDF();
     }
 
     private static void testArtistReportPDF() throws SQLException, IOException {
@@ -50,10 +51,11 @@ public class Test {
         ReportPDF pdf = new ReportPDF();
         String path = "C:\\Users\\bhash\\Documents\\Test\\test.pdf";
         Document document = pdf.generateReport(path, report);
+        System.out.println("Report for " + report.getArtist().getName() + " is generated and saved in: " + path);
     }
 
     private static void testArtistReports() throws SQLException {
-        int artistID = 76;
+        int artistID = 47;
         int conversionRate = 320;
 
         // Creating artist model by passing artistID
@@ -63,6 +65,7 @@ public class Test {
         double grossRevenue = report.getGrossRevenueInLKR();
         double partnerShare = report.getPartnerShareInLKR();
         ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
+        List<CoWriterShare> coWriterShare = report.getCoWritterList();
 
         // Printing calculated values
         System.out.println("Calculated Details for Selected Artist");
@@ -79,7 +82,17 @@ public class Test {
 
         System.out.println("Top Performing Songs");
         for (Songs song : topPerformingSongs) {
-            System.out.println(song.getISRC() + " | " + song.getRoyalty() * conversionRate);
+            System.out.println(song.getTrackTitle() + " | " + song.getRoyalty() * conversionRate);
+        }
+        System.out.println("========");
+
+        System.out.println("Co-Writer Share");
+        for (CoWriterShare share : coWriterShare) {
+            String songName = share.getSongName();
+            double royalty = share.getRoyalty();
+            String contributor = share.getContributor();
+
+            System.out.println(songName + " | " + royalty + " | " + contributor);
         }
     }
 

@@ -18,13 +18,13 @@ public class ArtistReport {
     private Double partnerShare;
     private ArrayList<Songs> topPerformingSongs;
 
-    private List<CowriterShare> coWritterList;
+    private List<CoWriterShare> coWritterList;
 
-    public List<CowriterShare> getCoWritterList() {
+    public List<CoWriterShare> getCoWritterList() {
         return coWritterList;
     }
 
-    public void setCoWritterList(List<CowriterShare> coWritterList) {
+    public void setCoWritterList(List<CoWriterShare> coWritterList) {
         this.coWritterList = coWritterList;
     }
 
