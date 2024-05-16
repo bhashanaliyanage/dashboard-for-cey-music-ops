@@ -2,6 +2,7 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.UserSettingsManager;
 import com.example.song_finder_fx.Model.ProductVersion;
+import com.example.song_finder_fx.Session.UserSession;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -24,10 +25,11 @@ import java.util.stream.Stream;
 
 public class Main extends Application {
     public static Stage primaryStage = null;
+    public static UserSession userSession;
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion(23.06);
+    public static ProductVersion versionInfo = new ProductVersion(23.12);
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
@@ -36,7 +38,15 @@ public class Main extends Application {
     public static File browseForCSV(Window window) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select CSV");
-        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
+
+        return fileChooser.showOpenDialog(window);
+    }
+
+    public static File browseForImage(Window window) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Image");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
 
         return fileChooser.showOpenDialog(window);
     }
@@ -197,6 +207,7 @@ public class Main extends Application {
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
 // TODO: 2/8/2024 System Tray
 // TODO: 2/14/2024 Make it play FLACs
+// TODO: Create a notification panel for software reminders like: Update artist name validation table
 
 // Performance
 // TODO: If copy to button clicked and user not chose any location the application starts to search
@@ -206,6 +217,26 @@ public class Main extends Application {
 
 // Revenue Analysis
 // TODO: 12/9/2023 Sub views of revenue analysis UI
+// TODO: Retrieve artist names from Postgres
+// TODO: A view to edit payee list
 
 // Search
 // TODO: 2/8/2024 Edit Song Details
+// TODO: Change song list retrieval process to Postgres
+
+// Ingests
+// TODO: 3/26/2024 Debug Ingest CSV
+
+// Manual Claims
+// TODO: A view to view created ingests
+    // TODO: Update Payee table from created ingests upon request
+// TODO: Tags For Manual Claims List (for Group Claims , Tv Programmes , Covers)
+// TODO: Edit details on an added manual claim in the add manual claim view
+// TODO: Remove an added manual claim in the add manual claim view
+// TODO: Reset add manual claim view after adding a manual claim
+// TODO: Batch Edit Artworks
+// TODO: Show artwork in identifier view
+// TODO: Batch Paste UPCs
+
+// User Accounts
+// TODO: Make the user experience of login and signup much better.

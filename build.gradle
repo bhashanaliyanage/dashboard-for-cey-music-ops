@@ -44,8 +44,8 @@ shadowJar {
 //}
 
 javafx {
-    version = "17" // Use the version that is compatible with your project
-    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web' ]
+    version = '21-ea+24' // Use the version that is compatible with your project
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
 dependencies {
@@ -83,10 +83,11 @@ dependencies {
     //audio cut
     implementation files('libs/jl1.0.1.jar')
 
+    // https://mvnrepository.com/artifact/net.sf.supercsv/super-csv
+    implementation 'net.sf.supercsv:super-csv:2.4.0'
 
-
-
-
+    // https://mvnrepository.com/artifact/org.mindrot/jbcrypt
+    implementation 'org.mindrot:jbcrypt:0.4'
 }
 
 test {

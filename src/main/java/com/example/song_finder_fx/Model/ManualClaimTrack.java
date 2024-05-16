@@ -1,28 +1,33 @@
 package com.example.song_finder_fx.Model;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
+
+import java.awt.image.BufferedImage;
+import java.time.LocalDate;
+
 public class ManualClaimTrack {
     private final int id;
     private final String trackName;
     private final String lyricist;
     private final String composer;
     private final String youtubeID;
+    private final LocalDate date;
     private boolean status = false;
     private String trimStart;
     private String trimEnd;
+    private BufferedImage image;
+    private BufferedImage previewImage;
+    private final int claimType;
 
-    /*public ManualClaimTrack(String trackName, String lyricist, String composer, String url) {
-        this.trackName = trackName;
-        this.lyricist = lyricist;
-        this.composer = composer;
-        this.youtubeID = url.substring(32);
-    }*/
-
-    public ManualClaimTrack(int id, String trackName, String lyricist, String composer, String url) {
+    public ManualClaimTrack(int id, String trackName, String lyricist, String composer, String youTubeID, LocalDate date, int claimType) {
         this.id = id;
         this.trackName = trackName;
         this.lyricist = lyricist;
         this.composer = composer;
-        this.youtubeID = url.substring(32);
+        this.youtubeID = youTubeID;
+        this.date = date;
+        this.claimType = claimType;
     }
 
     public String getTrackName() {
@@ -68,5 +73,46 @@ public class ManualClaimTrack {
 
     public String getTrimEnd() {
         return trimEnd;
+    }
+
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
+
+    public Image getImage() {
+        return SwingFXUtils.toFXImage(image, null);
+    }
+
+    public void setPreviewImage(BufferedImage image) {
+        this.previewImage = image;
+    }
+
+    public Image getPreviewImage() {
+        return SwingFXUtils.toFXImage(previewImage, null);
+    }
+
+    public BufferedImage getBufferedImage() {
+        return image;
+    }
+
+    public BufferedImage getBufferedPreviewImage() {
+        return previewImage;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public int getClaimType() {
+        return claimType;
+    }
+
+    public String getClaimTypeString() {
+        return switch (claimType) {
+            case 2 -> "TV Programs";
+            case 3 -> "Manual Claim";
+            case 4 -> "Single SR";
+            default -> "Unspecified";
+        };
     }
 }

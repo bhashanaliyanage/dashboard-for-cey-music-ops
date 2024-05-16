@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIControllers.ControllerMCIdentifiers">
+<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCIdentifiers">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -42,48 +42,48 @@
          </HBox.margin>
       </Label>
     </HBox>
-   <VBox maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../../styles.css" VBox.vgrow="ALWAYS">
+   <VBox maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../../styles.css"
+         VBox.vgrow="ALWAYS">
       <VBox.margin>
-         <Insets left="30.0" top="30.0" />
+         <Insets left="30.0" top="30.0"/>
       </VBox.margin>
-      <children>
-         <VBox>
-            <children>
-               <Label text="Add Identifiers">
-                  <font>
-                     <Font name="Segoe UI Semibold" size="19.0" />
-                  </font>
-                  <cursor>
-                     <Cursor fx:constant="DEFAULT" />
-                  </cursor>
-               </Label>
-               <Label text="(UPCs, Catalog Numbers, and ISRCs)" textFill="#656565">
-                  <cursor>
-                     <Cursor fx:constant="DEFAULT" />
-                  </cursor>
-               </Label>
-            </children>
-            <VBox.margin>
-               <Insets left="20.0" right="20.0" top="20.0" />
-            </VBox.margin>
+      <VBox>
+         <VBox.margin>
+            <Insets left="20.0" right="20.0" top="20.0"/>
+         </VBox.margin>
+         <Label text="Add Identifiers">
+            <font>
+               <Font name="Segoe UI Semibold" size="19.0"/>
+            </font>
+            <cursor>
+               <Cursor fx:constant="DEFAULT"/>
+            </cursor>
+         </Label>
+         <Label text="(UPCs, Catalog Numbers, and ISRCs)" textFill="#656565">
+            <cursor>
+               <Cursor fx:constant="DEFAULT"/>
+            </cursor>
+         </Label>
+      </VBox>
+      <ScrollPane hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets bottom="10.0" left="20.0" right="20.0" top="10.0"/>
+         </VBox.margin>
+         <VBox fx:id="vbClaimsList" prefWidth="641.0" spacing="10.0" styleClass="textarea-bg">
+            <padding>
+               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
          </VBox>
-         <ScrollPane hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
-            <VBox.margin>
-               <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
-            </VBox.margin>
-            <content>
-               <VBox fx:id="vbClaimsList" prefWidth="641.0" spacing="10.0" styleClass="textarea-bg">
-                  <padding>
-                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                  </padding>
-               </VBox>
-            </content>
-         </ScrollPane>
-      </children>
+      </ScrollPane>
    </VBox>
    <Button minWidth="688.0" mnemonicParsing="false" onMouseClicked="#onGenerate" styleClass="button_inside" text="Generate Ingest">
       <VBox.margin>
          <Insets bottom="10.0" left="30.0" top="10.0" />
+      </VBox.margin>
+   </Button>
+   <Button layoutX="40.0" layoutY="243.0" minWidth="688.0" mnemonicParsing="false" onMouseClicked="#onTest" styleClass="button_inside" text="...">
+      <VBox.margin>
+         <Insets bottom="10.0" left="30.0" />
       </VBox.margin>
    </Button>
 </VBox>

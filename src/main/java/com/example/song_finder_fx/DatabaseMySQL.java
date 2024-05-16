@@ -628,13 +628,19 @@ public class DatabaseMySQL {
         }
 
         try {
-            // Printing Searched Content
-            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getTrackTitle() + " | " + songs.get(0).getSinger());
-            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getTrackTitle() + " | " + songs.get(1).getSinger());
-            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getTrackTitle() + " | " + songs.get(2).getSinger());
+            Platform.runLater(() -> {
+                // Printing Searched Content
+                try {
+                    System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getTrackTitle() + " | " + songs.get(0).getSinger());
+                    System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getTrackTitle() + " | " + songs.get(1).getSinger());
+                    System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getTrackTitle() + " | " + songs.get(2).getSinger());
+                } catch (Exception e) {
+                    System.out.println("End of results");
+                }
 
-            // Printing new line
-            System.out.println("================");
+                // Printing new line
+                System.out.println("================");
+            });
         } catch (IndexOutOfBoundsException e) {
             System.out.println("End of results");
         }

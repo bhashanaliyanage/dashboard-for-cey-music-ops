@@ -18,13 +18,13 @@ public class ProductVersion {
         currentVersion = productVersion;
     }
 
-    public void setServerVerion(double serverVersion, String updateLocation) {
+    public void setServerVersion(double serverVersion, String updateLocation) {
         updateVersion = serverVersion;
         location = updateLocation;
     }
 
     public String getCurrentVersionInfo() {
-        return "Build " + currentVersion + " by Bhashana Liyanage";
+        return "Build " + currentVersion;
     }
 
     public double getCurrentVersionNumber() {

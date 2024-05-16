@@ -2,10 +2,12 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.CSVController;
 import com.example.song_finder_fx.Controller.ItemSwitcher;
-import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.ReportPDF;
+import com.example.song_finder_fx.Controller.RevenueReportController;
+import com.example.song_finder_fx.Model.Artist;
 import com.example.song_finder_fx.Model.ArtistReport;
 import com.example.song_finder_fx.Model.CsvSong;
+import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
@@ -29,8 +31,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
-import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -51,7 +55,6 @@ public class ControllerRevenueGenerator {
 
     //<editor-fold desc="Labels">
     public Label lblUpdateSongsDatabase;
-    public Label lblStatus;
     public Label lblWriter01;
     public Label lblWriter02;
     public Label lblWriter03;
@@ -70,7 +73,6 @@ public class ControllerRevenueGenerator {
     public Label lblISRC_Check;
     public Label lblGross;
     public Label lblP_Share;
-    public Label lblTax;
     public Label lblAmtPayable;
     public Label lblAsset01;
     public Label lblAsset02;
@@ -117,7 +119,7 @@ public class ControllerRevenueGenerator {
     public ComboBox<String> comboPayees;
     public TextField txtRate;
     private final UIController mainUIController;
-    private final ArtistReport report = new ArtistReport();
+    private ArtistReport report = new ArtistReport();
     CSVController csvController = new CSVController();
 
     public ControllerRevenueGenerator(UIController uiController) throws IOException {
@@ -478,63 +480,26 @@ public class ControllerRevenueGenerator {
         Parent newContentMain = loaderMain.load();
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
-        System.out.println("Here!");
-
-        /*Scene scene = mainUIController.mainVBox.getScene();
-        vbArtistReports = (VBox) scene.lookup("#vbArtistReports");*/
 
         Task<Void> task;
 
         task = new Task<>() {
             @Override
             protected Void call() throws SQLException, ClassNotFoundException {
-                Platform.runLater(() -> {
-                    lblStatus.setText("> Checking ISRC Sync...");
-                    comboPayees.setDisable(true);
-                });
+                // lblStatus.setText("Loading Payees...");
+                // ResultSet rsPayees = DatabaseMySQL.getPayees();
+                // ResultSet rsPayees = DatabasePostgres.getPayees(); // Postgres
+                List<String> payees = DatabasePostgres.getPayees();
 
-                ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
-//                ResultSet resultSet = DatabasePostgre.checkMissingISRCs();        //Postgress
-
-                int rowCount = 0;
-
-                while (resultSet.next()) {
-                    if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
-                        rowCount++;
-                    }
+                /*while (rsPayees.next()) {
+                    comboPayees.getItems().add(rsPayees.getString(1));
                 }
+                lblStatus.setVisible(false);
+                imgLoading.setVisible(false);
+                comboPayees.setDisable(false);*/
 
-                System.out.println("rowCount = " + rowCount);
-
-                if (rowCount > 0) {
-                    Platform.runLater(() -> {
-                        lblStatus.setVisible(false);
-                        imgLoading.setVisible(false);
-                        vbArtistReports.setDisable(true);
-                        try {
-                            NotificationBuilder.displayTrayError("ISRC Sync Error", "Please Update Missing ISRCs in Song Database to Sync Payee List");
-                        } catch (AWTException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                        try {
-                            lblStatus.setText("Loading Payees...");
-                            ResultSet rsPayees = DatabaseMySQL.getPayees();
-//                            ResultSet rsPayees = DatabasePostgre.getPayees();     //Postgress
-
-                            while (rsPayees.next()) {
-                                comboPayees.getItems().add(rsPayees.getString(1));
-                            }
-                            lblStatus.setVisible(false);
-                            imgLoading.setVisible(false);
-                            comboPayees.setDisable(false);
-                        } catch (SQLException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                }
+                // Temporary for testing
+                comboPayees.getItems().add("Rohana Weerasinghe");
 
                 return null;
             }
@@ -586,186 +551,102 @@ public class ControllerRevenueGenerator {
         return null;
     }
 
-    public void onLoadReportBtnClick() {
-        report.clear();
+    public void onLoadReportBtnClick() throws SQLException, ClassNotFoundException {
+        // Clearing Report Model
+        report = new ArtistReport();
+
+        // Getting Currency Rate
         String userInputRate = txtRate.getText();
-        double doubleConvertedRate;
         String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
+
         DecimalFormat df = new DecimalFormat("0.00");
-
-        final ArrayList<Double>[] royalty = new ArrayList[]{
-                new ArrayList<Double>()
-        };
-
+        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
         final double[] tax = {0};
         final double[] amountPayable = new double[1];
 
         if (!Objects.equals(selectedItem, null)) {
+            // Resetting ComboBox border
             comboPayees.setStyle("-fx-border-color: '#e9ebee';");
 
+            // Check if the user input is only numbers
             if (userInputRate.matches("\\d+(\\.\\d+)?")) {
-                // When user input is only numbers
                 initializeArtistReportUILabels();
 
-                doubleConvertedRate = Double.parseDouble(userInputRate);
-                Task<Void> taskGrossRevenue = new Task<>() {
-                    @Override
-                    protected Void call() {
-                        try {
-                            royalty[0] = DatabaseMySQL.getPayeeGrossRev(selectedItem);
-//                            royalty[0] = DatabasePostgre.getPayeeGrossRev(selectedItem);      //Postgress
+                // Convert user input rate to a double
+                double convertedRate = Double.parseDouble(userInputRate);
 
-                        } catch (SQLException | ClassNotFoundException e) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Error");
-                            alert.setHeaderText("An error occurred");
-                            alert.setContentText(String.valueOf(e));
-                            Platform.runLater(alert::showAndWait);
-                        }
+                // Getting artist ID
+                int artistID = DatabasePostgres.fetchArtistID(selectedItem);
 
-                        // Converting to LKR
-                        double grossRevenueInLKR = royalty[0].getFirst() * doubleConvertedRate;
-                        double partnerShareInLKR = royalty[0].get(1) * doubleConvertedRate;
+                // Creating artist model by passing artistID
+                ArtistReport report = getArtistReport(artistID, convertedRate);
 
-                        if (grossRevenueInLKR > 100000.00) {
-                            tax[0] = grossRevenueInLKR * 0.14;
-                        }
+                // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
+                double grossRevenue = report.getGrossRevenue();
+                double partnerShare = report.getPartnerShare();
+                double partnerShareInLKR = report.getPartnerShareInLKR();
+                ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
 
-                        // Calculating amount payable
-                        amountPayable[0] = grossRevenueInLKR - tax[0];
+                // Printing calculated values
+                {
+                    System.out.println("Calculated Details for Selected Artist");
+                    System.out.println("========");
 
-                        // Testing values before assigning
+                    System.out.println("Artist: " + report.getArtist().getName());
+                    System.out.println("EUR to LKR Conversion Rate: " + report.getConversionRate());
+                    System.out.println("Date: " + report.getDate());
+                    System.out.println("========");
+
+                    System.out.println("Gross Revenue: EUR " + grossRevenue);
+                    System.out.println("Partner Share: EUR " + partnerShare);
+                    System.out.println("Partner Share: LKR " + partnerShareInLKR);
+                    System.out.println("========");
+
+                    System.out.println("Top Performing Songs");
+                    for (Songs song : topPerformingSongs) {
+                        System.out.println(song.getTrackTitle() + " | " + song.getRoyalty() * convertedRate);
+                    }
+                }
+
+                int count = 0;
+
+                for (Songs song : topPerformingSongs) {
+                    count++;
+
+                    String assetTitle = song.getTrackTitle();
+                    double reportedRoyalty = song.getRoyalty() * convertedRate;
+
+                    if (count == 1) {
                         Platform.runLater(() -> {
-                            System.out.println("selectedItem = " + selectedItem);
-                            System.out.println("grossRevenueInLKR = " + grossRevenueInLKR);
-                            System.out.println("partnerShareInLKR = " + partnerShareInLKR);
-                            System.out.println("tax[0] = " + tax[0]);
-                            System.out.println("amountPayable[0] = " + amountPayable[0]);
-                            System.out.println("InitPreloader.revenue.getMonth() = " + InitPreloader.revenue.getMonth());
+                            lblAsset01.setText(assetTitle);
+                            lblAsset01Streams.setText("LKR " + df.format(reportedRoyalty));
                         });
-                        report.setGrossRevenue(selectedItem, grossRevenueInLKR, partnerShareInLKR, tax[0], amountPayable[0], InitPreloader.revenue.getMonth());
-
-                        // Update UI
+                    } else if (count == 2) {
                         Platform.runLater(() -> {
-                            lblGross.setText(report.getGrossRevenueInLKR());
-                            lblP_Share.setText(report.getPartnerShareInLKR());
-                            lblTax.setText(report.getTaxAmount());
-                            lblAmtPayable.setText(report.getAmountPayable());
+                            lblAsset02.setText(assetTitle);
+                            lblAsset02Streams.setText("LKR " + df.format(reportedRoyalty));
                         });
-                        return null;
+                    } else if (count == 3) {
+                        Platform.runLater(() -> {
+                            lblAsset03.setText(assetTitle);
+                            lblAsset03Streams.setText("LKR " + df.format(reportedRoyalty));
+                        });
+                    } else if (count == 4) {
+                        Platform.runLater(() -> {
+                            lblAsset04.setText(assetTitle);
+                            lblAsset04Streams.setText("LKR " + df.format(reportedRoyalty));
+                        });
+                    } else if (count == 5) {
+                        Platform.runLater(() -> {
+                            lblAsset05.setText(assetTitle);
+                            lblAsset05Streams.setText("LKR " + df.format(reportedRoyalty));
+                        });
                     }
-                };
+                }
 
-                Task<Void> taskCoWriterShare = new Task<>() {
-                    @Override
-                    protected Void call() throws SQLException, ClassNotFoundException {
-                        // Get the co-writer name and share in EUR from the database
-                        ResultSet rsCoWriterShares = DatabaseMySQL.getCoWriterShares(selectedItem);
-//                        ResultSet rsCoWriterShares = DatabasePostgre.getCoWriterShares(selectedItem);     //Postgress
-
-                        int count = 0;
-
-                        while (rsCoWriterShares.next()) { // Looping through writer 01 - 05
-                            count++;
-                            String artist = rsCoWriterShares.getString(1);
-                            double share = rsCoWriterShares.getDouble(2) * doubleConvertedRate;
-                            report.addCoWriter(artist);
-                            report.addCoWriterShare(share);
-
-                            if (count == 1) {
-                                Platform.runLater(() -> {
-                                    lblWriter01.setText(artist);
-                                    lblWriter01Streams.setText(df.format(share));
-                                });
-                            } else if (count == 2) {
-                                Platform.runLater(() -> {
-                                    lblWriter02.setText(artist);
-                                    lblWriter02Streams.setText(df.format(share));
-                                });
-                            } else if (count == 3) {
-                                Platform.runLater(() -> {
-                                    lblWriter03.setText(artist);
-                                    lblWriter03Streams.setText(df.format(share));
-                                });
-                            } else if (count == 4) {
-                                Platform.runLater(() -> {
-                                    lblWriter04.setText(artist);
-                                    lblWriter04Streams.setText(df.format(share));
-                                });
-                            } else if (count == 5) {
-                                Platform.runLater(() -> {
-                                    lblWriter05.setText(artist);
-                                    lblWriter05Streams.setText(df.format(share));
-                                });
-                            }
-                        }
-
-                        return null;
-                    }
-                };
-
-                Task<Void> taskTopPerformingSongs = new Task<>() {
-                    @Override
-                    protected Void call() throws Exception {
-                        ResultSet rsTopPerformingSongs = DatabaseMySQL.getTopPerformingSongsEdit(selectedItem);
-//                        ResultSet rsTopPerformingSongs = DatabasePostgre.getTopPerformingSongsEdit(selectedItem);     //Postgress
-
-                        int count = 0;
-
-                        while (rsTopPerformingSongs.next()) {
-                            count++;
-
-                            String assetTitle = rsTopPerformingSongs.getString(1);
-                            String payee = rsTopPerformingSongs.getString(2);
-                            double reportedRoyalty = rsTopPerformingSongs.getDouble(4);
-
-                            report.setTopPerformingSongDetails(assetTitle, payee, df.format(reportedRoyalty * doubleConvertedRate));
-
-                            if (count == 1) {
-                                Platform.runLater(() -> {
-                                    lblAsset01.setText(assetTitle + " (" + payee + ")");
-                                    lblAsset01Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
-                                });
-                            } else if (count == 2) {
-                                Platform.runLater(() -> {
-                                    lblAsset02.setText(assetTitle + " (" + payee + ")");
-                                    lblAsset02Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
-                                });
-                            } else if (count == 3) {
-                                Platform.runLater(() -> {
-                                    lblAsset03.setText(assetTitle + " (" + payee + ")");
-                                    lblAsset03Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
-                                });
-                            } else if (count == 4) {
-                                Platform.runLater(() -> {
-                                    lblAsset04.setText(assetTitle + " (" + payee + ")");
-                                    lblAsset04Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
-                                });
-                            } else if (count == 5) {
-                                Platform.runLater(() -> {
-                                    lblAsset05.setText(assetTitle + " (" + payee + ")");
-                                    lblAsset05Streams.setText(df.format(reportedRoyalty * doubleConvertedRate));
-                                });
-                            }
-                        }
-
-                        return null;
-                    }
-                };
-
-                taskCoWriterShare.setOnSucceeded(event -> {
-                    Thread threadTopPerformingSongs = new Thread(taskTopPerformingSongs);
-                    threadTopPerformingSongs.start();
-                });
-
-                taskGrossRevenue.setOnSucceeded(event -> {
-                    Thread threadCoWriterShare = new Thread(taskCoWriterShare);
-                    threadCoWriterShare.start();
-                });
-
-                Thread threadGrossRevenue = new Thread(taskGrossRevenue);
-                threadGrossRevenue.start();
-
+                lblGross.setText("EUR " + df.format(grossRevenue));
+                lblP_Share.setText("EUR " + df.format(partnerShare));
+                lblAmtPayable.setText("LKR " + df.format(partnerShareInLKR));
             } else {
                 // When User Input Contains Texts
                 txtRate.setStyle("-fx-border-color: red;");
@@ -776,12 +657,25 @@ public class ControllerRevenueGenerator {
         }
     }
 
+    private static ArtistReport getArtistReport(int artistID, double convertedRate) throws SQLException, ClassNotFoundException {
+        Artist artist = new Artist(artistID);
+
+        // Creating revenue report model by passing artist object and conversion rate
+        ArtistReport report = new ArtistReport(artist, convertedRate);
+
+        // Creating revenue report controller object
+        RevenueReportController revenueReportController = new RevenueReportController(report);
+
+        // Revenue report controller will have a method called calculate revenue (inputs report object and returns gross revenue, partner share, conversion rate, date, co-writer payment summary via report object)
+        report = revenueReportController.calculateRevenue();
+        return report;
+    }
+
     private void initializeArtistReportUILabels() {
         // Top bar labels
         txtRate.setStyle("-fx-border-color: '#e9ebee';");
         lblGross.setText("Loading...");
         lblP_Share.setText("Loading...");
-        lblTax.setText("Loading...");
         lblAmtPayable.setText("Loading...");
 
         // Co-Writer labels
@@ -937,23 +831,18 @@ public class ControllerRevenueGenerator {
     }
 
     //Write Csv file
-    public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath, String[] upcArray, String albumTitle, int startNum, String catelog, String PrimaryArtist,String ISRC) {
+    public static void writeCSVFile1(List<CsvSong> sgList, File csvFilePath, String[] upcArray, String albumTitle, int startNum, String catelog, String PrimaryArtist, String ISRC) {
 
         String UPC1 = null;
         String titl = null;
         int UPC = 0;
-        String s= ISRC.substring(7);
+        String s = ISRC.substring(7);
         int isr = Integer.parseInt(s);
-        String isrcName = ISRC.substring(0,8);
+        String isrcName = ISRC.substring(0, 8);
 
         System.out.println("write method");
         try (CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFilePath))) {
-            String[] headerRecord = {"Fname", "Album title", "Album version", "UPC", "Catalog number", "Primary Artists", "Featuring artists", "Release date", "Main genre", "Main subgenre", "Alternate genre", "Alternate subgenre",
-                    "Label", "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory", "Recording year", "Recording location", "Album format", "Number of volumes",
-                    "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier", "Track title", "Track version", "ISRC", "Track primary artists", "Featuring artists",
-                    "Volume number", "Track main genre", "Track main subgenre", "Track alternate genre", "Track alternate subgenre", "Track language (Metadata)", "Audio language", "Lyrics", "Available separately",
-                    "Track parental advisory", "Preview start", "Preview length", "Track recording year", "Track recording location", "Contributing artists", "Composer", "Lyrics", "Remixers",
-                    "Performers", "Producers", "Writers", "Publishers", "Track sequence", "Track catalog tier", "Original file name", "Original release date"}; // CSV Head
+            String[] headerRecord = {"Fname", "Album title", "Album version", "UPC", "Catalog number", "Primary Artists", "Featuring artists", "Release date", "Main genre", "Main subgenre", "Alternate genre", "Alternate subgenre", "Label", "CLine year", "CLine name", "PLine year", "PLine name", "Parental advisory", "Recording year", "Recording location", "Album format", "Number of volumes", "Territories", "Excluded territories", "Language (Metadata)", "Catalog tier", "Track title", "Track version", "ISRC", "Track primary artists", "Featuring artists", "Volume number", "Track main genre", "Track main subgenre", "Track alternate genre", "Track alternate subgenre", "Track language (Metadata)", "Audio language", "Lyrics", "Available separately", "Track parental advisory", "Preview start", "Preview length", "Track recording year", "Track recording location", "Contributing artists", "Composer", "Lyrics", "Remixers", "Performers", "Producers", "Writers", "Publishers", "Track sequence", "Track catalog tier", "Original file name", "Original release date"}; // CSV Head
             csvWriter.writeNext(headerRecord);
             int count = 0;
             int titlenum1 = startNum;
@@ -965,26 +854,26 @@ public class ControllerRevenueGenerator {
                 String ly = cs.getLyrics();
                 String com = cs.getComposer();
                 String artist = null;
-                if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist))  {
+                if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist) && sg.equalsIgnoreCase(PrimaryArtist)) {
                     artist = PrimaryArtist;
 //                    System.out.println(artist+"1");
                 } else if (ly.equalsIgnoreCase(PrimaryArtist) && com.equalsIgnoreCase(PrimaryArtist)) {
-                    artist = ly+"|"+com+"|"+sg;
+                    artist = ly + "|" + com + "|" + sg;
 //                    System.out.println(artist+"2");
-                } else if(sg.equalsIgnoreCase(PrimaryArtist) && ly.equalsIgnoreCase(PrimaryArtist)){
+                } else if (sg.equalsIgnoreCase(PrimaryArtist) && ly.equalsIgnoreCase(PrimaryArtist)) {
 
-                    artist = ly + "|"  + sg+"|"+com;
+                    artist = ly + "|" + sg + "|" + com;
 //                    System.out.println(artist+"3");
-                }else if(com.equalsIgnoreCase(PrimaryArtist)&& sg.equalsIgnoreCase(PrimaryArtist)){
-                    artist = com+"|"+sg+"|"+ly;
-                }else if(com.equalsIgnoreCase(PrimaryArtist)){
-                    artist=com+"|"+sg+"|"+ly;
-                }else if(ly.equalsIgnoreCase(PrimaryArtist)){
-                    artist=ly+"|"+sg+"|"+com;
-                }else if(sg.equalsIgnoreCase(PrimaryArtist)){
-                    artist=sg+"|"+ly+"|"+com;
-                }else{
-                    artist=null;
+                } else if (com.equalsIgnoreCase(PrimaryArtist) && sg.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = com + "|" + sg + "|" + ly;
+                } else if (com.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = com + "|" + sg + "|" + ly;
+                } else if (ly.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = ly + "|" + sg + "|" + com;
+                } else if (sg.equalsIgnoreCase(PrimaryArtist)) {
+                    artist = sg + "|" + ly + "|" + com;
+                } else {
+                    artist = null;
                 }
                 //add UPC
 //                UPC1 = String.valueOf(u);
@@ -1007,7 +896,7 @@ public class ControllerRevenueGenerator {
 //                int isr = Integer.parseInt(s);
 //                String isrcName = ISRC.substring(0,7);
 
-                String isrc = isrcName+isr;
+                String isrc = isrcName + isr;
 
                 String trackPrimaryArtist = ly + " | " + sg + " | " + com;
                 String compoNlyrics = com + " | " + ly;
@@ -1017,12 +906,7 @@ public class ControllerRevenueGenerator {
 //                    albumTitle1 = albumTitle+". Vol. "+titl;
                 }
 
-                String[] dataRecord = {"", albumTitle1, "", UPC1, catelog, PrimaryArtist, "", releasedate, "pop", "", "", "",
-                        "CeyMusic Records", curruntYear, "CeyMusic Publishing", curruntYear, "CeyMusic Records", "N", curruntYear, "Sri Lanka", "Album", "1",
-                        "World", "", "Si", "", cs.getSongTitle(), "", isrc, trackPrimaryArtist, cs.getSinger(),
-                        "1", "pop", "", "", "", "SI", "SI", "", "Y",
-                        "N", "0", "120", curruntYear, "Sri Lanka", "", cs.getComposer(), cs.getLyrics(), "",
-                        "", "", compoNlyrics, "CeyMusic Publishing", String.valueOf(count), "Mid", cs.getFileName(), releasedate};
+                String[] dataRecord = {"", albumTitle1, "", UPC1, catelog, PrimaryArtist, "", releasedate, "pop", "", "", "", "CeyMusic Records", curruntYear, "CeyMusic Publishing", curruntYear, "CeyMusic Records", "N", curruntYear, "Sri Lanka", "Album", "1", "World", "", "Si", "", cs.getSongTitle(), "", isrc, trackPrimaryArtist, cs.getSinger(), "1", "pop", "", "", "", "SI", "SI", "", "Y", "N", "0", "120", curruntYear, "Sri Lanka", "", cs.getComposer(), cs.getLyrics(), "", "", "", compoNlyrics, "CeyMusic Publishing", String.valueOf(count), "Mid", cs.getFileName(), releasedate};
                 csvWriter.writeNext(dataRecord);
 
 //COMMENTED FOR TEST WORKING CODE

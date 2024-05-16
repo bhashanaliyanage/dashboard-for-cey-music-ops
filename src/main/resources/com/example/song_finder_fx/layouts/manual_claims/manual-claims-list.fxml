@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIControllers.ControllerMCList">
+<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCList">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -34,7 +34,7 @@
          </HBox.margin>
       </Label>
     </HBox>
-   <VBox maxWidth="688.0" prefWidth="688.0" styleClass="clickable-pane-bg" stylesheets="@../../styles.css">
+   <VBox maxWidth="688.0" minHeight="100.0" prefWidth="688.0" styleClass="clickable-pane-bg" stylesheets="@../../styles.css">
       <Pane>
          <VBox.margin>
             <Insets />
@@ -79,7 +79,7 @@
          <HBox layoutX="11.0" layoutY="11.0" spacing="10.0">
             <children>
                <Button minWidth="328.0" mnemonicParsing="false" onAction="#onArchiveSelected" styleClass="button_inside" text="Archive Selected" />
-               <Button minWidth="328.0" mnemonicParsing="false" onAction="#onCheck" styleClass="button_inside" text="Check Checkboxes" />
+               <Button minWidth="328.0" mnemonicParsing="false" onAction="#onCheck" styleClass="button_inside" text="Create Ingest" />
             </children>
             <VBox.margin>
                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -89,7 +89,7 @@
    </VBox>
    <ScrollPane hbarPolicy="NEVER" minWidth="692.0" VBox.vgrow="ALWAYS">
       <VBox.margin>
-         <Insets left="28.0" right="30.0" top="-4.0" />
+         <Insets bottom="10.0" left="28.0" right="30.0" top="-4.0" />
       </VBox.margin>
       <content>
          <VBox fx:id="vbClaimsList" maxWidth="688.0" minWidth="688.0" spacing="10.0" styleClass="textarea-bg">

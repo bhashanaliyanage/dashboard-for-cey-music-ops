@@ -1,8 +1,10 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.NotificationBuilder;
+import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
+import com.example.song_finder_fx.Session.UserSession;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -46,10 +48,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class UIController {
+public class UIController implements com.example.song_finder_fx.Constants.UINode {
     public VBox sideVBox;
     private final NotificationBuilder nb = new NotificationBuilder();
-    public static final Node[] mainNodes = new Node[7];
     private final Search search = new Search();
 
 
@@ -65,6 +66,8 @@ public class UIController {
     public Button btnOpenLocation;
     public Button btnCopyTo;
     public Button btnAudioDatabase;
+    @FXML
+    private HBox btnArtistReports;
     //</editor-fold>
 
     //<editor-fold desc="ImageView">
@@ -119,6 +122,10 @@ public class UIController {
     public Label searchResultISRC;
     public Label songFeaturing;
     public Label songFeaturingCopied;
+    @FXML
+    private Label lblUser;
+    @FXML
+    private Label lblUserEmailAndUpdate;
     //</editor-fold>
 
     //<editor-fold desc="ScrollPane">
@@ -142,7 +149,40 @@ public class UIController {
 
     //</editor-fold>
     //</editor-fold>
-    public UIController() throws IOException {
+
+    @FXML
+    public void initialize() throws SQLException {
+        System.out.println("Initializing UI...");
+
+        // Loading user
+        UserSession userSession = new UserSession();
+        Main.userSession = userSession;
+
+        if (userSession.isLoggedIn()) {
+            int privilegeLevel = userSession.getPrivilegeLevel();
+
+            lblUser.setText(userSession.getNickName());
+            lblUserEmailAndUpdate.setText(userSession.getEmail());
+
+            if (privilegeLevel == 3) {
+                try {
+                    btnRevenueAnalysis.setDisable(true);
+                    btnArtistReports.setDisable(true);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (privilegeLevel == 2) {
+                btnRevenueAnalysis.setDisable(false);
+                btnArtistReports.setDisable(false);
+            }
+        } else {
+            try {
+                btnRevenueAnalysis.setDisable(true);
+                btnArtistReports.setDisable(true);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public static void setAllScenes() throws IOException {
@@ -553,9 +593,13 @@ public class UIController {
                     Label lblArtist = (Label) nodes[i].lookup("#songSinger");
                     Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
                     Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
+
                     lblSongName.setText(songList.get(i).getTrackTitle());
+//                    lblSongName.setText("test art");
                     lblISRC.setText(songList.get(i).getISRC().trim());
+
                     lblArtist.setText(songList.get(i).getSinger().trim());
+//                        lblArtist.setText("test name");
                     lblComposer.setText(songList.get(i).getComposer().trim());
                     lblLyricist.setText(songList.get(i).getLyricist().trim());
                     vboxSong.getChildren().add(nodes[i]);
@@ -1036,8 +1080,30 @@ public class UIController {
     //</editor-fold>
 
     public void onAboutButtonClicked() throws IOException {
-        ControllerSettings cs = new ControllerSettings(this);
-        cs.loadAbout(mainNodes[1]);
+        if (Main.userSession.isLoggedIn()) {
+            ControllerSettings cs = new ControllerSettings(this);
+            cs.loadAbout(mainNodes[1]);
+        } else {
+            // System.out.println("Load Log In | Sign Up View...");
+            // SceneController.loadLayout("layouts/user/login_signup.fxml");
+            Node node = SceneController.loadLayout("layouts/user/login_signup.fxml");
+            mainVBox.getChildren().setAll(node);
+
+            if (Main.versionInfo.updateAvailable()) {
+                loadUpdate();
+            }
+        }
+    }
+
+    private void loadUpdate() throws IOException {
+        FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-update.fxml"));
+        loader.setController(this);
+        Parent sidepanelContent = loader.load();
+
+        sideVBox.getChildren().clear();
+        sideVBox.getChildren().add(sidepanelContent);
+
+        // lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
     }
 
     public void onRevenueAnalysisBtnClick() throws IOException {

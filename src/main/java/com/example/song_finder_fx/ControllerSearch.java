@@ -90,31 +90,31 @@ public class ControllerSearch {
     @FXML
     void btnSetSearchTypeComposer() {
         lblSearchType.setText("Composer");
-        search.setType("COMPOSER");
+        search.setType("artist");
     }
 
     @FXML
     void btnSetSearchTypeISRC() {
         lblSearchType.setText("ISRC");
-        search.setType("ISRC");
+        search.setType("isrc");
     }
 
     @FXML
     void btnSetSearchTypeLyricist() {
         lblSearchType.setText("Lyricist");
-        search.setType("LYRICIST");
+        search.setType("artist");
     }
 
     @FXML
     void btnSetSearchTypeName() {
         lblSearchType.setText("Name");
-        search.setType("TRACK_TITLE");
+        search.setType("song_name");
     }
 
     @FXML
     void btnSetSearchTypeSinger() {
         lblSearchType.setText("Singer");
-        search.setType("SINGER");
+        search.setType("artist");
     }
 
     @FXML
@@ -460,7 +460,7 @@ public class ControllerSearch {
         String query = searchArea.getText();
         query = query.replace(" ", "+");
         query = "https://www.google.com/search?q=" + query + "+lyrics";
-        System.out.println("query = " + query);
+        // System.out.println("query = " + query);
 
         try {
             if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {

@@ -5,12 +5,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.IOException;
@@ -53,9 +52,11 @@ public class SceneController {
         return node.getScene();
     }
 
-    public static Window getWindowFromMouseEvent(MouseEvent event) {
-        Scene scene = ((Button) event.getSource()).getScene();
-        Stage stage = (Stage) scene.getWindow();
-        return stage;
+    public static Window getWindowFromScene(Scene scene) {
+        return scene.getWindow();
+    }
+
+    public static HBox getHBoxFromScene(Scene scene, String fxid) {
+        return (HBox) scene.lookup("#" + fxid);
     }
 }

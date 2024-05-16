@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="250.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIControllers.ControllerManualClaimEdit">
+<VBox prefWidth="250.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerManualClaimEdit">
    <Label text="Edit Claim">
       <font>
          <Font name="Segoe UI Semibold" size="19.0" />
@@ -28,9 +31,38 @@
             <Insets left="5.0" />
          </HBox.margin></Label>
    </HBox>
-   <VBox>
+   <VBox layoutX="30.0" layoutY="85.0">
       <VBox.margin>
          <Insets left="20.0" right="20.0" top="30.0" />
+      </VBox.margin>
+      <ImageView fx:id="imgPreview" fitHeight="210.0" fitWidth="210.0" onMouseClicked="#onChangeImageClicked" pickOnBounds="true" preserveRatio="true">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <Image url="@../../images/Green%20Gradient.jpg" />
+      </ImageView>
+   </VBox>
+   <VBox>
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="5.0" />
+      </VBox.margin>
+      <Label fx:id="lblLink" onMouseClicked="#onLinkClick" text="link" textFill="#656565" underline="true">
+         <font>
+            <Font name="System Italic" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Label>
+   </VBox>
+   <Button layoutX="30.0" layoutY="539.0" mnemonicParsing="false" onAction="#onYoutubeRequested" prefHeight="27.0" prefWidth="210.0" styleClass="button-big" text="Watch on Youtube">
+      <VBox.margin>
+         <Insets left="20.0" top="10.0" />
+      </VBox.margin>
+   </Button>
+   <VBox>
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="20.0" />
       </VBox.margin>
       <Label text="Song Name" />
       <TextField fx:id="txtSongName" promptText="Song Name" styleClass="textarea-bg">

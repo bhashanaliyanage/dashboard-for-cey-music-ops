@@ -23,7 +23,7 @@
             <Font name="Segoe UI Semibold" size="28.0" />
          </font>
       </Label>
-      <Label fx:id="lblStatus" layoutX="10.0" layoutY="10.0" text="| Loading..." textFill="#656565">
+      <Label fx:id="lblStatus" layoutX="10.0" layoutY="10.0" text="| Loading..." textFill="#656565" visible="false">
          <font>
             <Font name="Segoe UI Semibold" size="28.0" />
          </font>
@@ -31,7 +31,7 @@
             <Insets left="10.0" />
          </HBox.margin>
       </Label>
-      <ImageView fx:id="imgLoading" fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="imgLoading" fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" visible="false">
          <HBox.margin>
             <Insets left="10.0" />
          </HBox.margin>
@@ -59,18 +59,10 @@
          </HBox.margin>
       </Button>
    </HBox>
-   <HBox alignment="CENTER" layoutX="40.0" layoutY="110.0" prefHeight="70.0" prefWidth="200.0" spacing="70.0">
+   <HBox alignment="CENTER" layoutX="40.0" layoutY="110.0" prefHeight="70.0" prefWidth="200.0" spacing="130.0">
       <VBox.margin>
          <Insets left="30.0" right="30.0" top="30.0" />
       </VBox.margin>
-      <VBox alignment="CENTER_LEFT">
-         <Label text="Amount Payable" />
-         <Label fx:id="lblAmtPayable" layoutX="10.0" layoutY="10.0" text="N/A" textFill="#23ce6b">
-            <font>
-               <Font name="Segoe UI Semibold" size="16.0" />
-            </font>
-         </Label>
-      </VBox>
       <VBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0">
          <Label text="Gorss Revenue Produced" />
          <Label fx:id="lblGross" layoutX="10.0" layoutY="10.0" text="N/A" textFill="#007ea7">
@@ -80,16 +72,16 @@
          </Label>
       </VBox>
       <VBox alignment="CENTER_LEFT" layoutX="38.0" layoutY="10.0">
-         <Label text="Partner Share" />
+         <Label text="Partner Share of Gross" />
          <Label fx:id="lblP_Share" layoutX="10.0" layoutY="10.0" text="N/A" textFill="#007ea7">
             <font>
                <Font name="Segoe UI Semibold" size="16.0" />
             </font>
          </Label>
       </VBox>
-      <VBox alignment="CENTER_LEFT" layoutX="66.0" layoutY="10.0">
-         <Label text="14% TAX (If Applicable)" />
-         <Label fx:id="lblTax" layoutX="10.0" layoutY="10.0" text="N/A" textFill="#9c6615">
+      <VBox alignment="CENTER_LEFT">
+         <Label text="Amount Payable" />
+         <Label fx:id="lblAmtPayable" layoutX="10.0" layoutY="10.0" text="N/A" textFill="#23ce6b">
             <font>
                <Font name="Segoe UI Semibold" size="16.0" />
             </font>
@@ -100,7 +92,7 @@
       <VBox.margin>
          <Insets left="30.0" right="30.0" top="30.0" />
       </VBox.margin>
-      <VBox fx:id="vboxTopStreams" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+      <VBox fx:id="vboxTopStreams" disable="true" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
          <Group>
             <VBox.margin>
                <Insets left="20.0" top="20.0" />
@@ -121,20 +113,20 @@
          </Group>
          <HBox fx:id="asset01">
             <VBox.margin>
-               <Insets left="20.0" top="30.0"/>
+               <Insets left="20.0" top="30.0" />
             </VBox.margin>
             <Label fx:id="lblWriter01" text="N/A">
                <cursor>
-                  <Cursor fx:constant="DEFAULT"/>
+                  <Cursor fx:constant="DEFAULT" />
                </cursor>
             </Label>
             <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                <HBox.margin>
-                  <Insets right="30.0"/>
+                  <Insets right="30.0" />
                </HBox.margin>
                <Label fx:id="lblWriter01Streams" text="N/A">
                   <cursor>
-                     <Cursor fx:constant="DEFAULT"/>
+                     <Cursor fx:constant="DEFAULT" />
                   </cursor>
                </Label>
             </HBox>
@@ -142,20 +134,20 @@
          <HBox fx:id="asset02" layoutX="31.0" layoutY="106.0" prefWidth="529.0">
             <Label fx:id="lblWriter02" text="N/A">
                <cursor>
-                  <Cursor fx:constant="DEFAULT"/>
+                  <Cursor fx:constant="DEFAULT" />
                </cursor>
                <padding>
-                  <Insets left="20.0" top="10.0"/>
+                  <Insets left="20.0" top="10.0" />
                </padding>
             </Label>
             <HBox alignment="BOTTOM_RIGHT" HBox.hgrow="ALWAYS">
                <HBox.margin>
-                  <Insets right="30.0"/>
+                  <Insets right="30.0" />
                </HBox.margin>
                <children>
                   <Label fx:id="lblWriter02Streams" text="N/A">
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
                </children>

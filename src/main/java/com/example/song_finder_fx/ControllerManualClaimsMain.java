@@ -1,7 +1,5 @@
-package com.example.song_finder_fx.UIControllers;
+package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.ControllerSettings;
-import com.example.song_finder_fx.DatabasePostgres;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
