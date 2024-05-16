@@ -1088,7 +1088,22 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             // SceneController.loadLayout("layouts/user/login_signup.fxml");
             Node node = SceneController.loadLayout("layouts/user/login_signup.fxml");
             mainVBox.getChildren().setAll(node);
+
+            if (Main.versionInfo.updateAvailable()) {
+                loadUpdate();
+            }
         }
+    }
+
+    private void loadUpdate() throws IOException {
+        FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-update.fxml"));
+        loader.setController(this);
+        Parent sidepanelContent = loader.load();
+
+        sideVBox.getChildren().clear();
+        sideVBox.getChildren().add(sidepanelContent);
+
+        // lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
     }
 
     public void onRevenueAnalysisBtnClick() throws IOException {

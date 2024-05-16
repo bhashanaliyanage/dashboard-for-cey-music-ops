@@ -228,7 +228,7 @@ public class DatabasePostgres {
     public static List<ManualClaimTrack> getManualClaims() throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
-        String query = "SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork, date FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY public.manual_claims.claim_id ASC;";
+        String query = "SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork, date, claim_type FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY claim_type ASC, claim_id ASC;";
         ResultSet resultSet = statement.executeQuery(query);
         List<ManualClaimTrack> manualClaims = new ArrayList<>();
 
@@ -244,9 +244,10 @@ public class DatabasePostgres {
                 byte[] previewImageBytes = resultSet.getBytes(8);
                 byte[] artworkImageBytes = resultSet.getBytes(9);
                 Date date = resultSet.getDate(10);
+                int claimType = resultSet.getInt(11);
                 LocalDate localDate = sqlDateToLocalDate(date);
 
-                ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink, localDate);
+                ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink, localDate, claimType);
 
                 // Set the images to model
                 try {
@@ -473,8 +474,8 @@ public class DatabasePostgres {
         Connection conn = getConn();
         PreparedStatement preparedStatement = conn.prepareStatement(
                 "INSERT INTO public.manual_claims " +
-                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, artwork, preview_image, date) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, artwork, preview_image, date, claim_type) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         // Get artwork
@@ -496,6 +497,7 @@ public class DatabasePostgres {
         preparedStatement.setBytes(7, artwork);
         preparedStatement.setBytes(8, previewImage);
         preparedStatement.setDate(9, Date.valueOf(claim.getDate()));
+        preparedStatement.setInt(10, claim.getClaimType());
 
         // Execute the prepared statement
         return preparedStatement.executeUpdate();
@@ -847,7 +849,7 @@ public class DatabasePostgres {
         double d = 0.0;
         try {
             List<PayeeForReport> pr = new ArrayList<PayeeForReport>();
-            pr = getPayeRepot1(name);
+            pr = getPayeeReport1(name);
 
             for (int i = 0; i < pr.size(); i++) {
                 PayeeForReport dd = pr.get(i);
@@ -880,8 +882,8 @@ public class DatabasePostgres {
 
     }
 
-    public static List<PayeeForReport> getPayeRepot1(String name) {
-        System.out.println("oaye repot 1");
+    public static List<PayeeForReport> getPayeeReport1(String name) {
+        System.out.println("Getting Payee Report for: " + name);
         String sql = "   SELECT ip.isrc," + "       SUM(  CASE    WHEN ip.payee ='\" + arname + \"' THEN ip.share"
                 + "               WHEN ip.payee01 = '\" + arname + \"' THEN ip.payee01share"
                 + "               ELSE ip.payee02share  END ) AS total_payee_share, SUM( rv.reported_royalty_for_ceymusic / 100 * CASE "
@@ -901,8 +903,6 @@ public class DatabasePostgres {
             ps.setString(3, name);
             ps.setString(4, name);
             ps.setString(5, name);
-//			ps.setString(6, name);
-//			ps.setString(7, name);
             System.out.println();
 //			System.out.println(ps);
             ResultSet rs = ps.executeQuery();
@@ -1145,6 +1145,59 @@ public class DatabasePostgres {
         }
 
         return artists;
+    }
+
+    public static List<CoWriterSummary> getCoWriterPaymentSummary(String artistName) throws SQLException {
+        Connection conn = getConn();
+        List<CoWriterSummary> list = new ArrayList<>();
+
+        PreparedStatement ps = conn.prepareStatement("SELECT \n" +
+                "    CASE \n" +
+                "        WHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist)\n" +
+                "        ELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)\n" +
+                "    END AS contributor,\n" +
+                "    SUM(rep.after_deduction_royalty) AS total_royalty\n" +
+                "FROM public.isrc_payees ip\n" +
+                "JOIN SONGS S ON IP.ISRC = S.ISRC\n" +
+                "JOIN public.\"testRep1\" rep ON IP.ISRC = rep.asset_isrc\n" +
+                "WHERE (ip.payee = ? AND ip.share = 100)\n" +
+                "GROUP BY contributor\n" +
+                "ORDER BY total_royalty DESC LIMIT 5;");
+        ps.setString(1, artistName);
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            String contributor = rs.getString(1);
+            double royalty = rs.getDouble(2);
+
+            CoWriterSummary summary = new CoWriterSummary(contributor, royalty);
+
+            list.add(summary);
+        }
+
+        return list;
+    }
+
+    public static ManualClaimTrack getManualClaim(int claimIDInt) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT song_name, composer, lyricist, youtube_id, " +
+                "trim_start, trim_end, artwork, preview_image, date, claim_type FROM public.manual_claims " +
+                "WHERE claim_id = ?;");
+        ps.setInt(1, claimIDInt);
+        ResultSet rs = ps.executeQuery();
+        if (rs.isBeforeFirst()) {
+            rs.next();
+            String trackName = rs.getString(1);
+            String composer = rs.getString(2);
+            String lyricist = rs.getString(3);
+            String ytID = rs.getString(4);
+            Date date = rs.getDate(9);
+            LocalDate localDate = sqlDateToLocalDate(date);
+            int claimType = rs.getInt(10);
+            return new ManualClaimTrack(claimIDInt, trackName, lyricist, composer, ytID, localDate, claimType);
+        }
+        return null;
     }
 
     public List<Payee> check(String name) {
@@ -1818,7 +1871,7 @@ public class DatabasePostgres {
 
     }
 
-    public static List<CoWriterShare> getCoWriterShareNew2(String artist) throws SQLException {
+    public static List<CoWriterShare> getCoWriterPayments(String artist) throws SQLException {
         List<CoWriterShare> crLlist = new ArrayList<>();
         String sql = "SELECT \n" +
                 "\tip.isrc,\n" +
@@ -1850,6 +1903,7 @@ public class DatabasePostgres {
             cr.setComposer(rs.getString(7));
             cr.setLyricist(rs.getString(8));
             cr.setSongType(rs.getString(9));
+            cr.setShare(rs.getInt(5) + "%");
             crLlist.add(cr);
         }
         return crLlist;

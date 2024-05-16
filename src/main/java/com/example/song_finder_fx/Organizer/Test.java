@@ -42,8 +42,8 @@ public class Test {
         ManualClaimsController manualClaimsController = new ManualClaimsController(claims);
         // manualClaimsController.generateCSV(path);*/
 
-        // testArtistReports();
-        testArtistReportPDF();
+        testArtistReports();
+        // testArtistReportPDF();
     }
 
     private static void testArtistReportPDF() throws SQLException, IOException {
@@ -65,7 +65,7 @@ public class Test {
         double grossRevenue = report.getGrossRevenueInLKR();
         double partnerShare = report.getPartnerShareInLKR();
         ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
-        List<CoWriterShare> coWriterShare = report.getCoWritterList();
+        List<CoWriterSummary> coWriterSummaries = report.getCoWriterPaymentSummary();
 
         // Printing calculated values
         System.out.println("Calculated Details for Selected Artist");
@@ -87,12 +87,10 @@ public class Test {
         System.out.println("========");
 
         System.out.println("Co-Writer Share");
-        for (CoWriterShare share : coWriterShare) {
-            String songName = share.getSongName();
-            double royalty = share.getRoyalty();
-            String contributor = share.getContributor();
-
-            System.out.println(songName + " | " + royalty + " | " + contributor);
+        for (CoWriterSummary summary : coWriterSummaries) {
+            String contributor = summary.getContributor();
+            double royalty = summary.getRoyalty();
+            System.out.println(contributor + " | " + royalty);
         }
     }
 

@@ -118,7 +118,7 @@ public class InitPreloader implements Initializable {
                     versionDetails.next();
                     System.out.println("versionDetails = " + versionDetails.getDouble(1));
                     updateLocation = versionDetails.getString(2);
-                    Main.versionInfo.setServerVerion(versionDetails.getDouble(1), versionDetails.getString(2));
+                    Main.versionInfo.setServerVersion(versionDetails.getDouble(1), versionDetails.getString(2));
                 }
             } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);

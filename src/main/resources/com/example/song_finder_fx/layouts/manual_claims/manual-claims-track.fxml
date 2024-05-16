@@ -41,42 +41,34 @@
          </VBox>
       </HBox>
       <HBox layoutX="21.0" layoutY="21.0" prefWidth="200.0" spacing="10.0">
-         <children>
-            <VBox HBox.hgrow="ALWAYS">
-               <children>
-                  <Label text="Lyricist" textFill="#656565">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                  </Label>
-                  <TextField fx:id="txtLyricist" onAction="#onLyricistAction" prefHeight="30.0" promptText="Lyricist" styleClass="textarea-bg">
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </TextField>
-               </children>
-            </VBox>
-            <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label text="Composer" textFill="#656565">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                  </Label>
-                  <HBox alignment="CENTER_LEFT" spacing="5.0">
-                     <children>
-                        <TextField fx:id="txtComposer" prefHeight="30.0" promptText="Composer" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-               </children>
-            </VBox>
-         </children>
          <VBox.margin>
             <Insets top="10.0" />
          </VBox.margin>
+         <VBox HBox.hgrow="ALWAYS">
+            <Label text="Lyricist" textFill="#656565">
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+            </Label>
+            <TextField fx:id="txtLyricist" onAction="#onLyricistAction" prefHeight="30.0" promptText="Lyricist" styleClass="textarea-bg">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </TextField>
+         </VBox>
+         <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+            <Label text="Composer" textFill="#656565">
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+            </Label>
+            <HBox alignment="CENTER_LEFT" spacing="5.0">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+               <TextField fx:id="txtComposer" onAction="#onAddTrack" prefHeight="30.0" promptText="Composer" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
+            </HBox>
+         </VBox>
       </HBox>
       <HBox layoutX="21.0" layoutY="83.0" prefWidth="200.0" spacing="10.0">
          <VBox.margin>

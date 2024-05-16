@@ -2,7 +2,7 @@ package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.ArtistReport;
-import com.example.song_finder_fx.Model.CoWriterShare;
+import com.example.song_finder_fx.Model.CoWriterSummary;
 import com.example.song_finder_fx.Model.RevenueReport;
 import com.example.song_finder_fx.Model.Songs;
 
@@ -35,7 +35,11 @@ public record RevenueReportController(ArtistReport report) {
         String[] date = dateString.split("-");
         String month = date[1];
         report.setMonth(month);
-        report.setCoWritterList(DatabasePostgres.getCoWriterShareNew2(artistName));
+
+        // Getting Co-Writer Payments
+        report.setCoWritterList(DatabasePostgres.getCoWriterPayments(artistName));
+        List<CoWriterSummary> coWriterSummaryList = DatabasePostgres.getCoWriterPaymentSummary(artistName);
+        report.setCoWriterPaymentSummary(coWriterSummaryList);
 
         return report;
     }

@@ -20,6 +20,8 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -62,10 +64,9 @@ public class ControllerMCList {
         labelsSongName.clear();
         labelsComposer.clear();
         labelsLyricist.clear();
+        ivArtworks.clear();
 
         lblClaimCount.setText("Loading...");
-
-
 
         Task<Void> taskGetManualClaims = new Task<>() {
             @Override
@@ -89,6 +90,7 @@ public class ControllerMCList {
                         Label lblLyricist = (Label) node.lookup("#lblLyricist");
                         labelsLyricist.add(lblLyricist);
                         Label lblDate = (Label) node.lookup("#lblDate");
+                        Label lblClaimType = (Label) node.lookup("#lblClaimType");
                         CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
                         checkBoxes.add(checkBox);
                         HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
@@ -110,6 +112,8 @@ public class ControllerMCList {
                         lblComposer.setText(claim.getComposer());
                         lblLyricist.setText(claim.getLyricist());
                         lblDate.setText(TextFormatter.getDaysAgo(claim.getDate()));
+                        lblDate.setStyle(setColor(claim.getDate()));
+                        lblClaimType.setText(claim.getClaimTypeString());
 
                         int finalCount = count;
                         Platform.runLater(() -> {
@@ -149,6 +153,27 @@ public class ControllerMCList {
         Thread thread = new Thread(taskLoadClaims);
         // thread.start();*/
 
+    }
+
+    private String setColor(LocalDate localDate) {
+        // Get the current system date
+        LocalDate currentDate = LocalDate.now();
+
+        // Calculate the difference in days
+        long daysDifference = ChronoUnit.DAYS.between(localDate, currentDate);
+
+        // Determine the appropriate label based on the difference
+        String label;
+        if (daysDifference == 0) {
+            label = "-fx-text-fill: #72a276";
+        } else if (daysDifference == 1) {
+            // #F28F3B
+            label = "-fx-text-fill: #F28F3B";
+        } else {
+            // #A72608
+            label = "-fx-text-fill: #A72608";
+        }
+        return label;
     }
 
     @FXML

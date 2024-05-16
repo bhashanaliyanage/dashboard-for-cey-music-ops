@@ -1,6 +1,5 @@
 package com.example.song_finder_fx.Model;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,15 +8,13 @@ public class ArtistReport {
     private double conversionRate = 0;
     private String month = "";
     private final ArrayList<String> coWriters = new ArrayList<>();
-    /*private final ArrayList<String> topPerformingSongNames = new ArrayList<>();
-    private final ArrayList<String> topPerformingSongPayees = new ArrayList<>();
-    private final ArrayList<String> topPerformingSongPayeeShare = new ArrayList<>();*/
     private final ArrayList<String> coWriterShare = new ArrayList<>();
     private Double grossRevenue;
     private Double partnerShare;
     private ArrayList<Songs> topPerformingSongs;
 
     private List<CoWriterShare> coWritterList;
+    private List<CoWriterSummary> coWriterPaymentSummary;
 
     public List<CoWriterShare> getCoWritterList() {
         return coWritterList;
@@ -121,5 +118,13 @@ public class ArtistReport {
     }
 
     public void setPayee(String payee) {
+    }
+
+    public void setCoWriterPaymentSummary(List<CoWriterSummary> coWriterSummaryList) {
+        this.coWriterPaymentSummary = coWriterSummaryList;
+    }
+
+    public List<CoWriterSummary> getCoWriterPaymentSummary() {
+        return coWriterPaymentSummary;
     }
 }

@@ -137,6 +137,10 @@
     -fx-background-radius: 3;
 }
 
+.textarea-bg:focused {
+    -fx-border-color: '#17BEBB';
+}
+
 .check-box .box {
     -fx-background-color: '#FFFFFF';
     -fx-border-color: '#e9ebee';
@@ -227,7 +231,10 @@
     -fx-border-radius: 10 10 0 0;
 }
 
-
+.combo-box:focused
+{
+    -fx-border-color: '#17BEBB';
+}
 
 .combo-box-base
 {

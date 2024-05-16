@@ -39,7 +39,6 @@ public class Main extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select CSV");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
-        // fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
 
         return fileChooser.showOpenDialog(window);
     }
@@ -48,7 +47,6 @@ public class Main extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Image");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
-        // fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Image Files (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
 
         return fileChooser.showOpenDialog(window);
     }
@@ -209,6 +207,7 @@ public class Main extends Application {
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
 // TODO: 2/8/2024 System Tray
 // TODO: 2/14/2024 Make it play FLACs
+// TODO: Create a notification panel for software reminders like: Update artist name validation table
 
 // Performance
 // TODO: If copy to button clicked and user not chose any location the application starts to search

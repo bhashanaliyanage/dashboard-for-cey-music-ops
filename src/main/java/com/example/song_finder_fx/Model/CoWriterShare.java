@@ -1,5 +1,7 @@
 package com.example.song_finder_fx.Model;
 
+import java.util.Objects;
+
 public class CoWriterShare {
 
     private String isrc;
@@ -58,7 +60,12 @@ public class CoWriterShare {
     }
 
     public String getSongType() {
-        return songType;
+        if (Objects.equals(songType, "C")) {
+            return "PUB";
+        } else if (Objects.equals(songType, "O")) {
+            return "SR";
+        }
+        return "";
     }
 
     public void setSongType(String songType) {

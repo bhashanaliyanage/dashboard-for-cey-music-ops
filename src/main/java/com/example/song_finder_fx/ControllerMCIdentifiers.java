@@ -51,6 +51,8 @@ public class ControllerMCIdentifiers {
         vbClaimsList.getChildren().clear();
         upcs.clear();
         claimCNumbers.clear();
+        claimISRCs.clear();
+
         for (int i = 0; i < ControllerMCList.finalManualClaims.size(); i++) {
             ManualClaimTrack claim = ControllerMCList.finalManualClaims.get(i);
 

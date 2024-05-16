@@ -18,14 +18,16 @@ public class ManualClaimTrack {
     private String trimEnd;
     private BufferedImage image;
     private BufferedImage previewImage;
+    private final int claimType;
 
-    public ManualClaimTrack(int id, String trackName, String lyricist, String composer, String youTubeID, LocalDate date) {
+    public ManualClaimTrack(int id, String trackName, String lyricist, String composer, String youTubeID, LocalDate date, int claimType) {
         this.id = id;
         this.trackName = trackName;
         this.lyricist = lyricist;
         this.composer = composer;
         this.youtubeID = youTubeID;
         this.date = date;
+        this.claimType = claimType;
     }
 
     public String getTrackName() {
@@ -99,5 +101,18 @@ public class ManualClaimTrack {
 
     public LocalDate getDate() {
         return date;
+    }
+
+    public int getClaimType() {
+        return claimType;
+    }
+
+    public String getClaimTypeString() {
+        return switch (claimType) {
+            case 2 -> "TV Programs";
+            case 3 -> "Manual Claim";
+            case 4 -> "Single SR";
+            default -> "Unspecified";
+        };
     }
 }

@@ -85,11 +85,11 @@ public class TextFormatter {
         // Determine the appropriate label based on the difference
         String label;
         if (daysDifference == 0) {
-            label = "today";
+            label = "Today";
         } else if (daysDifference == 1) {
-            label = "yesterday";
+            label = "Yesterday";
         } else {
-            label = Math.abs(daysDifference) + " days ago";
+            label = Math.abs(daysDifference) + " Days Ago";
         }
         return label;
     }

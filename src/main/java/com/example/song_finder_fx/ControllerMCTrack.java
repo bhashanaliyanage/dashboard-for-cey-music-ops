@@ -1,6 +1,9 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.*;
+import com.example.song_finder_fx.Controller.ErrorDialog;
+import com.example.song_finder_fx.Controller.MCTrackController;
+import com.example.song_finder_fx.Controller.ManualClaims;
+import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
 import javafx.event.ActionEvent;
@@ -8,14 +11,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.textfield.TextFields;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -79,6 +78,7 @@ public class ControllerMCTrack {
         Scene scene = node.getScene();
         TextField txtURL = (TextField) scene.lookup("#txtURL");
         VBox vboxTracks = (VBox) scene.lookup("#vboxTracks");
+        ComboBox<String> comboClaimType = (ComboBox<String>) scene.lookup("#comboClaimType");
 
         Node nodeTrack = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
 
@@ -89,7 +89,8 @@ public class ControllerMCTrack {
         String trimStart = spinnerStart.getText();
         String trimEnd = spinnerEnd.getText();
         String url = txtURL.getText();
-        // System.out.println(url);
+        String selectedItem = comboClaimType.getSelectionModel().getSelectedItem();
+        int claimType = getClaimType(selectedItem);
 
         // Front-End validation
         boolean ifAnyNull = checkData();
@@ -99,16 +100,17 @@ public class ControllerMCTrack {
             String youtubeID = TextFormatter.extractYoutubeID(url);
 
             // Fetching Thumbnail
-            String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
+            /*String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
             BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
-            image = ImageProcessor.cropImage(image);
+            image = ImageProcessor.cropImage(image);*/
 
             // Getting Date
             LocalDate date = LocalDate.now();
 
             // Creating track model
-            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID, date);
+            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID, date, claimType);
             MCTrackController mcTrackController = new MCTrackController(track);
+
             try {
                 mcTrackController.checkNew();
             } catch (SQLException e) {
@@ -116,9 +118,9 @@ public class ControllerMCTrack {
             }
 
             // Setting Thumbnail and Preview Images to the model
-            track.setPreviewImage(image);
+            /*track.setPreviewImage(image);
             image = ImageProcessor.resizeImage(1400, 1400, image);
-            track.setImage(image);
+            track.setImage(image);*/
 
             boolean claimValidation = true;
 
@@ -147,6 +149,52 @@ public class ControllerMCTrack {
                 vboxTracks.getChildren().add(nodeTrack);
             }
         }
+    }
+
+    /*public void onAddTrackNew(ActionEvent event) throws IOException {
+        // Getting Parent Object References
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+        TextField txtURL = (TextField) scene.lookup("#txtURL");
+        VBox vboxTracks = (VBox) scene.lookup("#vboxTracks");
+        ComboBox<String> comboClaimType = (ComboBox<String>) scene.lookup("#comboClaimType");
+
+        Node nodeTrack = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
+
+        // Fetching user values
+        String trackName = txtTrackTitle.getText();
+        String lyricist = txtLyricist.getText();
+        String composer = txtComposer.getText();
+        String trimStart = spinnerStart.getText();
+        String trimEnd = spinnerEnd.getText();
+        String url = txtURL.getText();
+        String selectedItem = comboClaimType.getSelectionModel().getSelectedItem();
+        int claimType = getClaimType(selectedItem);
+
+        // Front-End validation
+        boolean ifAnyNull = checkData();
+
+        Task<List<Songs>> taskLoadVideo = new Task<>() {
+            @Override
+            protected java.util.List<Songs> call() throws IOException, URISyntaxException {
+                return null;
+            }
+        };
+
+        Thread threadLoadVideo = new Thread(taskLoadVideo);
+        threadLoadVideo.start();
+    }*/
+
+    private int getClaimType(String selectedItem) {
+        if (selectedItem == null) {
+            return 1; // Default value when the selected item is null
+        }
+        return switch (selectedItem) {
+            case "TV Programs" -> 2;
+            case "Manual Claim" -> 3;
+            case "Single SR" -> 4;
+            default -> 1;
+        };
     }
 
     private boolean checkData() {

@@ -3,9 +3,12 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.ImageProcessor;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.SceneController;
+import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -18,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Objects;
 
@@ -126,5 +130,39 @@ public void onChangeImageClicked(MouseEvent event) throws IOException, SQLExcept
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    void onYoutubeRequested(ActionEvent event) throws SQLException {
+        String claimID = lblClaimID.getText();
+        int claimIDInt = Integer.parseInt(claimID);
+        ManualClaimTrack track;
+
+        try {
+            track = DatabasePostgres.getManualClaim(claimIDInt);
+
+            if (track != null) {
+                String youtubeID = track.getYoutubeID();
+                String youtubeLink = "https://youtube.com/watch?v=" + youtubeID;
+
+                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    URI uri = new URI(youtubeLink);
+                    Desktop.getDesktop().browse(uri);
+                }
+            }
+        } catch (SQLException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error Fetching Manual Claim");
+            alert.setContentText(e.toString());
+            alert.showAndWait();
+        } catch (URISyntaxException | IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error Loading Youtube Link");
+            alert.setContentText(e.toString());
+            alert.showAndWait();
+        }
+
     }
 }
