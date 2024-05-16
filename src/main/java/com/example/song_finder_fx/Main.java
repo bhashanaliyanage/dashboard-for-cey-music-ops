@@ -29,7 +29,7 @@ public class Main extends Application {
     static List<String> songList = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion(23.12);
+    public static ProductVersion versionInfo = new ProductVersion(23.13);
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
@@ -202,10 +202,10 @@ public class Main extends Application {
 // TODO: 2/5/2024 Add a delete all button to the list
 
 // User Experience
+// TODO: 2/8/2024 System Tray | https://www.youtube.com/watch?v=fVjwV0fIZnQ
 // TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
 // TODO: Offer cancel method after proceed button clicked
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
-// TODO: 2/8/2024 System Tray
 // TODO: 2/14/2024 Make it play FLACs
 // TODO: Create a notification panel for software reminders like: Update artist name validation table
 
@@ -230,7 +230,6 @@ public class Main extends Application {
 // Manual Claims
 // TODO: A view to view created ingests
     // TODO: Update Payee table from created ingests upon request
-// TODO: Tags For Manual Claims List (for Group Claims , Tv Programmes , Covers)
 // TODO: Edit details on an added manual claim in the add manual claim view
 // TODO: Remove an added manual claim in the add manual claim view
 // TODO: Reset add manual claim view after adding a manual claim

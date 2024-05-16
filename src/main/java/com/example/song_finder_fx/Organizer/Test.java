@@ -4,6 +4,7 @@ import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Controller.RevenueReportController;
 import com.example.song_finder_fx.Model.*;
+import com.example.song_finder_fx.Session.UserSession;
 import com.itextpdf.layout.Document;
 
 import java.io.IOException;
@@ -44,6 +45,8 @@ public class Test {
 
         testArtistReports();
         // testArtistReportPDF();
+        UserSession userSession = new UserSession();
+        userSession.signup("opstemp", "temp", "temp@temp.com", "CeyMusic Ops");
     }
 
     private static void testArtistReportPDF() throws SQLException, IOException {

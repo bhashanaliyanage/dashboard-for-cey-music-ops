@@ -1074,7 +1074,7 @@ public class DatabasePostgres {
         }
     }
 
-    public static boolean createUser(String username, String password) throws SQLException {
+    public static boolean createUser(String username, String password, String email, String displayName) throws SQLException {
         Hasher hasher = new Hasher(username, password);
 
         Connection con = getConn();
@@ -1087,10 +1087,12 @@ public class DatabasePostgres {
         int count = rs.getInt(1);
 
         if (count == 0) {
-            PreparedStatement ps = con.prepareStatement("INSERT INTO public.user (username, password) VALUES (?, ?);");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO public.user (username, password, email, display_name) VALUES (?, ?, ?, ?);");
 
             ps.setString(1, hasher.getUserName());
             ps.setString(2, hasher.getHashedPass());
+            ps.setString(3, email);
+            ps.setString(4, displayName);
 
             int status = ps.executeUpdate();
 

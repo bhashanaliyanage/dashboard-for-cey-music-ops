@@ -72,7 +72,7 @@ public class ControllerMCTrack {
         });
     }
 
-    public void onAddTrack(ActionEvent event) throws IOException, URISyntaxException {
+    public void onAddTrack(ActionEvent event) throws IOException {
         // Getting Parent Object References
         Node node = (Node) event.getSource();
         Scene scene = node.getScene();
@@ -99,11 +99,6 @@ public class ControllerMCTrack {
             // Fetching YouTube ID
             String youtubeID = TextFormatter.extractYoutubeID(url);
 
-            // Fetching Thumbnail
-            /*String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
-            BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
-            image = ImageProcessor.cropImage(image);*/
-
             // Getting Date
             LocalDate date = LocalDate.now();
 
@@ -116,11 +111,6 @@ public class ControllerMCTrack {
             } catch (SQLException e) {
                 ErrorDialog.showErrorDialog("Error!", "Error Adding Track Data", e.toString());
             }
-
-            // Setting Thumbnail and Preview Images to the model
-            /*track.setPreviewImage(image);
-            image = ImageProcessor.resizeImage(1400, 1400, image);
-            track.setImage(image);*/
 
             boolean claimValidation = true;
 
@@ -141,7 +131,12 @@ public class ControllerMCTrack {
             }
 
             if (claimValidation) {
+                int size = ManualClaims.manualClaims.size();
+                System.out.println("Total Claims before adding track: " + size);
                 ManualClaims.manualClaims.add(track);
+                size = ManualClaims.manualClaims.size();
+                System.out.println("Total Claims after adding track: " + size);
+                // TODO: So the size variable before adding the track will be the index of the current track. Assign this to a label in manual-claims-track.fxml for later usages/ edits
                 titledPane.setText(trackName);
                 titledPane.setExpanded(false);
                 btnAddTrack.setDisable(true);

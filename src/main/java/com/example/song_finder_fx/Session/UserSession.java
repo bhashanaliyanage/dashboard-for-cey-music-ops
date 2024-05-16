@@ -74,8 +74,8 @@ public class UserSession {
     }
 
     // Method to simulate user signup
-    public void signup(String username, String password) throws SQLException {
-        boolean userCreated = DatabasePostgres.createUser(username, password);
+    public void signup(String username, String password, String email, String displayName) throws SQLException {
+        boolean userCreated = DatabasePostgres.createUser(username, password, email, displayName);
         if (userCreated) {
             // Simulate user signup logic
             // For demonstration purposes, let's assume signup always succeeds
