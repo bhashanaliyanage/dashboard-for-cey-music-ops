@@ -261,7 +261,7 @@ public class DatabasePostgres {
                     manualClaimTrack.setPreviewImage(previewImage);
                     manualClaimTrack.setImage(artwork);
                 } catch (IOException e) {
-                    Platform.runLater(() -> e.printStackTrace());
+                    Platform.runLater(e::printStackTrace);
                 }
 
                 if (trimStart != null && trimEnd != null) {
