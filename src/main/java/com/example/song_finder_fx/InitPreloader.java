@@ -1,6 +1,5 @@
 package com.example.song_finder_fx;
 
-import com.dustinredmond.fxtrayicon.FXTrayIcon;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Model.Revenue;
 import javafx.application.Platform;
@@ -10,8 +9,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
@@ -21,10 +18,7 @@ import javafx.stage.WindowEvent;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
