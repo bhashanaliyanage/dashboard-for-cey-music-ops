@@ -345,7 +345,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         return table;
     }
 
-    private static String getSaveLocation(Window window) {
+    public static String getSaveLocation(Window window) {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files (*.pdf)", "*.pdf"));
         chooser.setTitle("Save As");

@@ -1,5 +1,7 @@
 package com.example.song_finder_fx;
 
+import com.dustinredmond.fxtrayicon.FXTrayIcon;
+import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Model.Revenue;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -8,12 +10,22 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -21,6 +33,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.ResourceBundle;
+
+import static com.example.song_finder_fx.Main.trayIcon;
 
 public class InitPreloader implements Initializable {
     @FXML
@@ -146,23 +160,14 @@ public class InitPreloader implements Initializable {
 
                 VBox main = (VBox) scene.lookup("#mainVBox");
                 VBox leftVBox = (VBox) scene.lookup("#leftVBox");
-                // vboxAbout
                 HBox hboxAbout = (HBox) scene.lookup("#hboxAbout");
-                // lblSearch
                 Label lblSearch = (Label) scene.lookup("#lblSearch");
-                // lblSearchNCollect
                 Label lblSearchNCollect = (Label) scene.lookup("#lblSearchNCollect");
-                // lblRevenueAnalysis
                 Label lblRevenueAnalysis = (Label) scene.lookup("#lblRevenueAnalysis");
-                // lblArtistReports
                 Label lblArtistReports = (Label) scene.lookup("#lblArtistReports");
-                // lblSettings
                 Label lblSettings = (Label) scene.lookup("#lblSettings");
-                // vboxSongList
                 VBox vboxSongList = (VBox) scene.lookup("#vboxSongList");
-                // (VBox) btnDatabaseCheck
                 VBox btnDatabaseCheck = (VBox) scene.lookup("#btnDatabaseCheck");
-                // (VBox) btnDatabaseCheck2 (MediaPlayer)
                 VBox btnDatabaseCheck2 = (VBox) scene.lookup("#btnDatabaseCheck2");
 
                 main.getChildren().add(UIController.mainNodes[2]);
@@ -172,8 +177,58 @@ public class InitPreloader implements Initializable {
                 stage.getIcons().add(image);
                 stage.setWidth(1350);
                 stage.setHeight(900);
+
+                Platform.setImplicitExit(false);
+
+                // Set Tray Icon
+                try {
+                    SystemTray tray = SystemTray.getSystemTray();
+
+                    // Loading Font
+                    java.awt.Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf")).deriveFont(12f);
+
+                    // Loading Tray Icon Image
+                    String imagePath = "src/main/resources/com/example/song_finder_fx/icons/icon (Custom).png";
+                    BufferedImage myImage = ImageIO.read(new File(imagePath));
+                    trayIcon = new TrayIcon(myImage);
+
+                    // Setting Menu Items
+                    java.awt.MenuItem dash = new java.awt.MenuItem("Dashboard");
+                    dash.setFont(defaultFont);
+                    dash.addActionListener(event -> Platform.runLater(stage::show));
+
+                    java.awt.MenuItem sidebar = new java.awt.MenuItem("Open Side Bar");
+                    sidebar.addActionListener(event -> System.out.println("Side Bar Button Click"));
+                    sidebar.setFont(defaultFont);
+
+                    java.awt.MenuItem exit = new java.awt.MenuItem("Exit Dashboard");
+                    exit.addActionListener(event -> {
+                        Platform.exit();
+                        tray.remove(trayIcon);
+                    });
+                    exit.setFont(defaultFont);
+
+                    // Setting Tooltip
+                    trayIcon.setToolTip("CeyMusic Dashboard");
+
+                    PopupMenu popupMenu = new PopupMenu("Menu");
+                    popupMenu.add(dash);
+                    popupMenu.add(sidebar);
+                    popupMenu.addSeparator();
+                    popupMenu.add(exit);
+                    trayIcon.setPopupMenu(popupMenu);
+
+                    trayIcon.addActionListener(ActionEvent -> Platform.runLater(stage::show));
+
+                    tray.add(trayIcon);
+                } catch (AWTException | FontFormatException | IOException e) {
+                    System.out.println("System Tray Error: " + e);
+                }
+
                 stage.setScene(scene);
                 stage.show();
+
+                stage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 
                 if (Main.versionInfo.updateAvailable()) {
                     Label updateNotify = (Label) scene.lookup("#lblUserEmailAndUpdate");
@@ -234,6 +289,16 @@ public class InitPreloader implements Initializable {
             mainWindow.join();
         }
 
+    }
+
+    private void closeWindowEvent(WindowEvent windowEvent) {
+        Platform.runLater(() -> {
+            try {
+                NotificationBuilder.displayTrayInfo("CeyMusic Dashboard", "CeyMusic Dashboard is minimized to system tray");
+            } catch (AWTException e) {
+                System.out.println("Error Sending Notification: " + e);
+            }
+        });
     }
 
     private String checkDatabaseConnection() {

@@ -30,6 +30,7 @@ public class Main extends Application {
     static File selectedDirectory = null;
     static Clip clip;
     public static ProductVersion versionInfo = new ProductVersion(23.13);
+    public static TrayIcon trayIcon;
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
@@ -216,9 +217,8 @@ public class Main extends Application {
 // TODO: 12/9/2023 Side-Panel design for all pages
 
 // Revenue Analysis
-// TODO: 12/9/2023 Sub views of revenue analysis UI
-// TODO: Retrieve artist names from Postgres
 // TODO: A view to edit payee list
+// TODO: ISRC Payee Updater
 
 // Search
 // TODO: 2/8/2024 Edit Song Details

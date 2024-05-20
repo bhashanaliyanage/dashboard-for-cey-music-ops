@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'application'
-    /*id 'org.javamodularity.moduleplugin' version '1.8.12'*/
     id 'org.openjfx.javafxplugin' version '0.0.13'
     id 'org.beryx.jlink' version '2.25.0'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
@@ -88,6 +87,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.mindrot/jbcrypt
     implementation 'org.mindrot:jbcrypt:0.4'
+
+    // https://mvnrepository.com/artifact/com.dustinredmond.fxtrayicon/FXTrayIcon
+    implementation 'com.dustinredmond.fxtrayicon:FXTrayIcon:3.0.0'
 }
 
 test {

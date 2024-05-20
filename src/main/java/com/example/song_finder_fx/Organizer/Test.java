@@ -6,6 +6,9 @@ import com.example.song_finder_fx.Controller.RevenueReportController;
 import com.example.song_finder_fx.Model.*;
 import com.itextpdf.layout.Document;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -42,8 +45,13 @@ public class Test {
         ManualClaimsController manualClaimsController = new ManualClaimsController(claims);
         // manualClaimsController.generateCSV(path);*/
 
-        testArtistReports();
+        // testArtistReports();
         // testArtistReportPDF();
+
+        String path = "src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork.jpg";
+        BufferedImage myImage = ImageIO.read(new File(path));
+
+        System.out.println(myImage.getHeight());
     }
 
     private static void testArtistReportPDF() throws SQLException, IOException {

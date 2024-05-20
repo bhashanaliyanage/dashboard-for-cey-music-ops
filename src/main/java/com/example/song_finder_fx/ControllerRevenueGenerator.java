@@ -19,6 +19,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -45,6 +46,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static com.example.song_finder_fx.Controller.ReportPDF.getSaveLocation;
 
 public class ControllerRevenueGenerator {
     //<editor-fold desc="Buttons">
@@ -542,9 +545,6 @@ public class ControllerRevenueGenerator {
     }
 
     public void onLoadReportBtnClick() throws SQLException, ClassNotFoundException {
-        // Clearing Report Model
-        report = new ArtistReport();
-
         // Getting Currency Rate
         String userInputRate = txtRate.getText();
         String artistName = comboPayees.getSelectionModel().getSelectedItem();
@@ -561,6 +561,12 @@ public class ControllerRevenueGenerator {
 
                 // Convert user input rate to a double
                 double convertedRate = Double.parseDouble(userInputRate);
+
+                // Creating Artist
+                Artist artist = new Artist(0, artistName);
+
+                // Clearing Report Model
+                report = new ArtistReport(artist, convertedRate);
 
                 // Getting artist ID
                 int artistID = DatabasePostgres.fetchArtistID(artistName);
@@ -1163,22 +1169,29 @@ public class ControllerRevenueGenerator {
 
     }
 
-    public void onGetReportBtnClick(MouseEvent mouseEvent) throws IOException {
+    public void onGetReportBtnClick(MouseEvent mouseEvent) {
         System.out.println("ControllerRevenueGenerator.onGetReportBtnClick");
         String payee = comboPayees.getSelectionModel().getSelectedItem();
+
+        // String path = "C:\\Users\\bhash\\Documents\\Test\\test.pdf";
 
         comboPayees.setStyle("-fx-border-color: '#e9ebee';");
 
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
         Window window = scene.getWindow();
+        String path = getSaveLocation(window);
 
         if (!Objects.equals(payee, null)) {
             ReportPDF reportPDF = new ReportPDF();
             try {
-                reportPDF.generateReport(window, report);
+                reportPDF.generateReport(path, report);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("An error occurred when generating PDF");
+                alert.setContentText("Chosen Location: " + path + "\n\n" + "Cause: " + e);
+                Platform.runLater(alert::showAndWait);
             }
         } else {
             // If no Payee Selected

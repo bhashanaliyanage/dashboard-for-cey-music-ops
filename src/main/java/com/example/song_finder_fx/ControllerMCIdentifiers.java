@@ -224,8 +224,15 @@ public class ControllerMCIdentifiers {
                                 Platform.runLater(e::printStackTrace);
                             }
                         } else {
-                            Platform.runLater(() -> lblProcess.setText("Error Getting Artwork"));
-                            break;
+                            try {
+                                String path = "src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork.jpg";
+                                BufferedImage tempArtwork = ImageIO.read(new File(path));
+                                Platform.runLater(() -> lblProcess.setText("Error Getting Artwork. Copying Temporary Artwork: " + albumTitle));
+                                String outputPath = folder.getAbsolutePath() + "\\" + upc[0] + ".jpg";
+                                ImageIO.write(tempArtwork, "jpg", new File(outputPath));
+                            } catch (IOException e) {
+                                System.out.println("Error in Artwork: " + e);
+                            }
                         }
 
                         // Downloading audio to a temporary directory
