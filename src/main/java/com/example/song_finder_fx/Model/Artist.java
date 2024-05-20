@@ -5,9 +5,9 @@ public class Artist {
 
     private String artistName;
 
-    public Artist(int artistID) {
+    public Artist(int artistID, String artistName) {
         this.artistID = artistID;
-        artistName = null;
+        this.artistName = artistName;
     }
 
     public int getID() {

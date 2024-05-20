@@ -4,7 +4,6 @@ import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Controller.RevenueReportController;
 import com.example.song_finder_fx.Model.*;
-import com.example.song_finder_fx.Session.UserSession;
 import com.itextpdf.layout.Document;
 
 import java.io.IOException;
@@ -45,12 +44,11 @@ public class Test {
 
         testArtistReports();
         // testArtistReportPDF();
-        UserSession userSession = new UserSession();
-        userSession.signup("opstemp", "temp", "temp@temp.com", "CeyMusic Ops");
     }
 
     private static void testArtistReportPDF() throws SQLException, IOException {
-        ArtistReport report = getArtistReport(47, 320);
+        String artistName = "2Forty2";
+        ArtistReport report = getArtistReport(47, 320, artistName);
         ReportPDF pdf = new ReportPDF();
         String path = "C:\\Users\\bhash\\Documents\\Test\\test.pdf";
         Document document = pdf.generateReport(path, report);
@@ -59,10 +57,11 @@ public class Test {
 
     private static void testArtistReports() throws SQLException {
         int artistID = 47;
-        int conversionRate = 320;
+        int conversionRate = 1;
+        String artistName = "Rohana Weerasinghe";
 
         // Creating artist model by passing artistID
-        ArtistReport report = getArtistReport(artistID, conversionRate);
+        ArtistReport report = getArtistReport(artistID, conversionRate, artistName);
 
         // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
         double grossRevenue = report.getGrossRevenueInLKR();
@@ -97,8 +96,8 @@ public class Test {
         }
     }
 
-    private static ArtistReport getArtistReport(int artistID, int conversionRate) throws SQLException {
-        Artist artist = new Artist(artistID);
+    private static ArtistReport getArtistReport(int artistID, int conversionRate, String artistName) throws SQLException {
+        Artist artist = new Artist(artistID, artistName);
 
         // Creating revenue report model by passing artist object and conversion rate
         ArtistReport report = new ArtistReport(artist, conversionRate);

@@ -19,7 +19,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -481,32 +480,23 @@ public class ControllerRevenueGenerator {
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
 
-        Task<Void> task;
+        Task<Void> taskLocaPayees;
 
-        task = new Task<>() {
+        taskLocaPayees = new Task<>() {
             @Override
-            protected Void call() throws SQLException, ClassNotFoundException {
-                // lblStatus.setText("Loading Payees...");
-                // ResultSet rsPayees = DatabaseMySQL.getPayees();
-                // ResultSet rsPayees = DatabasePostgres.getPayees(); // Postgres
+            protected Void call() throws SQLException {
                 List<String> payees = DatabasePostgres.getPayees();
 
-                /*while (rsPayees.next()) {
-                    comboPayees.getItems().add(rsPayees.getString(1));
-                }
-                lblStatus.setVisible(false);
-                imgLoading.setVisible(false);
-                comboPayees.setDisable(false);*/
-
-                // Temporary for testing
-                comboPayees.getItems().add("Rohana Weerasinghe");
+                Platform.runLater(() -> {
+                    comboPayees.getItems().addAll(payees);
+                });
 
                 return null;
             }
         };
 
-        Thread t = new Thread(task);
-        t.start();
+        Thread threadLoadPayees = new Thread(taskLocaPayees);
+        threadLoadPayees.start();
     }
 
     public void onSidePanelAddNewReportBtnClick() throws IOException {
@@ -557,14 +547,11 @@ public class ControllerRevenueGenerator {
 
         // Getting Currency Rate
         String userInputRate = txtRate.getText();
-        String selectedItem = comboPayees.getSelectionModel().getSelectedItem();
+        String artistName = comboPayees.getSelectionModel().getSelectedItem();
 
         DecimalFormat df = new DecimalFormat("0.00");
-        final ArrayList<Double>[] royalty = new ArrayList[]{new ArrayList<Double>()};
-        final double[] tax = {0};
-        final double[] amountPayable = new double[1];
 
-        if (!Objects.equals(selectedItem, null)) {
+        if (!Objects.equals(artistName, null)) {
             // Resetting ComboBox border
             comboPayees.setStyle("-fx-border-color: '#e9ebee';");
 
@@ -576,10 +563,10 @@ public class ControllerRevenueGenerator {
                 double convertedRate = Double.parseDouble(userInputRate);
 
                 // Getting artist ID
-                int artistID = DatabasePostgres.fetchArtistID(selectedItem);
+                int artistID = DatabasePostgres.fetchArtistID(artistName);
 
                 // Creating artist model by passing artistID
-                ArtistReport report = getArtistReport(artistID, convertedRate);
+                ArtistReport report = getArtistReport(artistID, convertedRate, artistName);
 
                 // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
                 double grossRevenue = report.getGrossRevenue();
@@ -657,8 +644,8 @@ public class ControllerRevenueGenerator {
         }
     }
 
-    private static ArtistReport getArtistReport(int artistID, double convertedRate) throws SQLException, ClassNotFoundException {
-        Artist artist = new Artist(artistID);
+    private static ArtistReport getArtistReport(int artistID, double convertedRate, String artistName) throws SQLException, ClassNotFoundException {
+        Artist artist = new Artist(artistID, artistName);
 
         // Creating revenue report model by passing artist object and conversion rate
         ArtistReport report = new ArtistReport(artist, convertedRate);

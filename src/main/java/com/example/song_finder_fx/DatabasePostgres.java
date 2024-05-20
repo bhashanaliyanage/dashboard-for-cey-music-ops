@@ -48,7 +48,8 @@ public class DatabasePostgres {
         try {
             con.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Error on Closing Connection: " + e);
+            // e.printStackTrace();
         }
     }
 
@@ -789,11 +790,27 @@ public class DatabasePostgres {
         );
     }
 
-    public static List<String> getPayees() throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
-        PreparedStatement preparedStatement = db.prepareStatement("SELECT PAYEE FROM `isrc_payees` GROUP BY PAYEE ORDER BY PAYEE ASC;");
+    public static List<String> getPayees() throws SQLException {
+        Connection db = getConn();
+        List<String> list = new ArrayList<>();
+        PreparedStatement preparedStatement = db.prepareStatement("SELECT DISTINCT PAYEE AS ARTIST\n" +
+                "FROM ISRC_PAYEES\n" +
+                "WHERE PAYEE IS NOT NULL\n" +
+                "UNION\n" +
+                "SELECT DISTINCT PAYEE01 AS ARTIST\n" +
+                "FROM ISRC_PAYEES\n" +
+                "WHERE PAYEE01 IS NOT NULL\n" +
+                "UNION\n" +
+                "SELECT DISTINCT PAYEE02 AS ARTIST\n" +
+                "FROM ISRC_PAYEES\n" +
+                "WHERE PAYEE02 IS NOT NULL\n" +
+                "ORDER BY ARTIST;");
+        ResultSet rs = preparedStatement.executeQuery();
+        while (rs.next()) {
+            list.add(rs.getString(1));
+        }
 
-        return new ArrayList<>();
+        return list;
     }
 
     public static ArrayList<Double> getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
@@ -836,7 +853,6 @@ public class DatabasePostgres {
         RevenueReport rReport = new RevenueReport();
         try {
             rReport.setAfterDeductionRoyalty(getTotalRoyalty(name));
-
             rReport.setReportedRoyalty(getTotalRoyalty1(name));
         } catch (Exception e) {
             e.printStackTrace();
@@ -867,7 +883,7 @@ public class DatabasePostgres {
     public static double getTotalRoyalty(String name) {
         double d = 0.0;
         try {
-            List<PayeeForReport> pr = new ArrayList<PayeeForReport>();
+            List<PayeeForReport> pr;
             pr = getPayeRepot(name);
 
             for (int i = 0; i < pr.size(); i++) {
@@ -925,15 +941,18 @@ public class DatabasePostgres {
     }
 
     public static List<PayeeForReport> getPayeRepot(String name) {
-        String sql = "   SELECT ip.isrc," + "       SUM(  CASE    WHEN ip.payee = ? THEN ip.share"
-                + "               WHEN ip.payee01 = ? THEN ip.payee01share"
-                + "               ELSE ip.payee02share  END ) AS total_payee_share, SUM( rv.after_deduction_royalty / 100 * CASE "
-                + "               WHEN ip.payee = ? THEN ip.share\r\n"
-                + "               WHEN ip.payee01 = ? THEN ip.payee01share\r\n" + "               ELSE ip.payee02share"
-                + "           END ) AS total_calculated_royalty" + " FROM isrc_payees  ip "
-                + " JOIN \"reportViewSummary1\" rv ON ip.isrc = rv.asset_isrc"
-                + " WHERE ip.payee = ?  OR ip.payee01 = ?   OR ip.payee02 =  ? " + "GROUP BY ip.isrc ";
-        List<PayeeForReport> pReport = new ArrayList<PayeeForReport>();
+        String sql = """
+                   SELECT ip.isrc,       SUM(  CASE    WHEN ip.payee = ? THEN ip.share\
+                               WHEN ip.payee01 = ? THEN ip.payee01share\
+                               ELSE ip.payee02share  END ) AS total_payee_share, SUM( rv.after_deduction_royalty / 100 * CASE \
+                               WHEN ip.payee = ? THEN ip.share\r
+                               WHEN ip.payee01 = ? THEN ip.payee01share\r
+                               ELSE ip.payee02share\
+                           END ) AS total_calculated_royalty FROM isrc_payees  ip \
+                 JOIN "testRep1" rv ON ip.isrc = rv.asset_isrc\
+                 WHERE ip.payee = ?  OR ip.payee01 = ?   OR ip.payee02 =  ? GROUP BY ip.isrc \
+                """;
+        List<PayeeForReport> pReport = new ArrayList<>();
         Connection con = getConn();
 
         try {
@@ -1452,30 +1471,57 @@ public class DatabasePostgres {
     public static ArrayList<Songs> getTopPerformingSongs(String selectedItem) throws SQLException {
         Connection conn = getConn();
 
-        String sql = "SELECT S.SONG_NAME,\n" +
-                "\tR.REPORTED_ROYALTY\n" +
-                "FROM PUBLIC.REPORT AS R\n" +
-                "JOIN\n" +
-                "\t(SELECT ASSET_ISRC,\n" +
-                "\t\t\tMAX(REPORTED_ROYALTY) AS MAX_ROYALTY\n" +
-                "\t\tFROM PUBLIC.REPORT\n" +
-                "\t\tWHERE ASSET_ISRC IN\n" +
-                "\t\t\t\t(SELECT ISRC\n" +
-                "\t\t\t\t\tFROM PUBLIC.ISRC_PAYEES\n" +
-                "\t\t\t\t\tWHERE PAYEE01 = ?\n" +
-                "\t\t\t\t\t\tOR PAYEE = ?\n" +
-                "\t\t\t\t\t\tOR PAYEE02 = ?)\n" +
-                "\t\tGROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC\n" +
-                "AND R.REPORTED_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY\n" +
-                "LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC\n" +
-                "ORDER BY R.REPORTED_ROYALTY DESC\n" +
-                "LIMIT 5;";
+        /*String sql = """
+                SELECT S.SONG_NAME,
+                \tR.REPORTED_ROYALTY
+                FROM PUBLIC.REPORT AS R
+                JOIN
+                \t(SELECT ASSET_ISRC,
+                \t\t\tMAX(REPORTED_ROYALTY) AS MAX_ROYALTY
+                \t\tFROM PUBLIC.REPORT
+                \t\tWHERE ASSET_ISRC IN
+                \t\t\t\t(SELECT ISRC
+                \t\t\t\t\tFROM PUBLIC.ISRC_PAYEES
+                \t\t\t\t\tWHERE PAYEE01 = ?
+                \t\t\t\t\t\tOR PAYEE = ?
+                \t\t\t\t\t\tOR PAYEE02 = ?)
+                \t\tGROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC
+                AND R.REPORTED_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
+                LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
+                ORDER BY R.REPORTED_ROYALTY DESC
+                LIMIT 5;""";*/
+
+        String sql = """
+                SELECT S.SONG_NAME,
+                	R.AFTER_DEDUCTION_ROYALTY / 100 * (CASE WHEN ip.payee = ? THEN ip.share
+                		WHEN ip.payee01 = ? THEN ip.payee01share
+                		ELSE ip.payee02share END) AS share,
+                	R.ASSET_ISRC
+                FROM PUBLIC."testRep1" AS R
+                JOIN
+                	(SELECT ASSET_ISRC,
+                			MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
+                		FROM PUBLIC."testRep1"
+                		WHERE ASSET_ISRC IN
+                				(SELECT ISRC
+                					FROM PUBLIC.ISRC_PAYEES
+                					WHERE PAYEE01 = ?
+                						OR PAYEE = ?
+                						OR PAYEE02 = ?)
+                		GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC
+                AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
+                LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
+                LEFT JOIN PUBLIC.isrc_payees ip ON ip.isrc = R.asset_isrc
+                ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC
+                LIMIT 5;""";
 
         PreparedStatement ps = conn.prepareStatement(sql);
 
         ps.setString(1, selectedItem);
         ps.setString(2, selectedItem);
         ps.setString(3, selectedItem);
+        ps.setString(4, selectedItem);
+        ps.setString(5, selectedItem);
 
         ResultSet rs = ps.executeQuery();
 
