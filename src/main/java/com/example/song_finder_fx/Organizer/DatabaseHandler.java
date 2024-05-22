@@ -9,17 +9,18 @@ import java.util.List;
 
 public class DatabaseHandler {
     // Database connection
-    private final Connection connection;
+    // private final Connection connection;
 
     public DatabaseHandler() {
         // Initialize the database connection
-        connection = DatabasePostgres.getConn();
+        // connection = DatabasePostgres.getConn();
     }
 
     public List<Songs> searchSongsByTitle(String criteria) {
         List<Songs> searchResults = new ArrayList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement("SELECT isrc, song_name, file_name, upc, composer, lyricist, singer FROM public.\"song_metadata_new\" WHERE song_name LIKE ? LIMIT 15");
+            Connection conn = DatabasePostgres.getConn();
+            PreparedStatement statement = conn.prepareStatement("SELECT isrc, song_name, file_name, upc, composer, lyricist, singer, type, product_title FROM public.\"song_metadata_new\" WHERE song_name ILIKE ? LIMIT 15");
             statement.setString(1, criteria + "%");
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -32,6 +33,8 @@ public class DatabaseHandler {
                 song.setComposer(resultSet.getString(5));
                 song.setLyricist(resultSet.getString(6));
                 song.setSinger(resultSet.getString(7));
+                song.setType(resultSet.getString(8));
+                song.setProductTitle(resultSet.getString(9));
                 searchResults.add(song);
             }
         } catch (SQLException e) {

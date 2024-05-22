@@ -5,11 +5,13 @@ import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +40,9 @@ public class ControllerMCIdentifiers {
     @FXML
     private VBox vbClaimsList;
 
+    @FXML
+    private Label lblClaimCount;
+
     public static List<TextField> upcs = new ArrayList<>();
 
     public static List<TextField> claimCNumbers = new ArrayList<>();
@@ -53,8 +58,13 @@ public class ControllerMCIdentifiers {
         claimCNumbers.clear();
         claimISRCs.clear();
 
-        for (int i = 0; i < ControllerMCList.finalManualClaims.size(); i++) {
-            ManualClaimTrack claim = ControllerMCList.finalManualClaims.get(i);
+        List<ManualClaimTrack> claims = ControllerMCList.finalManualClaims;
+        int claimCount = claims.size();
+
+        lblClaimCount.setText("Total: " + claimCount);
+
+        for (int i = 0; i < claimCount; i++) {
+            ManualClaimTrack claim = claims.get(i);
 
             Node entry = SceneController.loadLayout("layouts/manual_claims/mci-entry.fxml");
 
@@ -89,6 +99,20 @@ public class ControllerMCIdentifiers {
             TextField claimISRC = (TextField) entry.lookup("#claimISRC");
             claimISRCs.add(claimISRC);
         }
+
+        /*TextField firstUPC_Field = upcs.getFirst();
+        firstUPC_Field.setOnKeyReleased(event -> {
+            if (event.isShortcutDown() && event.getCode().equals(KeyCode.V)) {
+                String inputText = firstUPC_Field.getText();
+                String test = "8721093238195\n" +
+                        "8721093238201\n" +
+                        "8721093238218";
+                String[] values = inputText.split("\n");
+                for (String value : values) {
+                    System.out.println("value = " + value);
+                }
+            }
+        });*/
     }
 
     @FXML
@@ -570,6 +594,35 @@ public class ControllerMCIdentifiers {
             String catNo = claimCNumbers.get(claimID).getText();
             final String[] userISRC = {claimISRCs.get(claimID).getText()};
             System.out.println((claimID + 1) + " | " + upc[0] + " | " + catNo + " | " + userISRC[0]);
+        }
+    }
+
+    @FXML
+    void onBulkPaste(ActionEvent event) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        if (clipboard.hasString()) {
+            String inputText = clipboard.getString();
+            String[] values = inputText.split("\n");
+
+            // Assign each value to the corresponding text field
+            for (int i = 0; i < Math.min(values.length, upcs.size()); i++) {
+                upcs.get(i).setText(values[i]);
+            }
+        }
+    }
+
+    @FXML
+    void onBulkPasteCatNos(ActionEvent event) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+
+        if (clipboard.hasString()) {
+            String inputText = clipboard.getString();
+            String[] values = inputText.split("\n");
+
+            // Assign each value to the corresponding text field
+            for (int i = 0; i < Math.min(values.length, claimCNumbers.size()); i++) {
+                claimCNumbers.get(i).setText(values[i]);
+            }
         }
     }
 }

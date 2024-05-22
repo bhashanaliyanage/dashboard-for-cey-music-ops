@@ -64,7 +64,7 @@
    </VBox>
    <VBox layoutX="40.0" layoutY="110.0" maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../../styles.css">
       <VBox.margin>
-         <Insets left="30.0" />
+         <Insets left="30.0" top="5.0" />
       </VBox.margin>
       <children>
          <HBox spacing="10.0">
@@ -78,8 +78,8 @@
          </HBox>
          <HBox layoutX="11.0" layoutY="11.0" spacing="10.0">
             <children>
-               <Button minWidth="328.0" mnemonicParsing="false" onAction="#onArchiveSelected" styleClass="button_inside" text="Archive Selected" />
-               <Button minWidth="328.0" mnemonicParsing="false" onAction="#onCheck" styleClass="button_inside" text="Create Ingest" />
+               <Button minWidth="328.0" mnemonicParsing="false" onAction="#onArchiveSelected" styleClass="button_inside_brown" text="Archive Selected" />
+               <Button minWidth="328.0" mnemonicParsing="false" onAction="#onCheck" styleClass="button_inside_brown" text="Create Ingest" />
             </children>
             <VBox.margin>
                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -89,7 +89,7 @@
    </VBox>
    <ScrollPane hbarPolicy="NEVER" minWidth="692.0" VBox.vgrow="ALWAYS">
       <VBox.margin>
-         <Insets bottom="10.0" left="28.0" right="30.0" top="-4.0" />
+         <Insets bottom="10.0" left="28.0" right="30.0" top="1.0" />
       </VBox.margin>
       <content>
          <VBox fx:id="vbClaimsList" maxWidth="688.0" minWidth="688.0" spacing="10.0" styleClass="textarea-bg">

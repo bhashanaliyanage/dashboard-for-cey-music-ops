@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vboxSong" alignment="CENTER_LEFT" prefHeight="80.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.UIController">
+<VBox fx:id="vboxSong" alignment="CENTER_LEFT" prefHeight="80.0" prefWidth="640.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.SongSongListController">
     <HBox alignment="CENTER_LEFT" prefHeight="50.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
         <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
             <Image url="@../images/logo_small_70x_2.png" />
@@ -17,22 +17,27 @@
             <Insets />
          </HBox.margin>
         </ImageView>
-        <VBox alignment="CENTER_LEFT" minWidth="300.0" prefHeight="47.0" prefWidth="94.0" HBox.hgrow="ALWAYS">
+        <VBox alignment="CENTER_LEFT" prefHeight="47.0" HBox.hgrow="ALWAYS">
             <HBox.margin>
                 <Insets left="10.0" top="2.5" />
             </HBox.margin>
             <HBox>
-                <Label fx:id="songNumber" text="Song Number">
+                <Label fx:id="songNumber" text="-">
                     <font>
-                        <Font name="Segoe UI Semibold" size="14.0"/>
+                        <Font name="Segoe UI Semibold" size="14.0" />
                     </font>
                 </Label>
+            <Label layoutX="10.0" layoutY="10.0" text=" | ">
+               <font>
+                  <Font name="Segoe UI Semibold" size="14.0" />
+               </font>
+            </Label>
                 <Label fx:id="srchRsSongName" layoutX="10.0" layoutY="10.0" text="Song Name">
                     <font>
-                        <Font name="Segoe UI Semibold" size="14.0"/>
+                        <Font name="Segoe UI Semibold" size="14.0" />
                     </font>
                     <HBox.margin>
-                        <Insets left="5.0"/>
+                        <Insets />
                     </HBox.margin>
                 </Label>
             </HBox>

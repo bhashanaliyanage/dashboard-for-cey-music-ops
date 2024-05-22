@@ -9,8 +9,8 @@ import java.util.List;
 public class SongSearch {
     private final DatabaseHandler databaseHandler;
 
-    public SongSearch(DatabaseHandler databaseHandler) {
-        this.databaseHandler = databaseHandler;
+    public SongSearch() {
+        databaseHandler = new DatabaseHandler();
     }
 
     public List<Songs> searchSong(String criteria, String searchType) {
@@ -19,6 +19,7 @@ public class SongSearch {
         // Check the search type and perform the appropriate search query
         switch (searchType) {
             case SearchType.SONG_NAME:
+                // System.out.println("SongSearch.searchSong");
                 searchResults = databaseHandler.searchSongsByTitle(criteria);
                 break;
             case SearchType.ISRC:

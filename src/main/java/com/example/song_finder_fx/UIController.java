@@ -736,10 +736,13 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     //<editor-fold desc="Song List">
-    public void onSongListButtonClicked() throws ClassNotFoundException {
-        ControllerSongList controllerSongList = new ControllerSongList(this);
-        controllerSongList.loadThings();
-        // songListTestButton();
+    public void onSongListButtonClicked() {
+        try {
+            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/song-list.fxml")));
+            mainVBox.getChildren().setAll(node);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void onDeleteSongClicked(MouseEvent event) {

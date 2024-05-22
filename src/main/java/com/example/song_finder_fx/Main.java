@@ -230,12 +230,14 @@ public class Main extends Application {
 // Manual Claims
 // TODO: A view to view created ingests
     // TODO: Update Payee table from created ingests upon request
+// TODO: View archived manual claims (which will be helpful to un-archive them for later usages)
 // TODO: Edit details on an added manual claim in the add manual claim view
-// TODO: Remove an added manual claim in the add manual claim view
+// TODO: Remove an added manual claim in the add manual claim view (which currently uses the archive method)
 // TODO: Reset add manual claim view after adding a manual claim
 // TODO: Batch Edit Artworks
-// TODO: Show artwork in identifier view
 // TODO: Batch Paste UPCs
+// TODO: Show artwork when switching to identifier view (will be helpful to identify the manual claim)
+// TODO: Offer a save button or periodically auto save in identifier view for better user experience
 
 // User Accounts
 // TODO: Make the user experience of login and signup much better.

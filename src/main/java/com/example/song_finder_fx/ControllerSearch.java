@@ -1,7 +1,10 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Constants.SearchType;
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
+import com.example.song_finder_fx.Organizer.SongSearch;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -53,6 +56,7 @@ public class ControllerSearch {
 
     @FXML
     private VBox vboxSongSearch;
+
     public VBox mainVBox;
     @FXML
     private Label lblSearchType;
@@ -65,6 +69,7 @@ public class ControllerSearch {
 
     @FXML
     private VBox vboxSong;
+
     @FXML
     private Label lblFeaturing;
 
@@ -76,45 +81,65 @@ public class ControllerSearch {
 
     @FXML
     private Label lblUPC;
+
     @FXML
     private Button btnCopy;
+
     private Parent newContent;
-    private final Search search = new Search();
+
+    private final Search searchOld = new Search();
+
     private boolean toggle = false;
+
     Songs songDetails;
+
+    private SongSearch search;
+
+    private String searchType = SearchType.SONG_NAME;
 
     public ControllerSearch() {
 
     }
 
     @FXML
+    void initialize() {
+        // DatabaseHandler databaseHandler = new DatabaseHandler();
+        search = new SongSearch();
+    }
+
+    @FXML
     void btnSetSearchTypeComposer() {
         lblSearchType.setText("Composer");
-        search.setType("artist");
+        searchOld.setType("artist");
+        searchType = SearchType.COMPOSER;
     }
 
     @FXML
     void btnSetSearchTypeISRC() {
         lblSearchType.setText("ISRC");
-        search.setType("isrc");
+        searchOld.setType("isrc");
+        searchType = SearchType.ISRC;
     }
 
     @FXML
     void btnSetSearchTypeLyricist() {
         lblSearchType.setText("Lyricist");
-        search.setType("artist");
+        searchOld.setType("artist");
+        searchType = SearchType.LYRICIST;
     }
 
     @FXML
     void btnSetSearchTypeName() {
         lblSearchType.setText("Name");
-        search.setType("song_name");
+        searchOld.setType("song_name");
+        searchType = SearchType.SONG_NAME;
     }
 
     @FXML
     void btnSetSearchTypeSinger() {
         lblSearchType.setText("Singer");
-        search.setType("artist");
+        searchOld.setType("artist");
+        searchType = SearchType.SINGER;
     }
 
     @FXML
@@ -127,8 +152,9 @@ public class ControllerSearch {
 
         Task<List<Songs>> task = new Task<>() {
             @Override
-            protected java.util.List<Songs> call() throws Exception {
-                return search.search(text);
+            protected java.util.List<Songs> call() {
+                return search.searchSong(text, searchType);
+                // return searchOld.search(text);
             }
         };
 
@@ -162,11 +188,71 @@ public class ControllerSearch {
                     }
 
                     vboxSong.getChildren().add(nodes[i]);
-                } catch (NullPointerException | IOException ex) {
+                } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
         });
+
+        Thread thread = new Thread(task);
+        thread.start();
+    }
+
+    @FXML
+    void getText2() {
+        // Getting search keywords
+        String text = searchArea.getText();
+
+        scrlpneSong.setVisible(true);
+        scrlpneSong.setContent(vboxSong);
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                List<Songs> songList = search.searchSong(text, searchType);
+                // return searchOld.search(text);
+
+                Node[] nodes;
+                nodes = new Node[songList.size()];
+                // System.out.println("songList.size() = " + songList.size());
+                Platform.runLater(() -> vboxSong.getChildren().clear());
+                for (int i = 0; i < nodes.length; i++) {
+                    try {
+                        nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
+                        Label lblSongName = (Label) nodes[i].lookup("#songName");
+                        Label lblISRC = (Label) nodes[i].lookup("#searchResultISRC");
+                        Label lblArtist = (Label) nodes[i].lookup("#songSinger");
+                        Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
+                        Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
+                        Label songType = (Label) nodes[i].lookup("#songType");
+                        HBox hbox2 = (HBox) nodes[i].lookup("#hbox2");
+
+                        lblSongName.setText(songList.get(i).getTrackTitle());
+                        lblISRC.setText(songList.get(i).getISRC().trim());
+                        lblArtist.setText(songList.get(i).getSinger().trim());
+                        lblComposer.setText(songList.get(i).getComposer().trim());
+                        lblLyricist.setText(songList.get(i).getLyricist().trim());
+
+                        if (songList.get(i).isOriginal()) {
+                            songType.setVisible(true);
+                        }
+
+                        if (songList.get(i).isInList()) {
+                            hbox2.setStyle("-fx-border-color: #6eb0e0");
+                        }
+
+                        int finalI = i;
+                        Platform.runLater(() -> vboxSong.getChildren().add(nodes[finalI]));
+                    } catch (IOException ex) {
+                        Platform.runLater(() -> {
+                            AlertBuilder.sendErrorAlert("Error", "Error occurred when loading song", ex.toString());
+                        });
+                    }
+                }
+                // return songList;
+                return null;
+            }
+        };
 
         Thread thread = new Thread(task);
         thread.start();

@@ -21,6 +21,7 @@ public class Songs {
 
     private String fileName;
     private double royalty;
+    private String type;
 
     public String getFeaturingArtist() {
         return featuringArtist;
@@ -151,7 +152,8 @@ public class Songs {
     }
 
     public boolean isOriginal() {
-        return !Objects.equals(singer, "");
+        return Objects.equals(type, "O");
+        // return !Objects.equals(singer, "");
     }
 
     public boolean isInList() {
@@ -205,6 +207,25 @@ public class Songs {
         return fileName;
     }
 
-    public void setSong_name(String song_name) {
+    public String getType() {
+        switch (type) {
+            case "O" -> {
+                return "Sound Registration";
+            }
+            case "C" -> {
+                return "UGC";
+            }
+            case null, default -> {
+                return "Unspecified";
+            }
+        }
+    }
+
+    public void setType(String string) {
+        this.type = string;
+    }
+
+    public void setProductTitle(String string) {
+        this.productTitle = string;
     }
 }

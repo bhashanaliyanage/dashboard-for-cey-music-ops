@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainVBox" prefWidth="696.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="mainVBox" prefWidth="696.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerInvoiceNew">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -165,87 +165,77 @@
                         </font>
                     </Label>
                 </VBox>
-                <HBox fx:id="hboxAmountPerItem" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0"
-                      styleClass="search-container" stylesheets="@../styles.css">
+                <HBox fx:id="hboxAmountPerItem" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0" styleClass="search-container" stylesheets="@../styles.css">
                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </padding>
                     <HBox.margin>
-                        <Insets/>
+                        <Insets />
                     </HBox.margin>
-                    <TextField fx:id="txtAmountPerItem" prefHeight="30.0" prefWidth="440.0"
-                               promptText="Amount Per Copyright Holder" stylesheets="@../styles.css">
+                    <TextField fx:id="txtAmountPerItem" prefHeight="30.0" prefWidth="440.0" promptText="Amount Per Copyright Holder" stylesheets="@../styles.css">
                         <styleClass>
-                            <String fx:value="text-field"/>
-                            <String fx:value="text-field"/>
+                            <String fx:value="text-field" />
+                            <String fx:value="text-field" />
                         </styleClass>
                     </TextField>
                 </HBox>
             </HBox>
-            <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="268.0" maxWidth="606.0" minHeight="67.0"
-                  minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg"
-                  stylesheets="@../styles.css">
+            <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="268.0" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
                 <padding>
-                    <Insets left="20.0"/>
+                    <Insets left="20.0" />
                 </padding>
                 <VBox.margin>
-                    <Insets left="30.0"/>
+                    <Insets left="30.0" />
                 </VBox.margin>
                 <Label prefHeight="40.0" prefWidth="120.0" text="Currency Format" wrapText="true">
                     <font>
-                        <Font name="Segoe UI Semilight" size="14.0"/>
+                        <Font name="Segoe UI Semilight" size="14.0" />
                     </font>
                     <HBox.margin>
-                        <Insets/>
+                        <Insets />
                     </HBox.margin>
                 </Label>
-                <HBox fx:id="hboxCurrencyFormat" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0"
-                      styleClass="search-container" stylesheets="@../styles.css">
+                <HBox fx:id="hboxCurrencyFormat" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0" styleClass="search-container" stylesheets="@../styles.css">
                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </padding>
                     <HBox.margin>
-                        <Insets/>
+                        <Insets />
                     </HBox.margin>
-                    <TextField fx:id="txtCurrencyFormat" prefHeight="30.0" prefWidth="440.0"
-                               promptText="Currency Format" stylesheets="@../styles.css">
+                    <TextField fx:id="txtCurrencyFormat" prefHeight="30.0" prefWidth="440.0" promptText="Currency Format" stylesheets="@../styles.css">
                         <styleClass>
-                            <String fx:value="text-field"/>
-                            <String fx:value="text-field"/>
+                            <String fx:value="text-field" />
+                            <String fx:value="text-field" />
                         </styleClass>
                     </TextField>
                 </HBox>
             </HBox>
-            <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="345.0" maxWidth="606.0" minHeight="67.0"
-                  minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg"
-                  stylesheets="@../styles.css">
+            <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="345.0" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
                 <padding>
-                    <Insets left="20.0"/>
+                    <Insets left="20.0" />
                 </padding>
                 <VBox.margin>
-                    <Insets left="30.0"/>
+                    <Insets left="30.0" />
                 </VBox.margin>
                 <Label prefHeight="40.0" prefWidth="120.0" text="Discount" wrapText="true">
                     <font>
-                        <Font name="Segoe UI Semilight" size="14.0"/>
+                        <Font name="Segoe UI Semilight" size="14.0" />
                     </font>
                     <HBox.margin>
-                        <Insets/>
+                        <Insets />
                     </HBox.margin>
                 </Label>
-                <HBox fx:id="hboxDiscount" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0"
-                      styleClass="search-container" stylesheets="@../styles.css">
+                <HBox fx:id="hboxDiscount" maxHeight="35.0" prefHeight="0.0" prefWidth="450.0" styleClass="search-container" stylesheets="@../styles.css">
                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </padding>
                     <HBox.margin>
-                        <Insets/>
+                        <Insets />
                     </HBox.margin>
-                    <TextField fx:id="txtDiscount" prefHeight="30.0" prefWidth="440.0"
-                               promptText="Leave this field if no discount applies" stylesheets="@../styles.css">
+                    <TextField fx:id="txtDiscount" prefHeight="30.0" prefWidth="440.0" promptText="Leave this field if no discount applies" stylesheets="@../styles.css">
                         <styleClass>
-                            <String fx:value="text-field"/>
-                            <String fx:value="text-field"/>
+                            <String fx:value="text-field" />
+                            <String fx:value="text-field" />
                         </styleClass>
                     </TextField>
                 </HBox>
@@ -254,12 +244,12 @@
                 <padding>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </padding>
-                <Button fx:id="btnGenerateInvoice" layoutX="31.0" layoutY="29.0" minHeight="30.0" minWidth="580.0" onAction="#onGenerateInvoice" styleClass="button_inside" stylesheets="@../styles.css" text="Generate Invoice">
+                <Button fx:id="btnGenerateInvoice" layoutX="31.0" layoutY="29.0" minHeight="30.0" minWidth="580.0" onAction="#onGenerateInvoice" styleClass="button_inside_brown" stylesheets="@../styles.css" text="Generate Invoice">
                     <VBox.margin>
                         <Insets />
                     </VBox.margin>
                 </Button>
-                <Button fx:id="btnCopyTo" minHeight="30.0" minWidth="580.0" styleClass="button_inside" stylesheets="@../styles.css" text="Copy List to Location">
+                <Button fx:id="btnCopyTo" disable="true" minHeight="30.0" minWidth="580.0" styleClass="button_inside" stylesheets="@../styles.css" text="Copy List to Location">
                     <HBox.margin>
                         <Insets bottom="20.0" right="30.0" top="20.0" />
                     </HBox.margin>
@@ -267,7 +257,7 @@
                         <Insets top="10.0" />
                     </VBox.margin>
                 </Button>
-                <Button fx:id="btnAddMore" layoutX="213.0" layoutY="21.0" minHeight="30.0" minWidth="580.0" styleClass="button_inside" stylesheets="@../styles.css" text="Add More Songs">
+                <Button fx:id="btnAddMore" disable="true" layoutX="213.0" layoutY="21.0" minHeight="30.0" minWidth="580.0" styleClass="button_inside" stylesheets="@../styles.css" text="Add More Songs">
                     <VBox.margin>
                         <Insets top="10.0" />
                     </VBox.margin>
