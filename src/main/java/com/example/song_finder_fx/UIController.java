@@ -51,7 +51,6 @@ import java.util.stream.Stream;
 
 public class UIController implements com.example.song_finder_fx.Constants.UINode {
     public VBox sideVBox;
-    private final NotificationBuilder nb = new NotificationBuilder();
     private final Search search = new Search();
 
 
@@ -704,7 +703,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         // TODO: Do this on a separate thread
         Connection con = checkDatabaseConnection();
         if (con != null) {
-            nb.displayTrayInfo("Database Connected", "Database Connection Success");
+            NotificationBuilder.displayTrayInfo("Database Connected", "Database Connection Success");
         } else {
             NotificationBuilder.displayTrayError("Error", "Error connecting database");
         }
