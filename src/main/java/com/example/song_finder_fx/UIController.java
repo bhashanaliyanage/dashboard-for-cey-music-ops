@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Model.Search;
@@ -490,10 +491,10 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         Connection con = checkDatabaseConnection();
 
         if (con != null) {
-            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-recent-songs.fxml"));
-            Parent sidepanelNewContent = sidepanelLoader.load();
             mainVBox.getChildren().clear();
             mainVBox.getChildren().add(mainNodes[2]);
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
         } else {
@@ -740,8 +741,13 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         try {
             Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/song-list.fxml")));
             mainVBox.getChildren().setAll(node);
+
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            sideVBox.getChildren().clear();
+            sideVBox.getChildren().add(sidepanelNewContent);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
         }
     }
 
@@ -874,9 +880,18 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     //<editor-fold desc="Settings">
-    public void onSettingsButtonClicked() throws IOException, SQLException, ClassNotFoundException {
-        ControllerSettings cs = new ControllerSettings(this);
-        cs.loadThings();
+    public void onSettingsButtonClicked() {
+        try {
+            ControllerSettings cs = new ControllerSettings(this);
+            cs.loadThings();
+
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            sideVBox.getChildren().clear();
+            sideVBox.getChildren().add(sidepanelNewContent);
+        } catch (IOException | SQLException | ClassNotFoundException e) {
+            AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
+        }
     }
     //</editor-fold>
 
@@ -889,18 +904,29 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         }
     }
 
-    public void onCollectSongsButtonClick(MouseEvent event) throws ClassNotFoundException, SQLException {
-        changeSelectorTo(rctCollectSongs);
-        checkDatabaseConnection();
+    public void onCollectSongsButtonClick(MouseEvent event) {
+        try {
+            changeSelectorTo(rctCollectSongs);
+            checkDatabaseConnection();
 
-        mainVBox.getChildren().clear();
-        mainVBox.getChildren().add(mainNodes[3]);
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(mainNodes[3]);
 
-        String directoryString = Main.getAudioDatabaseLocation();
-        Node node = (Node) event.getSource();
-        Scene scene = node.getScene();
-        Button btnAudioDatabase = (Button) scene.lookup("#btnAudioDatabase");
-        btnAudioDatabase.setText("   Audio Database: " + directoryString);
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            sideVBox.getChildren().clear();
+            sideVBox.getChildren().add(sidepanelNewContent);
+
+            String directoryString = Main.getAudioDatabaseLocation();
+            Node node = (Node) event.getSource();
+            Scene scene = node.getScene();
+            Button btnAudioDatabase = (Button) scene.lookup("#btnAudioDatabase");
+            btnAudioDatabase.setText("   Audio Database: " + directoryString);
+        } catch (ClassNotFoundException | SQLException e) {
+            AlertBuilder.sendErrorAlert("Error!", "Error Getting Audio Database", e.toString());
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error!", "Error Loading Side Panel", e.toString());
+        }
     }
 
     @FXML
@@ -1142,27 +1168,55 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     }
     //</editor-fold>
 
-    public void onArtistReportsBtnClick() throws IOException {
+    public void onArtistReportsBtnClick() {
         changeSelectorTo(rctArtistReports);
-        ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
-        revenueGenerator.loadArtistReports();
+
+        try {
+            ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
+            revenueGenerator.loadArtistReports();
+
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            sideVBox.getChildren().clear();
+            sideVBox.getChildren().add(sidepanelNewContent);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
+        }
     }
 
     public void hideLeft() {
         borderpane.setLeft(null);
     }
 
-    public void onIngestsBtnClick() throws IOException {
+    public void onIngestsBtnClick() {
         changeSelectorTo(rctIngests);
 
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests-chooser.fxml")));
-        mainVBox.getChildren().setAll(node);
+        try {
+            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests-chooser.fxml")));
+            mainVBox.getChildren().setAll(node);
+
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            sideVBox.getChildren().clear();
+            sideVBox.getChildren().add(sidepanelNewContent);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
+        }
     }
 
-    public void onManualClaimsBtnClick(MouseEvent mouseEvent) throws IOException {
+    public void onManualClaimsBtnClick() {
         changeSelectorTo(rctManualClaims);
 
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-main.fxml")));
-        mainVBox.getChildren().setAll(node);
+        try {
+            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-main.fxml")));
+            mainVBox.getChildren().setAll(node);
+
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            sideVBox.getChildren().clear();
+            sideVBox.getChildren().add(sidepanelNewContent);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
+        }
     }
 }

@@ -203,12 +203,11 @@ public class Main extends Application {
 // TODO: 2/5/2024 Add a delete all button to the list
 
 // User Experience
-// TODO: 2/8/2024 System Tray | https://www.youtube.com/watch?v=fVjwV0fIZnQ
+// TODO: 2/14/2024 Make it play FLACs
+// TODO: Create a notification panel for software reminders like: Update artist name validation table
 // TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
 // TODO: Offer cancel method after proceed button clicked
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
-// TODO: 2/14/2024 Make it play FLACs
-// TODO: Create a notification panel for software reminders like: Update artist name validation table
 
 // Performance
 // TODO: If copy to button clicked and user not chose any location the application starts to search
@@ -223,6 +222,7 @@ public class Main extends Application {
 // Search
 // TODO: 2/8/2024 Edit Song Details
 // TODO: Change song list retrieval process to Postgres
+// TODO: Sidebar for search
 
 // Ingests
 // TODO: 3/26/2024 Debug Ingest CSV
@@ -235,7 +235,6 @@ public class Main extends Application {
 // TODO: Remove an added manual claim in the add manual claim view (which currently uses the archive method)
 // TODO: Reset add manual claim view after adding a manual claim
 // TODO: Batch Edit Artworks
-// TODO: Batch Paste UPCs
 // TODO: Show artwork when switching to identifier view (will be helpful to identify the manual claim)
 // TODO: Offer a save button or periodically auto save in identifier view for better user experience
 

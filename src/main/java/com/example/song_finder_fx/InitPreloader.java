@@ -149,7 +149,7 @@ public class InitPreloader implements Initializable {
             try {
                 starting = true;
                 Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/main-view.fxml")));
-                Stage stage = new Stage();
+                Stage mainWindowStage = new Stage();
                 Scene scene = new Scene(root);
 
                 VBox main = (VBox) scene.lookup("#mainVBox");
@@ -166,11 +166,11 @@ public class InitPreloader implements Initializable {
 
                 main.getChildren().add(UIController.mainNodes[2]);
 
-                stage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionNumber() + " (beta)");
+                mainWindowStage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionNumber() + " (beta)");
                 Image image = new Image("com/example/song_finder_fx/icons/icon.png");
-                stage.getIcons().add(image);
-                stage.setWidth(1350);
-                stage.setHeight(900);
+                mainWindowStage.getIcons().add(image);
+                mainWindowStage.setWidth(1350);
+                mainWindowStage.setHeight(900);
 
                 Platform.setImplicitExit(false);
 
@@ -189,7 +189,7 @@ public class InitPreloader implements Initializable {
                     // Setting Menu Items
                     java.awt.MenuItem dash = new java.awt.MenuItem("Dashboard");
                     dash.setFont(defaultFont);
-                    dash.addActionListener(event -> Platform.runLater(stage::show));
+                    dash.addActionListener(event -> Platform.runLater(mainWindowStage::show));
 
                     java.awt.MenuItem sidebar = new java.awt.MenuItem("Open Side Bar");
                     sidebar.addActionListener(event -> System.out.println("Side Bar Button Click"));
@@ -212,17 +212,17 @@ public class InitPreloader implements Initializable {
                     popupMenu.add(exit);
                     trayIcon.setPopupMenu(popupMenu);
 
-                    trayIcon.addActionListener(ActionEvent -> Platform.runLater(stage::show));
+                    trayIcon.addActionListener(ActionEvent -> Platform.runLater(mainWindowStage::show));
 
                     tray.add(trayIcon);
                 } catch (AWTException | FontFormatException | IOException e) {
                     System.out.println("System Tray Error: " + e);
                 }
 
-                stage.setScene(scene);
-                stage.show();
+                mainWindowStage.setScene(scene);
+                mainWindowStage.show();
 
-                stage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
+                mainWindowStage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 
                 if (Main.versionInfo.updateAvailable()) {
                     Label updateNotify = (Label) scene.lookup("#lblUserEmailAndUpdate");
@@ -230,7 +230,7 @@ public class InitPreloader implements Initializable {
                     updateNotify.setStyle("-fx-text-fill: '#FEA82F'");
                 }
 
-                stage.widthProperty().addListener((obs, oldVal, newVal) -> {
+                mainWindowStage.widthProperty().addListener((obs, oldVal, newVal) -> {
                     if ((oldVal.intValue() > newVal.intValue()) && (newVal.intValue() <= 1235)) {
                         leftVBox.setPrefWidth(100);
                         leftVBox.setMinWidth(100);
