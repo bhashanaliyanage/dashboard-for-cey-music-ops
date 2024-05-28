@@ -59,7 +59,7 @@ public class ArtistReport {
                 "January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"
         };
-        return monthNames[monthInt];
+        return monthNames[monthInt - 1];
     }
 
     public ArrayList<String> getCoWriters() {

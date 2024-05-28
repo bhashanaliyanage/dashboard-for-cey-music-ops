@@ -9,10 +9,7 @@ import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.border.SolidBorder;
-import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Image;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 import javafx.stage.FileChooser;
@@ -34,7 +31,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
 
-    public void generateReport(Window window, ArtistReport report) throws IOException {
+    /*public void generateReport(Window window, ArtistReport report) throws IOException {
         String path = getSaveLocation(window);
 
         PDFDocument pdfDocument = new PDFDocument();
@@ -67,7 +64,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         document.add(tableFooter);
 
         document.close();
-    }
+    }*/
 
     private Table getCoWriterSummaryTable(ArtistReport report) {
         float[] columnWidth = {500f, 200f};
@@ -366,22 +363,29 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
 
         // Table 01
         Table tableHeader = getHeaderTable(reportHeading);
+        Table tableFooter = getFooterTable();
+        document.add(tableHeader); // Header
         Table table02 = getTable02(report);
+
+        tableFooter.setFixedPosition(20f, document.getBottomMargin(), document.getWidth());
+
         Table table03 = getTable03(report);
         // Table table04 = getTable04(report);
         Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
         Table tableCoWriterPaymentSummary = getCoWriterSummaryTable(report);
-        Table tableFooter = getFooterTable();
 
-        tableFooter.setFixedPosition(20f, document.getBottomMargin(), document.getWidth());
-
-        document.add(tableHeader); // Header
         document.add(table02);
         document.add(table03);
         // document.add(table04);
         document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
         document.add(tableTopPerformingSongsSummary); // Co-Writer Payment Summary
+
         document.add(tableFooter);
+
+        document.add(new AreaBreak());
+
+        document.add(tableHeader);
+        document.add(table02);
 
         document.close();
 

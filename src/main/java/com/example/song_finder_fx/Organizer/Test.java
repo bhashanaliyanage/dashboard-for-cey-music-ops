@@ -13,11 +13,12 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        testSearch();
+        // testSearch();
+        testArtistReportPDF();
     }
 
     private static void testArtistReportPDF() throws SQLException, IOException {
-        String artistName = "2Forty2";
+        String artistName = "Rohana Weerasinghe";
         ArtistReport report = getArtistReport(47, 320, artistName);
         ReportPDF pdf = new ReportPDF();
         String path = "C:\\Users\\bhash\\Documents\\Test\\test.pdf";

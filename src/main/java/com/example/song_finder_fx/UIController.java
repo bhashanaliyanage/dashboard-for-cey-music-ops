@@ -220,20 +220,20 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         // Adding songs to list
         Main.addSongToList(isrc.getText());
 
-        List<String> songList = Main.getSongList();
-        int songListLength = songList.size();
+        // List<String> songList = Main.getSongList();
+        // int songListLength = songList.size();
 
-        if (songListLength > 1) {
+        /*if (songListLength > 1) {
             String text = songList.getFirst() + " + " + (songListLength - 1) + " other songs added";
             songListButtonSubtitle.setText(text);
             System.out.println(text);
         } else {
             songListButtonSubtitle.setText(songList.getFirst());
             System.out.println(songList.getFirst());
-        }
+        }*/
     }
 
-    public void onAddToListButtonClickedInSearchSong(MouseEvent mouseEvent) {
+    /*public void onAddToListButtonClickedInSearchSong(MouseEvent mouseEvent) {
         // Getting scene
         Node node = (Node) mouseEvent.getSource();
         Scene scene = node.getScene();
@@ -255,7 +255,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             songListButtonSubtitle.setText(songList.getFirst());
             System.out.println(songList.getFirst());
         }
-    }
+    }*/
 
     public void onOpenFileLocationButtonClicked(MouseEvent mouseEvent) {
         boolean directoryStatus = Main.directoryCheckNew();
@@ -739,7 +739,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public void onSongListButtonClicked() {
         try {
             Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/song-list.fxml")));
-            mainVBox.getChildren().setAll(node);
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(node);
 
             FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
             Parent sidepanelNewContent = sidepanelLoader.load();
@@ -750,7 +751,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         }
     }
 
-    public void onDeleteSongClicked(MouseEvent event) {
+    /*public void onDeleteSongClicked(MouseEvent event) {
         String isrc = srchRsISRC.getText();
         System.out.println(isrc);
 
@@ -788,7 +789,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 songListButtonSubtitle.setText("Click Here to Add Songs");
             }
         }
-    }
+    }*/
 
     public void onPlaySongClicked(MouseEvent mouseEvent) {
         System.out.println("Test");

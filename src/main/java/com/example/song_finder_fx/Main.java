@@ -2,6 +2,7 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.UserSettingsManager;
 import com.example.song_finder_fx.Model.ProductVersion;
+import com.example.song_finder_fx.Model.Songs;
 import com.example.song_finder_fx.Session.UserSession;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
@@ -27,6 +28,7 @@ public class Main extends Application {
     public static Stage primaryStage = null;
     public static UserSession userSession;
     static List<String> songList = new ArrayList<>();
+    static List<Songs> songListNew = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
     public static ProductVersion versionInfo = new ProductVersion(23.13);
@@ -50,6 +52,14 @@ public class Main extends Application {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
 
         return fileChooser.showOpenDialog(window);
+    }
+
+    public static void addSongToList(Songs song) {
+        songListNew.add(song);
+    }
+
+    public static List<Songs> getSongListNew() {
+        return songListNew;
     }
 
     @Override
@@ -83,8 +93,8 @@ public class Main extends Application {
         }
     }
 
-    public static List<String> getSongList() {
-        return songList;
+    public static List<Songs> getSongList() {
+        return songListNew;
     }
 
     public static void directoryCheck() {

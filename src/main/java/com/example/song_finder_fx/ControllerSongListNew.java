@@ -56,14 +56,15 @@ public class ControllerSongListNew {
     @FXML
     void initialize() {
         // Song List
-        List<String> songList = Main.getSongList();
+        // List<String> songList = Main.getSongList();
+        List<Songs> songListNew = Main.getSongList();
 
         // Setting up UI
         scrlpneSong.setVisible(true);
         scrlpneSong.setContent(vboxSong);
 
         Node[] nodes;
-        nodes = new Node[songList.size()];
+        nodes = new Node[songListNew.size()];
         vboxSong.getChildren().clear();
 
         int listSize = Main.getSongList().size();
@@ -72,7 +73,7 @@ public class ControllerSongListNew {
         for (int i = 0; i < nodes.length; i++) {
             try {
                 System.out.println("i = " + i);
-                Songs songDetail = DatabaseMySQL.searchSongDetails(songList.get(i));
+                Songs songDetail = songListNew.get(i);
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist.fxml")));
                 Label lblSongNumber = (Label) nodes[i].lookup("#songNumber");
                 Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
@@ -84,9 +85,7 @@ public class ControllerSongListNew {
                 lblArtist.setText(songDetail.getSinger());
                 vboxSong.getChildren().add(nodes[i]);
             } catch (NullPointerException | IOException ex) {
-                ex.printStackTrace();
-            } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                AlertBuilder.sendErrorAlert("Error", "Error Loading Layout", ex.toString());
             }
         }
     }
@@ -99,8 +98,9 @@ public class ControllerSongListNew {
     @FXML
     void onCopyToButtonClicked(ActionEvent event) {
         Task<Void> task;
-        List<String> songList = Main.getSongList();
-        if (songList.isEmpty()) {
+        // List<String> songList = Main.getSongList();
+        List<Songs> songListNew = Main.getSongList();
+        if (songListNew.isEmpty()) {
             btnCopyTo.setText("Please add song(s) to list to proceed");
             btnCopyTo.setStyle("-fx-border-color: '#931621'");
         } else {
@@ -115,10 +115,10 @@ public class ControllerSongListNew {
                         task = new Task<>() {
                             @Override
                             protected Void call() throws Exception {
-                                int songListSize = songList.size();
+                                int songListSize = songListNew.size();
 
                                 for (int i = 0; i < songListSize; i++) {
-                                    String isrc = songList.get(i);
+                                    String isrc = songListNew.get(i).getISRC();
 
                                     int finalI = i;
                                     Platform.runLater(() -> updateButtonProceed("Copying " + (finalI + 1) + " of " + songListSize));
@@ -158,7 +158,7 @@ public class ControllerSongListNew {
     }
 
     @FXML
-    void onGenerateInvoiceButtonClicked(ActionEvent event) throws IOException {
+    void onGenerateInvoiceButtonClicked(ActionEvent event) {
         Scene scene;
         try {
             FXMLLoader loader = new FXMLLoader(ControllerInvoice.class.getResource("layouts/song-list-invoice.fxml"));

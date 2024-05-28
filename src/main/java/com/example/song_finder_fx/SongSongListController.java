@@ -60,19 +60,22 @@ public class SongSongListController {
             Node node = (Node) event.getSource();
             Scene scene = node.getScene();
 
-            List<String> songList = Main.getSongList();
-            int listSize = songList.size();
+            // List<String> songList = Main.getSongList();
+            List<Songs> songListNew = Main.getSongList();
+            int listSize = songListNew.size();
             Label lblListCount = (Label) scene.lookup("#lblListCount");
             Label songListButtonSubtitle = (Label) scene.lookup("#lblSongListSub");
             lblListCount.setText("Total: " + listSize);
 
             try {
                 if (listSize > 1) {
-                    String text = songList.getFirst() + " + " + (listSize - 1) + " other songs added";
+                    String isrcTemp = songListNew.getFirst().getISRC();
+                    String text = isrcTemp + " + " + (listSize - 1) + " other songs added";
+
                     songListButtonSubtitle.setText(text);
-                    System.out.println(text);
+                    // System.out.println("Test" + text);
                 } else {
-                    songListButtonSubtitle.setText(songList.getFirst());
+                    songListButtonSubtitle.setText(songListNew.getFirst().getISRC());
 //                    System.out.println(songList.getFirst());
                 }
             } catch (Exception e) {

@@ -92,42 +92,48 @@ public class ControllerInvoiceNew {
 
     @FXML
     void initialize() {
-        // Song List
-        List<String> songList = Main.getSongList();
+        List<Songs> songListNew = Main.getSongList();
 
+        setSongCount(songListNew.size());
+
+        loadSongList(songListNew);
+    }
+
+    private void loadSongList(List<Songs> songListNew) {
         // Setting up UI
         scrlpneSongInvoice.setVisible(true);
         scrlpneSongInvoice.setContent(vboxSong);
 
         Node[] nodes;
-        nodes = new Node[songList.size()];
+        nodes = new Node[songListNew.size()];
         vboxSong.getChildren().clear();
 
         for (int i = 0; i < nodes.length; i++) {
             try {
-                Songs songDetail = DatabaseMySQL.searchSongDetails(songList.get(i));
+                Songs songDetail = songListNew.get(i);
 
                 // Search Composer and Lyricist from Artists Table
                 String percentage;
                 String copyrightOwner = null;
+                String copyrightOwnerView = "";
 
                 if (songDetail.composerAndLyricistCeyMusic()) {
                     percentage = "100%";
                     copyrightOwner = songDetail.getComposer() + "\n" + songDetail.getLyricist();
+                    copyrightOwnerView = songDetail.getComposer() + " | " + songDetail.getLyricist();
                 } else if (songDetail.composerOrLyricistCeyMusic()) {
                     percentage = "50%";
                     if (songDetail.composerCeyMusic()) {
                         copyrightOwner = songDetail.getComposer();
+                        copyrightOwnerView = songDetail.getComposer();
                     } else {
                         copyrightOwner = songDetail.getLyricist();
+                        copyrightOwnerView = songDetail.getLyricist();
                     }
                 } else {
                     percentage = "0%";
                 }
 
-                /*// Adding song details to a temporary SQLite table
-                String songName = songDetail.getTrackTitle();
-                boolean status = Database.handleSongListTemp(songName, percentage, copyrightOwnerTemp);*/
                 songDetail.setPercentage(percentage);
                 songDetail.setCopyrightOwner(copyrightOwner);
                 songs.add(songDetail);
@@ -151,10 +157,12 @@ public class ControllerInvoiceNew {
                 Label lblSongName = (Label) nodes[i].lookup("#songName");
                 Label lblArtist = (Label) nodes[i].lookup("#songArtist");
                 Label lblSongShare = (Label) nodes[i].lookup("#songShare");
+                Label lblISRC = (Label) nodes[i].lookup("#lblISRC");
 
                 lblSongName.setText(songDetail.getTrackTitle());
-                lblArtist.setText(copyrightOwner);
+                lblArtist.setText(copyrightOwnerView);
                 lblSongShare.setText(percentage);
+                lblISRC.setText(songDetail.getISRC());
 
                 vboxSong.getChildren().add(nodes[i]);
             } catch (NullPointerException | IOException ex) {
@@ -163,6 +171,10 @@ public class ControllerInvoiceNew {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private void setSongCount(int size) {
+        lblListCount.setText("Total: " + size);
     }
 
     @FXML

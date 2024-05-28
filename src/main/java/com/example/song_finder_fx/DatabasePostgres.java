@@ -864,17 +864,15 @@ public class DatabasePostgres {
     public static double getTotalRoyalty1(String name) {
         double d = 0.0;
         try {
-            List<PayeeForReport> pr = new ArrayList<PayeeForReport>();
+            List<PayeeForReport> pr;
             pr = getPayeeReport1(name);
 
-            for (int i = 0; i < pr.size(); i++) {
-                PayeeForReport dd = pr.get(i);
+            for (PayeeForReport dd : pr) {
                 d = d + dd.getValue();
-
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return d;
 
@@ -884,7 +882,7 @@ public class DatabasePostgres {
         double d = 0.0;
         try {
             List<PayeeForReport> pr;
-            pr = getPayeRepot(name);
+            pr = getPayeeReport(name);
 
             for (int i = 0; i < pr.size(); i++) {
                 PayeeForReport dd = pr.get(i);
@@ -900,27 +898,27 @@ public class DatabasePostgres {
 
     public static List<PayeeForReport> getPayeeReport1(String name) {
         System.out.println("Getting Payee Report for: " + name);
-        String sql = "   SELECT ip.isrc," + "       SUM(  CASE    WHEN ip.payee ='\" + arname + \"' THEN ip.share"
-                + "               WHEN ip.payee01 = '\" + arname + \"' THEN ip.payee01share"
-                + "               ELSE ip.payee02share  END ) AS total_payee_share, SUM( rv.reported_royalty_for_ceymusic / 100 * CASE "
-                + "               WHEN ip.payee = ? THEN ip.share\r\n"
-                + "               WHEN ip.payee01 = ? THEN ip.payee01share\r\n" + "               ELSE ip.payee02share"
-                + "           END ) AS total_calculated_royalty" + " FROM isrc_payees  ip "
-                + " JOIN \"reportViewSummary1\" rv ON ip.isrc = rv.asset_isrc"
-                + " WHERE ip.payee =?  OR ip.payee01 =?   OR ip.payee02 =  ? " + "GROUP BY ip.isrc ";
-        List<PayeeForReport> pReport = new ArrayList<PayeeForReport>();
+        String sql = """
+                SELECT ip.isrc,\s
+                SUM(CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_payee_share,\s
+                SUM(rv.reported_royalty_for_ceymusic / 100 * CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_calculated_royalty
+                FROM isrc_payees ip\s
+                JOIN "summary_breakdown_02" rv ON ip.isrc = rv.asset_isrc
+                WHERE ip.payee = ? OR ip.payee01 = ? OR ip.payee02 = ? GROUP BY ip.isrc;
+                """;
+        List<PayeeForReport> pReport = new ArrayList<>();
         Connection con = getConn();
 
         try {
             PreparedStatement ps = con.prepareStatement(sql);
-//			System.out.println("here");
             ps.setString(1, name);
             ps.setString(2, name);
             ps.setString(3, name);
             ps.setString(4, name);
             ps.setString(5, name);
+            ps.setString(6, name);
+            ps.setString(7, name);
             System.out.println();
-//			System.out.println(ps);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -940,7 +938,7 @@ public class DatabasePostgres {
 
     }
 
-    public static List<PayeeForReport> getPayeRepot(String name) {
+    public static List<PayeeForReport> getPayeeReport(String name) {
         String sql = """
                    SELECT ip.isrc,       SUM(  CASE    WHEN ip.payee = ? THEN ip.share\
                                WHEN ip.payee01 = ? THEN ip.payee01share\
@@ -949,7 +947,7 @@ public class DatabasePostgres {
                                WHEN ip.payee01 = ? THEN ip.payee01share\r
                                ELSE ip.payee02share\
                            END ) AS total_calculated_royalty FROM isrc_payees  ip \
-                 JOIN "testRep1" rv ON ip.isrc = rv.asset_isrc\
+                 JOIN "summary_breakdown_02" rv ON ip.isrc = rv.asset_isrc\
                  WHERE ip.payee = ?  OR ip.payee01 = ?   OR ip.payee02 =  ? GROUP BY ip.isrc \
                 """;
         List<PayeeForReport> pReport = new ArrayList<>();
@@ -1172,18 +1170,19 @@ public class DatabasePostgres {
         Connection conn = getConn();
         List<CoWriterSummary> list = new ArrayList<>();
 
-        PreparedStatement ps = conn.prepareStatement("SELECT \n" +
-                "    CASE \n" +
-                "        WHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist)\n" +
-                "        ELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)\n" +
-                "    END AS contributor,\n" +
-                "    SUM(rep.after_deduction_royalty) AS total_royalty\n" +
-                "FROM public.isrc_payees ip\n" +
-                "JOIN SONGS S ON IP.ISRC = S.ISRC\n" +
-                "JOIN public.\"testRep1\" rep ON IP.ISRC = rep.asset_isrc\n" +
-                "WHERE (ip.payee = ? AND ip.share = 100)\n" +
-                "GROUP BY contributor\n" +
-                "ORDER BY total_royalty DESC LIMIT 5;");
+        PreparedStatement ps = conn.prepareStatement("""
+                SELECT\s
+                    CASE\s
+                        WHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist)
+                        ELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)
+                    END AS contributor,
+                    SUM(rep.after_deduction_royalty) AS total_royalty
+                FROM public.isrc_payees ip
+                JOIN SONGS S ON IP.ISRC = S.ISRC
+                JOIN public."summary_breakdown_02" rep ON IP.ISRC = rep.asset_isrc
+                WHERE (ip.payee = ? AND ip.share = 100)
+                GROUP BY contributor
+                ORDER BY total_royalty DESC LIMIT 5;""");
         ps.setString(1, artistName);
 
         ResultSet rs = ps.executeQuery();
@@ -1471,37 +1470,17 @@ public class DatabasePostgres {
     public static ArrayList<Songs> getTopPerformingSongs(String selectedItem) throws SQLException {
         Connection conn = getConn();
 
-        /*String sql = """
-                SELECT S.SONG_NAME,
-                \tR.REPORTED_ROYALTY
-                FROM PUBLIC.REPORT AS R
-                JOIN
-                \t(SELECT ASSET_ISRC,
-                \t\t\tMAX(REPORTED_ROYALTY) AS MAX_ROYALTY
-                \t\tFROM PUBLIC.REPORT
-                \t\tWHERE ASSET_ISRC IN
-                \t\t\t\t(SELECT ISRC
-                \t\t\t\t\tFROM PUBLIC.ISRC_PAYEES
-                \t\t\t\t\tWHERE PAYEE01 = ?
-                \t\t\t\t\t\tOR PAYEE = ?
-                \t\t\t\t\t\tOR PAYEE02 = ?)
-                \t\tGROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC
-                AND R.REPORTED_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
-                LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
-                ORDER BY R.REPORTED_ROYALTY DESC
-                LIMIT 5;""";*/
-
         String sql = """
                 SELECT S.SONG_NAME,
                 	R.AFTER_DEDUCTION_ROYALTY / 100 * (CASE WHEN ip.payee = ? THEN ip.share
                 		WHEN ip.payee01 = ? THEN ip.payee01share
                 		ELSE ip.payee02share END) AS share,
                 	R.ASSET_ISRC
-                FROM PUBLIC."testRep1" AS R
+                FROM PUBLIC."summary_breakdown_02" AS R
                 JOIN
                 	(SELECT ASSET_ISRC,
                 			MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
-                		FROM PUBLIC."testRep1"
+                		FROM PUBLIC."summary_breakdown_02"
                 		WHERE ASSET_ISRC IN
                 				(SELECT ISRC
                 					FROM PUBLIC.ISRC_PAYEES
@@ -1711,16 +1690,9 @@ public class DatabasePostgres {
 
         Connection conn = getConn();
 
-        PreparedStatement ps = conn.prepareStatement("SELECT ISRC, " +
-                "ALBUM_TITLE, " +
-                "UPC, " +
-                "TRACK_TITLE, " +
-                "SINGER, " +
-                "FEATURING, " +
-                "COMPOSER, " +
-                "LYRICIST, " +
-                "FILE_NAME FROM songs WHERE ISRC = ? LIMIT 1");
-        System.out.println("ISRC: " + isrc);
+        PreparedStatement ps = conn.prepareStatement("SELECT isrc, product_title, upc, song_name, singer, " +
+                "null AS featuring,  lyricist, composer FROM public.\"song_metadata_new\" WHERE isrc = ? LIMIT 1;");
+        // System.out.println("ISRC: " + isrc);
         ps.setString(1, isrc);
         rs = ps.executeQuery();
 
@@ -1745,7 +1717,7 @@ public class DatabasePostgres {
         Connection conn = getConn();
         int artistCount;
 
-        PreparedStatement ps = conn.prepareStatement("SELECT COUNT(ARTIST_NAME) FROM artists WHERE ARTIST_NAME = ?;");
+        PreparedStatement ps = conn.prepareStatement("SELECT COUNT(ARTIST_NAME) FROM artists WHERE ARTIST_NAME = ? AND status = 5;");
         ps.setString(1, artist);
         rs = ps.executeQuery();
 
@@ -1921,23 +1893,25 @@ public class DatabasePostgres {
 
     public static List<CoWriterShare> getCoWriterPayments(String artist) throws SQLException {
         List<CoWriterShare> crLlist = new ArrayList<>();
-        String sql = "SELECT \n" +
-                "\tip.isrc,\n" +
-                "\trep.after_deduction_royalty,\n" +
-                "\ts.song_name,\t \n" +
-                "\tip.payee, \n" +
-                "\tip.share, \n" +
-                "\tCASE \n" +
-                "\t\tWHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist)\n" +
-                "\t\tELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)\n" +
-                "\tEND AS contributor,\n" +
-                "\t(SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer, \n" +
-                "\t(SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist, s.type\n" +
-                "FROM public.isrc_payees ip\n" +
-                "JOIN SONGS S ON IP.ISRC = S.ISRC\n" +
-                "JOIN public.\"testRep1\" rep ON IP.ISRC = rep.asset_isrc\n" +
-                "WHERE (ip.payee = ? AND ip.share = 100)\n" +
-                "ORDER BY rep.after_deduction_royalty DESC LIMIT 5;";
+        String sql = """
+                SELECT\s
+                \tip.isrc,
+                \trep.after_deduction_royalty,
+                \ts.song_name,\t\s
+                \tip.payee,\s
+                \tip.share,\s
+                \tCASE\s
+                \t\tWHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist)
+                \t\tELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)
+                \tEND AS contributor,
+                \t(SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,\s
+                \t(SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist, s.type
+                FROM public.isrc_payees ip
+                JOIN SONGS S ON IP.ISRC = S.ISRC
+                JOIN public."summary_breakdown_02" rep ON IP.ISRC = rep.asset_isrc
+                WHERE (ip.payee = ? AND ip.share = 100)
+                ORDER BY rep.after_deduction_royalty DESC LIMIT 5;
+                """;
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setString(1, artist);

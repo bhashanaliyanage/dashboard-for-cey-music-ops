@@ -277,16 +277,17 @@ public class ControllerSearch {
         // Adding songs to list
         Main.addSongToList(searchResultISRC.getText());
 
-        List<String> songList = Main.getSongList();
-        int songListLength = songList.size();
+        // List<Songs> songList = Main.getSongList();
+        List<Songs> songListNew = Main.getSongList();
+        int songListLength = songListNew.size();
 
         if (songListLength > 1) {
-            String text = songList.getFirst() + " + " + (songListLength - 1) + " other songs added";
+            String text = songListNew.getFirst().getISRC() + " + " + (songListLength - 1) + " other songs added";
             songListButtonSubtitle.setText(text);
-            System.out.println(text);
+            // System.out.println(text);
         } else {
-            songListButtonSubtitle.setText(songList.getFirst());
-            System.out.println(songList.getFirst());
+            songListButtonSubtitle.setText(songListNew.getFirst().getISRC());
+            // System.out.println(songList.getFirst());
         }
 
         hbox2.setStyle("-fx-border-color: #6eb0e0");
@@ -447,9 +448,12 @@ public class ControllerSearch {
     void copyComposer() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
-        content.putString(songDetails.getControl());
+        
+        content.putString(songDetails.getComposer());
         boolean status = clipboard.setContent(content);
+        
         System.out.println("status = " + status);
+        
         if (status) {
             btnCopy.setText("Copied");
             Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));

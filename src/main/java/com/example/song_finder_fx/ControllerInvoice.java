@@ -52,7 +52,8 @@ public class ControllerInvoice {
         mainUIController.mainVBox.getChildren().add(newContent);
 
         // Song List
-        List<String> songList = Main.getSongList();
+        // List<Songs> songList = Main.getSongList();
+        List<Songs> songListNew = Main.getSongList();
 
         // Connecting to database
         DatabaseMySQL db = new DatabaseMySQL();
@@ -63,7 +64,7 @@ public class ControllerInvoice {
         scrlpneSongInvoice.setContent(vboxSong);
 
         Node[] nodes;
-        nodes = new Node[songList.size()];
+        nodes = new Node[songListNew.size()];
         vboxSong.getChildren().clear();
 
         // boolean deleted = Database.emptyTableSongListTemp();
@@ -75,7 +76,7 @@ public class ControllerInvoice {
 
         for (int i = 0; i < nodes.length; i++) {
             try {
-                Songs songDetail = db.searchSongDetails(songList.get(i));
+                Songs songDetail = songListNew.get(i);
 
                 // Search Composer and Lyricist from Artists Table
                 String percentage;

@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.ErrorDialog;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Model.Songs;
@@ -62,20 +63,21 @@ public class ControllerSongList {
 
     public void loadList() {
         // Song List
-        List<String> songList = Main.getSongList();
+        // List<String> songList = Main.getSongList();
+        List<Songs> songListNew = Main.getSongList();
 
         // Setting up UI
         scrlpneSong.setVisible(true);
         scrlpneSong.setContent(vboxSong);
 
         Node[] nodes;
-        nodes = new Node[songList.size()];
+        nodes = new Node[songListNew.size()];
         vboxSong.getChildren().clear();
 
         for (int i = 0; i < nodes.length; i++) {
             try {
                 System.out.println("i = " + i);
-                Songs songDetail = DatabaseMySQL.searchSongDetails(songList.get(i));
+                Songs songDetail = songListNew.get(i);
                 nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/song-songlist.fxml")));
                 Label lblSongName = (Label) nodes[i].lookup("#srchRsSongName");
                 Label lblISRC = (Label) nodes[i].lookup("#srchRsISRC");
@@ -84,18 +86,17 @@ public class ControllerSongList {
                 lblISRC.setText(songDetail.getISRC());
                 lblArtist.setText(songDetail.getSinger());
                 vboxSong.getChildren().add(nodes[i]);
-            } catch (NullPointerException | IOException ex) {
-                ex.printStackTrace();
-            } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+            } catch (IOException e) {
+                AlertBuilder.sendErrorAlert("Error", "Error Loading Layout", e.toString());
             }
         }
     }
 
     public void onCopyToButtonClicked() {
         Task<Void> task;
-        List<String> songList = Main.getSongList();
-        if (songList.isEmpty()) {
+        // List<String> songList = Main.getSongList();
+        List<Songs> songListNew = Main.getSongList();
+        if (songListNew.isEmpty()) {
             btnCopyTo.setText("Please add song(s) to list to proceed");
             btnCopyTo.setStyle("-fx-border-color: '#931621'");
         } else {
@@ -110,10 +111,10 @@ public class ControllerSongList {
                         task = new Task<>() {
                             @Override
                             protected Void call() throws Exception {
-                                int songListSize = songList.size();
+                                int songListSize = songListNew.size();
 
                                 for (int i = 0; i < songListSize; i++) {
-                                    String isrc = songList.get(i);
+                                    String isrc = songListNew.get(i).getISRC();
 
                                     int finalI = i;
                                     Platform.runLater(() -> updateButtonProceed("Copying " + (finalI + 1) + " of " + songListSize));

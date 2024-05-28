@@ -1,6 +1,7 @@
 package com.example.song_finder_fx.Model;
 
 import com.example.song_finder_fx.DatabaseMySQL;
+import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Main;
 
 import java.sql.ResultSet;
@@ -106,21 +107,21 @@ public class Songs {
     }
 
     public boolean composerAndLyricistCeyMusic() throws SQLException, ClassNotFoundException {
-        boolean composerCeyMusic = DatabaseMySQL.searchArtistTable(composer);
-        boolean lyricistCeyMusic = DatabaseMySQL.searchArtistTable(lyricist);
+        boolean composerCeyMusic = DatabasePostgres.searchArtistTable(composer);
+        boolean lyricistCeyMusic = DatabasePostgres.searchArtistTable(lyricist);
 
         return composerCeyMusic && lyricistCeyMusic;
     }
 
     public boolean composerOrLyricistCeyMusic() throws SQLException, ClassNotFoundException {
-        boolean composerCeyMusic = DatabaseMySQL.searchArtistTable(composer);
-        boolean lyricistCeyMusic = DatabaseMySQL.searchArtistTable(lyricist);
+        boolean composerCeyMusic = DatabasePostgres.searchArtistTable(composer);
+        boolean lyricistCeyMusic = DatabasePostgres.searchArtistTable(lyricist);
 
         return composerCeyMusic || lyricistCeyMusic;
     }
 
     public boolean composerCeyMusic() throws SQLException, ClassNotFoundException {
-        return DatabaseMySQL.searchArtistTable(composer);
+        return DatabasePostgres.searchArtistTable(composer);
     }
 
     public String getProductName() {
@@ -161,8 +162,8 @@ public class Songs {
         String targetIsrc = isrc.trim().replaceAll("\\p{C}", "");
 
 
-        for (String isrc2 : Main.getSongList()) {
-            String trimmedSong = isrc2.trim().replaceAll("\\p{C}", "");
+        for (Songs song : Main.getSongList()) {
+            String trimmedSong = song.getISRC().trim().replaceAll("\\p{C}", "");
 
             if (trimmedSong.equalsIgnoreCase(targetIsrc)) {
                 isIsrcPresent = true;

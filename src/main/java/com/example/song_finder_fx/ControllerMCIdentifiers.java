@@ -11,6 +11,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -98,6 +100,9 @@ public class ControllerMCIdentifiers {
 
             TextField claimISRC = (TextField) entry.lookup("#claimISRC");
             claimISRCs.add(claimISRC);
+
+            ImageView imgClaimPreview = (ImageView) entry.lookup("#imgClaimPreview");
+            imgClaimPreview.setImage(claim.getPreviewImage());
         }
 
         /*TextField firstUPC_Field = upcs.getFirst();
@@ -144,6 +149,7 @@ public class ControllerMCIdentifiers {
         for (int claimID = 0; claimID < totalClaims; claimID++) {
             final String[] upc = {upcs.get(claimID).getText()};
             String catNo = claimCNumbers.get(claimID).getText();
+            // currentISRC = claimISRCs.get(claimID).getText();
 
             // Validating UPCs
             if (upc[0].isEmpty()) {
@@ -182,6 +188,11 @@ public class ControllerMCIdentifiers {
                 }
             }
         }
+
+        /*currentISRC = claimISRCs.getFirst().getText();
+        if (currentISRC.isEmpty()) {
+            currentISRC = requestNewISRC();
+        }*/
 
         // Switching scenes
         Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests/generate_ingest.fxml")));
@@ -398,6 +409,7 @@ public class ControllerMCIdentifiers {
         String releaseDate = getDate();
         String year = getYear(releaseDate);
         String isrc = getISRC(i, currentISRC);
+        Platform.runLater(() -> System.out.println("isrc = " + isrc));
         String writers = String.format("%s | %s", composer, lyricist);
 
         List<String> row = new ArrayList<>();
@@ -485,11 +497,12 @@ public class ControllerMCIdentifiers {
         );
     }
 
-    private String getISRC(int i, String isrc) throws SQLException {
+    private String getISRC(int i, String isrc) {
         final String[] userISRC = {claimISRCs.get(i).getText()};
         if (Objects.equals(isrc, "")) {
             if (userISRC[0].isEmpty()) {
-                userISRC[0] = DatabasePostgres.getNewUGCISRC();
+                // userISRC[0] = requestNewISRC();
+                userISRC[0] = "";
                 System.out.println("isrc[0] = " + userISRC[0]);
             }
 
@@ -516,6 +529,21 @@ public class ControllerMCIdentifiers {
                 return userISRC[0];
             }
         }
+    }
+
+    private String requestNewISRC() {
+        final String[] isrc = new String[1];
+        Platform.runLater(() -> {
+            TextInputDialog inputDialog = new TextInputDialog(null);
+            inputDialog.setTitle("Cannot find ISRC");
+            inputDialog.setHeaderText("Enter a new ISRC");
+            inputDialog.setContentText("ISRC:");
+            inputDialog.showAndWait().ifPresent(newISRC -> {
+                System.out.println("New ISRC: " + newISRC);
+                isrc[0] =  newISRC;
+            });
+        });
+        return isrc[0];
     }
 
     private String getPrimaryArtists(ManualClaimTrack manualClaimTrack) {

@@ -15,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -148,119 +149,8 @@ public class InitPreloader implements Initializable {
         Thread mainWindow = new Thread(() -> Platform.runLater(() -> {
             try {
                 starting = true;
-                Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/main-view.fxml")));
-                Stage mainWindowStage = new Stage();
-                Scene scene = new Scene(root);
 
-                VBox main = (VBox) scene.lookup("#mainVBox");
-                VBox leftVBox = (VBox) scene.lookup("#leftVBox");
-                HBox hboxAbout = (HBox) scene.lookup("#hboxAbout");
-                Label lblSearch = (Label) scene.lookup("#lblSearch");
-                Label lblSearchNCollect = (Label) scene.lookup("#lblSearchNCollect");
-                Label lblRevenueAnalysis = (Label) scene.lookup("#lblRevenueAnalysis");
-                Label lblArtistReports = (Label) scene.lookup("#lblArtistReports");
-                Label lblSettings = (Label) scene.lookup("#lblSettings");
-                VBox vboxSongList = (VBox) scene.lookup("#vboxSongList");
-                VBox btnDatabaseCheck = (VBox) scene.lookup("#btnDatabaseCheck");
-                VBox btnDatabaseCheck2 = (VBox) scene.lookup("#btnDatabaseCheck2");
-
-                main.getChildren().add(UIController.mainNodes[2]);
-
-                mainWindowStage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionNumber() + " (beta)");
-                Image image = new Image("com/example/song_finder_fx/icons/icon.png");
-                mainWindowStage.getIcons().add(image);
-                mainWindowStage.setWidth(1350);
-                mainWindowStage.setHeight(900);
-
-                Platform.setImplicitExit(false);
-
-                // Set Tray Icon
-                try {
-                    SystemTray tray = SystemTray.getSystemTray();
-
-                    // Loading Font
-                    java.awt.Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf")).deriveFont(12f);
-
-                    // Loading Tray Icon Image
-                    String imagePath = "src/main/resources/com/example/song_finder_fx/icons/icon (Custom).png";
-                    BufferedImage myImage = ImageIO.read(new File(imagePath));
-                    trayIcon = new TrayIcon(myImage);
-
-                    // Setting Menu Items
-                    java.awt.MenuItem dash = new java.awt.MenuItem("Dashboard");
-                    dash.setFont(defaultFont);
-                    dash.addActionListener(event -> Platform.runLater(mainWindowStage::show));
-
-                    java.awt.MenuItem sidebar = new java.awt.MenuItem("Open Side Bar");
-                    sidebar.addActionListener(event -> System.out.println("Side Bar Button Click"));
-                    sidebar.setFont(defaultFont);
-
-                    java.awt.MenuItem exit = new java.awt.MenuItem("Exit Dashboard");
-                    exit.addActionListener(event -> {
-                        Platform.exit();
-                        tray.remove(trayIcon);
-                    });
-                    exit.setFont(defaultFont);
-
-                    // Setting Tooltip
-                    trayIcon.setToolTip("CeyMusic Dashboard");
-
-                    PopupMenu popupMenu = new PopupMenu("Menu");
-                    popupMenu.add(dash);
-                    popupMenu.add(sidebar);
-                    popupMenu.addSeparator();
-                    popupMenu.add(exit);
-                    trayIcon.setPopupMenu(popupMenu);
-
-                    trayIcon.addActionListener(ActionEvent -> Platform.runLater(mainWindowStage::show));
-
-                    tray.add(trayIcon);
-                } catch (AWTException | FontFormatException | IOException e) {
-                    System.out.println("System Tray Error: " + e);
-                }
-
-                mainWindowStage.setScene(scene);
-                mainWindowStage.show();
-
-                mainWindowStage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
-
-                if (Main.versionInfo.updateAvailable()) {
-                    Label updateNotify = (Label) scene.lookup("#lblUserEmailAndUpdate");
-                    updateNotify.setText("Update Available");
-                    updateNotify.setStyle("-fx-text-fill: '#FEA82F'");
-                }
-
-                mainWindowStage.widthProperty().addListener((obs, oldVal, newVal) -> {
-                    if ((oldVal.intValue() > newVal.intValue()) && (newVal.intValue() <= 1235)) {
-                        leftVBox.setPrefWidth(100);
-                        leftVBox.setMinWidth(100);
-                        hboxAbout.setVisible(false);
-                        lblSearch.setVisible(false);
-                        lblSearchNCollect.setVisible(false);
-                        lblRevenueAnalysis.setVisible(false);
-                        lblArtistReports.setVisible(false);
-                        lblSettings.setVisible(false);
-                        vboxSongList.setVisible(false);
-                        btnDatabaseCheck.setVisible(false);
-                        btnDatabaseCheck2.setVisible(false);
-                        // borderPane.setLeft(UIController.mainNodes[5]);
-                    }
-
-                    if ((oldVal.intValue() < newVal.intValue()) && (newVal.intValue() >= 1235)) {
-                        leftVBox.setPrefWidth(293);
-                        leftVBox.setMinWidth(293);
-                        hboxAbout.setVisible(true);
-                        lblSearch.setVisible(true);
-                        lblSearchNCollect.setVisible(true);
-                        lblRevenueAnalysis.setVisible(true);
-                        lblArtistReports.setVisible(true);
-                        lblSettings.setVisible(true);
-                        vboxSongList.setVisible(true);
-                        btnDatabaseCheck.setVisible(true);
-                        btnDatabaseCheck2.setVisible(true);
-                        // borderPane.setLeft(UIController.mainNodes[4]);
-                    }
-                });
+                initializeMainWindow();
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -283,6 +173,138 @@ public class InitPreloader implements Initializable {
             mainWindow.join();
         }
 
+    }
+
+    private void initializeMainWindow() throws IOException {
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/main-view.fxml")));
+        Scene scene = new Scene(root);
+
+        Stage mainWindowStage = setupStage();
+
+        setupSceneElements(scene, mainWindowStage);
+        setupSystemTray(mainWindowStage);
+    }
+
+    private static @NotNull Stage setupStage() {
+        Stage mainWindowStage = new Stage();
+        mainWindowStage.setTitle("CeyMusic Toolkit v" + Main.versionInfo.getCurrentVersionNumber() + " (beta)");
+        Image image = new Image("com/example/song_finder_fx/icons/icon.png");
+        mainWindowStage.getIcons().add(image);
+        mainWindowStage.setWidth(1350);
+        mainWindowStage.setHeight(900);
+        return mainWindowStage;
+    }
+
+    private static void setupSystemTray(Stage mainWindowStage) {
+        // Set Tray Icon
+        try {
+            SystemTray tray = SystemTray.getSystemTray();
+
+            // Loading Font
+            Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf")).deriveFont(12f);
+
+            // Loading Tray Icon Image
+            String imagePath = "src/main/resources/com/example/song_finder_fx/icons/icon (Custom).png";
+            BufferedImage myImage = ImageIO.read(new File(imagePath));
+            trayIcon = new TrayIcon(myImage);
+
+            // Setting Menu Items
+            MenuItem dash = new MenuItem("Dashboard");
+            dash.setFont(defaultFont);
+            dash.addActionListener(event -> Platform.runLater(mainWindowStage::show));
+
+            MenuItem sidebar = new MenuItem("Open Side Bar");
+            sidebar.addActionListener(event -> System.out.println("Side Bar Button Click"));
+            sidebar.setFont(defaultFont);
+
+            MenuItem exit = new MenuItem("Exit Dashboard");
+            exit.addActionListener(event -> {
+                Platform.exit();
+                tray.remove(trayIcon);
+            });
+            exit.setFont(defaultFont);
+
+            // Setting Tooltip
+            trayIcon.setToolTip("CeyMusic Dashboard");
+
+            PopupMenu popupMenu = new PopupMenu("Menu");
+            popupMenu.add(dash);
+            popupMenu.add(sidebar);
+            popupMenu.addSeparator();
+            popupMenu.add(exit);
+            trayIcon.setPopupMenu(popupMenu);
+
+            trayIcon.addActionListener(ActionEvent -> Platform.runLater(mainWindowStage::show));
+
+            tray.add(trayIcon);
+        } catch (AWTException | FontFormatException | IOException e) {
+            System.out.println("System Tray Error: " + e);
+        }
+    }
+
+    private void setupSceneElements(Scene scene, Stage mainWindowStage) {
+        VBox main = (VBox) scene.lookup("#mainVBox");
+        VBox leftVBox = (VBox) scene.lookup("#leftVBox");
+        HBox hboxAbout = (HBox) scene.lookup("#hboxAbout");
+        Label lblSearch = (Label) scene.lookup("#lblSearch");
+        Label lblSearchNCollect = (Label) scene.lookup("#lblSearchNCollect");
+        Label lblRevenueAnalysis = (Label) scene.lookup("#lblRevenueAnalysis");
+        Label lblArtistReports = (Label) scene.lookup("#lblArtistReports");
+        Label lblSettings = (Label) scene.lookup("#lblSettings");
+        VBox vboxSongList = (VBox) scene.lookup("#vboxSongList");
+        VBox btnDatabaseCheck = (VBox) scene.lookup("#btnDatabaseCheck");
+        VBox btnDatabaseCheck2 = (VBox) scene.lookup("#btnDatabaseCheck2");
+
+        main.getChildren().add(UIController.mainNodes[2]);
+
+        Platform.setImplicitExit(false);
+
+        mainWindowStage.setScene(scene);
+        mainWindowStage.show();
+
+        mainWindowStage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
+
+        if (Main.versionInfo.updateAvailable()) {
+            Label updateNotify = (Label) scene.lookup("#lblUserEmailAndUpdate");
+            updateNotify.setText("Update Available");
+            updateNotify.setStyle("-fx-text-fill: '#FEA82F'");
+        }
+
+        setupResizeListener(mainWindowStage, leftVBox, hboxAbout, lblSearch, lblSearchNCollect, lblRevenueAnalysis, lblArtistReports, lblSettings, vboxSongList, btnDatabaseCheck, btnDatabaseCheck2);
+    }
+
+    private static void setupResizeListener(Stage mainWindowStage, VBox leftVBox, HBox hboxAbout, Label lblSearch, Label lblSearchNCollect, Label lblRevenueAnalysis, Label lblArtistReports, Label lblSettings, VBox vboxSongList, VBox btnDatabaseCheck, VBox btnDatabaseCheck2) {
+        mainWindowStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+            if ((oldVal.intValue() > newVal.intValue()) && (newVal.intValue() <= 1235)) {
+                leftVBox.setPrefWidth(100);
+                leftVBox.setMinWidth(100);
+                hboxAbout.setVisible(false);
+                lblSearch.setVisible(false);
+                lblSearchNCollect.setVisible(false);
+                lblRevenueAnalysis.setVisible(false);
+                lblArtistReports.setVisible(false);
+                lblSettings.setVisible(false);
+                vboxSongList.setVisible(false);
+                btnDatabaseCheck.setVisible(false);
+                btnDatabaseCheck2.setVisible(false);
+                // borderPane.setLeft(UIController.mainNodes[5]);
+            }
+
+            if ((oldVal.intValue() < newVal.intValue()) && (newVal.intValue() >= 1235)) {
+                leftVBox.setPrefWidth(293);
+                leftVBox.setMinWidth(293);
+                hboxAbout.setVisible(true);
+                lblSearch.setVisible(true);
+                lblSearchNCollect.setVisible(true);
+                lblRevenueAnalysis.setVisible(true);
+                lblArtistReports.setVisible(true);
+                lblSettings.setVisible(true);
+                vboxSongList.setVisible(true);
+                btnDatabaseCheck.setVisible(true);
+                btnDatabaseCheck2.setVisible(true);
+                // borderPane.setLeft(UIController.mainNodes[4]);
+            }
+        });
     }
 
     private void closeWindowEvent(WindowEvent windowEvent) {

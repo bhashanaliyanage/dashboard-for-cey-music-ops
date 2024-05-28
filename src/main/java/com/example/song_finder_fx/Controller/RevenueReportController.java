@@ -26,7 +26,6 @@ public record RevenueReportController(ArtistReport report) {
         report.setPartnerShare(partnerShare);
 
         // Getting top 5 most performing songs
-        // TODO: 4/16/2024 Make this query gets data from ReportViewSummary1 view
         ArrayList<Songs> topP_Songs = DatabasePostgres.getTopPerformingSongs(report.getArtist().getName()); // This object only contains ISRC and Revenue for now. Need to get Song Name
         report.setTopPerformingSongs(topP_Songs);
 

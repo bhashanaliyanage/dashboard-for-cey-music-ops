@@ -32,13 +32,12 @@
             <VBox.margin>
                <Insets top="3.0" />
             </VBox.margin>
-            <Label maxWidth="1.7976931348623157E308" text="ISRC" textFill="#656565" />
-            <Label layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" text="|" textFill="#656565">
-               <HBox.margin>
-                  <Insets left="5.0" right="5.0" />
-               </HBox.margin>
-            </Label>
-            <Label fx:id="songArtist" prefHeight="10.0" text="Copyright Owner(s)" textFill="#656565" />
+            <Label fx:id="lblISRC" maxWidth="1.7976931348623157E308" text="ISRC" textFill="#656565" />
+         </HBox>
+         <HBox layoutX="10.0" layoutY="52.0">
+            <children>
+               <Label fx:id="songArtist" prefHeight="10.0" text="Copyright Owner(s)" textFill="#656565" />
+            </children>
          </HBox>
       </VBox>
       <Separator orientation="VERTICAL" prefHeight="200.0" />
