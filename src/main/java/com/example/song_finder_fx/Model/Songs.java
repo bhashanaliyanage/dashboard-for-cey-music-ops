@@ -1,6 +1,5 @@
 package com.example.song_finder_fx.Model;
 
-import com.example.song_finder_fx.DatabaseMySQL;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Main;
 

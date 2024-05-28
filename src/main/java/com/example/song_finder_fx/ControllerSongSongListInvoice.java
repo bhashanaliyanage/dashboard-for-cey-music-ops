@@ -1,6 +1,5 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Model.Songs;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -9,9 +8,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
-import java.util.List;
-import java.util.Objects;
 
 public class ControllerSongSongListInvoice {
 
