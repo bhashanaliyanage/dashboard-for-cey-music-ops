@@ -106,15 +106,25 @@ public class Songs {
     }
 
     public boolean composerAndLyricistCeyMusic() throws SQLException, ClassNotFoundException {
+        System.out.println("\nSongs.composerAndLyricistCeyMusic");
+
         boolean composerCeyMusic = DatabasePostgres.searchArtistTable(composer);
+        System.out.println("Composer CeyMusic: " + composerCeyMusic);
+
         boolean lyricistCeyMusic = DatabasePostgres.searchArtistTable(lyricist);
+        System.out.println("Lyricist CeyMusic: " + lyricistCeyMusic);
 
         return composerCeyMusic && lyricistCeyMusic;
     }
 
     public boolean composerOrLyricistCeyMusic() throws SQLException, ClassNotFoundException {
+        System.out.println("\nSongs.composerOrLyricistCeyMusic");
+
         boolean composerCeyMusic = DatabasePostgres.searchArtistTable(composer);
+        System.out.println("Composer CeyMusic: " + composerCeyMusic);
+
         boolean lyricistCeyMusic = DatabasePostgres.searchArtistTable(lyricist);
+        System.out.println("Lyricist CeyMusic: " + lyricistCeyMusic);
 
         return composerCeyMusic || lyricistCeyMusic;
     }
@@ -148,7 +158,7 @@ public class Songs {
     }
 
     public String getCopyrightOwner() {
-        return copyrightOwner;
+        return Objects.requireNonNullElse(copyrightOwner, "");
     }
 
     public boolean isOriginal() {

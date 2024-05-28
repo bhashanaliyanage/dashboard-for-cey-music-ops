@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vboxSongSearch" alignment="CENTER_LEFT" onKeyPressed="#onSearchedSongPress2" prefHeight="100.0" prefWidth="650.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerSearchSong">
+<VBox fx:id="vboxSongSearch" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="650.0" style="-fx-background-color: #FFFFFF;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerSearchSong">
     <HBox fx:id="hboxSongSearch">
         <HBox fx:id="hbox2" alignment="CENTER_LEFT" onMouseClicked="#onSearchedSongClick" prefWidth="512.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
             <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">

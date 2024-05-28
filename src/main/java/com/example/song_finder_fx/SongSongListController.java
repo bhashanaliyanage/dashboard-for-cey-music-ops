@@ -26,9 +26,6 @@ public class SongSongListController {
     private ImageView imgPlaySong;
 
     @FXML
-    private Label songNumber;
-
-    @FXML
     private Label srchRsArtist;
 
     @FXML
@@ -43,7 +40,9 @@ public class SongSongListController {
     @FXML
     void onDeleteSongClicked(MouseEvent event) {
         String isrc = srchRsISRC.getText();
-        System.out.println(isrc);
+
+        System.out.println("\nSongSongListController.onDeleteSongClicked");
+        System.out.println("Selected Song: " + isrc);
 
         boolean status = Main.deleteSongFromList(isrc);
 
@@ -65,7 +64,7 @@ public class SongSongListController {
             int listSize = songListNew.size();
             Label lblListCount = (Label) scene.lookup("#lblListCount");
             Label songListButtonSubtitle = (Label) scene.lookup("#lblSongListSub");
-            lblListCount.setText("Total: " + listSize);
+            lblListCount.setText(String.valueOf(listSize));
 
             try {
                 if (listSize > 1) {

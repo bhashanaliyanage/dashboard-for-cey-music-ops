@@ -4,6 +4,7 @@ import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.ErrorDialog;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Model.Songs;
+import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -16,11 +17,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -91,8 +95,20 @@ public class ControllerSongListNew {
     }
 
     @FXML
-    void onAddMoreButtonClicked(ActionEvent event) {
+    void onAddMoreButtonClicked(ActionEvent actionEvent) {
+        Node node = (Node) actionEvent.getSource();
+        Scene scene = node.getScene();
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+        mainVBox.getChildren().clear();
 
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/search-details.fxml"));
+        Parent newContent = null;
+        try {
+            newContent = loader.load();
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Loading View", e.toString());
+        }
+        mainVBox.getChildren().add(newContent);
     }
 
     @FXML
@@ -172,4 +188,53 @@ public class ControllerSongListNew {
         }
     }
 
+    public void onExportSongList(ActionEvent actionEvent) throws AWTException {
+        System.out.println("\nControllerSongListNew.onExportSongList");
+        List<Songs> songList = Main.getSongListNew();
+
+        // Getting User Location
+        Node node = (Node) actionEvent.getSource();
+        Scene scene = node.getScene();
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
+        chooser.setTitle("Save As");
+        File pathTo = chooser.showSaveDialog(scene.getWindow());
+        String path = pathTo.getAbsolutePath();
+        System.out.println("File Destination: " + path);
+
+        // Creating CSV File
+        try {
+            CSVWriter writer = new CSVWriter(new FileWriter(path));
+            List<String[]> rows = new ArrayList<>();
+            String[] header = new String[] {"Product Title","UPC","Track Title","ISRC","Singer","Lyrics","Composer","File Name"};
+            rows.add(header);
+
+            for (Songs song :
+                    songList) {
+                String[] row = getRow(song);
+                rows.add(row);
+            }
+
+            writer.writeAll(rows);
+            writer.close();
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Creating CSV File", e.toString());
+        }
+
+    }
+
+    @NotNull
+    private static String[] getRow(Songs song) {
+        String productTitle = song.getProductName();
+        String upc = song.getUPC();
+        String trackTitle = song.getTrackTitle();
+        String isrc = song.getISRC();
+        String singer = song.getSinger();
+        String lyrics = song.getLyricist();
+        String composer = song.getComposer();
+        String fileName = song.getFileName();
+
+        String[] row = new String[]{productTitle, upc, trackTitle, isrc, singer, lyrics, composer, fileName};
+        return row;
+    }
 }

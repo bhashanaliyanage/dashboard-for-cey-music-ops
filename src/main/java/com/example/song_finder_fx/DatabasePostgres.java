@@ -32,7 +32,7 @@ public class DatabasePostgres {
     public static Connection getConn() {
         String dbname = "songdata";
         String user = "postgres";
-        String pass = "ceymusic";
+        String pass = "thusitha01";
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -1704,8 +1704,8 @@ public class DatabasePostgres {
             String trackTitle = rs.getString(4);
             String singer = rs.getString(5);
             String featuringArtist = rs.getString(6);
-            String composer = rs.getString(7);
-            String lyricist = rs.getString(8);
+            String lyricist = rs.getString(7);
+            String composer = rs.getString(8);
             song.setSongDetails(isrcFromDatabase, albumTitle, upc, trackTitle, singer, featuringArtist, composer, lyricist);
         }
 

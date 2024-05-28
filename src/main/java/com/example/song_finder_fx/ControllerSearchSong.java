@@ -3,25 +3,36 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Model.Songs;
 import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import javax.sound.sampled.Clip;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
+
+import static com.example.song_finder_fx.UIController.setPlayerInfo;
 
 public class ControllerSearchSong {
 
@@ -87,6 +98,8 @@ public class ControllerSearchSong {
 
     @FXML
     private VBox vboxSongSearch;
+
+    private boolean toggle = false;
 
     Songs songDetails;
 
@@ -315,18 +328,123 @@ public class ControllerSearchSong {
     }
 
     @FXML
-    void onBtnPlayClicked(MouseEvent event) {
+    void onBtnPlayClicked(MouseEvent mouseEvent) {
+        Image imgTimer = new Image("com/example/song_finder_fx/images/icon _timer.png");
+        String isrc;
 
+        Main.directoryCheck();
+        Songs song = new Songs();
+
+        Node node = (Node) mouseEvent.getSource();
+        Scene scene = node.getScene();
+
+        Label lblPlayerSongName = (Label) scene.lookup("#lblPlayerSongName");
+        Label lblPlayerArtist = (Label) scene.lookup("#lblPlayerSongArtst");
+        ImageView imgMediaPico = (ImageView) scene.lookup("#imgMediaPico");
+
+        song.setTrackTitle(songName.getText());
+        song.setSinger(songSinger.getText());
+        isrc = searchResultISRC.getText();
+
+        Task<Void> task;
+        Path start = Paths.get(Main.selectedDirectory.toURI());
+        final boolean[] status = new boolean[1];
+
+        lblPlayerSongName.setText("Loading audio");
+        lblPlayerSongName.setStyle("-fx-text-fill: '#000000'");
+        imgMediaPico.setImage(imgTimer);
+
+        String finalIsrc = isrc;
+        task = new Task<>() {
+            @Override
+            protected Void call() {
+                Clip clip = Main.getClip();
+                if (clip != null) {
+                    clip.stop();
+                }
+                Platform.runLater(() -> System.out.println("Preparing to play audio..."));
+                try {
+                    status[0] = Main.playAudio(start, finalIsrc);
+                } catch (IOException e) {
+                    Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Playing Audio", e.toString()));
+                }
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(event -> setPlayerInfo(status, lblPlayerSongName, lblPlayerArtist, imgMediaPico, song));
+
+        new Thread(task).start();
     }
 
     @FXML
     void onSearchedSongClick(MouseEvent event) {
+        Duration duration = Duration.seconds(0.100);
 
-    }
+        // Create a timeline for increasing heights
+        Timeline timelineIncreaseHeight = new Timeline(
+                new KeyFrame(duration, new KeyValue(vboxSongSearch.prefHeightProperty(), 190)),
+                new KeyFrame(duration, new KeyValue(hboxSongSearch.prefHeightProperty(), 180))
+        );
 
-    @FXML
-    void onSearchedSongPress2(KeyEvent event) {
+        HBox hbox = new HBox();
+        Node node = null;
+        try {
+            node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/search-song-expanded-view.fxml")));
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error!", "Error Loading Details", e.toString());
+        }
+        Scene scene = vboxSongSearch.getScene();
+        hbox.getChildren().add(node);
 
+        if (!toggle) {
+            timelineIncreaseHeight.play();
+            timelineIncreaseHeight.setOnFinished(event2 -> {
+                vboxSongDetails.getChildren().add(hbox);
+                Label lblFeaturing = (Label) scene.lookup("#lblFeaturing");
+                Label lblProductName = (Label) scene.lookup("#lblProductName");
+                Label lblUPC = (Label) scene.lookup("#lblUPC");
+                Label lblShare = (Label) scene.lookup("#lblShare");
+
+                String isrc = searchResultISRC.getText();
+                try {
+                    songDetails = DatabaseMySQL.searchSongDetails(isrc);
+                } catch (SQLException | ClassNotFoundException e) {
+                    AlertBuilder.sendErrorAlert("Error!", "Error Loading Details", e.toString());
+                }
+
+                String percentage = "Unspecified";
+                try {
+                    if (songDetails.composerAndLyricistCeyMusic()) {
+                        percentage = "100%";
+                    } else if (songDetails.composerOrLyricistCeyMusic()) {
+                        percentage = "50%";
+                    } else {
+                        percentage = "0%";
+                    }
+                } catch (SQLException | ClassNotFoundException e) {
+                    AlertBuilder.sendErrorAlert("Error!", "Error Loading Details", e.toString());
+                }
+                songDetails.setPercentage(percentage);
+
+                lblFeaturing.setText(songDetails.getFeaturing());
+                lblProductName.setText(songDetails.getProductName());
+                lblUPC.setText(songDetails.getUPC());
+                lblShare.setText(percentage);
+            });
+            // Play the animation
+
+            toggle = true;
+        } else {
+            // Create a timeline for increasing heights
+            vboxSongDetails.getChildren().remove(3);
+            Timeline timelineDecreaseHeigt = new Timeline(
+                    new KeyFrame(duration, new KeyValue(vboxSongSearch.prefHeightProperty(), 100)),
+                    new KeyFrame(duration, new KeyValue(hboxSongSearch.prefHeightProperty(), 90))
+            );
+            timelineDecreaseHeigt.play();
+            toggle = false;
+        }
     }
 
 }

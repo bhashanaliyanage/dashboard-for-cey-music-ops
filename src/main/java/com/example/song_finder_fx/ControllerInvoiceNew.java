@@ -116,21 +116,24 @@ public class ControllerInvoiceNew {
                 String percentage;
                 String copyrightOwner = null;
                 String copyrightOwnerView = "";
+                String composer = songDetail.getComposer();
+                String lyricist = songDetail.getLyricist();
 
                 if (songDetail.composerAndLyricistCeyMusic()) {
                     percentage = "100%";
-                    copyrightOwner = songDetail.getComposer() + "\n" + songDetail.getLyricist();
-                    copyrightOwnerView = songDetail.getComposer() + " | " + songDetail.getLyricist();
+                    copyrightOwner = composer + "\n" + lyricist;
+                    copyrightOwnerView = composer + " | " + lyricist;
                 } else if (songDetail.composerOrLyricistCeyMusic()) {
                     percentage = "50%";
                     if (songDetail.composerCeyMusic()) {
-                        copyrightOwner = songDetail.getComposer();
-                        copyrightOwnerView = songDetail.getComposer();
+                        copyrightOwner = composer;
+                        copyrightOwnerView = composer;
                     } else {
-                        copyrightOwner = songDetail.getLyricist();
-                        copyrightOwnerView = songDetail.getLyricist();
+                        copyrightOwner = lyricist;
+                        copyrightOwnerView = lyricist;
                     }
                 } else {
+                    copyrightOwner = "Unspecified";
                     percentage = "0%";
                 }
 

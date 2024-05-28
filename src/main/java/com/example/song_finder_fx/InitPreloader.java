@@ -162,7 +162,7 @@ public class InitPreloader implements Initializable {
         audioDatabaseCheck.start();
         audioDatabaseCheck.join();
 
-        if (Objects.equals(con[0], "Connection Succeed")) {
+        if (true) {
             revenueAnalysisCheck.start();
             revenueAnalysisCheck.join();
             updatesCheck.start();

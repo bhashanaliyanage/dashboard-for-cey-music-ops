@@ -20,7 +20,7 @@ public class DatabaseHandler {
         List<Songs> searchResults = new ArrayList<>();
         try {
             Connection conn = DatabasePostgres.getConn();
-            PreparedStatement statement = conn.prepareStatement("SELECT isrc, song_name, file_name, upc, composer, lyricist, singer, type, product_title FROM public.\"song_metadata_new\" WHERE song_name ILIKE ? LIMIT 15");
+            PreparedStatement statement = conn.prepareStatement("SELECT isrc, song_name, file_name, upc, composer, lyricist, singer, type, product_title FROM public.\"song_metadata_new\" WHERE song_name ILIKE ? ORDER BY type DESC LIMIT 15");
             statement.setString(1, criteria + "%");
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
