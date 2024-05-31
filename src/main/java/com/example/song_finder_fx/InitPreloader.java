@@ -1,7 +1,9 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Model.Revenue;
+import com.example.song_finder_fx.Model.Updates;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -120,17 +122,23 @@ public class InitPreloader implements Initializable {
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
             try {
-                ResultSet versionDetails = DatabaseMySQL.checkUpdates();
-                // ResultSet versionDetails = DatabasePostgres.checkUpdates();        //Connection for Postgress
+                // ResultSet versionDetails = DatabaseMySQL.checkUpdates();
+                Updates versionDetailsNew = DatabasePostgres.checkUpdatesNew();        //Connection for Postgress
 
-                if (versionDetails != null) {
+                updateLocation = versionDetailsNew.getLocation();
+                // versionDetailsNew.getDetails()
+                Main.versionInfo.setServerVersion(versionDetailsNew.getVersion(), versionDetailsNew.getLocation(), versionDetailsNew.getDetails());
+
+                /*if (versionDetails != null) {
                     versionDetails.next();
                     System.out.println("versionDetails = " + versionDetails.getDouble(1));
                     updateLocation = versionDetails.getString(2);
                     Main.versionInfo.setServerVersion(versionDetails.getDouble(1), versionDetails.getString(2));
-                }
-            } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                }*/
+            } catch (SQLException e) {
+                Platform.runLater(() -> {
+                    AlertBuilder.sendErrorAlert("Error", "Error Getting Updates", e.toString());
+                });
             }
         });
 

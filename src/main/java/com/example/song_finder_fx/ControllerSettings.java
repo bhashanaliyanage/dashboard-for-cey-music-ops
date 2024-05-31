@@ -142,13 +142,13 @@ public class ControllerSettings {
 
     private void loadUpdate() throws IOException {
         FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-update.fxml"));
-        loader.setController(this);
+        // loader.setController(this);
         Parent sidepanelContent = loader.load();
 
         mainUIController.sideVBox.getChildren().clear();
         mainUIController.sideVBox.getChildren().add(sidepanelContent);
 
-        lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
+        // lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
     }
 
     public void onUpdateBtnClick(ActionEvent event) throws IOException, URISyntaxException {

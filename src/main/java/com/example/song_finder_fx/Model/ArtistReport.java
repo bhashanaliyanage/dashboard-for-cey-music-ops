@@ -54,12 +54,19 @@ public class ArtistReport {
     }
 
     public String getMonth() {
-        int monthInt = Integer.parseInt(month);
-        String[] monthNames = new String[] {
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-        };
-        return monthNames[monthInt - 1];
+        System.out.println("ArtistReport.getMonth");
+        System.out.println("month = " + month);
+        System.out.println("Artist Name: " + artist.getName());
+        try {
+            int monthInt = Integer.parseInt(month);
+            String[] monthNames = new String[] {
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+            };
+            return monthNames[monthInt - 1];
+        } catch (NumberFormatException e) {
+            return "Unspecified";
+        }
     }
 
     public ArrayList<String> getCoWriters() {
@@ -114,6 +121,9 @@ public class ArtistReport {
     }
 
     public void setMonth(String month) {
+        System.out.println("ArtistReport.setMonth");
+        System.out.println("month = " + month);
+        System.out.println("Artist Name: " + artist.getName());
         this.month = month;
     }
 

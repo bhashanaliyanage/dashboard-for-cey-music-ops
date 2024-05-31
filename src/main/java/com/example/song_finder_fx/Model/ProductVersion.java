@@ -12,15 +12,17 @@ import java.nio.file.StandardCopyOption;
 public class ProductVersion {
     private double updateVersion;
     private String location;
+    private String details;
     private final double currentVersion;
 
     public ProductVersion(Double productVersion) {
         currentVersion = productVersion;
     }
 
-    public void setServerVersion(double serverVersion, String updateLocation) {
+    public void setServerVersion(double serverVersion, String updateLocation, String details) {
         updateVersion = serverVersion;
         location = updateLocation;
+        this.details = details;
     }
 
     public String getCurrentVersionInfo() {
@@ -45,5 +47,9 @@ public class ProductVersion {
         Path tempFile = Files.createTempFile(tempDir, "update_cey_dash", ".msi");
         Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
         return new File(tempFile.toUri());
+    }
+
+    public String getDetails() {
+        return details;
     }
 }

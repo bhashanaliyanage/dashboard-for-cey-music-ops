@@ -112,7 +112,8 @@ public class NavigationController {
         Scene scene = ((Node) event.getSource()).getScene();
         VBox mainVBox = (VBox) scene.lookup("#mainVBox");
 
-        mainVBox.getChildren().setAll(aboutNode);
+        mainVBox.getChildren().clear();
+        mainVBox.getChildren().add(aboutNode);
 
         Label lblVersionInfoAboutPage = (Label) scene.lookup("#lblVersionInfoAboutPage");
         lblVersionInfoAboutPage.setText(Main.versionInfo.getCurrentVersionInfo());

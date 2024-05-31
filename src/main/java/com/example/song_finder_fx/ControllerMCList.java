@@ -56,6 +56,8 @@ public class ControllerMCList {
 
     private final Executor imageDownloadExecutor = Executors.newFixedThreadPool(5);
 
+    // public static Node nodeMC_Identifiers;
+
     @FXML
     public void initialize() throws SQLException, IOException {
         checkBoxes.clear();
@@ -201,7 +203,8 @@ public class ControllerMCList {
         Node node = SceneController.loadLayout("layouts/manual_claims/manual-claims-identifiers.fxml");
         Scene scene = SceneController.getSceneFromEvent(event);
         VBox main = SceneController.getMainVBox(scene);
-        main.getChildren().setAll(node);
+        main.getChildren().clear();
+        main.getChildren().add(node);
     }
 
     @FXML

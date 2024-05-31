@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -121,8 +122,12 @@ public class ControllerMCIdentifiers {
     }
 
     @FXML
-    void onBack() {
-
+    void onBack(MouseEvent event) {
+        Node nodeMCIdentifiers = ControllerManualClaimsMain.nodeMC_List;
+        Scene scene = SceneController.getSceneFromEvent(event);
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+        mainVBox.getChildren().setAll(nodeMCIdentifiers);
+        System.out.println("ControllerMCIdentifiers.onBack");
     }
 
     @FXML

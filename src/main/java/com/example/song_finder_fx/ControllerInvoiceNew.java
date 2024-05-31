@@ -114,7 +114,7 @@ public class ControllerInvoiceNew {
 
                 // Search Composer and Lyricist from Artists Table
                 String percentage;
-                String copyrightOwner = null;
+                String copyrightOwner;
                 String copyrightOwnerView = "";
                 String composer = songDetail.getComposer();
                 String lyricist = songDetail.getLyricist();
@@ -137,7 +137,10 @@ public class ControllerInvoiceNew {
                     percentage = "0%";
                 }
 
-                songDetail.setPercentage(percentage);
+                if (songDetail.getControl().isEmpty()) {
+                    songDetail.setPercentage(percentage);
+                }
+
                 songDetail.setCopyrightOwner(copyrightOwner);
                 songs.add(songDetail);
 
@@ -151,7 +154,7 @@ public class ControllerInvoiceNew {
                 ImageView ingPercentageChange = (ImageView) nodes[i].lookup("#btnPercentageChange");
 
                 // Setting percentage change icon, plus or minus according to the situation
-                if (Objects.equals(percentage, "100%")) {
+                if (Objects.equals(songDetail.getControl(), "100%")) {
                     ingPercentageChange.setImage(minusImg);
                 } else {
                     ingPercentageChange.setImage(plusImg);
@@ -164,7 +167,7 @@ public class ControllerInvoiceNew {
 
                 lblSongName.setText(songDetail.getTrackTitle());
                 lblArtist.setText(copyrightOwnerView);
-                lblSongShare.setText(percentage);
+                lblSongShare.setText(songDetail.getControl());
                 lblISRC.setText(songDetail.getISRC());
 
                 vboxSong.getChildren().add(nodes[i]);

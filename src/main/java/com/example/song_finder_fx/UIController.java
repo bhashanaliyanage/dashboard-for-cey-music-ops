@@ -1126,7 +1126,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     private void loadUpdate() throws IOException {
         FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-update.fxml"));
-        loader.setController(this);
+        // loader.setController(this);
         Parent sidepanelContent = loader.load();
 
         sideVBox.getChildren().clear();

@@ -5,6 +5,9 @@ import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Controller.RevenueReportController;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.*;
+import com.example.song_finder_fx.Session.User;
+import com.example.song_finder_fx.Session.UserSession;
+import com.example.song_finder_fx.Session.UserSummary;
 import com.itextpdf.layout.Document;
 
 import java.io.IOException;
@@ -14,7 +17,7 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        Songs songDetail = DatabasePostgres.searchSongDetails("LKA0W2301215");
+        /*Songs songDetail = DatabasePostgres.searchSongDetails("LKA0W2301215");
         String trackTitle = songDetail.getTrackTitle();
         String composer = songDetail.getComposer();
         String lyricist = songDetail.getLyricist();
@@ -41,7 +44,20 @@ public class Test {
         System.out.println("Composer: " + composer);
         System.out.println("Lyricist: " + lyricist);
         System.out.println("Copyright Owner(s): " + copyrightOwner);
-        System.out.println("CeyMusic Share: " + percentage);
+        System.out.println("CeyMusic Share: " + percentage);*/
+
+        testArtistReportPDF();
+        // testArtistReports();
+        // testDashboard();
+    }
+
+    private static void testDashboard() throws SQLException {
+        UserSession session = new UserSession();
+        UserSummary summary = new UserSummary(session);
+
+        System.out.println(summary.getGreeting());
+        System.out.println(summary.getManualClaimCount());
+        System.out.println(summary.getReportDayCount());
     }
 
     private static void testArtistReportPDF() throws SQLException, IOException {
@@ -66,31 +82,46 @@ public class Test {
         double partnerShare = report.getPartnerShareInLKR();
         ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
         List<CoWriterSummary> coWriterSummaries = report.getCoWriterPaymentSummary();
+        List<CoWriterShare> coWriterShares = report.getCoWritterList();
 
         // Printing calculated values
-        System.out.println("Calculated Details for Selected Artist");
-        System.out.println("========");
+        System.out.println("\nCalculated Details for Selected Artist");
 
-        System.out.println("Artist: " + report.getArtist().getName());
+        System.out.println("\n========");
+
+        System.out.println("\nArtist: " + report.getArtist().getName());
         System.out.println("EUR to LKR Conversion Rate: " + report.getConversionRate());
         System.out.println("Date: " + report.getDate());
-        System.out.println("========");
 
-        System.out.println("Gross Revenue: LKR " + grossRevenue);
+        System.out.println("\n========");
+
+        System.out.println("\nGross Revenue: LKR " + grossRevenue);
         System.out.println("Partner Share: LKR " + partnerShare);
         System.out.println("========");
 
-        System.out.println("Top Performing Songs");
+        System.out.println("\nTop Performing Songs");
         for (Songs song : topPerformingSongs) {
             System.out.println(song.getTrackTitle() + " | " + song.getRoyalty() * conversionRate);
         }
-        System.out.println("========");
 
-        System.out.println("Co-Writer Share");
+        System.out.println("\n========");
+
+        System.out.println("\nCo-Writer Share Summary");
         for (CoWriterSummary summary : coWriterSummaries) {
             String contributor = summary.getContributor();
             double royalty = summary.getRoyalty();
             System.out.println(contributor + " | " + royalty);
+        }
+
+        System.out.println("\nCo-Writer Share Detailed");
+        for (CoWriterShare share : coWriterShares) {
+            String songName = share.getSongName();
+            String songType = share.getSongType();
+            String percentage = share.getShare();
+            double artistShare = share.getRoyalty();
+            String coWriter = share.getContributor();
+
+            System.out.println(songName + " | " + songType + " | " + percentage + " | " + artistShare + " | " + coWriter);
         }
     }
 

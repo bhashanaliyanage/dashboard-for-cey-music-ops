@@ -44,7 +44,8 @@ public class ControllerLogIn {
 
             // Load Logged In View
             Node node = SceneController.loadLayout("layouts/user/login_success.fxml");
-            vBoxLogIn.getChildren().setAll(node);
+            vBoxLogIn.getChildren().clear();
+            vBoxLogIn.getChildren().add(node);
 
             // Set user details
             String nickname = Main.userSession.getNickName();

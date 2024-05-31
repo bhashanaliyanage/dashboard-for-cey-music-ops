@@ -544,112 +544,6 @@ public class ControllerRevenueGenerator {
         return null;
     }
 
-    public void onLoadReportBtnClick() throws SQLException, ClassNotFoundException {
-        // Getting Currency Rate
-        String userInputRate = txtRate.getText();
-        String artistName = comboPayees.getSelectionModel().getSelectedItem();
-
-        DecimalFormat df = new DecimalFormat("0.00");
-
-        if (!Objects.equals(artistName, null)) {
-            // Resetting ComboBox border
-            comboPayees.setStyle("-fx-border-color: '#e9ebee';");
-
-            // Check if the user input is only numbers
-            if (userInputRate.matches("\\d+(\\.\\d+)?")) {
-                initializeArtistReportUILabels();
-
-                // Convert user input rate to a double
-                double convertedRate = Double.parseDouble(userInputRate);
-
-                // Creating Artist
-                Artist artist = new Artist(0, artistName);
-
-                // Clearing Report Model
-                report = new ArtistReport(artist, convertedRate);
-
-                // Getting artist ID
-                int artistID = DatabasePostgres.fetchArtistID(artistName);
-
-                // Creating artist model by passing artistID
-                ArtistReport report = getArtistReport(artistID, convertedRate, artistName);
-
-                // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
-                double grossRevenue = report.getGrossRevenue();
-                double partnerShare = report.getPartnerShare();
-                double partnerShareInLKR = report.getPartnerShareInLKR();
-                ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
-
-                // Printing calculated values
-                {
-                    System.out.println("Calculated Details for Selected Artist");
-                    System.out.println("========");
-
-                    System.out.println("Artist: " + report.getArtist().getName());
-                    System.out.println("EUR to LKR Conversion Rate: " + report.getConversionRate());
-                    System.out.println("Date: " + report.getDate());
-                    System.out.println("========");
-
-                    System.out.println("Gross Revenue: EUR " + grossRevenue);
-                    System.out.println("Partner Share: EUR " + partnerShare);
-                    System.out.println("Partner Share: LKR " + partnerShareInLKR);
-                    System.out.println("========");
-
-                    System.out.println("Top Performing Songs");
-                    for (Songs song : topPerformingSongs) {
-                        System.out.println(song.getTrackTitle() + " | " + song.getRoyalty() * convertedRate);
-                    }
-                }
-
-                int count = 0;
-
-                for (Songs song : topPerformingSongs) {
-                    count++;
-
-                    String assetTitle = song.getTrackTitle();
-                    double reportedRoyalty = song.getRoyalty() * convertedRate;
-
-                    if (count == 1) {
-                        Platform.runLater(() -> {
-                            lblAsset01.setText(assetTitle);
-                            lblAsset01Streams.setText("LKR " + df.format(reportedRoyalty));
-                        });
-                    } else if (count == 2) {
-                        Platform.runLater(() -> {
-                            lblAsset02.setText(assetTitle);
-                            lblAsset02Streams.setText("LKR " + df.format(reportedRoyalty));
-                        });
-                    } else if (count == 3) {
-                        Platform.runLater(() -> {
-                            lblAsset03.setText(assetTitle);
-                            lblAsset03Streams.setText("LKR " + df.format(reportedRoyalty));
-                        });
-                    } else if (count == 4) {
-                        Platform.runLater(() -> {
-                            lblAsset04.setText(assetTitle);
-                            lblAsset04Streams.setText("LKR " + df.format(reportedRoyalty));
-                        });
-                    } else if (count == 5) {
-                        Platform.runLater(() -> {
-                            lblAsset05.setText(assetTitle);
-                            lblAsset05Streams.setText("LKR " + df.format(reportedRoyalty));
-                        });
-                    }
-                }
-
-                lblGross.setText("EUR " + df.format(grossRevenue));
-                lblP_Share.setText("EUR " + df.format(partnerShare));
-                lblAmtPayable.setText("LKR " + df.format(partnerShareInLKR));
-            } else {
-                // When User Input Contains Texts
-                txtRate.setStyle("-fx-border-color: red;");
-            }
-        } else {
-            // If no Payee Selected
-            comboPayees.setStyle("-fx-border-color: red;");
-        }
-    }
-
     private static ArtistReport getArtistReport(int artistID, double convertedRate, String artistName) throws SQLException, ClassNotFoundException {
         Artist artist = new Artist(artistID, artistName);
 
@@ -661,6 +555,9 @@ public class ControllerRevenueGenerator {
 
         // Revenue report controller will have a method called calculate revenue (inputs report object and returns gross revenue, partner share, conversion rate, date, co-writer payment summary via report object)
         report = revenueReportController.calculateRevenue();
+
+
+
         return report;
     }
 
@@ -1169,8 +1066,118 @@ public class ControllerRevenueGenerator {
 
     }
 
+    public void onLoadReportBtnClick() throws SQLException, ClassNotFoundException {
+        // Getting Currency Rate
+        String userInputRate = txtRate.getText();
+        String artistName = comboPayees.getSelectionModel().getSelectedItem();
+
+        DecimalFormat df = new DecimalFormat("0.00");
+
+        if (!Objects.equals(artistName, null)) {
+            // Resetting ComboBox border
+            comboPayees.setStyle("-fx-border-color: '#e9ebee';");
+
+            // Check if the user input is only numbers
+            if (userInputRate.matches("\\d+(\\.\\d+)?")) {
+                initializeArtistReportUILabels();
+
+                // Convert user input rate to a double
+                double convertedRate = Double.parseDouble(userInputRate);
+
+                // Creating Artist
+                Artist artist = new Artist(0, artistName);
+
+                // Clearing Report Model
+                report = new ArtistReport(artist, convertedRate);
+
+                // Getting artist ID
+                int artistID = DatabasePostgres.fetchArtistID(artistName);
+
+                // Creating artist model by passing artistID
+                report = getArtistReport(artistID, convertedRate, artistName);
+
+                // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
+                double grossRevenue = report.getGrossRevenue();
+                double partnerShare = report.getPartnerShare();
+                double partnerShareInLKR = report.getPartnerShareInLKR();
+                ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
+
+                // Printing calculated values
+                {
+                    System.out.println("Calculated Details for Selected Artist");
+                    System.out.println("========");
+
+                    System.out.println("Artist: " + report.getArtist().getName());
+                    System.out.println("EUR to LKR Conversion Rate: " + report.getConversionRate());
+                    System.out.println("Date: " + report.getDate());
+                    System.out.println("========");
+
+                    System.out.println("Gross Revenue: EUR " + grossRevenue);
+                    System.out.println("Partner Share: EUR " + partnerShare);
+                    System.out.println("Partner Share: LKR " + partnerShareInLKR);
+                    System.out.println("========");
+
+                    System.out.println("Top Performing Songs");
+                    for (Songs song : topPerformingSongs) {
+                        System.out.println(song.getTrackTitle() + " | " + song.getRoyalty() * convertedRate);
+                    }
+                }
+
+                int count = 0;
+
+                for (Songs song : topPerformingSongs) {
+                    count++;
+
+                    String assetTitle = song.getTrackTitle();
+                    double reportedRoyalty = song.getRoyalty() * convertedRate;
+
+                    if (count == 1) {
+                        Platform.runLater(() -> {
+                            lblAsset01.setText(assetTitle);
+                            lblAsset01Streams.setText("LKR " + df.format(reportedRoyalty));
+                        });
+                    } else if (count == 2) {
+                        Platform.runLater(() -> {
+                            lblAsset02.setText(assetTitle);
+                            lblAsset02Streams.setText("LKR " + df.format(reportedRoyalty));
+                        });
+                    } else if (count == 3) {
+                        Platform.runLater(() -> {
+                            lblAsset03.setText(assetTitle);
+                            lblAsset03Streams.setText("LKR " + df.format(reportedRoyalty));
+                        });
+                    } else if (count == 4) {
+                        Platform.runLater(() -> {
+                            lblAsset04.setText(assetTitle);
+                            lblAsset04Streams.setText("LKR " + df.format(reportedRoyalty));
+                        });
+                    } else if (count == 5) {
+                        Platform.runLater(() -> {
+                            lblAsset05.setText(assetTitle);
+                            lblAsset05Streams.setText("LKR " + df.format(reportedRoyalty));
+                        });
+                    }
+                }
+
+                lblGross.setText("EUR " + df.format(grossRevenue));
+                lblP_Share.setText("EUR " + df.format(partnerShare));
+                lblAmtPayable.setText("LKR " + df.format(partnerShareInLKR));
+            } else {
+                // When User Input Contains Texts
+                txtRate.setStyle("-fx-border-color: red;");
+            }
+        } else {
+            // If no Payee Selected
+            comboPayees.setStyle("-fx-border-color: red;");
+        }
+    }
+
     public void onGetReportBtnClick(MouseEvent mouseEvent) {
-        System.out.println("ControllerRevenueGenerator.onGetReportBtnClick");
+        System.out.println("\nControllerRevenueGenerator.onGetReportBtnClick");
+
+        System.out.println("Report Month: " + report.getMonth());
+
+
         String payee = comboPayees.getSelectionModel().getSelectedItem();
 
         // String path = "C:\\Users\\bhash\\Documents\\Test\\test.pdf";

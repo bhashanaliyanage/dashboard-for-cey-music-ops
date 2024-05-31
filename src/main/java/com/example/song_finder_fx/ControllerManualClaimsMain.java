@@ -17,6 +17,8 @@ public class ControllerManualClaimsMain {
     @FXML
     private Label lblClaimCount;
 
+    public static Node nodeMC_List;
+
     @FXML
     public void initialize() throws SQLException {
         lblClaimCount.setText(DatabasePostgres.getManualClaimCount());
@@ -27,15 +29,16 @@ public class ControllerManualClaimsMain {
         Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims.fxml")));
         Scene scene = ((Node) event.getSource()).getScene();
         VBox mainVBox = (VBox) scene.lookup("#mainVBox");
-        mainVBox.getChildren().setAll(node);
+        mainVBox.getChildren().clear();
+        mainVBox.getChildren().add(node);
     }
 
     @FXML
     void onIngestManualClaims(MouseEvent event) throws IOException {
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-list.fxml")));
+        nodeMC_List = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-list.fxml")));
         Scene scene = ((Node) event.getSource()).getScene();
         VBox mainVBox = (VBox) scene.lookup("#mainVBox");
-        mainVBox.getChildren().setAll(node);
+        mainVBox.getChildren().setAll(nodeMC_List);
     }
 
 }

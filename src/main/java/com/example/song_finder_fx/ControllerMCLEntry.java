@@ -45,7 +45,8 @@ public class ControllerMCLEntry {
         Scene scene = SceneController.getSceneFromEvent(event);
         VBox sideVBox = SceneController.getSideVBox(scene);
         Node layoutNode = SceneController.loadLayout("layouts/manual_claims/sidepanel-claim-edit.fxml");
-        sideVBox.getChildren().setAll(layoutNode);
+        sideVBox.getChildren().clear();
+        sideVBox.getChildren().add(layoutNode);
 
         Label lblClaimID = SceneController.getLabelFromScene(scene, "lblClaimID");
         Label lblTrackName = SceneController.getLabelFromScene(scene, "lblTrackName");

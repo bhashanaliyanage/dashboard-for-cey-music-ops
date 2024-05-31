@@ -33,6 +33,7 @@ public record RevenueReportController(ArtistReport report) {
         String dateString = DatabasePostgres.getSalesDate();
         String[] date = dateString.split("-");
         String month = date[1];
+        System.out.println("month = " + month);
         report.setMonth(month);
 
         // Getting Co-Writer Payments

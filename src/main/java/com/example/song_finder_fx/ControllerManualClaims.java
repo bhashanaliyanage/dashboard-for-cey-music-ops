@@ -100,7 +100,8 @@ public class ControllerManualClaims {
             comboClaimType.requestFocus();
 
             Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
-            vboxTracks.getChildren().setAll(node);
+            vboxTracks.getChildren().clear();
+            vboxTracks.getChildren().add(node);
 
             manualClaims.clear();
         } else {
@@ -139,7 +140,8 @@ public class ControllerManualClaims {
                                 } else {
                                     NotificationBuilder.displayTrayInfo("Manual Claim Added", "Your Claim for " + songName + " is successfully added");
                                     Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
-                                    vboxTracks.getChildren().setAll(node);
+                                    vboxTracks.getChildren().clear();
+                                    vboxTracks.getChildren().add(node);
                                 }
                             } catch (AWTException | IOException e) {
                                 Platform.runLater(() -> {

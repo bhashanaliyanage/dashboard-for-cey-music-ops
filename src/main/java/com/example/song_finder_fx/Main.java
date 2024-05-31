@@ -261,7 +261,6 @@ public class Main extends Application {
 // User Accounts
 // TODO: Make the user experience of login and signup much better.
 
-// Import Song List
 // Copy details by clicking song in song list
 // Auto Save and Restore Song List
 // Need a view to add a song, edit song

@@ -30,9 +30,24 @@ public class DatabasePostgres {
     private static Connection conn;
 
     public static Connection getConn() {
+        /*if (conn == null) {
+            String dbname = "songdata";
+            String user = "postgres";
+            String pass = "ceymusic";
+
+            try {
+                Class.forName("org.postgresql.Driver");
+                conn = DriverManager.getConnection("jdbc:postgresql://192.168.1.200:5432/" + dbname, user, pass);
+            } catch (Exception e) {
+                System.out.println("Error Connecting to database = " + e);
+            }
+
+        }
+        return conn;*/
+
         String dbname = "songdata";
         String user = "postgres";
-        String pass = "thusitha01";
+        String pass = "ceymusic";
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -667,7 +682,7 @@ public class DatabasePostgres {
     }
 
     public static ResultSet checkUpdates() throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
+        Connection db = getConn();
         ResultSet rs = null;
 
         PreparedStatement ps = db.prepareStatement("SELECT value, location FROM settings WHERE setting = 'version';");
@@ -679,6 +694,28 @@ public class DatabasePostgres {
         }
 
         return rs;
+    }
+
+    public static Updates checkUpdatesNew() throws SQLException {
+        // SELECT value, location FROM settings WHERE setting = 'version';
+        Connection db = getConn();
+        // ResultSet rs;
+
+        PreparedStatement ps = db.prepareStatement("SELECT value, location, details FROM public.settings WHERE setting = 'version';");
+        ResultSet rs = ps.executeQuery();
+
+        Updates updates = null;
+        if (rs.isBeforeFirst()) {
+            rs.next();
+
+            double version = rs.getDouble(1);
+            String location = rs.getString(2);
+            String details = rs.getString(3);
+
+            updates = new Updates(version, location, details);
+        }
+
+        return updates;
     }
 
     public static ResultSet checkMissingISRCs() throws SQLException, ClassNotFoundException {
@@ -1910,7 +1947,7 @@ public class DatabasePostgres {
                 JOIN SONGS S ON IP.ISRC = S.ISRC
                 JOIN public."summary_breakdown_02" rep ON IP.ISRC = rep.asset_isrc
                 WHERE (ip.payee = ? AND ip.share = 100)
-                ORDER BY rep.after_deduction_royalty DESC LIMIT 5;
+                ORDER BY rep.after_deduction_royalty DESC;
                 """;
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement(sql);

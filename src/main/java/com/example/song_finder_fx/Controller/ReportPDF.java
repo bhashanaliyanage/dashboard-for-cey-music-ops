@@ -26,6 +26,7 @@ import static com.example.song_finder_fx.Controller.Invoice.loadFont;
 
 public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
     private static final Border BLUE_BORDER = new SolidBorder(INVOICE_BLUE, 0.5f);
+    // private static final Border BLUE_BORDER_WO_SIDES = new SolidBorder()
     private static final Border BLACK_BORDER = new SolidBorder(INVOICE_BLACK, 0.5f);
     private static final Border DARK_BLUE_BORDER = new SolidBorder(INVOICE_DARK_BLUE, 0.5f);
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
@@ -364,31 +365,79 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         // Table 01
         Table tableHeader = getHeaderTable(reportHeading);
         Table tableFooter = getFooterTable();
-        document.add(tableHeader); // Header
-        Table table02 = getTable02(report);
-
         tableFooter.setFixedPosition(20f, document.getBottomMargin(), document.getWidth());
-
+        Table table02 = getTable02(report);
         Table table03 = getTable03(report);
-        // Table table04 = getTable04(report);
         Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
         Table tableCoWriterPaymentSummary = getCoWriterSummaryTable(report);
+        Table tableCoWriterPayments = getCoWriterPaymentsTable(report);
 
-        document.add(table02);
+        document.add(tableHeader); // Letter Head
+        document.add(table02); // Artist Name and Month
         document.add(table03);
         // document.add(table04);
         document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
         document.add(tableTopPerformingSongsSummary); // Co-Writer Payment Summary
-
         document.add(tableFooter);
 
         document.add(new AreaBreak());
 
-        document.add(tableHeader);
-        document.add(table02);
+        document.add(tableHeader); // Letter Head
+        document.add(table02); // Artist Name and Month
+        document.add(tableCoWriterPayments);
 
         document.close();
 
         return document;
+    }
+
+    private Table getCoWriterPaymentsTable(ArtistReport report) {
+        // Table
+        float[] columnWidth = {200f, 50f, 50f, 100f, 200f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Title").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Artist Share").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Co-Writer").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+
+        List<CoWriterShare> coWriterShares = report.getCoWritterList();
+        double conversionRate = report.getConversionRate();
+
+        for (CoWriterShare share : coWriterShares) {
+            String songName = share.getSongName();
+            String songType = share.getSongType();
+            String percentage = share.getShare();
+            double artistShare = share.getRoyalty();
+            String coWriter = share.getContributor();
+
+            table.addCell(new Cell().add(new Paragraph(songName).setFont(FONT_POPPINS).setPaddingLeft(5f))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));
+            table.addCell(new Cell().add(new Paragraph(songType).setFont(FONT_POPPINS))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
+            table.addCell(new Cell().add(new Paragraph(percentage).setFont(FONT_POPPINS))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
+            table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,09.2f", artistShare * conversionRate) + "/=").setFont(FONT_POPPINS))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
+            table.addCell(new Cell().add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));
+
+            // System.out.println(songName + " | " + songType + " | " + percentage + " | " + artistShare + " | " + coWriter);
+        }
+
+        return table;
     }
 }

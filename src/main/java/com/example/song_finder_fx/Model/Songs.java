@@ -109,11 +109,12 @@ public class Songs {
         System.out.println("\nSongs.composerAndLyricistCeyMusic");
 
         boolean composerCeyMusic = DatabasePostgres.searchArtistTable(composer);
-        System.out.println("Composer CeyMusic: " + composerCeyMusic);
+        // System.out.println("Composer CeyMusic: " + composerCeyMusic);
 
         boolean lyricistCeyMusic = DatabasePostgres.searchArtistTable(lyricist);
-        System.out.println("Lyricist CeyMusic: " + lyricistCeyMusic);
+        // System.out.println("Lyricist CeyMusic: " + lyricistCeyMusic);
 
+        System.out.println("Composer and Lyricist CeyMusic: " + (composerCeyMusic && lyricistCeyMusic));
         return composerCeyMusic && lyricistCeyMusic;
     }
 
@@ -121,11 +122,12 @@ public class Songs {
         System.out.println("\nSongs.composerOrLyricistCeyMusic");
 
         boolean composerCeyMusic = DatabasePostgres.searchArtistTable(composer);
-        System.out.println("Composer CeyMusic: " + composerCeyMusic);
+        // System.out.println("Composer CeyMusic: " + composerCeyMusic);
 
         boolean lyricistCeyMusic = DatabasePostgres.searchArtistTable(lyricist);
-        System.out.println("Lyricist CeyMusic: " + lyricistCeyMusic);
+        // System.out.println("Lyricist CeyMusic: " + lyricistCeyMusic);
 
+        System.out.println("Composer or Lyricist CeyMusic: " + (composerCeyMusic || lyricistCeyMusic));
         return composerCeyMusic || lyricistCeyMusic;
     }
 
