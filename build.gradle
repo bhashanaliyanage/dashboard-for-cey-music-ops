@@ -53,7 +53,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
     // SQLite connection
-    implementation "org.xerial:sqlite-jdbc:3.36.0.3"
+    implementation 'org.xerial:sqlite-jdbc:3.41.2.2'
 
     // MySQL Connection
     implementation 'mysql:mysql-connector-java:8.0.28'

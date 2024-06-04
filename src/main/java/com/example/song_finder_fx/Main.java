@@ -32,7 +32,7 @@ public class Main extends Application {
     static List<Songs> songListNew = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion(23.13);
+    public static ProductVersion versionInfo = new ProductVersion(23.14);
     public static TrayIcon trayIcon;
 
     public static void main(String[] args) {
@@ -219,8 +219,10 @@ public class Main extends Application {
 // TODO: 11/27/2023 Edit list in the invoice view
 
 // Song List
-// TODO: Export Song List data to a CSV
 // TODO: 2/5/2024 Add a delete all button to the list
+// TODO: Copy details by clicking song in song list
+// TODO: Auto Save and Restore Song List
+// TODO: Need a view to add a song, edit song
 
 // User Experience
 // TODO: 2/14/2024 Make it play FLACs
@@ -260,7 +262,3 @@ public class Main extends Application {
 
 // User Accounts
 // TODO: Make the user experience of login and signup much better.
-
-// Copy details by clicking song in song list
-// Auto Save and Restore Song List
-// Need a view to add a song, edit song

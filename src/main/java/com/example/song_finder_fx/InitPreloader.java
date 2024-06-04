@@ -136,9 +136,7 @@ public class InitPreloader implements Initializable {
                     Main.versionInfo.setServerVersion(versionDetails.getDouble(1), versionDetails.getString(2));
                 }*/
             } catch (SQLException e) {
-                Platform.runLater(() -> {
-                    AlertBuilder.sendErrorAlert("Error", "Error Getting Updates", e.toString());
-                });
+                Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Getting Updates", e.toString()));
             }
         });
 
@@ -158,7 +156,63 @@ public class InitPreloader implements Initializable {
             try {
                 starting = true;
 
-                initializeMainWindow();
+                Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/main-view.fxml")));
+                Scene scene = new Scene(root);
+
+                Stage mainWindowStage = setupStage();
+
+                setupSceneElements(scene, mainWindowStage);
+
+                // Set Tray Icon
+
+                Platform.runLater(() -> {
+                    try {
+                        SystemTray tray = SystemTray.getSystemTray();
+
+                        // Loading Font
+                        Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf")).deriveFont(12f);
+
+                        // Loading Tray Icon Image
+                        String imagePath = "src/main/resources/com/example/song_finder_fx/icons/icon (Custom).png";
+                        BufferedImage myImage = ImageIO.read(new File(imagePath));
+                        trayIcon = new TrayIcon(myImage);
+
+                        // Setting Menu Items
+                        MenuItem dash = new MenuItem("Dashboard");
+                        dash.setFont(defaultFont);
+                        dash.addActionListener(event -> Platform.runLater(mainWindowStage::show));
+
+                        MenuItem sidebar = new MenuItem("Open Side Bar");
+                        sidebar.addActionListener(event -> System.out.println("Side Bar Button Click"));
+                        sidebar.setFont(defaultFont);
+                        sidebar.setEnabled(false);
+
+                        MenuItem exit = new MenuItem("Exit Dashboard");
+                        exit.addActionListener(event -> {
+                            Platform.exit();
+                            tray.remove(trayIcon);
+                        });
+                        exit.setFont(defaultFont);
+
+                        // Setting Tooltip
+                        trayIcon.setToolTip("CeyMusic Dashboard");
+
+                        PopupMenu popupMenu = new PopupMenu("Menu");
+                        popupMenu.add(dash);
+                        popupMenu.add(sidebar);
+                        popupMenu.addSeparator();
+                        popupMenu.add(exit);
+                        trayIcon.setPopupMenu(popupMenu);
+
+                        trayIcon.addActionListener(ActionEvent -> Platform.runLater(mainWindowStage::show));
+
+                        tray.add(trayIcon);
+                    } catch (AWTException | FontFormatException | IOException e) {
+                        System.out.println("System Tray Error: " + e);
+                    }
+                });
+
+                // Platform.runLater(() -> setupSystemTray(mainWindowStage));
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -169,28 +223,15 @@ public class InitPreloader implements Initializable {
         databaseCheck.join();
         audioDatabaseCheck.start();
         audioDatabaseCheck.join();
+        revenueAnalysisCheck.start();
+        revenueAnalysisCheck.join();
+        updatesCheck.start();
+        updatesCheck.join();
+        loadScenes.start();
+        loadScenes.join();
+        mainWindow.start();
+        mainWindow.join();
 
-        if (true) {
-            revenueAnalysisCheck.start();
-            revenueAnalysisCheck.join();
-            updatesCheck.start();
-            updatesCheck.join();
-            loadScenes.start();
-            loadScenes.join();
-            mainWindow.start();
-            mainWindow.join();
-        }
-
-    }
-
-    private void initializeMainWindow() throws IOException {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/main-view.fxml")));
-        Scene scene = new Scene(root);
-
-        Stage mainWindowStage = setupStage();
-
-        setupSceneElements(scene, mainWindowStage);
-        setupSystemTray(mainWindowStage);
     }
 
     private static @NotNull Stage setupStage() {
@@ -201,53 +242,6 @@ public class InitPreloader implements Initializable {
         mainWindowStage.setWidth(1350);
         mainWindowStage.setHeight(900);
         return mainWindowStage;
-    }
-
-    private static void setupSystemTray(Stage mainWindowStage) {
-        // Set Tray Icon
-        try {
-            SystemTray tray = SystemTray.getSystemTray();
-
-            // Loading Font
-            Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf")).deriveFont(12f);
-
-            // Loading Tray Icon Image
-            String imagePath = "src/main/resources/com/example/song_finder_fx/icons/icon (Custom).png";
-            BufferedImage myImage = ImageIO.read(new File(imagePath));
-            trayIcon = new TrayIcon(myImage);
-
-            // Setting Menu Items
-            MenuItem dash = new MenuItem("Dashboard");
-            dash.setFont(defaultFont);
-            dash.addActionListener(event -> Platform.runLater(mainWindowStage::show));
-
-            MenuItem sidebar = new MenuItem("Open Side Bar");
-            sidebar.addActionListener(event -> System.out.println("Side Bar Button Click"));
-            sidebar.setFont(defaultFont);
-
-            MenuItem exit = new MenuItem("Exit Dashboard");
-            exit.addActionListener(event -> {
-                Platform.exit();
-                tray.remove(trayIcon);
-            });
-            exit.setFont(defaultFont);
-
-            // Setting Tooltip
-            trayIcon.setToolTip("CeyMusic Dashboard");
-
-            PopupMenu popupMenu = new PopupMenu("Menu");
-            popupMenu.add(dash);
-            popupMenu.add(sidebar);
-            popupMenu.addSeparator();
-            popupMenu.add(exit);
-            trayIcon.setPopupMenu(popupMenu);
-
-            trayIcon.addActionListener(ActionEvent -> Platform.runLater(mainWindowStage::show));
-
-            tray.add(trayIcon);
-        } catch (AWTException | FontFormatException | IOException e) {
-            System.out.println("System Tray Error: " + e);
-        }
     }
 
     private void setupSceneElements(Scene scene, Stage mainWindowStage) {
