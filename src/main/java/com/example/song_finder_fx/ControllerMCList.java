@@ -1,6 +1,5 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Constants.ClaimFilter;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -24,8 +23,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class ControllerMCList {
 

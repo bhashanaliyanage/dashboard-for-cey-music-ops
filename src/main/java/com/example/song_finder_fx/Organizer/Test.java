@@ -1,12 +1,10 @@
 package com.example.song_finder_fx.Organizer;
 
-import com.example.song_finder_fx.Constants.ClaimFilter;
 import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Controller.RevenueReportController;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.*;
-import com.example.song_finder_fx.Session.User;
 import com.example.song_finder_fx.Session.UserSession;
 import com.example.song_finder_fx.Session.UserSummary;
 import com.itextpdf.layout.Document;
