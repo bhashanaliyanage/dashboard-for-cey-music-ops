@@ -1,5 +1,6 @@
 package com.example.song_finder_fx.Organizer;
 
+import com.example.song_finder_fx.Constants.ClaimFilter;
 import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Controller.RevenueReportController;
@@ -12,43 +13,29 @@ import com.itextpdf.layout.Document;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        /*Songs songDetail = DatabasePostgres.searchSongDetails("LKA0W2301215");
-        String trackTitle = songDetail.getTrackTitle();
-        String composer = songDetail.getComposer();
-        String lyricist = songDetail.getLyricist();
-
-        // Search Composer and Lyricist from Artists Table
-        String percentage;
-        String copyrightOwner = null;
-
-        if (songDetail.composerAndLyricistCeyMusic()) {
-            percentage = "100%";
-            copyrightOwner = songDetail.getComposer() + "\n" + songDetail.getLyricist();
-        } else if (songDetail.composerOrLyricistCeyMusic()) {
-            percentage = "50%";
-            if (songDetail.composerCeyMusic()) {
-                copyrightOwner = songDetail.getComposer();
-            } else {
-                copyrightOwner = songDetail.getLyricist();
-            }
-        } else {
-            percentage = "0%";
-        }
-
-        System.out.println("\nTrack: " + trackTitle);
-        System.out.println("Composer: " + composer);
-        System.out.println("Lyricist: " + lyricist);
-        System.out.println("Copyright Owner(s): " + copyrightOwner);
-        System.out.println("CeyMusic Share: " + percentage);*/
-
-        testArtistReportPDF();
+        // testArtistReportPDF();
         // testArtistReports();
         // testDashboard();
+
+        List<ManualClaimTrack> archivedManualClaims;
+
+        LocalDate startDate = LocalDate.of(2024, 5, 1);
+        LocalDate endDate = LocalDate.of(2024, 5, 30);
+
+        archivedManualClaims = DatabasePostgres.getArchivedManualClaims(startDate, endDate);
+
+        System.out.println("\nTotal: " + archivedManualClaims.size());
+        System.out.println("\n");
+
+        for (ManualClaimTrack track : archivedManualClaims) {
+            System.out.println("Name: " + track.getTrackName());
+        }
     }
 
     private static void testDashboard() throws SQLException {

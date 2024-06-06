@@ -25,4 +25,24 @@ public class AlertBuilder {
             System.out.println("Error Sending Alert: " + content + "\n\n" + e);
         }
     }
+
+    public static void sendInfoAlert(String title, String header, String content) {
+        try {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+            // Adding Icon to Alert Dialog
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            String icon = "com/example/song_finder_fx/icons/icon (Custom).png";
+            stage.getIcons().add(new Image(icon));
+
+            alert.setTitle(title);
+            alert.setHeaderText(header);
+            alert.setContentText(content);
+
+            // Showing Alert
+            Platform.runLater(alert::showAndWait);
+        } catch (Exception e) {
+            System.out.println("Error Sending Alert: " + content + "\n\n" + e);
+        }
+    }
 }

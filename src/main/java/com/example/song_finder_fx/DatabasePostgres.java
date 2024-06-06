@@ -243,13 +243,19 @@ public class DatabasePostgres {
 
     public static List<ManualClaimTrack> getManualClaims() throws SQLException {
         Connection conn = getConn();
-        Statement statement = conn.createStatement();
-        String query = "SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork, date, claim_type FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY claim_type ASC, claim_id ASC;";
-        ResultSet resultSet = statement.executeQuery(query);
+        // Statement statement = conn.createStatement();
+        String query = "SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork, date, claim_type FROM public.manual_claims WHERE ingest_status = ? AND archive = false ORDER BY claim_type ASC, claim_id ASC;";
+        PreparedStatement ps = conn.prepareStatement("SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork, date, claim_type FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY claim_type ASC, claim_id ASC;");
+        // ps.setBoolean(1, type);
+        ResultSet resultSet = ps.executeQuery();
         List<ManualClaimTrack> manualClaims = new ArrayList<>();
+
+        int count = 0;
 
         if (resultSet.isBeforeFirst()) {
             while (resultSet.next()) {
+                count++;
+
                 int id = resultSet.getInt(1);
                 String songName = resultSet.getString(2);
                 String composer = resultSet.getString(3);
@@ -285,8 +291,76 @@ public class DatabasePostgres {
                 }
 
                 manualClaims.add(manualClaimTrack);
+
+                System.out.println("count = " + count);
             }
         }
+
+        resultSet.close();
+
+        return manualClaims;
+    }
+
+    public static List<ManualClaimTrack> getArchivedManualClaims(LocalDate startDate, LocalDate endDate) throws SQLException {
+        /*System.out.println("startDate = " + startDate);
+        System.out.println("endDate = " + endDate);*/
+
+        Connection conn = getConn();
+        PreparedStatement ps = conn.prepareStatement("SELECT claim_id, song_name, composer, lyricist, youtube_id, " +
+                "trim_start, trim_end, preview_image, artwork, date, claim_type FROM public.manual_claims " +
+                "WHERE ingest_status = false AND archive = true AND date BETWEEN ? AND ? ORDER BY claim_type ASC, claim_id DESC LIMIT 100;");
+        ps.setDate(1, Date.valueOf(startDate));
+        ps.setDate(2, Date.valueOf(endDate));
+        ResultSet resultSet = ps.executeQuery();
+        List<ManualClaimTrack> manualClaims = new ArrayList<>();
+
+        int count = 0;
+
+        if (resultSet.isBeforeFirst()) {
+            while (resultSet.next()) {
+                count++;
+
+                int id = resultSet.getInt(1);
+                String songName = resultSet.getString(2);
+                String composer = resultSet.getString(3);
+                String lyrics = resultSet.getString(4);
+                String youTubeLink = resultSet.getString(5);
+                String trimStart = resultSet.getString(6);
+                String trimEnd = resultSet.getString(7);
+                byte[] previewImageBytes = resultSet.getBytes(8);
+                byte[] artworkImageBytes = resultSet.getBytes(9);
+                Date date = resultSet.getDate(10);
+                int claimType = resultSet.getInt(11);
+                LocalDate localDate = sqlDateToLocalDate(date);
+
+                ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink, localDate, claimType);
+
+                // Set the images to model
+                try {
+                    ByteArrayInputStream previewImageInputStream = new ByteArrayInputStream(previewImageBytes);
+                    ByteArrayInputStream artworkImageInputStream = new ByteArrayInputStream(artworkImageBytes);
+
+                    BufferedImage previewImage = ImageIO.read(previewImageInputStream);
+                    BufferedImage artwork = ImageIO.read(artworkImageInputStream);
+                    // Platform.runLater(() -> System.out.println("artwork.getColorModel() = " + artwork.getColorModel()));
+
+                    manualClaimTrack.setPreviewImage(previewImage);
+                    manualClaimTrack.setImage(artwork);
+                } catch (IOException e) {
+                    Platform.runLater(e::printStackTrace);
+                }
+
+                if (trimStart != null && trimEnd != null) {
+                    manualClaimTrack.addTrimTime(trimStart, trimEnd);
+                }
+
+                manualClaims.add(manualClaimTrack);
+
+                System.out.println("count = " + count);
+            }
+        }
+
+        resultSet.close();
 
         return manualClaims;
     }
@@ -449,7 +523,6 @@ public class DatabasePostgres {
      * }
      * }
      */
-
 
     private static void insertSongArtists(CSVReader csvReader) throws SQLException, IOException, CsvValidationException {
         Connection db = getConn();
@@ -1256,6 +1329,25 @@ public class DatabasePostgres {
         }
         return null;
     }
+
+    public static int getArchivedManualClaimCount() throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("""
+                SELECT COUNT(claim_id)
+                FROM public.manual_claims\s
+                WHERE ingest_status = false AND archive = true;""");
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt(1);
+    }
+
+    public static int unArchiveManualClaim(int id) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("UPDATE public.manual_claims SET archive=false WHERE claim_id = ?;");
+        ps.setInt(1, id);
+        return ps.executeUpdate();
+    }
+
 
     public List<Payee> check(String name) {
 //        String name = "Victor Rathnayake";

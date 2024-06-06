@@ -50,7 +50,12 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class UIController implements com.example.song_finder_fx.Constants.UINode {
+
+    @FXML
     public VBox sideVBox;
+
+    public static VBox sideVBoxStatic;
+
     private final Search search = new Search();
 
 
@@ -89,7 +94,12 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     //<editor-fold desc="VBox">
     public VBox textAreaVbox;
+
+    @FXML
     public VBox mainVBox;
+
+    public static VBox mainVBoxStatic;
+
     @FXML
     public VBox vboxSong;
     public VBox btnDatabaseCheck;
@@ -155,6 +165,14 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         System.out.println("Initializing UI...");
 
         // Loading user
+        loadUser();
+
+        // Setting UI Elements
+        mainVBoxStatic = mainVBox;
+        sideVBoxStatic = sideVBox;
+    }
+
+    private void loadUser() throws SQLException {
         UserSession userSession = new UserSession();
         Main.userSession = userSession;
 

@@ -1,9 +1,11 @@
 package com.example.song_finder_fx.Model;
 
+import com.example.song_finder_fx.DatabasePostgres;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import java.awt.image.BufferedImage;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class ManualClaimTrack {
@@ -114,5 +116,10 @@ public class ManualClaimTrack {
             case 4 -> "Single SR";
             default -> "Unspecified";
         };
+    }
+
+    public int unArchive() throws SQLException {
+        int status = DatabasePostgres.unArchiveManualClaim(id);
+        return status;
     }
 }

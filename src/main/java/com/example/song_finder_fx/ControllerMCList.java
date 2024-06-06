@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Constants.ClaimFilter;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -53,10 +54,6 @@ public class ControllerMCList {
     public static List<ManualClaimTrack> finalManualClaims = new ArrayList<>();
 
     public static Map<Integer, ManualClaimTrack> claimMap = new HashMap<>();
-
-    private final Executor imageDownloadExecutor = Executors.newFixedThreadPool(5);
-
-    // public static Node nodeMC_Identifiers;
 
     @FXML
     public void initialize() throws SQLException, IOException {
