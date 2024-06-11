@@ -78,12 +78,13 @@ public class DatabasePostgres {
 
     public static int addRowFUGAReport(FUGAReport report, Connection conn) throws SQLException {
         try {
-            String query = String.format("INSERT INTO public.report (asset_isrc, reported_royalty, territory, sale_start_date, dsp) VALUES ('%s', '%s', '%s', '%s', '%s');",
+            String query = String.format("INSERT INTO public.report (asset_isrc, reported_royalty, territory, sale_start_date, dsp, upc) VALUES ('%s', '%s', '%s', '%s', '%s', '%s');",
                     report.getAssetISRC(),
                     report.getReportedRoyalty(),
                     report.getTerritory(),
                     report.getSaleStartDate(),
-                    report.getDsp());
+                    report.getDsp(),
+                    report.getProductUPC());
 
             Statement statement = conn.createStatement();
             return statement.executeUpdate(query);
@@ -1346,6 +1347,43 @@ public class DatabasePostgres {
         PreparedStatement ps = con.prepareStatement("UPDATE public.manual_claims SET archive=false WHERE claim_id = ?;");
         ps.setInt(1, id);
         return ps.executeUpdate();
+    }
+
+    public static int getMissingPayeeCount() throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("""
+                SELECT COUNT(DISTINCT(r.asset_isrc)) FROM public.report r
+                LEFT OUTER JOIN isrc_payees s ON s.isrc = r.asset_isrc
+                WHERE s.isrc IS NULL;""");
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt(1);
+    }
+
+    public static int getMissingISRC_Count() throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("""
+                SELECT COUNT(DISTINCT(r.asset_isrc)) FROM public.report r
+                LEFT OUTER JOIN songs s ON s.isrc = r.asset_isrc
+                WHERE s.isrc IS NULL;""");
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt(1);
+    }
+
+    public static boolean checkIfArtistValidated(String composer) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT COUNT(artist_id) FROM public.artists WHERE " +
+                "artist_name = ? AND validated = true;");
+        ps.setString(1, composer);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        int count = rs.getInt(1);
+        if (count > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

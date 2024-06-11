@@ -231,7 +231,6 @@ public class InitPreloader implements Initializable {
         loadScenes.join();
         mainWindow.start();
         mainWindow.join();
-
     }
 
     private static @NotNull Stage setupStage() {

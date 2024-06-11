@@ -73,7 +73,7 @@ public class CSVController {
         // report.setSaleType(nextLine[4]);
         // report.setSaleUserType(nextLine[5]);
         report.setTerritory(nextLine[6]);
-        // report.setProductUPC(nextLine[7]);
+        report.setProductUPC(nextLine[7]);
         // report.setProductReference(nextLine[8]);
         // report.setProductCatalogNumber(nextLine[9]);
         // report.setProductLabel(nextLine[10]);

@@ -71,6 +71,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Button btnOpenLocation;
     public Button btnCopyTo;
     public Button btnAudioDatabase;
+    public HBox btnIngests;
     @FXML
     private HBox btnArtistReports;
     //</editor-fold>
@@ -186,17 +187,20 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 try {
                     btnRevenueAnalysis.setDisable(true);
                     btnArtistReports.setDisable(true);
+                    btnIngests.setDisable(true);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (privilegeLevel == 2) {
                 btnRevenueAnalysis.setDisable(false);
                 btnArtistReports.setDisable(false);
+                btnIngests.setDisable(false);
             }
         } else {
             try {
                 btnRevenueAnalysis.setDisable(true);
                 btnArtistReports.setDisable(true);
+                btnIngests.setDisable(true);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -504,7 +508,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     @FXML
     protected void onSearchDetailsButtonClick() throws ClassNotFoundException, IOException {
-        changeSelectorTo(rctSearchSongs);
         Connection con = checkDatabaseConnection();
 
         if (con != null) {
@@ -514,6 +517,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             Parent sidepanelNewContent = sidepanelLoader.load();
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
+            changeSelectorTo(rctSearchSongs);
         } else {
             UIController.showErrorDialog("Database Connection Error!", "Error Connecting to Database", "Please check your XAMPP server up and running");
         }
@@ -924,7 +928,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     public void onCollectSongsButtonClick(MouseEvent event) {
         try {
-            changeSelectorTo(rctCollectSongs);
             checkDatabaseConnection();
 
             mainVBox.getChildren().clear();
@@ -934,6 +937,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             Parent sidepanelNewContent = sidepanelLoader.load();
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
+
+            changeSelectorTo(rctCollectSongs);
 
             String directoryString = Main.getAudioDatabaseLocation();
             Node node = (Node) event.getSource();
@@ -1154,9 +1159,10 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     }
 
     public void onRevenueAnalysisBtnClick() throws IOException {
-        changeSelectorTo(rctRevenue);
         ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
         revenueGenerator.loadRevenueGenerator();
+
+        changeSelectorTo(rctRevenue);
     }
 
     //<editor-fold desc="Invoice">
@@ -1187,7 +1193,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     public void onArtistReportsBtnClick() {
-        changeSelectorTo(rctArtistReports);
 
         try {
             ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
@@ -1197,6 +1202,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             Parent sidepanelNewContent = sidepanelLoader.load();
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
+
+            changeSelectorTo(rctArtistReports);
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
         }
@@ -1207,8 +1214,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     }
 
     public void onIngestsBtnClick() {
-        changeSelectorTo(rctIngests);
-
         try {
             Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests-chooser.fxml")));
             mainVBox.getChildren().setAll(node);
@@ -1217,14 +1222,14 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             Parent sidepanelNewContent = sidepanelLoader.load();
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
+
+            changeSelectorTo(rctIngests);
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
         }
     }
 
     public void onManualClaimsBtnClick() {
-        changeSelectorTo(rctManualClaims);
-
         try {
             Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-main.fxml")));
             mainVBox.getChildren().setAll(node);
@@ -1233,6 +1238,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             Parent sidepanelNewContent = sidepanelLoader.load();
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
+
+            changeSelectorTo(rctManualClaims);
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
         }
