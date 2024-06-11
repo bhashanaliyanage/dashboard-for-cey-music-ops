@@ -245,7 +245,6 @@ public class DatabasePostgres {
     public static List<ManualClaimTrack> getManualClaims() throws SQLException {
         Connection conn = getConn();
         // Statement statement = conn.createStatement();
-        String query = "SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork, date, claim_type FROM public.manual_claims WHERE ingest_status = ? AND archive = false ORDER BY claim_type ASC, claim_id ASC;";
         PreparedStatement ps = conn.prepareStatement("SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork, date, claim_type FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY claim_type ASC, claim_id ASC;");
         // ps.setBoolean(1, type);
         ResultSet resultSet = ps.executeQuery();

@@ -133,28 +133,6 @@ public class ControllerMCList {
             }
         };
 
-        Task<Void> taskCheckPayees = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                for (Label label : labelsComposer) {
-                    String composer = label.getText();
-                    boolean status = DatabasePostgres.checkIfArtistValidated(composer);
-                    if (status) {
-                        Platform.runLater(() -> label.setStyle("-fx-text-fill: red"));
-                    }
-                }
-
-                for (Label label : labelsLyricist) {
-                    String composer = label.getText();
-                    boolean status = DatabasePostgres.checkIfArtistValidated(composer);
-                    if (status) {
-                        Platform.runLater(() -> label.setStyle("-fx-text-fill: red"));
-                    }
-                }
-                return null;
-            }
-        };
-
         taskGetManualClaims.setOnSucceeded(event -> {
             Thread thread = new Thread(() -> {
                 try {

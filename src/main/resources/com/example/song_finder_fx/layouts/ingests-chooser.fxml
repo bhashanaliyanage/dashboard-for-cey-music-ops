@@ -21,83 +21,79 @@
       </Label>
    </HBox>
    <HBox disable="true" spacing="10.0">
-      <children>
-         <VBox prefHeight="100.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
-            <children>
-               <HBox prefWidth="270.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-                  <children>
-                     <Label prefHeight="50.0" text="Missing Payees" HBox.hgrow="ALWAYS">
-                        <font>
-                           <Font name="Segoe UI Semibold" size="14.0" />
-                        </font>
-                        <cursor>
-                           <Cursor fx:constant="DEFAULT" />
-                        </cursor>
-                        <HBox.margin>
-                           <Insets left="20.0" />
-                        </HBox.margin>
-                     </Label>
-                     <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
-                        <HBox.margin>
-                           <Insets left="20.0" right="20.0" />
-                        </HBox.margin>
-                        <children>
-                           <Label fx:id="lblMissingPayees" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="50.0" text="Loading" textAlignment="RIGHT">
-                              <cursor>
-                                 <Cursor fx:constant="DEFAULT" />
-                              </cursor>
-                           </Label>
-                        </children>
-                     </HBox>
-                  </children>
-               </HBox>
-               <VBox alignment="CENTER" disable="true" onMouseClicked="#onExportPayeesClick" VBox.vgrow="ALWAYS">
-                  <children>
-                     <Label text="Click to Export CSV" />
-                  </children>
-               </VBox>
-            </children>
-         </VBox>
-         <VBox layoutX="10.0" layoutY="10.0" prefHeight="100.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
-            <children>
-               <HBox prefWidth="270.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-                  <children>
-                     <Label prefHeight="50.0" text="Missing ISRCs" HBox.hgrow="ALWAYS">
-                        <font>
-                           <Font name="Segoe UI Semibold" size="14.0" />
-                        </font>
-                        <cursor>
-                           <Cursor fx:constant="DEFAULT" />
-                        </cursor>
-                        <HBox.margin>
-                           <Insets left="20.0" />
-                        </HBox.margin>
-                     </Label>
-                     <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
-                        <HBox.margin>
-                           <Insets left="20.0" right="20.0" />
-                        </HBox.margin>
-                        <children>
-                           <Label fx:id="lblMissingISRCs" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="50.0" text="Loading" textAlignment="RIGHT">
-                              <cursor>
-                                 <Cursor fx:constant="DEFAULT" />
-                              </cursor>
-                           </Label>
-                        </children>
-                     </HBox>
-                  </children>
-               </HBox>
-               <VBox alignment="CENTER" disable="true" onMouseClicked="#onExportISRCsClick" VBox.vgrow="ALWAYS">
-                  <children>
-                     <Label text="Click to Export CSV" />
-                  </children>
-               </VBox>
-            </children>
-         </VBox>
-      </children>
       <VBox.margin>
-         <Insets left="30.0" right="30.0" top="30.0" />
+         <Insets left="30.0" right="30.0" top="30.0"/>
       </VBox.margin>
+      <VBox prefHeight="100.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
+         <HBox prefWidth="270.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+            <Label prefHeight="50.0" text="Missing Payees" HBox.hgrow="ALWAYS">
+               <font>
+                  <Font name="Segoe UI Semibold" size="14.0"/>
+               </font>
+               <cursor>
+                  <Cursor fx:constant="DEFAULT"/>
+               </cursor>
+               <HBox.margin>
+                  <Insets left="20.0"/>
+               </HBox.margin>
+            </Label>
+            <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="20.0" right="20.0"/>
+               </HBox.margin>
+               <children>
+                  <Label fx:id="lblMissingPayees" alignment="CENTER_RIGHT" contentDisplay="RIGHT"
+                         prefHeight="50.0" text="Loading" textAlignment="RIGHT">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT"/>
+                     </cursor>
+                  </Label>
+               </children>
+            </HBox>
+         </HBox>
+         <VBox alignment="CENTER" disable="true" onMouseClicked="#onExportPayeesClick" VBox.vgrow="ALWAYS">
+            <children>
+               <Label text="Click to Export CSV"/>
+            </children>
+         </VBox>
+      </VBox>
+      <VBox layoutX="10.0" layoutY="10.0" prefHeight="100.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
+         <children>
+            <HBox prefWidth="270.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+               <children>
+                  <Label prefHeight="50.0" text="Missing ISRCs" HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font name="Segoe UI Semibold" size="14.0"/>
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT"/>
+                     </cursor>
+                     <HBox.margin>
+                        <Insets left="20.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets left="20.0" right="20.0"/>
+                     </HBox.margin>
+                     <children>
+                        <Label fx:id="lblMissingISRCs" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="50.0"
+                               text="Loading" textAlignment="RIGHT">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT"/>
+                           </cursor>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+            <VBox alignment="CENTER" disable="true" onMouseClicked="#onExportISRCsClick" VBox.vgrow="ALWAYS">
+               <children>
+                  <Label text="Click to Export CSV"/>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
    </HBox>
    <HBox spacing="10.0">
       <children>
