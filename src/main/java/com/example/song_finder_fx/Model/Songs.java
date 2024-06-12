@@ -69,7 +69,7 @@ public class Songs {
         this.isrc = isrc;
     }
 
-    public void setIsrc(String isrc) {
+    public void setISRC(String isrc) {
         this.isrc = isrc;
     }
 

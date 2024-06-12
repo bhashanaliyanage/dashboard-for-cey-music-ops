@@ -152,7 +152,7 @@ public class ControllerMCList {
                         }
                     }
                 } catch (SQLException e) {
-                    Platform.runLater(() -> e.printStackTrace());
+                    Platform.runLater(e::printStackTrace);
                 }
             });
             thread.start();

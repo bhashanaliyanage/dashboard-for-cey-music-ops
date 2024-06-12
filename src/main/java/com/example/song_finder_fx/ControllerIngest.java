@@ -2,22 +2,34 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.SceneController;
+import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ControllerIngest {
+    
+    @FXML
+    private Label lblImportIngest;
 
     @FXML
     private Label lblMissingISRCs;
@@ -64,12 +76,95 @@ public class ControllerIngest {
 
     @FXML
     void onExportISRCsClick(MouseEvent event) {
+        System.out.println("ControllerIngest.onExportISRCsClick");
+        try {
+            // Getting User Location
+            Node node = (Node) event.getSource();
+            Scene scene = node.getScene();
+            FileChooser chooser = new FileChooser();
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
+            chooser.setTitle("Save As");
+            File file = chooser.showSaveDialog(scene.getWindow());
 
+            if (file != null) {
+                File openFile = writeMissingISRCs(file);
+
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().open(openFile);
+                }
+            }
+
+        } catch (SQLException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
+        }
+    }
+
+    private static @NotNull File writeMissingISRCs(File file) throws SQLException, IOException {
+        ArrayList<Songs> songs =  DatabasePostgres.getMissingISRCs();
+        String path = file.getAbsolutePath();
+        CSVWriter writer = new CSVWriter(new FileWriter(path));
+        List<String[]> rows = new ArrayList<>();
+        String[] header = new String[]{"UPC", "ISRC"};
+        rows.add(header);
+
+        for (Songs song : songs) {
+            String[] row = {song.getUPC(), song.getISRC()};
+            rows.add(row);
+        }
+
+        writer.writeAll(rows);
+        writer.close();
+
+        File openFile = new File(path);
+        return openFile;
     }
 
     @FXML
     void onExportPayeesClick(MouseEvent event) {
+        try {
+            // Getting User Location
+            Node node = (Node) event.getSource();
+            Scene scene = node.getScene();
+            FileChooser chooser = new FileChooser();
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
+            chooser.setTitle("Save As");
+            File file = chooser.showSaveDialog(scene.getWindow());
 
+            if (file != null) {
+                File openFile = writeMissingPayees(file);
+
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().open(openFile);
+                }
+            }
+
+        } catch (SQLException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
+        }
+    }
+
+    private File writeMissingPayees(File file) throws SQLException, IOException {
+        ArrayList<Songs> songs =  DatabasePostgres.getMissingPayees();
+        String path = file.getAbsolutePath();
+        CSVWriter writer = new CSVWriter(new FileWriter(path));
+        List<String[]> rows = new ArrayList<>();
+        String[] header = new String[]{"UPC", "ISRC"};
+        rows.add(header);
+
+        for (Songs song : songs) {
+            String[] row = {song.getUPC(), song.getISRC()};
+            rows.add(row);
+        }
+
+        writer.writeAll(rows);
+        writer.close();
+
+        File openFile = new File(path);
+        return openFile;
     }
 
     @FXML
@@ -84,19 +179,23 @@ public class ControllerIngest {
                 @Override
                 protected Void call() {
                     try {
+                        Platform.runLater(() -> lblImportIngest.setText("Validating CSV"));
+
                         CSVReader reader = new CSVReader(new FileReader(file));
                         String[] row = reader.readNext();
-
-                        /*while ((row = reader.readNext()) != null) {
-
-                        }*/
 
                         int rowLength = row.length;
 
                         System.out.println("Column Count: " + rowLength);
 
                         if (rowLength == 63) {
+                            while ((row = reader.readNext()) != null) {
+                                // Import
 
+                            }
+                        } else {
+                            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Invalid CSV Format", "Expected 63 columns but found " + rowLength));
+                            Platform.runLater(() -> lblImportIngest.setText("Import Ingest"));
                         }
                     } catch (CsvValidationException | IOException e) {
                         Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Reading CSV File", e.toString()));

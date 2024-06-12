@@ -26,7 +26,7 @@ public class DatabaseHandler {
             while (resultSet.next()) {
                 // Create Song objects from the ResultSet and add them to the searchResults list
                 Songs song = new Songs();
-                song.setIsrc(resultSet.getString(1));
+                song.setISRC(resultSet.getString(1));
                 song.setTrackTitle(resultSet.getString(2));
                 song.setFileName(resultSet.getString(3));
                 song.setUPC(resultSet.getString(4));

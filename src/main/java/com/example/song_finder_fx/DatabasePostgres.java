@@ -94,7 +94,7 @@ public class DatabasePostgres {
         return 0;
     }
 
-    public static List<Report> reporLi(List<String> isrcList) {
+    /*public static List<Report> reporLi(List<String> isrcList) {
         List<Report> repoList = new ArrayList<>();
         String sql = "SELECT reported_royalty_for_ceymusic,reported_royalty_after_gst,other_territories_earnings,after_gst,au_earnings,reported_royalty_summary,asset_isrc " +
                 "FROM public.\"reportViewSummary1\" WHERE asset_isrc = ?";
@@ -122,7 +122,7 @@ public class DatabasePostgres {
         }
 
         return repoList;
-    }
+    }*/
 
 
     public static ResultSet getFullBreakdown() throws SQLException {
@@ -1383,6 +1383,58 @@ public class DatabasePostgres {
         } else {
             return false;
         }
+    }
+
+    public static ArrayList<Songs> getMissingISRCs() throws SQLException {
+        ArrayList<Songs> songs = new ArrayList<>();
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("""
+                SELECT r.upc, r.asset_isrc FROM public.report r
+                LEFT OUTER JOIN songs s ON s.isrc = r.asset_isrc
+                WHERE s.isrc IS NULL
+                GROUP BY r.asset_isrc, r.upc;""");
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.isBeforeFirst()) {
+            while (rs.next()) {
+                String upc = rs.getString(1);
+                String isrc = rs.getString(2);
+
+                Songs song = new Songs();
+                song.setUPC(upc);
+                song.setISRC(isrc);
+                songs.add(song);
+            }
+        }
+
+        return songs;
+    }
+
+    public static ArrayList<Songs> getMissingPayees() throws SQLException {
+        ArrayList<Songs> songs = new ArrayList<>();
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("""
+                SELECT r.upc, r.asset_isrc FROM public.report r
+                LEFT OUTER JOIN isrc_payees s ON s.isrc = r.asset_isrc
+                WHERE s.isrc IS NULL
+                GROUP BY r.asset_isrc, r.upc;""");
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.isBeforeFirst()) {
+            while (rs.next()) {
+                String upc = rs.getString(1);
+                String isrc = rs.getString(2);
+
+                Songs song = new Songs();
+                song.setUPC(upc);
+                song.setISRC(isrc);
+                songs.add(song);
+            }
+        }
+
+        return songs;
     }
 
 
