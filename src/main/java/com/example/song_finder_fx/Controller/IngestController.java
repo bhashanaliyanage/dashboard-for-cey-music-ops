@@ -19,45 +19,46 @@ public class IngestController {
 
         public List<String> getMissingPayeeList() {
 
-        List<String> stringList = new ArrayList<>();
-            Connection con = DatabasePostgres.getConn();
             List<String> isrcList = new ArrayList<String>();
-            String sql = "select asset_isrc FROM report WHERE asset_isrc NOT IN(SELECT isrc FROM isrc_payees )";
-            try {
+            String sql = "SELECT asset_isrc FROM report WHERE asset_isrc NOT IN (SELECT isrc FROM isrc_payees)";
+
+            try(Connection con = DatabasePostgres.getConn();
                 PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    String isrc = rs.getString(1);
+                ResultSet rs = ps.executeQuery()){
+
+                while(rs.next()) {
+                    String isrc =  rs.getString(1);
                     isrcList.add(isrc);
-
                 }
-
-            } catch (Exception e) {
+            }catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                DatabasePostgres.closeConnection(con);
             }
+
             return isrcList;
         }
 
         public List<String>  getMissingSongs(){
 
-            List<String> isrcList = new ArrayList<String>();
-            Connection con = DatabasePostgres.getConn();
+            List<String> isrcList = new ArrayList<>();
             String sql = "SELECT asset_isrc FROM report WHERE asset_isrc NOT IN (SELECT isrc FROM songs)";
-            try {
-                PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery();
+            System.out.println(sql);
+
+            try (Connection con = DatabasePostgres.getConn();
+                 PreparedStatement ps = con.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
                     String isrc = rs.getString(1);
+                    System.out.println(isrc + " this is string set");
                     isrcList.add(isrc);
                 }
-            } catch (Exception e) {
+
+                System.out.println("123");
+
+            } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                DatabasePostgres.closeConnection(con);
             }
+
             return isrcList;
 
         }
