@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArtistReport {
+    private int year = 0;
+    private int monthInt = 0;
     private Artist artist = null;
     private double conversionRate = 0;
     private String month = "";
@@ -15,6 +17,17 @@ public class ArtistReport {
 
     private List<CoWriterShare> coWritterList;
     private List<CoWriterSummary> coWriterPaymentSummary;
+
+    public ArtistReport(Artist artist, int conversionRate, int year, int month) {
+        System.out.println("ArtistReport.ArtistReport");
+        System.out.println("Year: " + year);
+        System.out.println("Month: " + month);
+
+        this.artist = artist;
+        this.conversionRate = conversionRate;
+        this.year = year;
+        this.monthInt = month;
+    }
 
     public List<CoWriterShare> getCoWritterList() {
         return coWritterList;
@@ -54,11 +67,8 @@ public class ArtistReport {
     }
 
     public String getMonth() {
-        System.out.println("ArtistReport.getMonth");
-        System.out.println("month = " + month);
-        System.out.println("Artist Name: " + artist.getName());
         try {
-            int monthInt = Integer.parseInt(month);
+            // int monthInt = Integer.parseInt(month);
             String[] monthNames = new String[] {
                     "January", "February", "March", "April", "May", "June",
                     "July", "August", "September", "October", "November", "December"
@@ -136,5 +146,13 @@ public class ArtistReport {
 
     public List<CoWriterSummary> getCoWriterPaymentSummary() {
         return coWriterPaymentSummary;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public int getMonthInt() {
+        return monthInt;
     }
 }

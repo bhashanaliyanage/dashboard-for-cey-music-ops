@@ -1,7 +1,7 @@
 package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.DatabasePostgres;
-import com.example.song_finder_fx.Model.CsvData;
+import com.example.song_finder_fx.Model.IngestCSVData;
 import com.example.song_finder_fx.Model.Ingest;
 import com.example.song_finder_fx.Model.YouDownload;
 import com.opencsv.CSVReader;
@@ -23,66 +23,66 @@ public class IngestController {
         return DatabasePostgres.getAllIngests();
     }
 
-        public List<String> getMissingPayeeList() {
+    public List<String> getMissingPayeeList() {
 
-            List<String> isrcList = new ArrayList<String>();
-            String sql = "SELECT asset_isrc FROM report WHERE asset_isrc NOT IN (SELECT isrc FROM isrc_payees)";
+        List<String> isrcList = new ArrayList<String>();
+        String sql = "SELECT asset_isrc FROM report WHERE asset_isrc NOT IN (SELECT isrc FROM isrc_payees)";
 
-            try(Connection con = DatabasePostgres.getConn();
-                PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()){
+        try (Connection con = DatabasePostgres.getConn();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-                while(rs.next()) {
-                    String isrc =  rs.getString(1);
-                    isrcList.add(isrc);
-                }
-            }catch (Exception e) {
-                e.printStackTrace();
+            while (rs.next()) {
+                String isrc = rs.getString(1);
+                isrcList.add(isrc);
             }
-
-            return isrcList;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        public List<String>  getMissingSongs(){
+        return isrcList;
+    }
 
-            List<String> isrcList = new ArrayList<>();
-            String sql = "SELECT asset_isrc FROM report WHERE asset_isrc NOT IN (SELECT isrc FROM songs)";
-            System.out.println(sql);
+    public List<String> getMissingSongs() {
 
-            try (Connection con = DatabasePostgres.getConn();
-                 PreparedStatement ps = con.prepareStatement(sql);
-                 ResultSet rs = ps.executeQuery()) {
+        List<String> isrcList = new ArrayList<>();
+        String sql = "SELECT asset_isrc FROM report WHERE asset_isrc NOT IN (SELECT isrc FROM songs)";
+        System.out.println(sql);
 
-                while (rs.next()) {
-                    String isrc = rs.getString(1);
-                    System.out.println(isrc + " this is string set");
-                    isrcList.add(isrc);
-                }
+        try (Connection con = DatabasePostgres.getConn();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-                System.out.println("123");
-
-            } catch (SQLException e) {
-                e.printStackTrace();
+            while (rs.next()) {
+                String isrc = rs.getString(1);
+                System.out.println(isrc + " this is string set");
+                isrcList.add(isrc);
             }
 
-            return isrcList;
+            System.out.println("123");
 
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-    public List<CsvData> readCsvData(String file) {
-        List<CsvData> dataList = new ArrayList<CsvData>();
+        return isrcList;
+
+    }
+
+    public List<IngestCSVData> readCsvData(String file) {
+        List<IngestCSVData> dataList = new ArrayList<IngestCSVData>();
         try (CSVReader csvreader = new CSVReaderBuilder(new FileReader(file)).withSkipLines(1).build()) {
 
-            String [] record;
+            String[] record;
 
-            while((record = csvreader.readNext())!=null) {
+            while ((record = csvreader.readNext()) != null) {
                 String AlbumTitle = record[1].trim();
                 String upc = record[3].trim();
-                String catalogNumber =  record[4].trim();
+                String catalogNumber = record[4].trim();
                 String releaseDate = record[7].trim();
-                String label =  record[12].trim();
+                String label = record[12].trim();
                 String Clineyear = record[13].trim();
-                String CLineName =  record[14].trim();
+                String CLineName = record[14].trim();
                 String PLineYear = record[15].trim();
                 String PLineName = record[16].trim();
                 String RecrdingYear = record[18].trim();
@@ -93,11 +93,11 @@ public class IngestController {
                 String trackPrimaryArtist = record[29].trim();
                 String Composer = record[46].trim();
                 String Lyricists = record[47].trim();
-                String Writers =record[51].trim();
+                String Writers = record[51].trim();
                 String Publishers = record[52].trim();
                 String OriginalFileName = record[55].trim();
 //				String originalReleaseDate = record[56].trim();
-                CsvData csv =  new CsvData();
+                IngestCSVData csv = new IngestCSVData();
 
                 csv.setAlbumTitle(AlbumTitle);
                 csv.setUps(upc);
@@ -128,20 +128,20 @@ public class IngestController {
         return dataList;
     }
 
-    public String insertTempTable(List<CsvData> dataList) {
+    public String insertTempTable(List<IngestCSVData> dataList) {
         Connection con = DatabasePostgres.getConn();
-        String s= "";
-        String sql  = "INSERT INTO temp_table ("
+        String s = "";
+        String sql = "INSERT INTO temp_ingests ("
                 + "    album_title, upc, catalog_number, release_date, label, cline_year, cline_name, pline_name, "
                 + "    pline_year, recording_year, recording_location, album_format, track_title, isrc, track_primary_artist, "
                 + "    composer, lyricists, writers, publishers, original_filename ) "
                 + "   VALUES ("
-                + "    ?, ?, ?, ?, ?, ?, ?,?, "	//8
-                + "    ?, ?, ?, ?, ?, ?, ?, ?, "	// 8 - 16
-                + "    ?, ?, ?, ?)";			//16 - 20
+                + "    ?, ?, ?, ?, ?, ?, ?,?, "    //8
+                + "    ?, ?, ?, ?, ?, ?, ?, ?, "    // 8 - 16
+                + "    ?, ?, ?, ?)";            //16 - 20
 
         try {
-            for(CsvData data :dataList) {
+            for (IngestCSVData data : dataList) {
                 PreparedStatement ps = con.prepareStatement(sql);
                 ps.setString(1, data.getAlbumTitle());
                 ps.setString(2, data.getUps());
@@ -164,24 +164,23 @@ public class IngestController {
                 ps.setString(19, data.getPublishers());
                 ps.setString(20, data.getOriginalFileName());
                 ps.executeUpdate();
-                s="done";
+                s = "done";
             }
 
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             DatabasePostgres.closeConnection(con);
         }
         return s;
     }
 
-    public String insertTemp(YouDownload file){
-        List<CsvData> dataList = new ArrayList<CsvData>();
-        dataList = readCsvData(file.getFileLocation());
-        String s=  insertTempTable(dataList);
-        return  s;
+    public String insertTemp(File file) {
+        System.out.println("IngestController.insertTemp");
+        List<IngestCSVData> dataList;
+        dataList = readCsvData(file.getAbsolutePath());
+        return insertTempTable(dataList);
     }
 
 }

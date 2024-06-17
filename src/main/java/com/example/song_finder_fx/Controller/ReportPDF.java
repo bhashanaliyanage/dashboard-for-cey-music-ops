@@ -106,7 +106,8 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
             double convertedRoyalty = amount * conversionRate;
 
             String contributor = summary.getContributor();
-            String royaltyShare = "LKR " + String.format("%,09.2f", convertedRoyalty) + "/=";
+            // String royaltyShare = "LKR " + String.format("%,09.2f", convertedRoyalty) + "/=";
+            String royaltyShare = "LKR " + String.format("%,9.2f", convertedRoyalty) + "/=";
 
             table.addCell(new Cell().add(new Paragraph(contributor).setFont(FONT_POPPINS))
                     .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
@@ -231,6 +232,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                     .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,09.2f", royalty)).setFont(FONT_POPPINS))
                     .setTextAlignment(TextAlignment.RIGHT).setPaddingRight(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+            // "LKR " + String.format("%,9.2f", royalty) + "/="
         }
 
         return table;
@@ -289,15 +291,15 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                 .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_DARK_BLUE).setBorder(DARK_BLUE_BORDER));
 
         // Row 02
-        table.addCell(new Cell().add(new Paragraph("EUR " + String.format("%,09.2f", report.getGrossRevenue())).setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph("EUR " + String.format("%,9.2f", report.getGrossRevenue())).setFont(FONT_POPPINS))
                 .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
         table.addCell(new Cell().add(new Paragraph(""))
                 .setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().add(new Paragraph("EUR " + String.format("%,09.2f", report.getPartnerShare())).setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph("EUR " + String.format("%,9.2f", report.getPartnerShare())).setFont(FONT_POPPINS))
                 .setFontSize(10f).setTextAlignment(TextAlignment.CENTER).setBorder(DARK_BLUE_BORDER));
         table.addCell(new Cell().add(new Paragraph(""))
                 .setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,09.2f", report.getPartnerShareInLKR())).setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", report.getPartnerShareInLKR())).setFont(FONT_POPPINS))
                 .setFontSize(10f).setTextAlignment(TextAlignment.CENTER).setBorder(DARK_BLUE_BORDER));
 
         return table;
@@ -430,7 +432,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(percentage).setFont(FONT_POPPINS))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
-            table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,09.2f", artistShare * conversionRate) + "/=").setFont(FONT_POPPINS))
+            table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare * conversionRate) + "/=").setFont(FONT_POPPINS))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));

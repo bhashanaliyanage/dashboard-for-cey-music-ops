@@ -13,13 +13,17 @@ import java.util.List;
 public record RevenueReportController(ArtistReport report) {
 
     public ArtistReport calculateRevenue() throws SQLException {
-        // Getting artist name
-        // ArtistController artistController = new ArtistController(report.getArtist());
-        // String artistName = artistController.fetchArtistName();
-        // report.getArtist().setName(artistName);
+        // Refreshing Tables
+        int status = DatabasePostgres.refreshSummaryTable(report);
+
+        if (status > 0) {
+            System.out.println("Summary Table Refreshed\n");
+        } else {
+            System.out.println("Error Updating Summary Report\n");
+        }
 
         // Getting gross revenue and partner share
-        RevenueReport grossNPartnerShare = DatabasePostgres.getPayeeGrossRev1(report.getArtist().getName());
+        RevenueReport grossNPartnerShare = DatabasePostgres.getPayeeGrossRevNew(report);
         Double grossRevenue = grossNPartnerShare.getReportedRoyalty();
         Double partnerShare = grossNPartnerShare.getAfterDeductionRoyalty();
         report.setGrossRevenue(grossRevenue);
@@ -30,11 +34,11 @@ public record RevenueReportController(ArtistReport report) {
         report.setTopPerformingSongs(topP_Songs);
 
         // Getting report month
-        String dateString = DatabasePostgres.getSalesDate();
+        /*String dateString = DatabasePostgres.getSalesDate();
         String[] date = dateString.split("-");
         String month = date[1];
         System.out.println("month = " + month);
-        report.setMonth(month);
+        report.setMonth(month);*/
 
         // Getting Co-Writer Payments
         report.setCoWritterList(DatabasePostgres.getCoWriterPayments(report.getArtist().getName()));

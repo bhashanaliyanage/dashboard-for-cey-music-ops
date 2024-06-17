@@ -1,6 +1,7 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.AlertBuilder;
+import com.example.song_finder_fx.Controller.IngestController;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
@@ -189,10 +190,9 @@ public class ControllerIngest {
                         System.out.println("Column Count: " + rowLength);
 
                         if (rowLength == 63) {
-                            while ((row = reader.readNext()) != null) {
-                                // Import
-
-                            }
+                            IngestController ingestController = new IngestController();
+                            String status = ingestController.insertTemp(file);
+                            Platform.runLater(() -> System.out.println("\nImport Status: " + status));
                         } else {
                             Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Invalid CSV Format", "Expected 63 columns but found " + rowLength));
                             Platform.runLater(() -> lblImportIngest.setText("Import Ingest"));

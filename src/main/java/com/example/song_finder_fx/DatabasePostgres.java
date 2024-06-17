@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.CSVController;
 import com.example.song_finder_fx.Model.*;
 import com.example.song_finder_fx.Session.Hasher;
 import com.example.song_finder_fx.Session.User;
@@ -17,7 +18,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,21 +34,6 @@ public class DatabasePostgres {
     private static Connection conn;
 
     public static Connection getConn() {
-        /*if (conn == null) {
-            String dbname = "songdata";
-            String user = "postgres";
-            String pass = "ceymusic";
-
-            try {
-                Class.forName("org.postgresql.Driver");
-                conn = DriverManager.getConnection("jdbc:postgresql://192.168.1.200:5432/" + dbname, user, pass);
-            } catch (Exception e) {
-                System.out.println("Error Connecting to database = " + e);
-            }
-
-        }
-        return conn;*/
-
         String dbname = "songdata";
         String user = "postgres";
         String pass = "ceymusic";
@@ -242,6 +231,13 @@ public class DatabasePostgres {
                 .orElse(null);
     }
 
+    public static LocalDateTime sqlDateToLocalDateTime(Date date) {
+        return Optional.ofNullable(date)
+                .map(Date::getTime)
+                .map(time -> LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault()))
+                .orElse(null);
+    }
+
     public static List<ManualClaimTrack> getManualClaims() throws SQLException {
         Connection conn = getConn();
         // Statement statement = conn.createStatement();
@@ -366,11 +362,15 @@ public class DatabasePostgres {
     }
 
     public static void archiveSelectedClaim(String songNo) throws SQLException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
-        String query = String.format("UPDATE public.manual_claims SET archive = TRUE WHERE claim_id = %s;", songNo);
+        String query = "UPDATE public.manual_claims SET archive = TRUE WHERE claim_id = ?;";
 
-        statement.executeUpdate(query);
+        try (Connection conn = getConn();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, Integer.parseInt(songNo));
+            stmt.executeUpdate();
+
+        }
     }
 
     public static List<String> getAllArtists() throws SQLException {
@@ -479,7 +479,7 @@ public class DatabasePostgres {
 
     public static int addIngest(LocalDate date, String userName, String filePath, String ingestFileName) throws SQLException {
         Connection db = getConn();
-        String query = String.format("INSERT INTO public.ingests(ingest_date, user_name_note, root_folder, csv_filename) VALUES ('%s', '%s', '%s', '%s') RETURNING ingest_id;", date, userName, filePath, ingestFileName);
+        String query = String.format("INSERT INTO public.mc_ingests(ingest_date, user_name_note, root_folder, csv_filename) VALUES ('%s', '%s', '%s', '%s') RETURNING ingest_id;", date, userName, filePath, ingestFileName);
         Statement statement = db.createStatement();
         ResultSet rs = statement.executeQuery(query);
         int id = 0;
@@ -496,7 +496,7 @@ public class DatabasePostgres {
     public static void addIngestProduct(int ingestID, String upc, String albumTitle, String s, String composer, String lyricist, String originalFileName) throws SQLException {
         Connection db = getConn();
         String query = String.format("INSERT INTO " +
-                        "public.ingest_products(ingest_id, upc, song_name, isrc, composer, lyricist, file_name) " +
+                        "public.mc_ingest_products(ingest_id, upc, song_name, isrc, composer, lyricist, file_name) " +
                         "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');",
                 ingestID, upc, albumTitle, s, composer, lyricist, originalFileName);
         Statement statement = db.createStatement();
@@ -958,24 +958,34 @@ public class DatabasePostgres {
 
 
     //GET  REVN REPORT 24/04/2024
-    public static RevenueReport getPayeeGrossRev1(String name) {
+    public static RevenueReport getPayeeGrossRev1(ArtistReport report) {
 //		System.out.println("call this");
         RevenueReport rReport = new RevenueReport();
         try {
-            rReport.setAfterDeductionRoyalty(getTotalRoyalty(name));
-            rReport.setReportedRoyalty(getTotalRoyalty1(name));
+            rReport.setAfterDeductionRoyalty(getTotalRoyalty(report));
+            rReport.setReportedRoyalty(getTotalRoyalty1(report));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return rReport;
-
     }
 
-    public static double getTotalRoyalty1(String name) {
+    public static RevenueReport getPayeeGrossRevNew(ArtistReport report) {
+        RevenueReport rReport = new RevenueReport();
+        try {
+            rReport.setAfterDeductionRoyalty(getTotalRoyalty(report));
+            rReport.setReportedRoyalty(getTotalRoyalty1(report));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rReport;
+    }
+
+    public static double getTotalRoyalty1(ArtistReport report) {
         double d = 0.0;
         try {
             List<PayeeForReport> pr;
-            pr = getPayeeReport1(name);
+            pr = getPayeeReport1(report.getArtist().getName());
 
             for (PayeeForReport dd : pr) {
                 d = d + dd.getValue();
@@ -988,11 +998,11 @@ public class DatabasePostgres {
 
     }
 
-    public static double getTotalRoyalty(String name) {
+    public static double getTotalRoyalty(ArtistReport report) {
         double d = 0.0;
         try {
             List<PayeeForReport> pr;
-            pr = getPayeeReport(name);
+            pr = getPayeeReport(report);
 
             for (int i = 0; i < pr.size(); i++) {
                 PayeeForReport dd = pr.get(i);
@@ -1009,11 +1019,11 @@ public class DatabasePostgres {
     public static List<PayeeForReport> getPayeeReport1(String name) {
         System.out.println("Getting Payee Report for: " + name);
         String sql = """
-                SELECT ip.isrc,\s
-                SUM(CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_payee_share,\s
+                SELECT ip.isrc,
+                SUM(CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_payee_share,
                 SUM(rv.reported_royalty_for_ceymusic / 100 * CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_calculated_royalty
-                FROM isrc_payees ip\s
-                JOIN "summary_breakdown_02" rv ON ip.isrc = rv.asset_isrc
+                FROM isrc_payees ip
+                JOIN public.summary_bd_02 rv ON ip.isrc = rv.asset_isrc
                 WHERE ip.payee = ? OR ip.payee01 = ? OR ip.payee02 = ? GROUP BY ip.isrc;
                 """;
         List<PayeeForReport> pReport = new ArrayList<>();
@@ -1048,31 +1058,28 @@ public class DatabasePostgres {
 
     }
 
-    public static List<PayeeForReport> getPayeeReport(String name) {
+    public static List<PayeeForReport> getPayeeReport(ArtistReport report) {
         String sql = """
-                   SELECT ip.isrc,       SUM(  CASE    WHEN ip.payee = ? THEN ip.share\
-                               WHEN ip.payee01 = ? THEN ip.payee01share\
-                               ELSE ip.payee02share  END ) AS total_payee_share, SUM( rv.after_deduction_royalty / 100 * CASE \
-                               WHEN ip.payee = ? THEN ip.share\r
-                               WHEN ip.payee01 = ? THEN ip.payee01share\r
-                               ELSE ip.payee02share\
-                           END ) AS total_calculated_royalty FROM isrc_payees  ip \
-                 JOIN "summary_breakdown_02" rv ON ip.isrc = rv.asset_isrc\
-                 WHERE ip.payee = ?  OR ip.payee01 = ?   OR ip.payee02 =  ? GROUP BY ip.isrc \
+                SELECT ip.isrc,\s
+                SUM(CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_payee_share,
+                SUM(rv.after_deduction_royalty / 100 * CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_calculated_royalty
+                FROM isrc_payees ip JOIN public.summary_bd_02 rv ON ip.isrc = rv.asset_isrc
+                WHERE ip.payee = ? OR ip.payee01 = ? OR ip.payee02 = ? GROUP BY ip.isrc
                 """;
         List<PayeeForReport> pReport = new ArrayList<>();
         Connection con = getConn();
 
         try {
             PreparedStatement ps = con.prepareStatement(sql);
-//			System.out.println("here");
-            ps.setString(1, name);
-            ps.setString(2, name);
-            ps.setString(3, name);
-            ps.setString(4, name);
-            ps.setString(5, name);
-            ps.setString(6, name);
-            ps.setString(7, name);
+            System.out.println("Payee: " + report.getPayee());
+            System.out.println("Artist Name: " + report.getArtist().getName());
+            ps.setString(1, report.getArtist().getName());
+            ps.setString(2, report.getArtist().getName());
+            ps.setString(3, report.getArtist().getName());
+            ps.setString(4, report.getArtist().getName());
+            ps.setString(5, report.getArtist().getName());
+            ps.setString(6, report.getArtist().getName());
+            ps.setString(7, report.getArtist().getName());
 //			System.out.println(ps);
             ResultSet rs = ps.executeQuery();
 
@@ -1113,8 +1120,8 @@ public class DatabasePostgres {
     public static List<Ingest> getAllIngests() throws SQLException, IOException {
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement("SELECT i.ingest_id, i.ingest_date, i.user_name_note, " +
-                "(SELECT COUNT(ip.upc) FROM public.ingest_products ip WHERE ip.ingest_id = i.ingest_id) AS product_count, " +
-                "i.root_folder, i.ingest FROM public.ingests i;");
+                "(SELECT COUNT(ip.upc) FROM public.mc_ingest_products ip WHERE ip.ingest_id = i.ingest_id) AS product_count, " +
+                "i.root_folder, i.ingest FROM public.mc_ingests i;");
         ResultSet rs = ps.executeQuery();
         List<Ingest> ingests = new ArrayList<>();
         if (rs.isBeforeFirst()) {
@@ -1289,7 +1296,7 @@ public class DatabasePostgres {
                     SUM(rep.after_deduction_royalty) AS total_royalty
                 FROM public.isrc_payees ip
                 JOIN SONGS S ON IP.ISRC = S.ISRC
-                JOIN public."summary_breakdown_02" rep ON IP.ISRC = rep.asset_isrc
+                JOIN public.summary_bd_02 rep ON IP.ISRC = rep.asset_isrc
                 WHERE (ip.payee = ? AND ip.share = 100)
                 GROUP BY contributor
                 ORDER BY total_royalty DESC LIMIT 5;""");
@@ -1371,18 +1378,21 @@ public class DatabasePostgres {
     }
 
     public static boolean checkIfArtistValidated(String composer) throws SQLException {
-        Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement("SELECT COUNT(artist_id) FROM public.artists WHERE " +
-                "artist_name = ? AND validated = true;");
-        ps.setString(1, composer);
-        ResultSet rs = ps.executeQuery();
-        rs.next();
-        int count = rs.getInt(1);
-        if (count > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        String query = "SELECT COUNT(artist_id) FROM public.artists WHERE artist_name = ? AND validated = true;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, composer);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0;
+                }
+            }
+        } // The Connection, PreparedStatement, and ResultSet will be closed here.
+
+        return false; // Default return value in case the artist is not found.
     }
 
     public static ArrayList<Songs> getMissingISRCs() throws SQLException {
@@ -1435,6 +1445,93 @@ public class DatabasePostgres {
         }
 
         return songs;
+    }
+
+    public static void importReport(ReportMetadata report) throws SQLException, IOException, CsvValidationException {
+        String insertMetadataSQL = "INSERT INTO report_metadata (report_month, report_year, created_at) VALUES (?, ?, ?) RETURNING id";
+        String insertReportSQL = "INSERT INTO reports_new (report_id, asset_isrc, reported_royalty, territory, sale_start_date, dsp, product_label, upc) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        Connection con = getConn();
+
+        // Insert metadata and get the generated report_id
+        int reportId;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(insertMetadataSQL, Statement.RETURN_GENERATED_KEYS)) {
+            // pstmt.setString(1, "");
+            pstmt.setInt(1, report.getReportMonth());
+            pstmt.setInt(2, report.getReportYear());
+            pstmt.setObject(3, report.getCreatedAt());
+            pstmt.executeUpdate();
+
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    reportId = rs.getInt(1);
+                } else {
+                    throw new SQLException("Failed to retrieve report_id.");
+                }
+            }
+        }
+
+        // Insert report data
+        try (CSVReader reader = new CSVReader(new FileReader(report.getCsvFile()));
+             PreparedStatement pstmt = conn.prepareStatement(insertReportSQL)) {
+
+            String[] nextLine;
+            reader.readNext(); // Skip header
+            while ((nextLine = reader.readNext()) != null) {
+                FUGAReport fugaReport = CSVController.getFUGAReport(nextLine);
+                pstmt.setInt(1, reportId);
+                pstmt.setString(2, fugaReport.getAssetISRC());
+                pstmt.setDouble(3, fugaReport.getReportedRoyalty());
+                pstmt.setString(4, fugaReport.getTerritory());
+                pstmt.setDate(5, fugaReport.getSaleStartDateNew());
+                pstmt.setString(6, fugaReport.getDsp());
+                pstmt.setString(7, fugaReport.getProductLabel());
+                pstmt.setString(8, String.valueOf(fugaReport.getProductUPC()));
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+        }
+    }
+
+    public static int refreshSummaryTable(ArtistReport report) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("CALL refresh_report_summary(?, ?);");
+        System.out.println("Report Month: " + report.getMonthInt());
+        System.out.println("Report Year: " + report.getYear());
+        ps.setInt(1, report.getMonthInt());
+        ps.setInt(2, report.getYear());
+        return ps.executeUpdate();
+    }
+
+    public static List<ReportMetadata> getAllReports() throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("SELECT id, report_month, report_year, created_at FROM public.report_metadata;");
+        ResultSet rs = ps.executeQuery();
+
+        List<ReportMetadata> list = new ArrayList<>();
+
+        if (rs.isBeforeFirst()) {
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                int month = rs.getInt(2);
+                int year = rs.getInt(3);
+                Date createdDate = rs.getDate(4);
+
+                ReportMetadata reports = new ReportMetadata(id, month, year, sqlDateToLocalDateTime(createdDate));
+                list.add(reports);
+            }
+        }
+
+        return list;
+    }
+
+    public static boolean removeReport(int id) throws SQLException {
+        Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement("DELETE FROM report_metadata WHERE id = ?;");
+        ps.setInt(1, id);
+        int status = ps.executeUpdate();
+        return status > 0;
     }
 
 
@@ -1690,27 +1787,22 @@ public class DatabasePostgres {
 
         String sql = """
                 SELECT S.SONG_NAME,
-                	R.AFTER_DEDUCTION_ROYALTY / 100 * (CASE WHEN ip.payee = ? THEN ip.share
-                		WHEN ip.payee01 = ? THEN ip.payee01share
-                		ELSE ip.payee02share END) AS share,
-                	R.ASSET_ISRC
-                FROM PUBLIC."summary_breakdown_02" AS R
-                JOIN
-                	(SELECT ASSET_ISRC,
-                			MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
-                		FROM PUBLIC."summary_breakdown_02"
-                		WHERE ASSET_ISRC IN
-                				(SELECT ISRC
-                					FROM PUBLIC.ISRC_PAYEES
-                					WHERE PAYEE01 = ?
-                						OR PAYEE = ?
-                						OR PAYEE02 = ?)
-                		GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC
-                AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
+                R.AFTER_DEDUCTION_ROYALTY / 100 * (CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS share,
+                R.ASSET_ISRC
+                FROM PUBLIC.summary_bd_02 AS R
+                JOIN (SELECT ASSET_ISRC, MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
+                	  FROM PUBLIC.summary_bd_02
+                	  WHERE ASSET_ISRC IN (SELECT ISRC
+                						   FROM PUBLIC.ISRC_PAYEES
+                						   WHERE PAYEE01 = ?
+                						   OR PAYEE = ?
+                						   OR PAYEE02 = ?)
+                	  GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
                 LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
                 LEFT JOIN PUBLIC.isrc_payees ip ON ip.isrc = R.asset_isrc
                 ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC
-                LIMIT 5;""";
+                LIMIT 5;
+                """;
 
         PreparedStatement ps = conn.prepareStatement(sql);
 
@@ -2051,7 +2143,7 @@ public class DatabasePostgres {
 
     public static void addIngestCSV(byte[] byteArray, int ingestID) throws SQLException {
         Connection conn = getConn();
-        PreparedStatement preparedStatement = conn.prepareStatement("UPDATE public.ingests SET ingest=? WHERE ingest_id = ?;");
+        PreparedStatement preparedStatement = conn.prepareStatement("UPDATE public.mc_ingests SET ingest=? WHERE ingest_id = ?;");
         preparedStatement.setBytes(1, byteArray);
         preparedStatement.setInt(2, ingestID);
         preparedStatement.executeUpdate();
@@ -2112,23 +2204,28 @@ public class DatabasePostgres {
     public static List<CoWriterShare> getCoWriterPayments(String artist) throws SQLException {
         List<CoWriterShare> crLlist = new ArrayList<>();
         String sql = """
-                SELECT\s
-                \tip.isrc,
-                \trep.after_deduction_royalty,
-                \ts.song_name,\t\s
-                \tip.payee,\s
-                \tip.share,\s
-                \tCASE\s
-                \t\tWHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist)
-                \t\tELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)
-                \tEND AS contributor,
-                \t(SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,\s
-                \t(SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist, s.type
-                FROM public.isrc_payees ip
-                JOIN SONGS S ON IP.ISRC = S.ISRC
-                JOIN public."summary_breakdown_02" rep ON IP.ISRC = rep.asset_isrc
-                WHERE (ip.payee = ? AND ip.share = 100)
-                ORDER BY rep.after_deduction_royalty DESC;
+                SELECT ip.isrc,
+                  rep.after_deduction_royalty,
+                  s.song_name,
+                  ip.payee,
+                  ip.share,
+                  CASE WHEN ip.payee = (SELECT ar.artist_name\s
+                                      FROM public.artists ar\s
+                                      WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name\s
+                                                                             FROM public.artists ar\s
+                                                                             WHERE ar.artist_id = s.lyricist)
+                                                                             ELSE (SELECT ar.artist_name\s
+                                                                                   FROM public.artists ar\s
+                                                                                   WHERE ar.artist_id = s.composer)
+                                                                                   END AS contributor,
+                  (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
+                  (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist,
+                  s.type
+                  FROM public.isrc_payees ip
+                  JOIN SONGS S ON IP.ISRC = S.ISRC
+                  JOIN public.summary_bd_02 rep ON IP.ISRC = rep.asset_isrc
+                  WHERE (ip.payee = ? AND ip.share = 100)
+                  ORDER BY rep.after_deduction_royalty DESC;
                 """;
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement(sql);
