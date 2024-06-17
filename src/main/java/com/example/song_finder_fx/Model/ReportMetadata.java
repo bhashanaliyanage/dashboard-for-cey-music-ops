@@ -3,9 +3,7 @@ package com.example.song_finder_fx.Model;
 import com.example.song_finder_fx.DatabasePostgres;
 
 import java.io.File;
-import java.sql.Date;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ReportMetadata {

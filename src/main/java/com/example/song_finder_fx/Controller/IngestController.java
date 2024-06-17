@@ -3,7 +3,6 @@ package com.example.song_finder_fx.Controller;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.IngestCSVData;
 import com.example.song_finder_fx.Model.Ingest;
-import com.example.song_finder_fx.Model.YouDownload;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 

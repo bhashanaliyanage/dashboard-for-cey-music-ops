@@ -8,7 +8,6 @@ public class ArtistReport {
     private int monthInt = 0;
     private Artist artist = null;
     private double conversionRate = 0;
-    private String month = "";
     private final ArrayList<String> coWriters = new ArrayList<>();
     private final ArrayList<String> coWriterShare = new ArrayList<>();
     private Double grossRevenue;
@@ -134,7 +133,6 @@ public class ArtistReport {
         System.out.println("ArtistReport.setMonth");
         System.out.println("month = " + month);
         System.out.println("Artist Name: " + artist.getName());
-        this.month = month;
     }
 
     public void setPayee(String payee) {
