@@ -405,32 +405,6 @@ public class DatabasePostgres {
         return result;
     }
 
-    public static String getNewUGCISRC() throws SQLException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
-        String query = "SELECT isrc FROM public.songs WHERE isrc LIKE 'LKA0U%' ORDER BY isrc DESC LIMIT 1;";
-        ResultSet rs = statement.executeQuery(query);
-        if (rs.isBeforeFirst()) {
-            rs.next();
-            String lastISRC = rs.getString(1);
-
-            // Extract prefix (first 7 characters)
-            String prefix = lastISRC.substring(0, 7);
-
-            // Extract suffix (remaining characters)
-            String suffixStr = lastISRC.substring(7);
-            int suffix = Integer.parseInt(suffixStr);
-            suffix++;
-
-            // Format the suffix as a 5-digit integer
-            String formattedSuffix = String.format("%05d", suffix);
-
-            return prefix + formattedSuffix;
-        }
-
-        return "Error!";
-    }
-
     public static void emptyReportTable() throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
