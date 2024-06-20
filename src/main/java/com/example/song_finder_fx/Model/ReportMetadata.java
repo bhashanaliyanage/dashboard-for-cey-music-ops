@@ -8,17 +8,14 @@ import java.time.LocalDateTime;
 
 public class ReportMetadata {
     private int id;
-    // private String reportName;
+    private String reportName;
     private int reportMonth;
     private int reportYear;
     private LocalDateTime createdAt;
     private File csvFile; // Field to store the CSV file
 
-    // Constructors
-    public ReportMetadata() {}
-
-    public ReportMetadata(int reportMonth, int reportYear, File csvFile) {
-        // this.reportName = reportName;
+    public ReportMetadata(String reportName, int reportMonth, int reportYear, File csvFile) {
+        this.reportName = reportName;
         this.reportMonth = reportMonth;
         this.reportYear = reportYear;
         this.createdAt = LocalDateTime.now();
@@ -83,5 +80,9 @@ public class ReportMetadata {
 
     public boolean remove() throws SQLException {
         return DatabasePostgres.removeReport(id);
+    }
+
+    public String getName() {
+        return reportName;
     }
 }

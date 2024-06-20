@@ -2,6 +2,7 @@ package com.example.song_finder_fx.Organizer;
 
 import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.IngestController;
+import com.example.song_finder_fx.Controller.ItemSwitcher;
 import com.example.song_finder_fx.Controller.ReportPDF;
 import com.example.song_finder_fx.Controller.RevenueReportController;
 import com.example.song_finder_fx.DatabasePostgres;
@@ -16,23 +17,111 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        // testArtistReportPDF();
+        int month = 1;
+        int year = 2024;
+
+        ArrayList<String> names = new ArrayList<>(Arrays.asList(
+                "Ajantha Ranasinghe",
+                "Aloy Gunawardena",
+                "Ananda Hewaranhindage",
+                "Aruna Lian",
+                "Bandula Nanayakkarawasam",
+                "C. T. Fernando",
+                "Camillus Perera",
+                "Chaaminda Rathnasuriya",
+                "Chandrarathne Manawasinghe",
+                "Charith Senadheera",
+                "Daya De Alwis",
+                "Dhammika Hettiarachchi",
+                "Dharmarathna Perera",
+                "Dharmasiri Gamage",
+                "Gayaman Dissanayake",
+                "Gunadasa Kapuge",
+                "Hemasiri Halpita",
+                "Indrajith Mirihana",
+                "Jagath J Edirisinghe",
+                "Karunaratne Abeysekera",
+                "KDK Dharmawardena",
+                "Kularatne Ariyawansa",
+                "Kumaradasa Saputhanthri",
+                "Lionel Algama",
+                "Mahagama Sekara",
+                "Mahesh Vithana",
+                "Mahinda Dissanayake",
+                "Maithree Panagoda",
+                "Menaka Chandimal",
+                "Methun SK",
+                "Miyuru Sangeeth",
+                "Mohommed Salih",
+                "Naadagama",
+                "Nadeeka Jayawardena",
+                "Nalaka Sajee",
+                "Namal Udugama",
+                "Nanda Malini",
+                "P. L. A. Somapala",
+                "Premasiri Khemadasa",
+                "Rajee Wasantha Welgama",
+                "Rathna Sri Wijesinghe",
+                "Ravi Siriwardhana",
+                "Ridma Weerawardena",
+                "Rodney Vidhana Pathirana",
+                "Saman Athaudahetti",
+                "Saman Kularatne",
+                "Samudra Wettasinghe",
+                "Sanath Nandasiri",
+                "Sangeeth Wijesuriya",
+                "Sarath Dasanayake",
+                "Sarath De Alwis",
+                "Sarathchandra Attygalle",
+                "Senanga Dissanayake",
+                "Shantha Deshabandu",
+                "Shirley Waijayantha",
+                "Somadasa Elvitigala",
+                "Stanley Peiris",
+                "Sunil Ariyaratne",
+                "Sunil Dharmasena",
+                "Sunil R Gamage",
+                "Sunil Sarath Perera",
+                "Vasantha Kumara Kobawaka",
+                "Victor Rathnayake",
+                "W.D. Amaradeva",
+                "Wasana Ediriarachchi",
+                "WAYO",
+                "Yamuna Malini Perera"
+        ));
+
+        // Refreshing Tables
+        DatabasePostgres.refreshSummaryTable(month, year);
+
+        List<String> payees = DatabasePostgres.getPayees(month, year);
+
+        System.out.println("\nTotal Number of Payees for " + ItemSwitcher.setMonth(month) + ": " + payees.size() + "\n");
+
+        String path = "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk";
+
+        for (String payee : payees) {
+            // System.out.println(payee);
+            if (names.contains(payee)) {
+                System.out.println("Available in the list: " + payee);
+                testArtistReportPDF(0, 320, payee, year, month, path + "\\" + payee + ".pdf");
+            } else {
+                System.out.println("Not Available in the list: " + payee);
+            }
+        }
+
+        // testArtistReportPDF(0, 1, "Rohana Weerasinghe", 2024, 1, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\test.pdf");
+
+        // testAddNewFugaReport();
+
         // testArtistReportsNew();
-        // testDashboard();
-        // testArchivedManualClaims();
-        // testStoreIngests();
+    }
 
-        /*ReportMetadata report = new ReportMetadata(1, 2024, new File("D:\\CeyMusic\\CeyMusic Software Dev\\Tools\\Report Generator\\October2021StatementRun_IslandDreamRecords-standard (1)\\October2021StatementRun_IslandDreamRecords-royalty_product_and_asset.csv"));
-        try {
-            DatabasePostgres.importReport(report);
-        } catch (SQLException | IOException | CsvValidationException e) {
-            throw new RuntimeException(e);
-        }*/
-
+    private static void testRemoveAllReports() throws SQLException {
         List<ReportMetadata> reports = DatabasePostgres.getAllReports();
 
         for (ReportMetadata report : reports) {
@@ -43,12 +132,21 @@ public class Test {
         }
     }
 
+    private static void testAddNewFugaReport() {
+        ReportMetadata report = new ReportMetadata("Test March", 1, 2024, new File("D:\\CeyMusic\\CeyMusic Software Dev\\Tools\\Report Generator\\March2024StatementRun_IslandDreamRecords-standard\\March2024StatementRun_IslandDreamRecords-royalty_product_and_asset.csv"));
+        try {
+            DatabasePostgres.importReport(report);
+        } catch (SQLException | IOException | CsvValidationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void testArtistReportsNew() throws SQLException {
         int artistID = 47;
         int conversionRate = 1;
         String artistName = "Rohana Weerasinghe";
         int year = 2024;
-        int month = 2;
+        int month = 3;
 
         // Creating artist model by passing artistID
         ArtistReport report = getArtistReportNew(artistID, conversionRate, artistName, year, month);
@@ -148,19 +246,12 @@ public class Test {
         System.out.println(summary.getReportDayCount());
     }
 
-    private static void testArtistReportPDF() throws SQLException, IOException {
-        int artistID = 47;
-        int conversionRate = 1;
-        String artistName = "Rohana Weerasinghe";
-        int year = 2024;
-        int month = 2;
+    private static void testArtistReportPDF(int artistID, int conversionRate, String artistName, int year, int month, String path) throws SQLException, IOException {
         ArtistReport report = getArtistReportNew(artistID, conversionRate, artistName, year, month);
 
-        // double grossRevenue = report.getGrossRevenueInLKR();
-        // System.out.println("\nGross Revenue: LKR " + grossRevenue);
+        System.out.println("report.getGrossRevenue() = " + report.getGrossRevenue());
 
         ReportPDF pdf = new ReportPDF();
-        String path = "C:\\Users\\bhash\\Documents\\Test\\test.pdf";
         Document document = pdf.generateReport(path, report);
         System.out.println("Report for " + report.getArtist().getName() + " is generated and saved in: " + path);
     }

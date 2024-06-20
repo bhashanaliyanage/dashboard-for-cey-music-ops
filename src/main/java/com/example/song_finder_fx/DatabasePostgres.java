@@ -1,6 +1,7 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.CSVController;
+import com.example.song_finder_fx.Controller.ItemSwitcher;
 import com.example.song_finder_fx.Model.*;
 import com.example.song_finder_fx.Session.Hasher;
 import com.example.song_finder_fx.Session.User;
@@ -55,14 +56,6 @@ public class DatabasePostgres {
             System.out.println("Error on Closing Connection: " + e);
             // e.printStackTrace();
         }
-    }
-
-    private static int updateCatNo(String artist_name, String cat_no_handler, int last_cat_no) throws SQLException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
-        String query = String.format("UPDATE public.artists SET cat_no_handler = '%s', last_cat_no = %s WHERE artist_name = '%s';", cat_no_handler, last_cat_no, artist_name);
-
-        return statement.executeUpdate(query);
     }
 
     public static int addRowFUGAReport(FUGAReport report, Connection conn) throws SQLException {
@@ -900,25 +893,25 @@ public class DatabasePostgres {
         );
     }
 
-    public static List<String> getPayees() throws SQLException {
-        Connection db = getConn();
+    public static List<String> getPayees(int month, int year) throws SQLException {
+        // Refresh tables
+        // refreshSummaryTable(month, year);
+
+        String query = """
+            SELECT payee, SUM(adjusted_royalty) AS adjusted_royalty FROM public.summary_bd_03_multiple GROUP BY payee\s
+            ORDER BY adjusted_royalty DESC;
+           \s""";
+
         List<String> list = new ArrayList<>();
-        PreparedStatement preparedStatement = db.prepareStatement("SELECT DISTINCT PAYEE AS ARTIST\n" +
-                "FROM ISRC_PAYEES\n" +
-                "WHERE PAYEE IS NOT NULL\n" +
-                "UNION\n" +
-                "SELECT DISTINCT PAYEE01 AS ARTIST\n" +
-                "FROM ISRC_PAYEES\n" +
-                "WHERE PAYEE01 IS NOT NULL\n" +
-                "UNION\n" +
-                "SELECT DISTINCT PAYEE02 AS ARTIST\n" +
-                "FROM ISRC_PAYEES\n" +
-                "WHERE PAYEE02 IS NOT NULL\n" +
-                "ORDER BY ARTIST;");
-        ResultSet rs = preparedStatement.executeQuery();
-        while (rs.next()) {
-            list.add(rs.getString(1));
-        }
+
+        try (Connection db = getConn();
+             PreparedStatement preparedStatement = db.prepareStatement(query);
+             ResultSet rs = preparedStatement.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(rs.getString(1));
+            }
+        } // The Connection, PreparedStatement, and ResultSet will be closed here.
 
         return list;
     }
@@ -926,15 +919,6 @@ public class DatabasePostgres {
     public static ArrayList<Double> getPayeeGrossRev(String artistName) throws SQLException, ClassNotFoundException {
         Connection connection = getConn();
         ArrayList<Double> royalty = new ArrayList<>();
-
-        /*
-         PreparedStatement psGetGross = connection.prepareStatement("SELECT Asset_ISRC, " +
-         "((((SUM(CASE WHEN Territory = 'AU' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' THEN Reported_Royalty ELSE 0 END))) * 0.85) * `isrc_payees`.`SHARE`/100 AS REPORTED_ROYALTY, " +
-         "(((((SUM(CASE WHEN Territory = 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label = 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) + (((((SUM(CASE WHEN Territory = 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END)) * 0.9) + (SUM(CASE WHEN Territory != 'AU' AND Product_Label != 'CeyMusic Records' THEN Reported_Royalty ELSE 0 END))) * 0.85) * 0.1) AS PARTNER_SHARE " +
-         "FROM `report` " +
-         "JOIN isrc_payees ON isrc_payees.ISRC = report.Asset_ISRC AND `isrc_payees`.`PAYEE` = ? " +
-         "ORDER BY `REPORTED_ROYALTY` DESC;");
-         */
 
 
         PreparedStatement psGetGross = connection.prepareStatement("SELECT report.asset_isrc, " +
@@ -1448,7 +1432,7 @@ public class DatabasePostgres {
     }
 
     public static void importReport(ReportMetadata report) throws SQLException, IOException, CsvValidationException {
-        String insertMetadataSQL = "INSERT INTO report_metadata (report_month, report_year, created_at) VALUES (?, ?, ?) RETURNING id";
+        String insertMetadataSQL = "INSERT INTO report_metadata (report_name, report_month, report_year, created_at) VALUES (?, ?, ?, ?) RETURNING id";
         String insertReportSQL = "INSERT INTO reports_new (report_id, asset_isrc, reported_royalty, territory, sale_start_date, dsp, product_label, upc) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         Connection con = getConn();
@@ -1457,10 +1441,10 @@ public class DatabasePostgres {
         int reportId;
 
         try (PreparedStatement pstmt = conn.prepareStatement(insertMetadataSQL, Statement.RETURN_GENERATED_KEYS)) {
-            // pstmt.setString(1, "");
-            pstmt.setInt(1, report.getReportMonth());
-            pstmt.setInt(2, report.getReportYear());
-            pstmt.setObject(3, report.getCreatedAt());
+            pstmt.setString(1, report.getName());
+            pstmt.setInt(2, report.getReportMonth());
+            pstmt.setInt(3, report.getReportYear());
+            pstmt.setObject(4, report.getCreatedAt());
             pstmt.executeUpdate();
 
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -1494,7 +1478,7 @@ public class DatabasePostgres {
         }
     }
 
-    public static int refreshSummaryTable(ArtistReport report) throws SQLException {
+    /*public static int refreshSummaryTable(ArtistReport report) throws SQLException {
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement("CALL refresh_report_summary(?, ?);");
         System.out.println("Report Month: " + report.getMonthInt());
@@ -1502,6 +1486,27 @@ public class DatabasePostgres {
         ps.setInt(1, report.getMonthInt());
         ps.setInt(2, report.getYear());
         return ps.executeUpdate();
+    }*/
+
+    public static void refreshSummaryTable(int month, int year) throws SQLException {
+        String callProcedure = "CALL refresh_report_summary(?, ?);";
+        String refreshMaterializedView = "REFRESH MATERIALIZED VIEW summary_bd_03_multiple;";
+
+        try (Connection con = getConn();
+             PreparedStatement psProcedure = con.prepareStatement(callProcedure);
+             PreparedStatement psRefresh = con.prepareStatement(refreshMaterializedView)) {
+
+            System.out.println("Report Month: " + ItemSwitcher.setMonth(month));
+            System.out.println("Report Year: " + year);
+            psProcedure.setInt(1, month);
+            psProcedure.setInt(2, year);
+
+            System.out.println("Refreshing Tables...");
+
+            psProcedure.executeUpdate();
+            // After the stored procedure is executed, refresh the materialized view.
+            psRefresh.executeUpdate();
+        }
     }
 
     public static List<ReportMetadata> getAllReports() throws SQLException {

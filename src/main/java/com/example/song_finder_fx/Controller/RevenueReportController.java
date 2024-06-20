@@ -14,13 +14,7 @@ public record RevenueReportController(ArtistReport report) {
 
     public ArtistReport calculateRevenue() throws SQLException {
         // Refreshing Tables
-        int status = DatabasePostgres.refreshSummaryTable(report);
-
-        if (status > 0) {
-            System.out.println("Summary Table Refreshed\n");
-        } else {
-            System.out.println("Error Updating Summary Report\n");
-        }
+        DatabasePostgres.refreshSummaryTable(report.getMonthInt(), report.getYear());
 
         // Getting gross revenue and partner share
         RevenueReport grossNPartnerShare = DatabasePostgres.getPayeeGrossRevNew(report);

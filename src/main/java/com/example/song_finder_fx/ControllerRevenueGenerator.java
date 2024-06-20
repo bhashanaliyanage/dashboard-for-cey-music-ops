@@ -483,12 +483,15 @@ public class ControllerRevenueGenerator {
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
 
+        /*int month = 0;
+        int year = 0;
+
         Task<Void> taskLocaPayees;
 
         taskLocaPayees = new Task<>() {
             @Override
             protected Void call() throws SQLException {
-                List<String> payees = DatabasePostgres.getPayees();
+                List<String> payees = DatabasePostgres.getPayees(month, year);
 
                 Platform.runLater(() -> {
                     comboPayees.getItems().addAll(payees);
@@ -499,7 +502,7 @@ public class ControllerRevenueGenerator {
         };
 
         Thread threadLoadPayees = new Thread(taskLocaPayees);
-        threadLoadPayees.start();
+        threadLoadPayees.start();*/
     }
 
     public void onSidePanelAddNewReportBtnClick() throws IOException {
