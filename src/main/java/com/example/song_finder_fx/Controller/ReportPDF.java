@@ -77,7 +77,8 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         // ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
         List<CoWriterSummary> coWriterSummaryList = report.getCoWriterPaymentSummary();
         // int songCount = topPerformingSongs.size();
-        double conversionRate = report.getConversionRate();
+        double eurToAudRate = report.getEurToAudRate();
+        double AudToLkrRate = report.getAudToLkrRate();
 
         // Table 02 Row 01
         table.addCell(new Cell(1, 2).add(new Paragraph("")).setBorder(Border.NO_BORDER));
@@ -94,7 +95,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         /*for (int i = 0; i <= (songCount -1); i++) {
             Songs song = topPerformingSongs.get(i);
             String trackTitle = song.getTrackTitle();
-            double royalty = song.getRoyalty() * conversionRate;
+            double royalty = song.getRoyalty() * eurToAudRate;
             table.addCell(new Cell().add(new Paragraph(trackTitle).setFont(FONT_POPPINS))
                     .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,09.2f", royalty)).setFont(FONT_POPPINS))
@@ -103,7 +104,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
 
         for (CoWriterSummary summary : coWriterSummaryList) {
             double amount = summary.getRoyalty();
-            double convertedRoyalty = amount * conversionRate;
+            double convertedRoyalty = amount * eurToAudRate * AudToLkrRate;
 
             String contributor = summary.getContributor();
             // String royaltyShare = "LKR " + String.format("%,09.2f", convertedRoyalty) + "/=";
@@ -127,7 +128,8 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
 
         ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
         int songCount = topPerformingSongs.size();
-        double conversionRate = report.getConversionRate();
+        double eurToAudRate = report.getEurToAudRate();
+        double AudToLkrRate = report.getAudToLkrRate();
 
         // Table 02 Row 01
         table.addCell(new Cell(1, 2).add(new Paragraph("")).setBorder(Border.NO_BORDER));
@@ -146,7 +148,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
 
             String trackTitle = song.getTrackTitle();
 
-            double royalty = song.getRoyalty() * conversionRate;
+            double royalty = song.getRoyalty() * eurToAudRate * AudToLkrRate;
             String finalAmount = "LKR " + String.format("%,9.2f", royalty) + "/=";
 
             table.addCell(new Cell().add(new Paragraph(trackTitle).setFont(FONT_POPPINS))
@@ -191,7 +193,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
     }
 
     private Table getCoWriterTable(ArtistReport report) {
-        double conversionRate = report.getConversionRate();
+        double conversionRate = report.getEurToAudRate();
         List<CoWriterShare> coWriterShares = report.getCoWritterList();
 
         // Table
@@ -238,38 +240,6 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         return table;
     }
 
-    private Table getTable04(ArtistReport report) {
-        // Table
-        float[] columnWidth = {300f, 5f, 300f};
-        Table table = new Table(columnWidth);
-        table.setMarginLeft(20f);
-        table.setMarginRight(20f);
-        table.setMarginTop(10f);
-        DecimalFormat df = new DecimalFormat("0.00");
-
-        // Row 01
-        table.addCell(new Cell().add(new Paragraph("Partner Share of Gross").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_BLACK).setBorder(BLACK_BORDER));
-        table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().add(new Paragraph("Amount Payable").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_BLACK).setBorder(BLACK_BORDER));
-        /*table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));*/
-        /*table.addCell(new Cell().add(new Paragraph("14% TAX (If Applicable)").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_WHITE).setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_RED).setBorder(BLACK_BORDER));*/
-
-        // Row 02
-        table.addCell(new Cell().add(new Paragraph("LKR " + df.format(report.getPartnerShareInLKR())).setFont(FONT_POPPINS))
-                .setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBorder(BLACK_BORDER));
-        table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().add(new Paragraph("LKR " + df.format(report.getPartnerShareInLKR())).setFont(FONT_POPPINS))
-                .setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBorder(BLACK_BORDER));
-        /*table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));*/
-        /*table.addCell(new Cell().add(new Paragraph("-").setFont(FONT_POPPINS))
-                .setFontSize(16f).setTextAlignment(TextAlignment.CENTER).setBorder(BLACK_BORDER));*/
-
-        return table;
-    }
-
     private Table getTable03(ArtistReport report) {
         // Table
         float[] columnWidth = {200f, 5f, 200f, 5f, 200f};
@@ -291,11 +261,11 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                 .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(INVOICE_DARK_BLUE).setBorder(DARK_BLUE_BORDER));
 
         // Row 02
-        table.addCell(new Cell().add(new Paragraph("EUR " + String.format("%,9.2f", report.getGrossRevenue())).setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph("AUD " + String.format("%,9.2f", report.getGrossRevenueInAUD())).setFont(FONT_POPPINS))
                 .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
         table.addCell(new Cell().add(new Paragraph(""))
                 .setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().add(new Paragraph("EUR " + String.format("%,9.2f", report.getPartnerShare())).setFont(FONT_POPPINS))
+        table.addCell(new Cell().add(new Paragraph("AUD " + String.format("%,9.2f", report.getPartnerShareInAUD())).setFont(FONT_POPPINS))
                 .setFontSize(10f).setTextAlignment(TextAlignment.CENTER).setBorder(DARK_BLUE_BORDER));
         table.addCell(new Cell().add(new Paragraph(""))
                 .setBorder(Border.NO_BORDER));
@@ -417,7 +387,8 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                 setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
 
         List<CoWriterShare> coWriterShares = report.getCoWritterList();
-        double conversionRate = report.getConversionRate();
+        double eurToAudRate = report.getEurToAudRate();
+        double audToLkrRate = report.getAudToLkrRate();
 
         for (CoWriterShare share : coWriterShares) {
             String songName = share.getSongName();
@@ -432,7 +403,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(percentage).setFont(FONT_POPPINS))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
-            table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare * conversionRate) + "/=").setFont(FONT_POPPINS))
+            table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare * eurToAudRate * audToLkrRate) + "/=").setFont(FONT_POPPINS))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));

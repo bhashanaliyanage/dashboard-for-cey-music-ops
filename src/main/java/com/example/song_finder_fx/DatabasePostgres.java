@@ -366,21 +366,6 @@ public class DatabasePostgres {
         }
     }
 
-    public static List<String> getAllArtists() throws SQLException {
-        Connection conn = getConn();
-        String query = "SELECT artist_name FROM public.artists ORDER BY artist_name ASC;";
-        Statement statement = conn.createStatement();
-        List<String> artists = new ArrayList<>();
-
-        ResultSet rs = statement.executeQuery(query);
-        while (rs.next()) {
-            String artist = rs.getString(1);
-            artists.add(artist);
-        }
-
-        return artists;
-    }
-
     public static void editManualClaim(String songID, String trackName, String composer, String lyricist) throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
@@ -1001,7 +986,7 @@ public class DatabasePostgres {
     }
 
     public static List<PayeeForReport> getPayeeReport1(String name) {
-        System.out.println("Getting Payee Report for: " + name);
+        System.out.println("\nGetting Payee Report for: " + name + "...");
         String sql = """
                 SELECT ip.isrc,
                 SUM(CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_payee_share,
@@ -1055,8 +1040,6 @@ public class DatabasePostgres {
 
         try {
             PreparedStatement ps = con.prepareStatement(sql);
-            System.out.println("Payee: " + report.getPayee());
-            System.out.println("Artist Name: " + report.getArtist().getName());
             ps.setString(1, report.getArtist().getName());
             ps.setString(2, report.getArtist().getName());
             ps.setString(3, report.getArtist().getName());
@@ -1496,12 +1479,11 @@ public class DatabasePostgres {
              PreparedStatement psProcedure = con.prepareStatement(callProcedure);
              PreparedStatement psRefresh = con.prepareStatement(refreshMaterializedView)) {
 
-            System.out.println("Report Month: " + ItemSwitcher.setMonth(month));
-            System.out.println("Report Year: " + year);
+            System.out.println("\nRefreshing Summary Tables for " + ItemSwitcher.setMonth(month) + " " + year);
             psProcedure.setInt(1, month);
             psProcedure.setInt(2, year);
 
-            System.out.println("Refreshing Tables...");
+            // System.out.println("Refreshing Tables...");
 
             psProcedure.executeUpdate();
             // After the stored procedure is executed, refresh the materialized view.

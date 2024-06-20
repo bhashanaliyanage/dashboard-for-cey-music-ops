@@ -24,6 +24,10 @@ public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
         int month = 1;
         int year = 2024;
+        /*double eurToAudRate = 1.51;
+        double audToLkrRate = 214.46;*/
+        double eurToAudRate = 1.61;
+        double audToLkrRate = 327.7;
 
         ArrayList<String> names = new ArrayList<>(Arrays.asList(
                 "Ajantha Ranasinghe",
@@ -108,13 +112,13 @@ public class Test {
             // System.out.println(payee);
             if (names.contains(payee)) {
                 System.out.println("Available in the list: " + payee);
-                testArtistReportPDF(0, 320, payee, year, month, path + "\\" + payee + ".pdf");
+                testArtistReportPDF(0, eurToAudRate, audToLkrRate, payee, year, month, path + "\\" + payee + ".pdf");
             } else {
                 System.out.println("Not Available in the list: " + payee);
             }
         }
 
-        // testArtistReportPDF(0, 1, "Rohana Weerasinghe", 2024, 1, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\test.pdf");
+        // testArtistReportPDF(0, eurToAudRate, audToLkrRate, "Rohana Weerasinghe", year, month, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\test.pdf");
 
         // testAddNewFugaReport();
 
@@ -143,13 +147,14 @@ public class Test {
 
     private static void testArtistReportsNew() throws SQLException {
         int artistID = 47;
-        int conversionRate = 1;
+        double eurToAudRate = 1.61;
+        double audToLkrRate = 327.70;
         String artistName = "Rohana Weerasinghe";
         int year = 2024;
         int month = 3;
 
         // Creating artist model by passing artistID
-        ArtistReport report = getArtistReportNew(artistID, conversionRate, artistName, year, month);
+        ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month);
 
         // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
         double grossRevenue = report.getGrossRevenueInLKR();
@@ -164,7 +169,8 @@ public class Test {
         System.out.println("\n========");
 
         System.out.println("\nArtist: " + report.getArtist().getName());
-        System.out.println("EUR to LKR Conversion Rate: " + report.getConversionRate());
+        System.out.println("EUR to AUD Conversion Rate: " + report.getEurToAudRate());
+        System.out.println("AUD to LKR Conversion Rate: " + report.getAudToLkrRate());
         System.out.println("Date: " + report.getDate());
 
         System.out.println("\n========");
@@ -175,7 +181,7 @@ public class Test {
 
         System.out.println("\nTop Performing Songs");
         for (Songs song : topPerformingSongs) {
-            System.out.println(song.getTrackTitle() + " | " + song.getRoyalty() * conversionRate);
+            System.out.println(song.getTrackTitle() + " | " + (song.getRoyalty() * eurToAudRate * audToLkrRate));
         }
 
         System.out.println("\n========");
@@ -184,7 +190,7 @@ public class Test {
         for (CoWriterSummary summary : coWriterSummaries) {
             String contributor = summary.getContributor();
             double royalty = summary.getRoyalty();
-            System.out.println(contributor + " | " + royalty);
+            System.out.println(contributor + " | " + royalty * eurToAudRate * audToLkrRate);
         }
 
         System.out.println("\nCo-Writer Share Detailed");
@@ -192,18 +198,18 @@ public class Test {
             String songName = share.getSongName();
             String songType = share.getSongType();
             String percentage = share.getShare();
-            double artistShare = share.getRoyalty();
+            double artistShare = share.getRoyalty() * eurToAudRate * audToLkrRate;
             String coWriter = share.getContributor();
 
             System.out.println(songName + " | " + songType + " | " + percentage + " | " + artistShare + " | " + coWriter);
         }
     }
 
-    private static ArtistReport getArtistReportNew(int artistID, int conversionRate, String artistName, int year, int month) throws SQLException {
+    private static ArtistReport getArtistReportNew(int artistID, double eurToAudRate, double audToLkrRate, String artistName, int year, int month) throws SQLException {
         Artist artist = new Artist(artistID, artistName);
 
         // Creating revenue report model by passing artist object and conversion rate
-        ArtistReport report = new ArtistReport(artist, conversionRate, year, month);
+        ArtistReport report = new ArtistReport(artist, eurToAudRate, audToLkrRate, year, month);
 
         // Creating revenue report controller object
         RevenueReportController revenueReportController = new RevenueReportController(report);
@@ -246,14 +252,14 @@ public class Test {
         System.out.println(summary.getReportDayCount());
     }
 
-    private static void testArtistReportPDF(int artistID, int conversionRate, String artistName, int year, int month, String path) throws SQLException, IOException {
-        ArtistReport report = getArtistReportNew(artistID, conversionRate, artistName, year, month);
+    private static void testArtistReportPDF(int artistID, double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
+        ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month);
 
-        System.out.println("report.getGrossRevenue() = " + report.getGrossRevenue());
+        // System.out.println("report.getGrossRevenue() = " + report.getGrossRevenue());
 
         ReportPDF pdf = new ReportPDF();
         Document document = pdf.generateReport(path, report);
-        System.out.println("Report for " + report.getArtist().getName() + " is generated and saved in: " + path);
+        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + path);
     }
 
     private static void testArtistReports() throws SQLException {
@@ -264,7 +270,7 @@ public class Test {
         int year = 2024;
 
         // Creating artist model by passing artistID
-        ArtistReport report = getArtistReportNew(artistID, conversionRate, artistName, month, year);
+        ArtistReport report = getArtistReportNew(artistID, conversionRate, 0, artistName, month, year);
 
         // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
         double grossRevenue = report.getGrossRevenueInLKR();
@@ -279,7 +285,7 @@ public class Test {
         System.out.println("\n========");
 
         System.out.println("\nArtist: " + report.getArtist().getName());
-        System.out.println("EUR to LKR Conversion Rate: " + report.getConversionRate());
+        System.out.println("EUR to LKR Conversion Rate: " + report.getEurToAudRate());
         System.out.println("Date: " + report.getDate());
 
         System.out.println("\n========");
@@ -314,7 +320,7 @@ public class Test {
         }
     }
 
-    private static ArtistReport getArtistReport(int artistID, int conversionRate, String artistName, int month, int year) throws SQLException {
+    /*private static ArtistReport getArtistReport(int artistID, int conversionRate, String artistName, int month, int year) throws SQLException {
         Artist artist = new Artist(artistID, artistName);
 
         // Creating revenue report model by passing artist object and conversion rate
@@ -326,7 +332,7 @@ public class Test {
         // Revenue report controller will have a method called calculate revenue (inputs report object and returns gross revenue, partner share, conversion rate, date, co-writer payment summary via report object)
         report = revenueReportController.calculateRevenue();
         return report;
-    }
+    }*/
 
     private static void testSearch() {
         // DatabaseHandler databaseHandler = new DatabaseHandler();

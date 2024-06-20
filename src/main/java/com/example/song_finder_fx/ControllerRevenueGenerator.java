@@ -1111,7 +1111,7 @@ public class ControllerRevenueGenerator {
                     System.out.println("========");
 
                     System.out.println("Artist: " + report.getArtist().getName());
-                    System.out.println("EUR to LKR Conversion Rate: " + report.getConversionRate());
+                    System.out.println("EUR to LKR Conversion Rate: " + report.getEurToAudRate());
                     System.out.println("Date: " + report.getDate());
                     System.out.println("========");
 
