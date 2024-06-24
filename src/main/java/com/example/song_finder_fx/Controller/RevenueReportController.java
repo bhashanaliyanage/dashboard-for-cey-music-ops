@@ -14,12 +14,15 @@ public record RevenueReportController(ArtistReport report) {
 
     public ArtistReport calculateRevenue() throws SQLException {
         // Refreshing Tables
-        DatabasePostgres.refreshSummaryTable(report.getMonthInt(), report.getYear());
+        // DatabasePostgres.refreshSummaryTable(report.getMonthInt(), report.getYear());
 
         // Getting gross revenue and partner share
         RevenueReport grossNPartnerShare = DatabasePostgres.getPayeeGrossRevNew(report);
         Double grossRevenue = grossNPartnerShare.getReportedRoyalty();
         Double partnerShare = grossNPartnerShare.getAfterDeductionRoyalty();
+
+        System.out.println("partnerShare = " + partnerShare);
+
         report.setGrossRevenue(grossRevenue);
         report.setPartnerShare(partnerShare);
 

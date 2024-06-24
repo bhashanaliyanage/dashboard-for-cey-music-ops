@@ -35,13 +35,20 @@ public class DatabasePostgres {
     private static Connection conn;
 
     public static Connection getConn() {
+        // LocalHost
+        String ip = "jdbc:postgresql://192.168.1.200:5432/";
         String dbname = "songdata";
         String user = "postgres";
         String pass = "ceymusic";
 
+        // CloudClusters Trial Ends 24/06/26
+        String ip2 = "jdbc:postgresql://108.181.197.151:18964/";
+        String dbname2 = "ceymusic-songdata";
+        String user2 = "bhashana";
+
         try {
             Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection("jdbc:postgresql://192.168.1.200:5432/" + dbname, user, pass);
+            conn = DriverManager.getConnection(ip + dbname, user, pass);
         } catch (Exception e) {
             System.out.println("Error Connecting to database = " + e);
         }
@@ -955,8 +962,10 @@ public class DatabasePostgres {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return d;
 
+        // System.out.println("d = " + d);
+
+        return d;
     }
 
     public static List<PayeeForReport> getPayeeReport1(String name) {

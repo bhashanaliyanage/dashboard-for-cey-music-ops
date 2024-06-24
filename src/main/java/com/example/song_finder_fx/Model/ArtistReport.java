@@ -68,11 +68,11 @@ public class ArtistReport {
     }*/
 
     public double getGrossRevenueInLKR() {
-        return grossRevenue * eurToAudRate * audToLkrRate;
+        return grossRevenue / eurToAudRate * audToLkrRate;
     }
 
     public double getPartnerShareInLKR() {
-        return partnerShare * eurToAudRate * audToLkrRate;
+        return partnerShare / eurToAudRate * audToLkrRate;
     }
 
     public String getPayee() {
@@ -173,10 +173,10 @@ public class ArtistReport {
     }
 
     public double getGrossRevenueInAUD() {
-        return grossRevenue * eurToAudRate;
+        return grossRevenue / eurToAudRate;
     }
 
     public double getPartnerShareInAUD() {
-        return partnerShare * eurToAudRate;
+        return partnerShare / eurToAudRate;
     }
 }

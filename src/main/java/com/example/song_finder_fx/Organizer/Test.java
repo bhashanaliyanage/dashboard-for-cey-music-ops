@@ -22,12 +22,22 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
+        // DatabasePostgres.refreshSummaryTable(1, 2024);
+
+        testBulkReporting();
+
+        // testArtistReportPDF(0, 0.6285, 186.78, "Ajantha Ranasinghe", 2024, 1, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\test.pdf");
+
+        // testAddNewFugaReport();
+
+        // testArtistReportsNew();
+    }
+
+    private static void testBulkReporting() throws SQLException, IOException {
         int month = 1;
         int year = 2024;
-        /*double eurToAudRate = 1.51;
-        double audToLkrRate = 214.46;*/
-        double eurToAudRate = 1.61;
-        double audToLkrRate = 327.7;
+        double eurToAudRate = 0.6285;
+        double audToLkrRate = 186.78;
 
         ArrayList<String> names = new ArrayList<>(Arrays.asList(
                 "Ajantha Ranasinghe",
@@ -112,17 +122,17 @@ public class Test {
             // System.out.println(payee);
             if (names.contains(payee)) {
                 System.out.println("Available in the list: " + payee);
-                testArtistReportPDF(0, eurToAudRate, audToLkrRate, payee, year, month, path + "\\" + payee + ".pdf");
+                testArtistReportPDF(0,
+                        eurToAudRate,
+                        audToLkrRate,
+                        payee,
+                        year,
+                        month,
+                        path + "\\" + year + "_" + ItemSwitcher.setMonth(month).toLowerCase() + "_" + payee.toLowerCase().replace(" ", "_") + ".pdf");
             } else {
                 System.out.println("Not Available in the list: " + payee);
             }
         }
-
-        // testArtistReportPDF(0, eurToAudRate, audToLkrRate, "Rohana Weerasinghe", year, month, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\test.pdf");
-
-        // testAddNewFugaReport();
-
-        // testArtistReportsNew();
     }
 
     private static void testRemoveAllReports() throws SQLException {

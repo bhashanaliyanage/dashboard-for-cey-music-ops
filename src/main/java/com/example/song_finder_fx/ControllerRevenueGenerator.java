@@ -507,14 +507,14 @@ public class ControllerRevenueGenerator {
 
     public void onSidePanelAddNewReportBtnClick() throws IOException {
         FXMLLoader loaderMain = new FXMLLoader(ControllerSettings.class.getResource("layouts/revenue-report-processing.fxml"));
-        loaderMain.setController(this);
+        // loaderMain.setController(this);
         Parent newContentMain = loaderMain.load();
 
         mainUIController.mainVBox.getChildren().setAll(newContentMain);
 
-        Task<Void> taskCheckMissingISRCs = checkMissingISRCs();
+        /*Task<Void> taskCheckMissingISRCs = checkMissingISRCs();
         Thread threadCheckMissingISRCs = new Thread(taskCheckMissingISRCs);
-        threadCheckMissingISRCs.start();
+        threadCheckMissingISRCs.start();*/
     }
 
     public void OnComboPayeeKeyPress(KeyEvent event) {
