@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 
 <VBox xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <Label text="Reported Royalty">
+   <Label text="FUGA Reports">
       <font>
          <Font name="Segoe UI Semibold" size="19.0" />
       </font>

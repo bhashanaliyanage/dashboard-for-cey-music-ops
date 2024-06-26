@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.CSVController;
 import com.example.song_finder_fx.Controller.ItemSwitcher;
 import com.example.song_finder_fx.Model.*;
@@ -19,20 +20,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
+import java.sql.Date;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
+
+import static com.example.song_finder_fx.Controller.CSVController.getReportTotalRowCount;
 
 public class DatabasePostgres {
 
     static StringBuilder errorBuffer = new StringBuilder();
     private static Connection conn;
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     public static Connection getConn() {
         // LocalHost
@@ -452,16 +455,6 @@ public class DatabasePostgres {
         return id;
     }
 
-    public static void addIngestProduct(int ingestID, String upc, String albumTitle, String s, String composer, String lyricist, String originalFileName) throws SQLException {
-        Connection db = getConn();
-        String query = String.format("INSERT INTO " +
-                        "public.mc_ingest_products(ingest_id, upc, song_name, isrc, composer, lyricist, file_name) " +
-                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');",
-                ingestID, upc, albumTitle, s, composer, lyricist, originalFileName);
-        Statement statement = db.createStatement();
-        statement.executeUpdate(query);
-    }
-
     /**
      * public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
      * List<ManualClaimTrack> manualClaims = getManualClaims();
@@ -864,9 +857,9 @@ public class DatabasePostgres {
         // refreshSummaryTable(month, year);
 
         String query = """
-            SELECT payee, SUM(adjusted_royalty) AS adjusted_royalty FROM public.summary_bd_03_multiple GROUP BY payee\s
-            ORDER BY adjusted_royalty DESC;
-           \s""";
+                 SELECT payee, SUM(adjusted_royalty) AS adjusted_royalty FROM public.summary_bd_03_multiple GROUP BY payee\s
+                 ORDER BY adjusted_royalty DESC;
+                \s""";
 
         List<String> list = new ArrayList<>();
 
@@ -1321,7 +1314,8 @@ public class DatabasePostgres {
         PreparedStatement ps = con.prepareStatement("""
                 SELECT COUNT(DISTINCT(r.asset_isrc)) FROM public.report r
                 LEFT OUTER JOIN songs s ON s.isrc = r.asset_isrc
-                WHERE s.isrc IS NULL;""");
+                WHERE s.isrc IS NULL;
+                """);
         ResultSet rs = ps.executeQuery();
         rs.next();
         return rs.getInt(1);
@@ -1502,6 +1496,133 @@ public class DatabasePostgres {
         ps.setInt(1, id);
         int status = ps.executeUpdate();
         return status > 0;
+    }
+
+    public static int importReport(ReportMetadata report, Label lblImport, Label lblReportProgress) {
+        Platform.runLater(() -> {
+            lblImport.setText("Working on...");
+            lblReportProgress.setText("0%");
+        });
+
+        int key = 0;
+
+        // Insert metadata and get the generated report_id
+        int reportId = 0;
+
+        try {
+            BufferedReader bReader = new BufferedReader(new FileReader(report.getCsvFile()));
+            int totalRowCount = getReportTotalRowCount(bReader);
+            int rowcount2 = 0; // While loop's row count
+
+            String insertMetadataSQL = "INSERT INTO report_metadata (report_name, report_month, report_year, created_at) VALUES (?, ?, ?, ?) RETURNING id";
+            String insertReportSQL = "INSERT INTO reports_new (report_id, asset_isrc, reported_royalty, territory, sale_start_date, dsp, product_label, upc) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+            Connection con = getConn();
+
+
+            try (PreparedStatement pstmt = con.prepareStatement(insertMetadataSQL, Statement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, report.getName());
+                pstmt.setInt(2, report.getReportMonth());
+                pstmt.setInt(3, report.getReportYear());
+                pstmt.setObject(4, report.getCreatedAt());
+                pstmt.executeUpdate();
+
+                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        reportId = rs.getInt(1);
+                    } else {
+                        throw new SQLException("Failed to retrieve report_id.");
+                    }
+                }
+            }
+
+            // Insert report data
+            Platform.runLater(() -> lblImport.setText("Importing"));
+            Platform.runLater(() -> lblReportProgress.setVisible(true));
+            try (CSVReader reader = new CSVReader(new FileReader(report.getCsvFile()));
+                 PreparedStatement pstmt = con.prepareStatement(insertReportSQL)) {
+
+                String[] nextLine;
+                reader.readNext(); // Skip header
+                while ((nextLine = reader.readNext()) != null) {
+                    rowcount2++;
+                    double percentage = ((double) rowcount2 / totalRowCount) * 100;
+
+                    FUGAReport fugaReport = CSVController.getFUGAReport(nextLine);
+                    pstmt.setInt(1, reportId);
+                    pstmt.setString(2, fugaReport.getAssetISRC());
+                    pstmt.setDouble(3, fugaReport.getReportedRoyalty());
+                    pstmt.setString(4, fugaReport.getTerritory());
+                    pstmt.setDate(5, fugaReport.getSaleStartDateNew());
+                    pstmt.setString(6, fugaReport.getDsp());
+                    pstmt.setString(7, fugaReport.getProductLabel());
+                    pstmt.setString(8, String.valueOf(fugaReport.getProductUPC()));
+                    // pstmt.addBatch();
+
+                    // addRowFUGAReport(fugaReport, con);
+                    pstmt.executeUpdate();
+
+                    Platform.runLater(() -> lblReportProgress.setText(df.format(percentage) + "%"));
+                }
+                // pstmt.executeBatch();
+                /*ResultSet rs = pstmt.getGeneratedKeys();
+                rs.next();
+                key = rs.getInt(1);*/
+            }
+            Platform.runLater(() -> lblImport.setText("Report Imported. Please Check Missing ISRCs"));
+        } catch (IOException | CsvValidationException e) {
+            Platform.runLater(() -> {
+                lblImport.setText("Error Reading CSV");
+                lblImport.setStyle("-fx-text-fill: red");
+                AlertBuilder.sendErrorAlert("Error", "Error Reading CSV", e.toString());
+                e.printStackTrace();
+            });
+        } catch (SQLException e) {
+            lblImport.setText("Error Importing CSV");
+            lblImport.setStyle("-fx-text-fill: red");
+            AlertBuilder.sendErrorAlert("Error", "Error Importing CSV", e.toString());
+            e.printStackTrace();
+        }
+
+        return reportId;
+    }
+
+    public static int getMissingPayeeCount(int key) throws SQLException {
+        String query = """
+                SELECT COUNT(DISTINCT(r.asset_isrc)) FROM public.reports_new r
+                LEFT OUTER JOIN isrc_payees s ON s.isrc = r.asset_isrc
+                WHERE s.isrc IS NULL AND r.report_id = ?;
+                """;
+        try (Connection con = getConn();
+             PreparedStatement pstmt = con.prepareStatement(query);) {
+            pstmt.setInt(1, key);
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    public static int getMissingISRC_Count(int key) throws SQLException {
+        String query = """
+                SELECT COUNT(DISTINCT(r.asset_isrc)) FROM public.reports_new r
+                LEFT OUTER JOIN songs s ON s.isrc = r.asset_isrc
+                WHERE s.isrc IS NULL AND r.report_id = ?;
+                """;
+        try (Connection con = getConn();
+             PreparedStatement pstmt = con.prepareStatement(query);) {
+            pstmt.setInt(1, key);
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+        return 0;
     }
 
 
