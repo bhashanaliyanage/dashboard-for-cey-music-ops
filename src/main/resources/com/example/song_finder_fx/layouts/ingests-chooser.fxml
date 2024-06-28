@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -24,132 +23,58 @@
       <VBox.margin>
          <Insets left="30.0" right="30.0" top="30.0" />
       </VBox.margin>
-      <VBox prefHeight="100.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
-         <HBox prefWidth="270.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-            <Label prefHeight="50.0" text="Missing Payees" HBox.hgrow="ALWAYS">
-               <font>
-                  <Font name="Segoe UI Semibold" size="14.0" />
-               </font>
-               <cursor>
-                  <Cursor fx:constant="DEFAULT" />
-               </cursor>
-               <HBox.margin>
-                  <Insets left="20.0" />
-               </HBox.margin>
-            </Label>
-            <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
-               <HBox.margin>
-                  <Insets left="20.0" right="20.0" />
-               </HBox.margin>
-               <children>
-                  <Label fx:id="lblMissingPayees" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="50.0" text="Loading" textAlignment="RIGHT">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                  </Label>
-               </children>
-            </HBox>
-         </HBox>
-         <VBox alignment="CENTER" onMouseClicked="#onExportPayeesClick" VBox.vgrow="ALWAYS">
-            <children>
-               <Label text="Click to Export CSV" />
-            </children>
-         </VBox>
-      </VBox>
-      <VBox layoutX="10.0" layoutY="10.0" prefHeight="100.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
-         <children>
-            <HBox prefWidth="270.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-               <children>
-                  <Label prefHeight="50.0" text="Missing ISRCs" HBox.hgrow="ALWAYS">
-                     <font>
-                        <Font name="Segoe UI Semibold" size="14.0" />
-                     </font>
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                     <HBox.margin>
-                        <Insets left="20.0" />
-                     </HBox.margin>
-                  </Label>
-                  <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
-                     <HBox.margin>
-                        <Insets left="20.0" right="20.0" />
-                     </HBox.margin>
-                     <children>
-                        <Label fx:id="lblMissingISRCs" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="50.0" text="Loading" textAlignment="RIGHT">
-                           <cursor>
-                              <Cursor fx:constant="DEFAULT" />
-                           </cursor>
-                        </Label>
-                     </children>
-                  </HBox>
-               </children>
-            </HBox>
-            <VBox alignment="CENTER" onMouseClicked="#onExportISRCsClick" VBox.vgrow="ALWAYS">
-               <Label text="Click to Export CSV"/>
-            </VBox>
-         </children>
-      </VBox>
-   </HBox>
-   <HBox spacing="10.0">
-      <VBox.margin>
-         <Insets left="30.0" right="30.0" top="10.0"/>
-      </VBox.margin>
-      <HBox alignment="CENTER_LEFT" onMouseClicked="#onImportIngest" prefHeight="70.0" styleClass="clickable-pane-bg"
-            HBox.hgrow="ALWAYS">
+      <HBox alignment="CENTER_LEFT" onMouseClicked="#onImportIngest" prefHeight="70.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
          <ImageView fitHeight="23.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
             <HBox.margin>
-               <Insets left="30.0"/>
+               <Insets left="30.0" />
             </HBox.margin>
-            <Image url="@../images/icon_csv.png"/>
+            <Image url="@../images/icon_csv.png" />
          </ImageView>
          <Label fx:id="lblImportIngest" text="Import Ingest">
             <HBox.margin>
-               <Insets left="20.0"/>
+               <Insets left="20.0" />
             </HBox.margin>
             <font>
-               <Font size="14.0"/>
+               <Font size="14.0" />
             </font>
          </Label>
       </HBox>
-      <HBox alignment="CENTER_LEFT" disable="true" onMouseClicked="#onUpdatePayees" prefHeight="70.0"
-            styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
+      <HBox alignment="CENTER_LEFT" disable="true" onMouseClicked="#onUpdatePayees" prefHeight="70.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
          <children>
             <ImageView fitHeight="23.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../images/icon_user.png"/>
+                  <Image url="@../images/icon_user.png" />
                </image>
                <HBox.margin>
-                  <Insets left="30.0"/>
+                  <Insets left="30.0" />
                </HBox.margin>
             </ImageView>
             <Label text="Update Payees">
                <HBox.margin>
-                  <Insets left="20.0"/>
+                  <Insets left="20.0" />
                </HBox.margin>
                <font>
-                  <Font size="14.0"/>
+                  <Font size="14.0" />
                </font>
             </Label>
          </children>
       </HBox>
-      <HBox alignment="CENTER_LEFT" disable="true" onMouseClicked="#onUpdateSongs" prefHeight="70.0"
-            styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
+      <HBox alignment="CENTER_LEFT" disable="true" onMouseClicked="#onUpdateSongs" prefHeight="70.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
          <children>
             <ImageView fitHeight="23.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../images/music-note%201.png"/>
+                  <Image url="@../images/music-note%201.png" />
                </image>
                <HBox.margin>
-                  <Insets left="30.0"/>
+                  <Insets left="30.0" />
                </HBox.margin>
             </ImageView>
             <Label text="Update Songs">
                <HBox.margin>
-                  <Insets left="20.0"/>
+                  <Insets left="20.0" />
                </HBox.margin>
                <font>
-                  <Font size="14.0"/>
+                  <Font size="14.0" />
                </font>
             </Label>
          </children>

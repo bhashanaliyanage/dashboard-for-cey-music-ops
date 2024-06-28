@@ -24,13 +24,19 @@ public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
         // DatabasePostgres.refreshSummaryTable(1, 2024);
 
-        testBulkReporting();
+        // testBulkReporting();
 
         // testArtistReportPDF(0, 0.6285, 186.78, "Ajantha Ranasinghe", 2024, 1, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\test.pdf");
 
         // testAddNewFugaReport();
 
         // testArtistReportsNew();
+
+        // testDashboard();
+        UserSession us = new UserSession();
+        us.logout();
+
+        // us.signup("bhashanaliyanage", "ceymusic", "bhashanaliyanage@gmail.com", "Bhashana Liyanage");
     }
 
     private static void testBulkReporting() throws SQLException, IOException {

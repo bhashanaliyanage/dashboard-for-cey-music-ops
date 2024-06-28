@@ -1192,9 +1192,9 @@ public class DatabasePostgres {
         }
     }
 
-    public static User getUserPrivilegeLevel(String username) throws SQLException {
+    public static User getUserData(String username) throws SQLException {
         Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement("SELECT privilege_level, email, display_name FROM public.user WHERE LOWER(username) = LOWER(?);");
+        PreparedStatement ps = con.prepareStatement("SELECT privilege_level, email, display_name, id FROM public.user WHERE LOWER(username) = LOWER(?);");
         ps.setString(1, username);
         ResultSet rs = ps.executeQuery();
         rs.next();
@@ -1202,11 +1202,13 @@ public class DatabasePostgres {
         int privilegeLevel = rs.getInt(1);
         String email = rs.getString(2);
         String nickName = rs.getString(3);
+        int userID = rs.getInt(4);
 
         User user = new User();
         user.setPrivilegeLevel(privilegeLevel);
         user.setEmail(email);
         user.setNickName(nickName);
+        user.setUserID(userID);
 
         return user;
     }
@@ -1339,14 +1341,17 @@ public class DatabasePostgres {
         return false; // Default return value in case the artist is not found.
     }
 
-    public static ArrayList<Songs> getMissingISRCs() throws SQLException {
+    public static ArrayList<Songs> getMissingISRCs(int report_id) throws SQLException {
         ArrayList<Songs> songs = new ArrayList<>();
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement("""
-                SELECT r.upc, r.asset_isrc FROM public.report r
+                SELECT r.upc, r.asset_isrc FROM public.reports_new r
                 LEFT OUTER JOIN songs s ON s.isrc = r.asset_isrc
-                WHERE s.isrc IS NULL
-                GROUP BY r.asset_isrc, r.upc;""");
+                WHERE s.isrc IS NULL AND r.report_id = ?
+                GROUP BY r.upc, r.asset_isrc
+                ORDER BY r.asset_isrc;
+                """);
+        ps.setInt(1, report_id);
 
         ResultSet rs = ps.executeQuery();
 
@@ -1365,14 +1370,19 @@ public class DatabasePostgres {
         return songs;
     }
 
-    public static ArrayList<Songs> getMissingPayees() throws SQLException {
+    public static ArrayList<Songs> getMissingPayees(int i) throws SQLException {
         ArrayList<Songs> songs = new ArrayList<>();
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement("""
-                SELECT r.upc, r.asset_isrc FROM public.report r
+                SELECT r.upc, r.asset_isrc FROM public.reports_new r
                 LEFT OUTER JOIN isrc_payees s ON s.isrc = r.asset_isrc
-                WHERE s.isrc IS NULL
-                GROUP BY r.asset_isrc, r.upc;""");
+                WHERE s.isrc IS NULL AND r.report_id = ?
+                GROUP BY r.asset_isrc, r.upc;
+                """);
+
+        ps.setInt(1, i);
+
+        System.out.println("i = " + i);
 
         ResultSet rs = ps.executeQuery();
 
@@ -1380,6 +1390,8 @@ public class DatabasePostgres {
             while (rs.next()) {
                 String upc = rs.getString(1);
                 String isrc = rs.getString(2);
+
+                System.out.println("isrc = " + isrc);
 
                 Songs song = new Songs();
                 song.setUPC(upc);
@@ -1613,7 +1625,7 @@ public class DatabasePostgres {
                 WHERE s.isrc IS NULL AND r.report_id = ?;
                 """;
         try (Connection con = getConn();
-             PreparedStatement pstmt = con.prepareStatement(query);) {
+             PreparedStatement pstmt = con.prepareStatement(query)) {
             pstmt.setInt(1, key);
 
             ResultSet rs = pstmt.executeQuery();
@@ -1623,6 +1635,40 @@ public class DatabasePostgres {
             }
         }
         return 0;
+    }
+
+    public static int getFUGA_ReportID(int month, int year) throws SQLException {
+        String query = "SELECT id FROM public.report_metadata WHERE report_month = ? AND report_year = ?;";
+        int id = 0;
+
+        try (Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setInt(1, month);
+            ps.setInt(2, year);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                id = rs.getInt(1);
+            }
+        }
+
+        return id;
+    }
+
+    public static int changeUserNickName(int userID, String nickName) throws SQLException {
+        String sql = "UPDATE public.user SET display_name=? WHERE id = ?;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nickName);
+            ps.setInt(2, userID);
+            return ps.executeUpdate();
+        }
+    }
+
+    public static void changeUserName(int userID, String username) {
+
     }
 
 

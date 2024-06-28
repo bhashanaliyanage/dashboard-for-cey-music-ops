@@ -133,8 +133,12 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Label searchResultISRC;
     public Label songFeaturing;
     public Label songFeaturingCopied;
+
     @FXML
     private Label lblUser;
+
+    public static Label lblUserStatic;
+
     @FXML
     private Label lblUserEmailAndUpdate;
     //</editor-fold>
@@ -158,6 +162,16 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Rectangle rctRevenue;
     public Rectangle rctArtistReports;
 
+    public static Label lblUserEmailAndUpdateStatic;
+
+    public static HBox btnRevenueAnalysisStatic;
+
+    public static HBox btnArtistReportsStatic;
+
+    public static HBox btnIngestsStatic;
+
+
+
     //</editor-fold>
     //</editor-fold>
 
@@ -165,42 +179,56 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public void initialize() throws SQLException {
         System.out.println("Initializing UI...");
 
-        // Loading user
-        loadUser();
-
         // Setting UI Elements
         mainVBoxStatic = mainVBox;
         sideVBoxStatic = sideVBox;
+
+        lblUserStatic = lblUser;
+        lblUserEmailAndUpdateStatic = lblUserEmailAndUpdate;
+        btnRevenueAnalysisStatic = btnRevenueAnalysis;
+        btnArtistReportsStatic = btnArtistReports;
+        btnIngestsStatic = btnIngests;
+
+        // Loading user
+        loadUser();
     }
 
-    private void loadUser() throws SQLException {
+    public static void disableUser() {
+        btnRevenueAnalysisStatic.setDisable(true);
+        btnArtistReportsStatic.setDisable(true);
+        btnIngestsStatic.setDisable(true);
+        lblUserStatic.setText("Log In | Sign Up");
+        lblUserEmailAndUpdateStatic.setText("CeyMusic Dashboard");
+    }
+
+    public static void loadUser() throws SQLException {
         UserSession userSession = new UserSession();
         Main.userSession = userSession;
 
         if (userSession.isLoggedIn()) {
             int privilegeLevel = userSession.getPrivilegeLevel();
 
-            lblUser.setText(userSession.getNickName());
-            lblUserEmailAndUpdate.setText(userSession.getEmail());
+            lblUserStatic.setText(userSession.getNickName());
+            lblUserEmailAndUpdateStatic.setText(userSession.getEmail());
 
             if (privilegeLevel == 3) {
                 try {
-                    btnRevenueAnalysis.setDisable(true);
-                    btnArtistReports.setDisable(true);
-                    btnIngests.setDisable(true);
+                    btnRevenueAnalysisStatic.setDisable(true);
+                    btnArtistReportsStatic.setDisable(true);
+                    btnIngestsStatic.setDisable(true);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (privilegeLevel == 2) {
-                btnRevenueAnalysis.setDisable(false);
-                btnArtistReports.setDisable(false);
-                btnIngests.setDisable(false);
+                btnRevenueAnalysisStatic.setDisable(false);
+                btnArtistReportsStatic.setDisable(false);
+                btnIngestsStatic.setDisable(false);
             }
         } else {
             try {
-                btnRevenueAnalysis.setDisable(true);
-                btnArtistReports.setDisable(true);
-                btnIngests.setDisable(true);
+                btnRevenueAnalysisStatic.setDisable(true);
+                btnArtistReportsStatic.setDisable(true);
+                btnIngestsStatic.setDisable(true);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -1133,8 +1161,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     public void onAboutButtonClicked() throws IOException {
         if (Main.userSession.isLoggedIn()) {
-            ControllerSettings cs = new ControllerSettings(this);
-            cs.loadAbout(mainNodes[1]);
+            Node node = SceneController.loadLayout("layouts/user/profile.fxml");
+            mainVBox.getChildren().setAll(node);
         } else {
             // System.out.println("Load Log In | Sign Up View...");
             // SceneController.loadLayout("layouts/user/login_signup.fxml");

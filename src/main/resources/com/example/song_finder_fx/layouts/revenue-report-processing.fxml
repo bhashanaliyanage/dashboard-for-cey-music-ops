@@ -50,15 +50,15 @@
             </HBox>
             <HBox spacing="10.0">
                <VBox.margin>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="30.0"/>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
                </VBox.margin>
                <VBox spacing="10.0">
-                  <Label text="Month" textFill="#656565"/>
-                  <ComboBox fx:id="comboMonth" prefWidth="330.0" promptText="Month" VBox.vgrow="ALWAYS"/>
+                  <Label text="Month" textFill="#656565" />
+                  <ComboBox fx:id="comboMonth" prefWidth="330.0" promptText="Month" VBox.vgrow="ALWAYS" />
                </VBox>
                <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" HBox.hgrow="ALWAYS">
-                  <Label text="Year" textFill="#656565"/>
-                  <TextField fx:id="txtYear" promptText="YYYY" styleClass="textarea-bg"/>
+                  <Label text="Year" textFill="#656565" />
+                  <TextField fx:id="txtYear" promptText="YYYY" styleClass="textarea-bg" />
                </VBox>
             </HBox>
          </VBox>
@@ -96,14 +96,6 @@
                <HBox alignment="CENTER_LEFT">
                   <children>
                      <Label fx:id="lblImport" text="Click Browse Button to Begin Import Process" textFill="#656565" />
-                     <ImageView fx:id="imgImportCaution" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                        <image>
-                           <Image url="@../images/done.png" />
-                        </image>
-                        <HBox.margin>
-                           <Insets left="10.0" />
-                        </HBox.margin>
-                     </ImageView>
                      <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                         <children>
                            <Label fx:id="lblReportProgress" text="Import Progress" visible="false" />
@@ -116,7 +108,7 @@
                </HBox>
             </children>
          </VBox>
-         <HBox fx:id="hboxMissingAssets" disable="true" layoutX="30.0" layoutY="365.0" prefHeight="100.0" prefWidth="688.0" spacing="10.0">
+         <HBox fx:id="hboxMissingAssets" disable="true" layoutX="30.0" layoutY="400.0" prefHeight="100.0" prefWidth="688.0" spacing="10.0">
             <children>
                <VBox prefHeight="100.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
                   <children>
@@ -192,6 +184,21 @@
                </VBox>
             </children>
          </HBox>
+         <VBox alignment="TOP_RIGHT" layoutX="30.0" layoutY="365.0" maxWidth="688.0" prefWidth="688.0" stylesheets="@../styles.css">
+            <children>
+               <ImageView fx:id="imgImportCaution" fitHeight="18.0" fitWidth="18.0" onMouseClicked="#onReload" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@../images/refresh-circle.256x256.png" />
+                  </image>
+                  <cursor>
+                     <Cursor fx:constant="HAND" />
+                  </cursor>
+               </ImageView>
+            </children>
+            <padding>
+               <Insets right="5.0" />
+            </padding>
+         </VBox>
       </Pane>
    </ScrollPane>
 </VBox>

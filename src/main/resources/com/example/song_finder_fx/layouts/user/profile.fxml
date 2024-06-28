@@ -5,7 +5,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
@@ -13,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerLogIn">
+<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerProfile">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -46,7 +45,7 @@
                                  <Cursor fx:constant="DEFAULT" />
                               </cursor>
                            </Label>
-                           <Label fx:id="lblUsername" layoutX="10.0" layoutY="10.0" text="username">
+                           <Label fx:id="lblUsernameTop" layoutX="10.0" layoutY="10.0" text="username">
                               <font>
                                  <Font name="Segoe UI Semibold" size="19.0" />
                               </font>
@@ -70,16 +69,17 @@
                         </cursor>
                      </Label>
                   </VBox>
-                  <VBox alignment="TOP_RIGHT" layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+                  <HBox alignment="TOP_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
                      <children>
+                        <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#onEdit" prefWidth="100.0" styleClass="button_inside" text="Edit Profile" />
                         <Button fx:id="btnLogOut" mnemonicParsing="false" onAction="#onLogOut" prefWidth="100.0" styleClass="button_inside" text="Log Out" />
                      </children>
-                  </VBox>
+                  </HBox>
                </children>
             </HBox>
-            <HBox>
+            <HBox styleClass="textarea-bg">
                <VBox.margin>
-                  <Insets left="20.0" top="30.0" />
+                  <Insets left="20.0" right="20.0" top="30.0" />
                </VBox.margin>
                <children>
                   <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
@@ -97,17 +97,6 @@
                                     <Font name="Segoe UI Semibold" size="12.0" />
                                  </font>
                               </Label>
-                              <ImageView fitHeight="64.0" fitWidth="17.0" onMouseClicked="#onNicknameEdit" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../images/pencil%201.png" />
-                                 </image>
-                                 <HBox.margin>
-                                    <Insets left="10.0" />
-                                 </HBox.margin>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </ImageView>
                            </children>
                         </HBox>
                         <HBox layoutX="10.0" layoutY="101.0">
@@ -118,17 +107,6 @@
                                     <Font name="Segoe UI Semibold" size="12.0" />
                                  </font>
                               </Label>
-                              <ImageView fitHeight="64.0" fitWidth="17.0" onMouseClicked="#onUsernameEdit" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../images/pencil%201.png" />
-                                 </image>
-                                 <HBox.margin>
-                                    <Insets left="10.0" />
-                                 </HBox.margin>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </ImageView>
                            </children>
                         </HBox>
                         <HBox layoutX="10.0" layoutY="114.0">
@@ -139,17 +117,6 @@
                                     <Font name="Segoe UI Semibold" size="12.0" />
                                  </font>
                               </Label>
-                              <ImageView fitHeight="64.0" fitWidth="17.0" onMouseClicked="#onEmailEdit" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../images/pencil%201.png" />
-                                 </image>
-                                 <HBox.margin>
-                                    <Insets left="10.0" />
-                                 </HBox.margin>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </ImageView>
                            </children>
                         </HBox>
                         <HBox layoutX="10.0" layoutY="128.0">
@@ -160,55 +127,12 @@
                                     <Font name="Segoe UI Semibold" size="12.0" />
                                  </font>
                               </Label>
-                              <ImageView fitHeight="64.0" fitWidth="17.0" onMouseClicked="#onPasswordEdit" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../images/pencil%201.png" />
-                                 </image>
-                                 <HBox.margin>
-                                    <Insets left="10.0" />
-                                 </HBox.margin>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </ImageView>
                            </children>
                         </HBox>
                      </children>
                   </VBox>
                </children>
             </HBox>
-            <TextField fx:id="txtUsername" prefHeight="30.0" promptText="Username" styleClass="textarea-bg">
-               <VBox.margin>
-                  <Insets left="20.0" right="20.0" top="30.0" />
-               </VBox.margin>
-            </TextField>
-            <TextField fx:id="txtPassword" layoutX="31.0" layoutY="106.0" onAction="#onLogIn" prefHeight="30.0" promptText="Password" styleClass="textarea-bg">
-               <VBox.margin>
-                  <Insets left="20.0" right="20.0" top="10.0" />
-               </VBox.margin>
-            </TextField>
-            <Button fx:id="btnLogIn" mnemonicParsing="false" onAction="#onLogIn" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside" text="Log In">
-               <VBox.margin>
-                  <Insets bottom="10.0" left="20.0" right="20.0" top="30.0" />
-               </VBox.margin>
-            </Button>
-            <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
-               <children>
-                  <Label text="or">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                  </Label>
-               </children>
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-            </HBox>
-            <Button fx:id="btnSignUp" layoutX="31.0" layoutY="206.0" mnemonicParsing="false" onAction="#onSignUp" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Sign Up">
-               <VBox.margin>
-                  <Insets bottom="20.0" left="20.0" right="20.0" />
-               </VBox.margin>
-            </Button>
          </VBox>
          <padding>
             <Insets bottom="20.0" />

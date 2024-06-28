@@ -3,29 +3,21 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.IngestController;
 import com.example.song_finder_fx.Controller.SceneController;
-import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.FileChooser;
 import javafx.stage.Window;
-import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 public class ControllerIngest {
     
@@ -77,7 +69,7 @@ public class ControllerIngest {
 
     @FXML
     void onExportISRCsClick(MouseEvent event) {
-        System.out.println("ControllerIngest.onExportISRCsClick");
+        /*System.out.println("ControllerIngest.onExportISRCsClick");
         try {
             // Getting User Location
             Node node = (Node) event.getSource();
@@ -99,11 +91,11 @@ public class ControllerIngest {
             AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
-        }
+        }*/
     }
 
-    private static @NotNull File writeMissingISRCs(File file) throws SQLException, IOException {
-        ArrayList<Songs> songs =  DatabasePostgres.getMissingISRCs();
+    /*private static @NotNull File writeMissingISRCs(File file) throws SQLException, IOException {
+        ArrayList<Songs> songs =  DatabasePostgres.getMissingISRCs(report_id);
         String path = file.getAbsolutePath();
         CSVWriter writer = new CSVWriter(new FileWriter(path));
         List<String[]> rows = new ArrayList<>();
@@ -120,11 +112,11 @@ public class ControllerIngest {
 
         File openFile = new File(path);
         return openFile;
-    }
+    }*/
 
     @FXML
     void onExportPayeesClick(MouseEvent event) {
-        try {
+        /*try {
             // Getting User Location
             Node node = (Node) event.getSource();
             Scene scene = node.getScene();
@@ -145,11 +137,11 @@ public class ControllerIngest {
             AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
-        }
+        }*/
     }
 
-    private File writeMissingPayees(File file) throws SQLException, IOException {
-        ArrayList<Songs> songs =  DatabasePostgres.getMissingPayees();
+    /*private File writeMissingPayees(File file) throws SQLException, IOException {
+        ArrayList<Songs> songs =  DatabasePostgres.getMissingPayees(i);
         String path = file.getAbsolutePath();
         CSVWriter writer = new CSVWriter(new FileWriter(path));
         List<String[]> rows = new ArrayList<>();
@@ -166,7 +158,7 @@ public class ControllerIngest {
 
         File openFile = new File(path);
         return openFile;
-    }
+    }*/
 
     @FXML
     void onImportIngest(MouseEvent event) {
@@ -193,6 +185,9 @@ public class ControllerIngest {
                             IngestController ingestController = new IngestController();
                             String status = ingestController.insertTemp(file);
                             Platform.runLater(() -> System.out.println("\nImport Status: " + status));
+                            if (Objects.equals(status, "done")) {
+                                Platform.runLater(() -> lblImportIngest.setText("Import Ingest"));
+                            }
                         } else {
                             Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Invalid CSV Format", "Expected 63 columns but found " + rowLength));
                             Platform.runLater(() -> lblImportIngest.setText("Import Ingest"));

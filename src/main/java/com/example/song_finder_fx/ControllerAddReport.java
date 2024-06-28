@@ -51,6 +51,8 @@ public class ControllerAddReport {
     @FXML
     private HBox hboxMissingAssets;
 
+    private final int[] key = new int[]{0};
+
     @FXML
     void initialize() {
         // Create a list of month names
@@ -80,8 +82,10 @@ public class ControllerAddReport {
             dialog.setContentText("Name: ");
             dialog.showAndWait().ifPresent(name -> reportName[0] = name);
             // Setting report name if not exists
-            if (reportName[0].isEmpty()) {
-                reportName[0] = ItemSwitcher.setMonth(month + 1).toLowerCase() + "_" + year;
+            if (reportName[0] != null) {
+                if (reportName[0].isEmpty()) {
+                    reportName[0] = ItemSwitcher.setMonth(month + 1).toLowerCase() + "_" + year;
+                }
             }
 
             // Getting report location
@@ -103,7 +107,7 @@ public class ControllerAddReport {
 
     private @NotNull Thread getThread(ReportMetadata report) {
         Task<Void> task;
-        final int[] key = new int[1];
+        // final int[] key = new int[1];
 
         task = new Task<>() {
             @Override
@@ -180,40 +184,107 @@ public class ControllerAddReport {
 
     @FXML
     void onExportISRCsClick(MouseEvent event) {
-        boolean ifAnyNull = checkData();
+        if (key[0] == 0) {
+            boolean ifAnyNull = checkData();
 
-        if (!ifAnyNull) {
-            int month = comboMonth.getSelectionModel().getSelectedIndex();
-            int year = Integer.parseInt(txtYear.getText());
-            // TODO: Modify Export Missing Metadata Method
-        }
+            if (!ifAnyNull) {
+                int month = comboMonth.getSelectionModel().getSelectedIndex();
+                int year = Integer.parseInt(txtYear.getText());
+                // TODO: Modify Export Missing Metadata Method
 
-        try {
-            // Getting User Location
-            Node node = (Node) event.getSource();
-            Scene scene = node.getScene();
-            FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
-            chooser.setTitle("Save As");
-            File file = chooser.showSaveDialog(scene.getWindow());
+                try {
+                    int id = DatabasePostgres.getFUGA_ReportID(month + 1, year);
+                    // Getting User Location
+                    File file = getFile(event);
 
-            if (file != null) {
-                File openFile = writeMissingISRCs(file);
+                    if (file != null) {
+                        File openFile = writeMissingISRCs(file, id);
 
-                if (Desktop.isDesktopSupported()) {
-                    Desktop.getDesktop().open(openFile);
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().open(openFile);
+                        }
+                    }
+
+                } catch (SQLException e) {
+                    AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
+                } catch (IOException e) {
+                    AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
                 }
             }
 
-        } catch (SQLException e) {
-            AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
-        } catch (IOException e) {
-            AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
+        } else {
+            // Load Missing Data
+
+
+            // Write Missing Data
+
         }
     }
 
-    private static @NotNull File writeMissingISRCs(File file) throws SQLException, IOException {
-        ArrayList<Songs> songs =  DatabasePostgres.getMissingISRCs();
+    @FXML
+    void onExportPayeesClick(MouseEvent event) {
+
+        if (key[0] == 0) {
+            boolean ifAnyNull = checkData();
+
+            if (!ifAnyNull) {
+                int month = comboMonth.getSelectionModel().getSelectedIndex();
+                int year = Integer.parseInt(txtYear.getText());
+                // TODO: Modify Export Missing Metadata Method
+
+                try {
+                    int id = DatabasePostgres.getFUGA_ReportID(month + 1, year);
+
+                    // Getting User Location
+                    File file = getFile(event);
+
+                    if (file != null) {
+                        File openFile = writeMissingPayees(file, id);
+
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().open(openFile);
+                        }
+                    }
+
+                } catch (SQLException e) {
+                    AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
+                } catch (IOException e) {
+                    AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
+                }
+            }
+
+        } else {
+            try {
+                File file = getFile(event);
+
+                if (file != null) {
+                    File openFile = writeMissingPayees(file, key[0]);
+
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().open(openFile);
+                    }
+                }
+
+            } catch (SQLException e) {
+                AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
+            } catch (IOException e) {
+                AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
+            }
+        }
+
+    }
+
+    private static File getFile(MouseEvent event) {
+        Node node = (Node) event.getSource();
+        Scene scene = node.getScene();
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
+        chooser.setTitle("Save As");
+        return chooser.showSaveDialog(scene.getWindow());
+    }
+
+    private static @NotNull File writeMissingISRCs(File file, int report_id) throws SQLException, IOException {
+        ArrayList<Songs> songs =  DatabasePostgres.getMissingISRCs(report_id);
         String path = file.getAbsolutePath();
         CSVWriter writer = new CSVWriter(new FileWriter(path));
         java.util.List<String[]> rows = new ArrayList<>();
@@ -232,42 +303,8 @@ public class ControllerAddReport {
         return openFile;
     }
 
-    @FXML
-    void onExportPayeesClick(MouseEvent event) {
-        boolean ifAnyNull = checkData();
-
-        if (!ifAnyNull) {
-            int month = comboMonth.getSelectionModel().getSelectedIndex();
-            int year = Integer.parseInt(txtYear.getText());
-            // TODO: Modify Export Missing Metadata Method
-        }
-
-        try {
-            // Getting User Location
-            Node node = (Node) event.getSource();
-            Scene scene = node.getScene();
-            FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
-            chooser.setTitle("Save As");
-            File file = chooser.showSaveDialog(scene.getWindow());
-
-            if (file != null) {
-                File openFile = writeMissingPayees(file);
-
-                if (Desktop.isDesktopSupported()) {
-                    Desktop.getDesktop().open(openFile);
-                }
-            }
-
-        } catch (SQLException e) {
-            AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
-        } catch (IOException e) {
-            AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
-        }
-    }
-
-    private File writeMissingPayees(File file) throws SQLException, IOException {
-        ArrayList<Songs> songs =  DatabasePostgres.getMissingPayees();
+    private File writeMissingPayees(File file, int i) throws SQLException, IOException {
+        ArrayList<Songs> songs =  DatabasePostgres.getMissingPayees(i);
         String path = file.getAbsolutePath();
         CSVWriter writer = new CSVWriter(new FileWriter(path));
         List<String[]> rows = new ArrayList<>();
@@ -282,7 +319,66 @@ public class ControllerAddReport {
         writer.writeAll(rows);
         writer.close();
 
-        File openFile = new File(path);
-        return openFile;
+        return new File(path);
+    }
+
+    @FXML
+    void onReload(MouseEvent event) {
+        try {
+            if (key[0] == 0) {
+                // Check if month and year available
+                boolean ifAnyNull = checkData();
+
+                if (!ifAnyNull) {
+                    // Get Report ID
+                    int month = comboMonth.getSelectionModel().getSelectedIndex();
+                    int year = Integer.parseInt(txtYear.getText());
+                    int id = DatabasePostgres.getFUGA_ReportID(month + 1, year);
+
+                    // Load Missing Data
+                    loadMissingData(id);
+                }
+            } else {
+                // Load Missing Data
+                System.out.println("Load Report");
+                loadMissingData(key[0]);
+            }
+        } catch (SQLException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Loading Metadata", "Please check report month and year or reload application\n\n" + e);
+        }
+    }
+
+    private void loadMissingData(int id) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                try {
+                    int missingPayeeCount = DatabasePostgres.getMissingPayeeCount(id);
+                    Platform.runLater(() -> lblMissingPayees.setText(String.valueOf(missingPayeeCount)));
+                    Platform.runLater(() -> hboxMissingAssets.setDisable(false));
+                } catch (SQLException e) {
+                    Platform.runLater(() -> {
+                        AlertBuilder.sendErrorAlert("Error", "Unable to fetch details", e.toString());
+                        e.printStackTrace();
+                    });
+                }
+
+                try {
+                    int missingISRC_Count = DatabasePostgres.getMissingISRC_Count(id);
+                    Platform.runLater(() -> lblMissingISRCs.setText(String.valueOf(missingISRC_Count)));
+                    Platform.runLater(() -> hboxMissingAssets.setDisable(false));
+                } catch (SQLException e) {
+                    Platform.runLater(() -> {
+                        AlertBuilder.sendErrorAlert("Error", "Unable to fetch details", e.toString());
+                        e.printStackTrace();
+                    });
+                }
+
+                return null;
+            }
+        };
+
+        Thread thread = new Thread(task);
+        thread.start();
     }
 }

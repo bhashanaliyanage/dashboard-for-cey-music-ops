@@ -6,6 +6,15 @@ public class ItemSwitcher {
     public ItemSwitcher() {
     }
 
+    public static String setPrivilegeLevel(int privilegeLevel) {
+        return switch (privilegeLevel) {
+            case 1 -> "Super";
+            case 2 -> "Admin";
+            case 3 -> "Ops";
+            default -> "Unspecified User Group";
+        };
+    }
+
     public String setCountry(String countryCode) {
         return switch (countryCode) {
             case "AU" -> "Australia";

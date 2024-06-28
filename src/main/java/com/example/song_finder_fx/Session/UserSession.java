@@ -9,8 +9,6 @@ public class UserSession {
     private final Preferences preferences;
     private String username;
     private boolean isLoggedIn;
-    int privilegeLevel;
-    String email;
     private User user;
 
     // Constructor
@@ -41,7 +39,7 @@ public class UserSession {
 
     // Private method to set privileges based on user role
     private void setPrivilegesAndEmail(String username) throws SQLException {
-        this.user = DatabasePostgres.getUserPrivilegeLevel(username);
+        this.user = DatabasePostgres.getUserData(username);
     }
 
     // Method to simulate login
@@ -112,5 +110,25 @@ public class UserSession {
 
     public String getNickName() {
         return user.getNickName();
+    }
+
+    public String getUserName() {
+        return username;
+    }
+
+    public boolean changeNickName(String nickName) throws SQLException {
+        int userID = user.getUserID();
+        int affectedRowCount = DatabasePostgres.changeUserNickName(userID, nickName);
+        if (affectedRowCount > 0) {
+            user.setNickName(nickName);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void changeUsername(String username) {
+        /*int userID = user.getUserID();
+        DatabasePostgres.changeUserName(userID, username);*/
     }
 }
