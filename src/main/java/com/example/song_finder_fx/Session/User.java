@@ -37,4 +37,8 @@ public class User {
     public void setUserID(int userID) {
         this.id = userID;
     }
+
+    public void setUsername(String username) {
+
+    }
 }

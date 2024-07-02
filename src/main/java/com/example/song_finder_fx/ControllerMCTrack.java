@@ -1,8 +1,6 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.ErrorDialog;
-import com.example.song_finder_fx.Controller.MCTrackController;
-import com.example.song_finder_fx.Controller.ManualClaims;
+import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
@@ -12,13 +10,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.textfield.TextFields;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -226,16 +228,29 @@ public class ControllerMCTrack {
                 status = true;
                 spinnerStart.setStyle("-fx-border-color: red;");
             } else {
-                spinnerStart.setStyle("-fx-border-color: '#e9ebee';");
-            }
-        }
+                if (!trimEnd.isEmpty()) {
+                    if (isNotValidTimeFormat(trimStart)) {
+                        status = true;
+                        spinnerEnd.setStyle("-fx-border-color: red;");
+                    } else {
+                        LocalTime startTime = LocalTime.parse(trimStart);
+                        LocalTime endTime = LocalTime.parse(trimEnd);
 
-        if (!trimEnd.isEmpty()) {
-            if (isNotValidTimeFormat(trimStart)) {
-                status = true;
-                spinnerEnd.setStyle("-fx-border-color: red;");
-            } else {
-                spinnerEnd.setStyle("-fx-border-color: '#e9ebee';");
+                        if (endTime.isBefore(startTime)) {
+                            status = true;
+                            spinnerEnd.setStyle("-fx-border-color: red;");
+                            spinnerStart.setStyle("-fx-border-color: red;");
+                            try {
+                                NotificationBuilder.displayTrayError("Time Validation Error", "Please check trim start and end times");
+                            } catch (AWTException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            spinnerEnd.setStyle("-fx-border-color: '#e9ebee';");
+                            spinnerStart.setStyle("-fx-border-color: '#e9ebee';");
+                        }
+                    }
+                }
             }
         }
 

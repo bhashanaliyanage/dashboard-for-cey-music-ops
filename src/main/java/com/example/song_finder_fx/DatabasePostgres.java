@@ -6,6 +6,7 @@ import com.example.song_finder_fx.Controller.ItemSwitcher;
 import com.example.song_finder_fx.Model.*;
 import com.example.song_finder_fx.Session.Hasher;
 import com.example.song_finder_fx.Session.User;
+import com.example.song_finder_fx.Session.UserSession;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
@@ -43,11 +44,6 @@ public class DatabasePostgres {
         String dbname = "songdata";
         String user = "postgres";
         String pass = "ceymusic";
-
-        // CloudClusters Trial Ends 24/06/26
-        String ip2 = "jdbc:postgresql://108.181.197.151:18964/";
-        String dbname2 = "ceymusic-songdata";
-        String user2 = "bhashana";
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -1193,24 +1189,30 @@ public class DatabasePostgres {
     }
 
     public static User getUserData(String username) throws SQLException {
+        System.out.println("Getting User Data for: " + username);
+
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement("SELECT privilege_level, email, display_name, id FROM public.user WHERE LOWER(username) = LOWER(?);");
         ps.setString(1, username);
         ResultSet rs = ps.executeQuery();
-        rs.next();
+        if (rs.isBeforeFirst()) {
+            rs.next();
 
-        int privilegeLevel = rs.getInt(1);
-        String email = rs.getString(2);
-        String nickName = rs.getString(3);
-        int userID = rs.getInt(4);
+            int privilegeLevel = rs.getInt(1);
+            String email = rs.getString(2);
+            String nickName = rs.getString(3);
+            int userID = rs.getInt(4);
 
-        User user = new User();
-        user.setPrivilegeLevel(privilegeLevel);
-        user.setEmail(email);
-        user.setNickName(nickName);
-        user.setUserID(userID);
+            User user = new User();
+            user.setPrivilegeLevel(privilegeLevel);
+            user.setEmail(email);
+            user.setNickName(nickName);
+            user.setUserID(userID);
 
-        return user;
+            return user;
+        } else {
+            return null;
+        }
     }
 
     public static List<String> getAllValidatedArtists() throws SQLException {
@@ -1642,7 +1644,7 @@ public class DatabasePostgres {
         int id = 0;
 
         try (Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement(query)) {
+             PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, month);
             ps.setInt(2, year);
 
@@ -1657,7 +1659,7 @@ public class DatabasePostgres {
     }
 
     public static int changeUserNickName(int userID, String nickName) throws SQLException {
-        String sql = "UPDATE public.user SET display_name=? WHERE id = ?;";
+        String sql = "UPDATE public.user SET display_name = ? WHERE id = ?;";
 
         try (Connection con = getConn();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -1667,8 +1669,16 @@ public class DatabasePostgres {
         }
     }
 
-    public static void changeUserName(int userID, String username) {
+    public static int changeUserName(int userID, String username) throws SQLException {
+        String sql = "UPDATE public.user SET username = ? WHERE id = ?;";
 
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setInt(2, userID);
+
+            return ps.executeUpdate();
+        }
     }
 
 

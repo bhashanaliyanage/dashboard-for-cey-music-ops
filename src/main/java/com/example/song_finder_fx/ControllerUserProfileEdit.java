@@ -56,17 +56,14 @@ public class ControllerUserProfileEdit {
                 }
             }
 
-            /*if (!Objects.equals(username, session.getUserName())) {
-                Main.userSession.changeUsername(username);
-                ControllerProfile.lblUsernameStatic.setText(username);
-            }*/
+            if (!Objects.equals(username, session.getUserName())) {
+                if (Main.userSession.changeUsername(username)) {
+                    ControllerProfile.lblUsernameStatic.setText(username);
+                }
+            }
         } catch (Exception e) {
             AlertBuilder.sendErrorAlert("Error", "Error Updating Values", e.toString());
         }
-
-        /*if (!nickName.isEmpty()) {
-        }*/
-
     }
 
 }

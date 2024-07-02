@@ -40,6 +40,12 @@ public class UserSession {
     // Private method to set privileges based on user role
     private void setPrivilegesAndEmail(String username) throws SQLException {
         this.user = DatabasePostgres.getUserData(username);
+
+        if (this.user == null) {
+            logout();
+        } else {
+            this.username = username;
+        }
     }
 
     // Method to simulate login
@@ -88,10 +94,14 @@ public class UserSession {
 
     // Method to simulate logout
     public void logout() {
-        isLoggedIn = false;
         // Remove logged user details from preferences
         clearSession();
+
         System.out.println("Logout successful. Goodbye, " + username + "!");
+
+        isLoggedIn = false;
+        this.user = null;
+        this.username = null;
     }
 
     // Method to clear logged user details from preferences
@@ -127,8 +137,14 @@ public class UserSession {
         }
     }
 
-    public void changeUsername(String username) {
-        /*int userID = user.getUserID();
-        DatabasePostgres.changeUserName(userID, username);*/
+    public boolean changeUsername(String username) throws SQLException {
+        int userID = user.getUserID();
+        int affectedRowCount = DatabasePostgres.changeUserName(userID, username);
+        if (affectedRowCount > 0) {
+            this.username = username;
+            return true;
+        } else {
+            return false;
+        }
     }
 }
