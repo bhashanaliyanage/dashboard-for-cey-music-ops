@@ -24,23 +24,23 @@ public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
         // DatabasePostgres.refreshSummaryTable(1, 2024);
 
-        // testBulkReporting();
+        testBulkReporting();
 
-        // testArtistReportPDF(0, 0.6285, 186.78, "Ajantha Ranasinghe", 2024, 1, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\test.pdf");
+        // testArtistReportPDF(0, 0.6285, 186.78, "KDK Dharmawardena", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\test.pdf");
 
         // testAddNewFugaReport();
 
         // testArtistReportsNew();
 
         // testDashboard();
-        UserSession us = new UserSession();
-        us.logout();
+//         UserSession us = new UserSession();
+//         us.signup();
 
         // us.signup("bhashanaliyanage", "ceymusic", "bhashanaliyanage@gmail.com", "Bhashana Liyanage");
     }
 
     private static void testBulkReporting() throws SQLException, IOException {
-        int month = 1;
+        int month = 3;
         int year = 2024;
         double eurToAudRate = 0.6285;
         double audToLkrRate = 186.78;
@@ -163,11 +163,13 @@ public class Test {
 
     private static void testArtistReportsNew() throws SQLException {
         int artistID = 47;
-        double eurToAudRate = 1.61;
-        double audToLkrRate = 327.70;
-        String artistName = "Rohana Weerasinghe";
+        double eurToAudRate = 0.6285;
+        double audToLkrRate = 186.78;
+        String artistName = "Ajantha Ranasinghe";
         int year = 2024;
         int month = 3;
+
+        DatabasePostgres.refreshSummaryTable(3, 2024);
 
         // Creating artist model by passing artistID
         ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month);
@@ -269,6 +271,8 @@ public class Test {
     }
 
     private static void testArtistReportPDF(int artistID, double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
+        DatabasePostgres.refreshSummaryTable(month, year);
+
         ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month);
 
         // System.out.println("report.getGrossRevenue() = " + report.getGrossRevenue());

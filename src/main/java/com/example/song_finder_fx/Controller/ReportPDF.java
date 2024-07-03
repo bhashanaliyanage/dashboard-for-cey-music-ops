@@ -104,11 +104,11 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
 
         for (CoWriterSummary summary : coWriterSummaryList) {
             double amount = summary.getRoyalty();
-            double convertedRoyalty = amount * eurToAudRate * AudToLkrRate;
+            double convertedRoyalty = amount / eurToAudRate * AudToLkrRate;
 
             String contributor = summary.getContributor();
             // String royaltyShare = "LKR " + String.format("%,09.2f", convertedRoyalty) + "/=";
-            String royaltyShare = "LKR " + String.format("%,9.2f", convertedRoyalty) + "/=";
+            String royaltyShare = "LKR " + String.format("%,9.2f", convertedRoyalty) + "/-";
 
             table.addCell(new Cell().add(new Paragraph(contributor).setFont(FONT_POPPINS))
                     .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
@@ -148,8 +148,8 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
 
             String trackTitle = song.getTrackTitle();
 
-            double royalty = song.getRoyalty() * eurToAudRate * AudToLkrRate;
-            String finalAmount = "LKR " + String.format("%,9.2f", royalty) + "/=";
+            double royalty = song.getRoyalty() / eurToAudRate * AudToLkrRate;
+            String finalAmount = "LKR " + String.format("%,9.2f", royalty) + "/-";
 
             table.addCell(new Cell().add(new Paragraph(trackTitle).setFont(FONT_POPPINS))
                     .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
@@ -403,7 +403,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(percentage).setFont(FONT_POPPINS))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
-            table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare * eurToAudRate * audToLkrRate) + "/=").setFont(FONT_POPPINS))
+            table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare / eurToAudRate * audToLkrRate) + "/-").setFont(FONT_POPPINS))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));

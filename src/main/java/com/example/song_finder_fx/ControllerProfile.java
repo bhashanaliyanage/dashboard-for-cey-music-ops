@@ -10,10 +10,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class ControllerProfile {
 
@@ -22,6 +22,8 @@ public class ControllerProfile {
 
     @FXML
     private Label lblEmail;
+
+    public static Label lblEmailStatic;
 
     @FXML
     private Label lblNickname;
@@ -69,6 +71,7 @@ public class ControllerProfile {
         lblNicknameStatic = lblNickname;
         lblUsernameStatic = lblUsername;
         lblUsernameTopStatic = lblUsernameTop;
+        lblEmailStatic = lblEmail;
     }
 
     @FXML
@@ -78,7 +81,12 @@ public class ControllerProfile {
             Node node = SceneController.loadLayout("layouts/user/login_signup.fxml");
             UIController.mainVBoxStatic.getChildren().setAll(node);
             UIController.disableUser();
-        } catch (IOException e) {
+            UIController.mainVBoxStatic.setDisable(false);
+
+            Node node2 = SceneController.loadLayout("layouts/sidepanel-blank.fxml");
+            UIController.sideVBoxStatic.getChildren().clear();
+            UIController.sideVBoxStatic.getChildren().add(node2);
+        } catch (IOException | SQLException e) {
             AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString());
         }
     }

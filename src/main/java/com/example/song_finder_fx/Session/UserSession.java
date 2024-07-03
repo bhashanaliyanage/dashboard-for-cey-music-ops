@@ -65,7 +65,7 @@ public class UserSession {
         }
     }
 
-    // Private method to simulate authentication
+    // Private Method to simulate authentication
     private boolean authenticate(String username, String password) throws SQLException {
         Hasher hasher = new Hasher(username, password);
         return hasher.validate();
@@ -146,5 +146,20 @@ public class UserSession {
         } else {
             return false;
         }
+    }
+
+    public boolean changeEmail(String email) throws SQLException {
+        int userID = user.getUserID();
+        int affectedRowCount = DatabasePostgres.changeUserEmail(userID, email);
+        if (affectedRowCount > 0) {
+            this.user.setEmail(email);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean checkUsernameAvailability(String username) throws SQLException {
+        return DatabasePostgres.checkUsernameAvailability(username);
     }
 }

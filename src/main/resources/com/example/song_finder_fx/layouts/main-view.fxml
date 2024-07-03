@@ -47,7 +47,7 @@
                     </Label>
                 </VBox>
             </HBox>
-            <HBox fx:id="btnSeachSongs" maxWidth="278.0" onMouseClicked="#onSearchDetailsButtonClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
+            <HBox fx:id="btnSeachSongs" disable="true" maxWidth="278.0" onMouseClicked="#onSearchDetailsButtonClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
                 <VBox.margin>
                     <Insets left="25.0" top="10.0" />
                 </VBox.margin>
@@ -72,7 +72,7 @@
                     </Label>
                 </VBox>
             </HBox>
-            <HBox fx:id="btnCollectSongs" layoutX="35.0" layoutY="170.0" maxWidth="278.0" onMouseClicked="#onCollectSongsButtonClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
+            <HBox fx:id="btnCollectSongs" disable="true" layoutX="35.0" layoutY="170.0" maxWidth="278.0" onMouseClicked="#onCollectSongsButtonClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
                 <VBox.margin>
                     <Insets left="25.0" />
                 </VBox.margin>
@@ -97,7 +97,7 @@
                     </Label>
                 </VBox>
             </HBox>
-            <HBox fx:id="btnArtistReports2" layoutX="35.0" layoutY="233.0" maxWidth="278.0" onMouseClicked="#onManualClaimsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
+            <HBox fx:id="btnManualClaims" disable="true" layoutX="35.0" layoutY="233.0" maxWidth="278.0" onMouseClicked="#onManualClaimsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
                 <VBox.margin>
                     <Insets left="25.0" />
                 </VBox.margin>
@@ -223,7 +223,7 @@
                 </VBox>
             </HBox>
             <VBox alignment="BOTTOM_LEFT" prefWidth="321.0" spacing="10.0" VBox.vgrow="ALWAYS">
-                <HBox layoutX="30.0" layoutY="224.0" onMouseClicked="#onSettingsButtonClicked" styleClass="button-vbox" stylesheets="@../styles.css">
+                <HBox fx:id="btnSettings" disable="true" layoutX="30.0" layoutY="224.0" onMouseClicked="#onSettingsButtonClicked" styleClass="button-vbox" stylesheets="@../styles.css">
                     <VBox.margin>
                         <Insets bottom="5.0" left="20.0" right="20.0" />
                     </VBox.margin>
@@ -244,7 +244,7 @@
                         </Label>
                     </VBox>
                 </HBox>
-                <HBox fx:id="btnSongList" layoutX="30.0" layoutY="383.0" onMouseClicked="#onSongListButtonClicked" styleClass="button-vbox" stylesheets="@../styles.css">
+                <HBox fx:id="btnSongList" disable="true" layoutX="30.0" layoutY="383.0" onMouseClicked="#onSongListButtonClicked" styleClass="button-vbox" stylesheets="@../styles.css">
                     <VBox.margin>
                         <Insets bottom="5.0" left="20.0" right="20.0" />
                     </VBox.margin>

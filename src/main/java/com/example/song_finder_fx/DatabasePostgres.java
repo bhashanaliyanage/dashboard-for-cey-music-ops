@@ -6,7 +6,6 @@ import com.example.song_finder_fx.Controller.ItemSwitcher;
 import com.example.song_finder_fx.Model.*;
 import com.example.song_finder_fx.Session.Hasher;
 import com.example.song_finder_fx.Session.User;
-import com.example.song_finder_fx.Session.UserSession;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
@@ -1681,6 +1680,51 @@ public class DatabasePostgres {
         }
     }
 
+    public static int changeUserEmail(int userID, String email) throws SQLException {
+        String sql = "UPDATE public.user SET email = ? WHERE id = ?;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, userID);
+
+            return ps.executeUpdate();
+        }
+    }
+
+    public static boolean changePassword(String userName, String newPassword) throws SQLException {
+        Hasher hasher = new Hasher(userName, newPassword);
+
+        String sql = "UPDATE public.user SET password = ? WHERE username = ?;";
+
+        try (Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, hasher.getHashedPass());
+            ps.setString(2, hasher.getUserName());
+
+            int status = ps.executeUpdate();
+
+            return status > 0;
+        }
+    }
+
+    public static boolean checkUsernameAvailability(String username) throws SQLException {
+        String sql = "SELECT COUNT(username) FROM public.user WHERE LOWER(username) = LOWER(?);";
+
+        try (Connection con = getConn();
+             PreparedStatement psCheckUser = con.prepareStatement(sql)) {
+
+            psCheckUser.setString(1, username);
+
+            ResultSet rs = psCheckUser.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+
+            return count == 0;
+        }
+
+    }
+
 
     public List<Payee> check(String name) {
 //        String name = "Victor Rathnayake";
@@ -1938,16 +1982,16 @@ public class DatabasePostgres {
                 R.ASSET_ISRC
                 FROM PUBLIC.summary_bd_02 AS R
                 JOIN (SELECT ASSET_ISRC, MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
-                	  FROM PUBLIC.summary_bd_02
-                	  WHERE ASSET_ISRC IN (SELECT ISRC
-                						   FROM PUBLIC.ISRC_PAYEES
-                						   WHERE PAYEE01 = ?
-                						   OR PAYEE = ?
-                						   OR PAYEE02 = ?)
-                	  GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
+                FROM PUBLIC.summary_bd_02
+                WHERE ASSET_ISRC IN (SELECT ISRC
+                FROM PUBLIC.ISRC_PAYEES
+                WHERE PAYEE01 = ?
+                OR PAYEE = ?
+                OR PAYEE02 = ?)
+                GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
                 LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
                 LEFT JOIN PUBLIC.isrc_payees ip ON ip.isrc = R.asset_isrc
-                ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC
+                ORDER BY share DESC
                 LIMIT 5;
                 """;
 
@@ -2356,13 +2400,13 @@ public class DatabasePostgres {
                   s.song_name,
                   ip.payee,
                   ip.share,
-                  CASE WHEN ip.payee = (SELECT ar.artist_name\s
-                                      FROM public.artists ar\s
-                                      WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name\s
-                                                                             FROM public.artists ar\s
+                  CASE WHEN ip.payee = (SELECT ar.artist_name
+                                      FROM public.artists ar
+                                      WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name
+                                                                             FROM public.artists ar
                                                                              WHERE ar.artist_id = s.lyricist)
-                                                                             ELSE (SELECT ar.artist_name\s
-                                                                                   FROM public.artists ar\s
+                                                                             ELSE (SELECT ar.artist_name
+                                                                                   FROM public.artists ar
                                                                                    WHERE ar.artist_id = s.composer)
                                                                                    END AS contributor,
                   (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
@@ -2373,7 +2417,7 @@ public class DatabasePostgres {
                   JOIN public.summary_bd_02 rep ON IP.ISRC = rep.asset_isrc
                   WHERE (ip.payee = ? AND ip.share = 100)
                   ORDER BY rep.after_deduction_royalty DESC;
-                """;
+               """;
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setString(1, artist);

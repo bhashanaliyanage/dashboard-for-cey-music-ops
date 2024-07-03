@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" maxWidth="688.0" prefHeight="310.0" prefWidth="688.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+     <Label prefWidth="633.0" text="Thank you for signing up! Your account is being reviewed by an admin. You'll receive an email notification once your user role has been approved. Please be patient, this process may take up to 24 hours." textAlignment="CENTER" wrapText="true">
+         <font>
+             <Font size="14.0" />
+         </font>
+         <cursor>
+             <Cursor fx:constant="DEFAULT" />
+         </cursor>
+     </Label>
+</VBox>

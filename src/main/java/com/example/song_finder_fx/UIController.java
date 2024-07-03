@@ -86,11 +86,23 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     //<editor-fold desc="HBox">
     public HBox hboxInvoiceSong;
+
     public HBox btnSeachSongs;
+
     public HBox btnCollectSongs;
+
     public HBox btnRevenueAnalysis;
-    public HBox searchAndCollect;
+
     public HBox searchAndCollect1;
+
+    @FXML
+    private HBox btnManualClaims;
+
+    @FXML
+    private HBox btnSettings;
+
+    @FXML
+    private HBox btnSongList;
     //</editor-fold>
 
     //<editor-fold desc="VBox">
@@ -170,7 +182,15 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     public static HBox btnIngestsStatic;
 
+    public static HBox btnSeachSongsStatic;
 
+    public static HBox btnCollectSongsStatic;
+
+    public static HBox btnManualClaimsStatic;
+
+    public static HBox btnSettingsStatic;
+
+    public static HBox btnSongListStatic;
 
     //</editor-fold>
     //</editor-fold>
@@ -188,15 +208,19 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         btnRevenueAnalysisStatic = btnRevenueAnalysis;
         btnArtistReportsStatic = btnArtistReports;
         btnIngestsStatic = btnIngests;
+        btnSeachSongsStatic = btnSeachSongs;
+        btnCollectSongsStatic = btnCollectSongs;
+        btnManualClaimsStatic = btnManualClaims;
+        btnSettingsStatic = btnSettings;
+        btnSongListStatic = btnSongList;
 
         // Loading user
         loadUser();
     }
 
-    public static void disableUser() {
-        btnRevenueAnalysisStatic.setDisable(true);
-        btnArtistReportsStatic.setDisable(true);
-        btnIngestsStatic.setDisable(true);
+    public static void disableUser() throws SQLException {
+        loadUser();
+
         lblUserStatic.setText("Log In | Sign Up");
         lblUserEmailAndUpdateStatic.setText("CeyMusic Dashboard");
     }
@@ -216,6 +240,14 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                     btnRevenueAnalysisStatic.setDisable(true);
                     btnArtistReportsStatic.setDisable(true);
                     btnIngestsStatic.setDisable(true);
+
+                    btnSeachSongsStatic.setDisable(false);
+                    btnCollectSongsStatic.setDisable(false);
+                    btnManualClaimsStatic.setDisable(false);
+                    btnSettingsStatic.setDisable(false);
+                    btnSongListStatic.setDisable(false);
+
+                    mainVBoxStatic.setDisable(false);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -223,12 +255,28 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 btnRevenueAnalysisStatic.setDisable(false);
                 btnArtistReportsStatic.setDisable(false);
                 btnIngestsStatic.setDisable(false);
+
+                btnSeachSongsStatic.setDisable(false);
+                btnCollectSongsStatic.setDisable(false);
+                btnManualClaimsStatic.setDisable(false);
+                btnSettingsStatic.setDisable(false);
+                btnSongListStatic.setDisable(false);
+
+                mainVBoxStatic.setDisable(false);
             }
         } else {
             try {
                 btnRevenueAnalysisStatic.setDisable(true);
                 btnArtistReportsStatic.setDisable(true);
                 btnIngestsStatic.setDisable(true);
+
+                btnSeachSongsStatic.setDisable(true);
+                btnCollectSongsStatic.setDisable(true);
+                btnManualClaimsStatic.setDisable(true);
+                btnSettingsStatic.setDisable(true);
+                btnSongListStatic.setDisable(true);
+
+                mainVBoxStatic.setDisable(true);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -1160,6 +1208,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     public void onAboutButtonClicked() throws IOException {
+        mainVBox.setDisable(false);
+
         if (Main.userSession.isLoggedIn()) {
             Node node = SceneController.loadLayout("layouts/user/profile.fxml");
             mainVBox.getChildren().setAll(node);

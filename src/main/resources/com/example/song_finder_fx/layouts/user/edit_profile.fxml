@@ -55,7 +55,7 @@
          </VBox.margin>
       </TextField>
    </VBox>
-   <VBox disable="true" layoutX="10.0" layoutY="149.0">
+   <VBox layoutX="10.0" layoutY="149.0">
       <VBox.margin>
          <Insets left="20.0" right="20.0" top="10.0" />
       </VBox.margin>
@@ -69,7 +69,7 @@
          </VBox.margin>
       </TextField>
    </VBox>
-   <VBox disable="true" layoutX="30.0" layoutY="223.0">
+   <VBox layoutX="30.0" layoutY="223.0">
       <children>
          <Label text="Current Password">
             <VBox.margin>
@@ -86,20 +86,37 @@
          <Insets left="20.0" right="20.0" top="10.0" />
       </VBox.margin>
    </VBox>
-   <VBox disable="true" layoutX="30.0" layoutY="282.0">
+   <VBox layoutX="30.0" layoutY="282.0">
       <VBox.margin>
-         <Insets left="20.0" right="20.0" top="10.0"/>
+         <Insets left="20.0" right="20.0" top="10.0" />
       </VBox.margin>
       <Label text="New Password">
          <VBox.margin>
-            <Insets left="5.0"/>
+            <Insets left="5.0" />
          </VBox.margin>
       </Label>
       <PasswordField fx:id="pfNew" promptText="●●●●●●●●" styleClass="textarea-bg">
          <VBox.margin>
-            <Insets top="5.0"/>
+            <Insets top="5.0" />
          </VBox.margin>
       </PasswordField>
+   </VBox>
+   <VBox layoutX="30.0" layoutY="341.0">
+      <children>
+         <Label text="Re-Enter New Password">
+            <VBox.margin>
+               <Insets left="5.0" />
+            </VBox.margin>
+         </Label>
+         <PasswordField fx:id="pfNewReEnter" promptText="●●●●●●●●" styleClass="textarea-bg">
+            <VBox.margin>
+               <Insets top="5.0" />
+            </VBox.margin>
+         </PasswordField>
+      </children>
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="10.0" />
+      </VBox.margin>
    </VBox>
    <Button mnemonicParsing="false" onAction="#onSave" prefHeight="27.0" prefWidth="210.0" styleClass="button-big" text="Save Changes">
       <VBox.margin>
