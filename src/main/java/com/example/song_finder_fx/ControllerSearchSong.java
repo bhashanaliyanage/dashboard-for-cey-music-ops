@@ -408,7 +408,8 @@ public class ControllerSearchSong {
 
                 String isrc = searchResultISRC.getText();
                 try {
-                    songDetails = DatabaseMySQL.searchSongDetails(isrc);
+                    // songDetails = DatabaseMySQL.searchSongDetails(isrc);
+                    songDetails = DatabasePostgres.searchSongDetails(isrc);
                 } catch (SQLException | ClassNotFoundException e) {
                     AlertBuilder.sendErrorAlert("Error!", "Error Loading Details", e.toString());
                 }

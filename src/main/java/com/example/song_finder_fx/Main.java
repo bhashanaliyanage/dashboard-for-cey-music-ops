@@ -32,7 +32,7 @@ public class Main extends Application {
     static List<Songs> songListNew = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion(23.14);
+    public static ProductVersion versionInfo = new ProductVersion(23.15);
     public static TrayIcon trayIcon;
 
     public static void main(String[] args) {
@@ -196,8 +196,8 @@ public class Main extends Application {
     }
 
     public static void copyAudio(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
-        DatabaseMySQL.searchAndCopySongs(isrc, directory, destination);
-//        DatabasePostgre.searchAndCopySongs(isrc, directory, destination);     //Postgress
+//        DatabaseMySQL.searchAndCopySongs(isrc, directory, destination);
+        DatabasePostgres.searchAndCopySongs(isrc, directory, destination);     //Postgress
 
     }
 

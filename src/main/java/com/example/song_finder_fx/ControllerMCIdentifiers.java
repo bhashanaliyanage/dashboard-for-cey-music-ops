@@ -219,7 +219,7 @@ public class ControllerMCIdentifiers {
         CsvListWriter csvWriter = getCsvListWriter(destination, ingestFileName[0]);
 
         // Creating entry in ingests database and getting ingest ID
-        int ingestID = DatabasePostgres.addIngest(date, userName, destination.getAbsolutePath(), ingestFileName[0]);
+        int ingestID = DatabasePostgres.addManualClaimIngest(date, userName, destination.getAbsolutePath(), ingestFileName[0]);
 
         if (ingestID > 0) {
             // Updating UI with ingest ID

@@ -365,7 +365,8 @@ public class ControllerSearch {
 
                 String isrc = searchResultISRC.getText();
                 try {
-                    songDetails = DatabaseMySQL.searchSongDetails(isrc);
+                    // songDetails = DatabaseMySQL.searchSongDetails(isrc);
+                    songDetails = DatabasePostgres.searchSongDetails(isrc);
                 } catch (SQLException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
@@ -413,7 +414,8 @@ public class ControllerSearch {
     void contextM() throws SQLException, ClassNotFoundException {
         System.out.println("ControllerSearch.contextM");
         String isrc = searchResultISRC.getText();
-        songDetails = DatabaseMySQL.searchSongDetails(isrc);
+        // songDetails = DatabaseMySQL.searchSongDetails(isrc);
+        songDetails = DatabasePostgres.searchSongDetails(isrc);
     }
 
     @FXML

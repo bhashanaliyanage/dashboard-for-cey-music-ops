@@ -1,12 +1,10 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Model.FUGAReport;
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 
 import java.io.*;
@@ -33,106 +31,6 @@ public class DatabaseMySQL {
             conn = DriverManager.getConnection(url, username, password);
         }
         return conn;
-    }
-
-
-    /*public static String searchFileName(String isrc) throws SQLException, ClassNotFoundException {
-        Connection db = getConn();
-        ResultSet rs;
-        String filename = null;
-
-        PreparedStatement ps = db.prepareStatement("SELECT FILE_NAME FROM songs WHERE ISRC = ?");
-        ps.setString(1, isrc);
-
-        rs = ps.executeQuery();
-
-        while (rs.next()) {
-            filename = rs.getString(1);
-        }
-
-        return filename;
-    }*/
-
-    public static void createTableArtists() throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
-
-        PreparedStatement ps = db.prepareStatement("CREATE TABLE IF NOT EXISTS artists (ARTIST_NAME VARCHAR(100) PRIMARY KEY)");
-        ps.executeUpdate();
-    }
-
-    public static void importToArtistsTable(File csv) throws SQLException, ClassNotFoundException, IOException {
-        Connection db = DatabaseMySQL.getConn();
-
-        PreparedStatement preparedStatement = db.prepareStatement("INSERT INTO artists (ARTIST_NAME) VALUES (?)");
-
-        BufferedReader reader = new BufferedReader(new FileReader(csv));
-        String line;
-
-        while ((line = reader.readLine()) != null) {
-            System.out.println("line = " + line);
-            preparedStatement.setString(1, line);
-
-            int result = preparedStatement.executeUpdate();
-            if (result > 0) {
-                System.out.println("Added: " + line);
-            } else {
-                System.out.println("Error Adding: " + line);
-            }
-        }
-
-        reader.close();
-    }
-
-    public static int addRowFUGAReport(FUGAReport report) throws SQLException, ClassNotFoundException {
-        PreparedStatement ps = getPreparedStatementAddRowToFuga();
-
-        ps.setString(1, report.getSaleStartDate());
-        ps.setString(2, report.getSaleEndDate());
-        ps.setString(3, report.getDsp());
-        ps.setString(4, report.getSaleStoreName());
-        ps.setString(5, report.getSaleType());
-        ps.setString(6, report.getSaleUserType());
-        ps.setString(7, report.getTerritory());
-        ps.setLong(8, report.getProductUPC());
-        ps.setLong(9, report.getProductReference());
-        ps.setString(10, report.getProductCatalogNumber());
-        ps.setString(11, report.getProductLabel());
-        ps.setString(12, report.getProductArtist());
-        ps.setString(13, report.getProductTitle());
-        ps.setString(14, report.getAssetArtist());
-        ps.setString(15, report.getAssetTitle());
-        ps.setString(16, report.getAssetVersion());
-        ps.setInt(17, report.getAssetDuration());
-        ps.setString(18, report.getAssetISRC());
-        ps.setLong(19, report.getAssetReference());
-        ps.setString(20, report.getAssetOrProduct());
-        ps.setInt(21, report.getProductQuantity());
-        ps.setInt(22, report.getAssetQuantity());
-        ps.setDouble(23, report.getOriginalGrossIncome());
-        ps.setString(24, report.getOriginalCurrency());
-        ps.setDouble(25, report.getExchangeRate());
-        ps.setDouble(26, report.getConvertedGrossIncome());
-        ps.setString(27, report.getContractDealTerm());
-        ps.setDouble(28, report.getReportedRoyalty());
-        ps.setString(29, report.getCurrency());
-        ps.setInt(30, report.getReportRunID());
-        ps.setInt(31, report.getReportID());
-        ps.setLong(32, report.getSaleID());
-
-        return ps.executeUpdate();
-    }
-
-    private static PreparedStatement getPreparedStatementAddRowToFuga() throws ClassNotFoundException, SQLException {
-        Connection db = DatabaseMySQL.getConn();
-
-        return db.prepareStatement("INSERT INTO report " +
-                "(Sale_Start_date, Sale_End_date, DSP, Sale_Store_Name, Sale_Type, Sale_User_Type, Territory, " +
-                "Product_UPC, Product_Reference, Product_Catalog_Number, Product_Label, Product_Artist, Product_Title, " +
-                "Asset_Artist, Asset_Title, Asset_Version, Asset_Duration, Asset_ISRC, Asset_Reference, AssetOrProduct, " +
-                "Product_Quantity, Asset_Quantity, Original_Gross_Income, Original_currency, Exchange_Rate, " +
-                "Converted_Gross_Income, Contract_deal_term, Reported_Royalty, Currency, Report_Run_ID, Report_ID, " +
-                "Sale_ID) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
 
 
@@ -449,7 +347,7 @@ public class DatabaseMySQL {
                         System.out.println("File not found for ISRC: " + isrc);
                     }
                 } catch (Exception e) {
-                    showErrorDialog("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
+                    AlertBuilder.sendErrorAlert("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
                     throw new RuntimeException(e);
                 }
             }
@@ -461,16 +359,7 @@ public class DatabaseMySQL {
         errorBuffer.append(error);
     }
 
-    private static void showErrorDialog(String title, String headerText, String contentText) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-
-        alert.showAndWait();
-    }
-
-    public static void updatePayees(CSVReader reader) throws CsvValidationException, IOException, SQLException, ClassNotFoundException {
+    public static void updatePayees(CSVReader reader) {
         // Getting Connection
 //        Connection conn = getConn();
 
@@ -513,65 +402,6 @@ public class DatabaseMySQL {
             e.printStackTrace();
         }
 
-        /**
-        String[] row;
-        while ((row = reader.readNext()) != null) {
-            // Assigning Variables
-            String isrc = row[0];
-            String payee01 = row[1];
-            String payee02 = row[3];
-            String payee03 = row[5];
-            int payee01Share;
-            int payee02Share;
-            int payee03Share;
-
-            if (!Objects.equals(row[2], "")) {
-                payee01Share = Integer.parseInt(row[2]);
-            } else {
-                payee01Share = 0;
-            }
-
-            if (!Objects.equals(row[4], "")) {
-                payee02Share = Integer.parseInt(row[4]);
-            } else {
-                payee02Share = 0;
-            }
-
-            if (!Objects.equals(row[6], "")) {
-                payee03Share = Integer.parseInt(row[6]);
-            } else {
-                payee03Share = 0;
-            }
-
-            // Update Payee 01
-            ps.setString(1, isrc);
-            ps.setString(2, payee01);
-            ps.setInt(3, payee01Share);
-            ps.setString(4, payee01);
-            ps.setInt(5, payee01Share);
-            ps.executeUpdate();
-
-            // If Payee 02 is available
-            if (!Objects.equals(payee02, "")) {
-                ps.setString(1, isrc);
-                ps.setString(2, payee02);
-                ps.setInt(3, payee02Share);
-                ps.setString(4, payee02);
-                ps.setInt(5, payee02Share);
-                ps.executeUpdate();
-            }
-
-            // If Payee 03 is available
-            if (!Objects.equals(payee03, "")) {
-                ps.setString(1, isrc);
-                ps.setString(2, payee03);
-                ps.setInt(3, payee03Share);
-                ps.setString(4, payee03);
-                ps.setInt(5, payee03Share);
-                ps.executeUpdate();
-            }
-        }
-        */
     }
 
     public static ResultSet getTopPerformingSongs(String selectedItem) throws SQLException, ClassNotFoundException {
@@ -732,30 +562,6 @@ public class DatabaseMySQL {
 
         ps.executeUpdate();
         ps2.executeUpdate();
-    }
-
-    public static void main(String[] args) throws IOException, CsvValidationException, SQLException, ClassNotFoundException {
-        File csv = new File("src/main/resources/com/example/song_finder_fx/catalog_numbers.csv");
-        CSVReader csvReader = new CSVReaderBuilder(new FileReader(csv)).build();
-        System.out.println("inside main");
-        updatePayees(csvReader);
-
-        /**
-        Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement("UPDATE artists\n" +
-                "SET LAST_CAT_NO = ?\n" +
-                "WHERE ARTIST_NAME = ?;");
-
-        String[] record;
-        while ((record = csvReader.readNext()) != null) {
-            System.out.println(record[1] + ": " + record[0]);
-            ps.setString(1, record[0]);
-            ps.setString(2, record[1]);
-            ps.executeUpdate();
-        }
-        */
-
-        csvReader.close();
     }
 
     public static String getCatNoFor(String mainArtist) throws SQLException, ClassNotFoundException {

@@ -101,35 +101,35 @@
          </Label>
       </VBox>
    </HBox>
-   <HBox fx:id="searchAndCollect1" alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0" prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+   <HBox fx:id="searchAndCollect1" alignment="CENTER_LEFT" maxWidth="606.0" minHeight="67.0" minWidth="600.0"
+         prefHeight="67.0" prefWidth="485.0" styleClass="textarea-bg" stylesheets="@../styles.css">
       <padding>
-         <Insets left="20.0" />
+         <Insets left="20.0"/>
       </padding>
-      <children>
-         <Button fx:id="btnProceed" minHeight="30.0" minWidth="220.0" onAction="#onProceedButtonClick" styleClass="button_inside" stylesheets="@../styles.css" text="Proceed">
-            <font>
-               <Font name="Segoe UI Semilight" size="14.0" />
-            </font>
-            <HBox.margin>
-               <Insets bottom="20.0" top="20.0" />
-            </HBox.margin>
-         </Button>
-         <ImageView fx:id="ProgressView" fitHeight="64.0" fitWidth="81.0" pickOnBounds="true" preserveRatio="true" visible="false">
-            <HBox.margin>
-               <Insets left="20.0" right="20.0" />
-            </HBox.margin>
-            <image>
-               <Image url="@../windows11-loading.gif" />
-            </image>
-         </ImageView>
-         <Button layoutX="31.0" layoutY="29.0" minHeight="30.0" minWidth="220.0" onAction="#onOpenDestinationButtonClick" styleClass="button_inside" stylesheets="@../styles.css" text="Open Destination Folder">
-            <font>
-               <Font name="Segoe UI Semilight" size="14.0" />
-            </font>
-         </Button>
-      </children>
       <VBox.margin>
-         <Insets bottom="30.0" left="30.0" />
+         <Insets bottom="30.0" left="30.0"/>
       </VBox.margin>
+      <Button fx:id="btnProceed" minHeight="30.0" minWidth="220.0" onAction="#onProceedButtonClick"
+              styleClass="button_inside" stylesheets="@../styles.css" text="Proceed">
+         <font>
+            <Font name="Segoe UI Semilight" size="14.0"/>
+         </font>
+         <HBox.margin>
+            <Insets bottom="20.0" top="20.0"/>
+         </HBox.margin>
+      </Button>
+      <ImageView fx:id="ProgressView" fitHeight="64.0" fitWidth="81.0" pickOnBounds="true" preserveRatio="true"
+                 visible="false">
+         <HBox.margin>
+            <Insets left="20.0" right="20.0"/>
+         </HBox.margin>
+         <Image url="@../windows11-loading.gif"/>
+      </ImageView>
+      <Button layoutX="31.0" layoutY="29.0" minHeight="30.0" minWidth="220.0" onAction="#onOpenDestinationButtonClick"
+              styleClass="button_inside" stylesheets="@../styles.css" text="Open Destination Folder">
+         <font>
+            <Font name="Segoe UI Semilight" size="14.0"/>
+         </font>
+      </Button>
    </HBox>
 </VBox>

@@ -1,10 +1,8 @@
 package com.example.song_finder_fx.Controller;
 
-import com.example.song_finder_fx.DatabaseMySQL;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.FUGAReport;
 import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
@@ -18,13 +16,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class CSVController {
     private File csv;
@@ -165,28 +160,6 @@ public class CSVController {
         Platform.runLater(() -> System.out.println("Execution time: " + durationInSeconds + " seconds"));
 
         return status;
-    }
-
-    public int writeMissingISRCs() throws SQLException, ClassNotFoundException, IOException {
-        ResultSet resultSet = DatabaseMySQL.checkMissingISRCs();
-        // ResultSet resultSet = DatabasePostgres.checkMissingISRCs();      //Connection for Postgress
-
-        CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFile.toFile()));
-        List<String[]> rows = new ArrayList<>();
-
-        while (resultSet.next()) {
-            if ((!Objects.equals(resultSet.getString(1), "")) && (resultSet.getString(2) == null) && (resultSet.getString(3) == null)) {
-                String[] row = new String[]{
-                        resultSet.getString(1)
-                };
-                rows.add(row);
-            }
-        }
-
-        csvWriter.writeAll(rows);
-        csvWriter.close();
-
-        return rows.size();
     }
 
     public void copyMissingISRCList(File destination) throws IOException {

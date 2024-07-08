@@ -12,23 +12,18 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Properties;
 
 public class ControllerSettings {
     private UIController mainUIController = null;
     public Button btnAudioDatabase;
     public Button btnSave;
-    public Button btnImportArtists;
     public Label lblVersion;
     public Label lblVersionInfoAboutPage;
 
@@ -75,27 +70,6 @@ public class ControllerSettings {
     }
 
 
-    //not  use in Fxml
-    public void onImportArtistsButtonClick() throws SQLException, ClassNotFoundException, IOException {
-        System.out.println("ControllerSettings.onImportArtistsButtonClick");
-
-        // Prompt user to import CSV
-        FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
-        fileChooser.getExtensionFilters().add(extFilter);
-        File csv = fileChooser.showOpenDialog(btnAudioDatabase.getScene().getWindow());
-        btnImportArtists.setText("   " + csv.getName());
-
-        // Make table
-//        DatabaseMySQL.createTableArtists();
-
-        // Import to table in a separate thread
-//        DatabaseMySQL.importToArtistsTable(csv);
-
-        // Update user interface
-        btnImportArtists.setText("   Execution Complete");
-    }
-
     public void onSaveButtonClicked() throws SQLException, ClassNotFoundException {
         // System.out.println("Save Button Clicked");
         File directory = Main.getSelectedDirectory();
@@ -112,19 +86,6 @@ public class ControllerSettings {
             }
         }
 
-        /*if (directory.isDirectory()) {
-            // Boolean status = Database.saveDirectory(directoryString);
-
-            if (status) {
-                btnSave.setText("Saved");
-                System.out.println("Saved");
-            } else {
-                btnSave.setText("Error Saving!");
-                System.out.println("Error Saving");
-            }
-        } else {
-            System.out.println("Selected Directory is Null");
-        }*/
     }
 
     public void loadAbout(Node aboutView) throws IOException {

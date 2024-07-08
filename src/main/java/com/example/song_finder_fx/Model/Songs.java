@@ -10,6 +10,7 @@ import java.util.Objects;
 public class Songs {
     private String isrc = "";
     private String trackTitle = "";
+    private String primaryArtist = "";
     private String singer = "";
     private String composer = "";
     private String lyricist = "";
@@ -65,8 +66,9 @@ public class Songs {
         this.lyricist = lyricist;
     }
 
-    public Songs(String isrc, String song_name) {
+    public Songs(String isrc, String trackTitle) {
         this.isrc = isrc;
+        this.trackTitle = trackTitle;
     }
 
     public void setISRC(String isrc) {

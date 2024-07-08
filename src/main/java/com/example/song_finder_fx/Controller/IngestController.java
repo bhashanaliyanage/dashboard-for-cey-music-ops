@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,10 @@ public class IngestController {
 
     public List<Ingest> getCreatedIngests() throws SQLException, IOException {
         return DatabasePostgres.getAllIngests();
+    }
+
+    public List<Ingest> getUnApprovedIngests() throws SQLException, IOException {
+        return DatabasePostgres.getUnApprovedIngests();
     }
 
     public List<String> getMissingPayeeList() {
@@ -127,17 +132,17 @@ public class IngestController {
         return dataList;
     }
 
-    public String insertTempTable(List<IngestCSVData> dataList) {
+    public String insertTempTable(List<IngestCSVData> dataList, int id) {
         Connection con = DatabasePostgres.getConn();
         String s = "";
         String sql = "INSERT INTO temp_ingests ("
                 + "    album_title, upc, catalog_number, release_date, label, cline_year, cline_name, pline_name, "
                 + "    pline_year, recording_year, recording_location, album_format, track_title, isrc, track_primary_artist, "
-                + "    composer, lyricists, writers, publishers, original_filename ) "
+                + "    composer, lyricists, writers, publishers, original_filename, ingest_id) "
                 + "   VALUES ("
                 + "    ?, ?, ?, ?, ?, ?, ?,?, "    //8
                 + "    ?, ?, ?, ?, ?, ?, ?, ?, "    // 8 - 16
-                + "    ?, ?, ?, ?)";            //16 - 20
+                + "    ?, ?, ?, ?, ?)";            //16 - 20
 
         try {
             for (IngestCSVData data : dataList) {
@@ -162,6 +167,7 @@ public class IngestController {
                 ps.setString(18, data.getWriters());
                 ps.setString(19, data.getPublishers());
                 ps.setString(20, data.getOriginalFileName());
+                ps.setInt(21, id);
                 ps.executeUpdate();
                 s = "done";
             }
@@ -175,11 +181,18 @@ public class IngestController {
         return s;
     }
 
-    public String insertTemp(File file) {
-        System.out.println("IngestController.insertTemp");
-        List<IngestCSVData> dataList;
-        dataList = readCsvData(file.getAbsolutePath());
-        return insertTempTable(dataList);
+    public String insertIngest(String ingestName, LocalDate date, File file) throws SQLException {
+        System.out.println("IngestController.insertIngest");
+
+        int id = DatabasePostgres.addTempIngestMetadata(ingestName, date);
+
+        if (id > 0) {
+            List<IngestCSVData> dataList;
+            dataList = readCsvData(file.getAbsolutePath());
+            return insertTempTable(dataList, id);
+        }
+
+        return "";
     }
 
 }

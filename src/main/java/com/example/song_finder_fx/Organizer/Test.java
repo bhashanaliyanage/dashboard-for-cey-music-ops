@@ -238,10 +238,10 @@ public class Test {
         return report;
     }
 
-    private static void testStoreIngests() {
+    private static void testStoreIngests() throws SQLException {
         File file = new File("C:\\Users\\bhash\\Downloads\\Catalog Ingestion CSV Downloads\\PRK-CEY-001-004.csv");
         IngestController ingestController = new IngestController();
-        String status = ingestController.insertTemp(file);
+        String status = ingestController.insertIngest("test", LocalDate.now(), file);
         System.out.println("\nImport Status: " + status);
     }
 

@@ -2,25 +2,35 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.IngestController;
+import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.SceneController;
+import com.example.song_finder_fx.Model.Ingest;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Window;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 public class ControllerIngest {
-    
+
+    @FXML
+    public Label lblCount;
+
     @FXML
     private Label lblImportIngest;
 
@@ -31,136 +41,46 @@ public class ControllerIngest {
     private Label lblMissingPayees;
 
     @FXML
+    private TextField txtFileLocation;
+
+    @FXML
+    private TextField txtName;
+
+    private File file;
+
+    public static List<Ingest> unApprovedIngests;
+
+    @FXML
     void initialize() {
-        Task<Void> taskMissingPayees = new Task<>() {
+        Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                try {
-                    int missingPayeeCount = DatabasePostgres.getMissingPayeeCount();
-                    Platform.runLater(() -> lblMissingPayees.setText(String.valueOf(missingPayeeCount)));
-                } catch (SQLException e) {
-                    AlertBuilder.sendErrorAlert("Error", "Unable to fetch details", e.toString());
-                }
+                getUnApprovedIngests();
                 return null;
             }
         };
 
-        Task<Void> taskMissingISRCs = new Task<>() {
-            @Override
-            protected Void call() {
-                try {
-                    int missingISRC_Count = DatabasePostgres.getMissingISRC_Count();
-                    Platform.runLater(() -> lblMissingISRCs.setText(String.valueOf(missingISRC_Count)));
-                } catch (SQLException e) {
-                    AlertBuilder.sendErrorAlert("Error", "Unable to fetch details", e.toString());
-                }
-                return null;
-            }
-        };
-
-        Thread threadMissingPayees = new Thread(taskMissingPayees);
-        threadMissingPayees.start();
-        // threadMissingPayees.join();
-
-        Thread threadMissingISRCs = new Thread(taskMissingISRCs);
-        threadMissingISRCs.start();
-        // threadMissingISRCs.join();
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
-    @FXML
-    void onExportISRCsClick(MouseEvent event) {
-        /*System.out.println("ControllerIngest.onExportISRCsClick");
+    private void getUnApprovedIngests() {
         try {
-            // Getting User Location
-            Node node = (Node) event.getSource();
-            Scene scene = node.getScene();
-            FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
-            chooser.setTitle("Save As");
-            File file = chooser.showSaveDialog(scene.getWindow());
-
-            if (file != null) {
-                File openFile = writeMissingISRCs(file);
-
-                if (Desktop.isDesktopSupported()) {
-                    Desktop.getDesktop().open(openFile);
-                }
-            }
-
+            unApprovedIngests = DatabasePostgres.getUnApprovedIngests();
+            Platform.runLater(() -> lblCount.setText(String.valueOf(unApprovedIngests.size())));
         } catch (SQLException e) {
-            AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
-        } catch (IOException e) {
-            AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
-        }*/
+            Platform.runLater(() -> {
+                try {
+                    NotificationBuilder.displayTrayError("Error", "Error Fetching Un-Approved Ingests");
+                    e.printStackTrace();
+                } catch (AWTException ex) {
+                    System.out.println("Error Fetching Un-Approved Ingests\nStack Trace: " + e);
+                }
+            });
+        }
     }
 
-    /*private static @NotNull File writeMissingISRCs(File file) throws SQLException, IOException {
-        ArrayList<Songs> songs =  DatabasePostgres.getMissingISRCs(report_id);
-        String path = file.getAbsolutePath();
-        CSVWriter writer = new CSVWriter(new FileWriter(path));
-        List<String[]> rows = new ArrayList<>();
-        String[] header = new String[]{"UPC", "ISRC"};
-        rows.add(header);
-
-        for (Songs song : songs) {
-            String[] row = {song.getUPC(), song.getISRC()};
-            rows.add(row);
-        }
-
-        writer.writeAll(rows);
-        writer.close();
-
-        File openFile = new File(path);
-        return openFile;
-    }*/
-
-    @FXML
-    void onExportPayeesClick(MouseEvent event) {
-        /*try {
-            // Getting User Location
-            Node node = (Node) event.getSource();
-            Scene scene = node.getScene();
-            FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
-            chooser.setTitle("Save As");
-            File file = chooser.showSaveDialog(scene.getWindow());
-
-            if (file != null) {
-                File openFile = writeMissingPayees(file);
-
-                if (Desktop.isDesktopSupported()) {
-                    Desktop.getDesktop().open(openFile);
-                }
-            }
-
-        } catch (SQLException e) {
-            AlertBuilder.sendErrorAlert("Error", "Error Getting Songs", e.toString());
-        } catch (IOException e) {
-            AlertBuilder.sendErrorAlert("Error", "Error Generating CSV", e.toString());
-        }*/
-    }
-
-    /*private File writeMissingPayees(File file) throws SQLException, IOException {
-        ArrayList<Songs> songs =  DatabasePostgres.getMissingPayees(i);
-        String path = file.getAbsolutePath();
-        CSVWriter writer = new CSVWriter(new FileWriter(path));
-        List<String[]> rows = new ArrayList<>();
-        String[] header = new String[]{"UPC", "ISRC"};
-        rows.add(header);
-
-        for (Songs song : songs) {
-            String[] row = {song.getUPC(), song.getISRC()};
-            rows.add(row);
-        }
-
-        writer.writeAll(rows);
-        writer.close();
-
-        File openFile = new File(path);
-        return openFile;
-    }*/
-
-    @FXML
+    /*@FXML
     void onImportIngest(MouseEvent event) {
         Scene scene = SceneController.getSceneFromEvent(event);
         Window window = SceneController.getWindowFromScene(scene);
@@ -168,7 +88,7 @@ public class ControllerIngest {
 
         if (file != null) {
             // System.out.println("True");
-            Task<Void> task = new Task<Void>() {
+            Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
                     try {
@@ -183,11 +103,14 @@ public class ControllerIngest {
 
                         if (rowLength == 63) {
                             IngestController ingestController = new IngestController();
-                            String status = ingestController.insertTemp(file);
-                            Platform.runLater(() -> System.out.println("\nImport Status: " + status));
-                            if (Objects.equals(status, "done")) {
+
+                            System.out.println("ControllerIngest.call | Using Old Importing Method");
+
+                            // String status = ingestController.insertIngest(ingestName, date, file);
+                            // Platform.runLater(() -> System.out.println("\nImport Status: " + status));
+                            *//*if (Objects.equals(status, "done")) {
                                 Platform.runLater(() -> lblImportIngest.setText("Import Ingest"));
-                            }
+                            }*//*
                         } else {
                             Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Invalid CSV Format", "Expected 63 columns but found " + rowLength));
                             Platform.runLater(() -> lblImportIngest.setText("Import Ingest"));
@@ -202,16 +125,116 @@ public class ControllerIngest {
             Thread thread = new Thread(task);
             thread.start();
         }
+    }*/
+
+    @FXML
+    public void onImportNew() {
+        String ingestName = txtName.getText();
+        LocalDate date = LocalDate.now();
+
+        if (!txtName.getText().isEmpty()) {
+            txtName.setStyle("-fx-border-color: '#e9ebee';");
+
+            if (file != null) {
+                txtFileLocation.setStyle("-fx-border-color: '#e9ebee';");
+
+                IngestController ingestController = new IngestController();
+
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call() {
+                        try {
+                            String status = ingestController.insertIngest(ingestName, date, file);
+                            if (Objects.equals(status, "done")) {
+                                Platform.runLater(() -> {
+                                    txtName.setText("");
+                                    txtFileLocation.setText("");
+                                    file = null;
+
+                                    getUnApprovedIngests();
+
+                                    try {
+                                        NotificationBuilder.displayTrayInfo("Ingest Imported", "Please check and approve " + unApprovedIngests.size() + " un-approved ingests");
+                                    } catch (AWTException e) {
+                                        System.out.println("Unable to send notifications: " + e);
+                                    }
+                                });
+                            } else {
+                                Platform.runLater(() -> {
+                                    try {
+                                        NotificationBuilder.displayTrayError("Error", "Ingest not imported");
+                                    } catch (AWTException e) {
+                                        System.out.println("Unable to send notifications: " + e);
+                                    }
+                                });
+                            }
+                        } catch (SQLException e) {
+                            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Importing Ingest", e.toString()));
+                        }
+
+                        return null;
+                    }
+                };
+
+                Thread thread = new Thread(task);
+                thread.start();
+            } else {
+                txtFileLocation.setStyle("-fx-border-color: red;");
+            }
+        } else {
+            txtName.setStyle("-fx-border-color: red;");
+        }
     }
 
     @FXML
-    void onUpdatePayees(MouseEvent event) {
+    void onBrowse(ActionEvent event) {
+        Scene scene = SceneController.getSceneFromEvent(event);
+        Window window = SceneController.getWindowFromScene(scene);
+        file = Main.browseForCSV(window);
 
+        if (file != null) {
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    try {
+                        CSVReader reader = new CSVReader(new FileReader(file));
+                        String[] row = reader.readNext();
+
+                        int rowLength = row.length;
+
+                        System.out.println("Column Count: " + rowLength);
+
+                        if (rowLength == 63) {
+                            Platform.runLater(() -> {
+                                try {
+                                    NotificationBuilder.displayTrayInfo("CSV Validated", "You can proceed to import");
+                                    txtFileLocation.setText(file.getAbsolutePath());
+                                } catch (AWTException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                        } else {
+                            Platform.runLater(() -> {
+                                try {
+                                    NotificationBuilder.displayTrayError("Invalid CSV Format", "Expected 63 columns but found " + rowLength);
+                                } catch (AWTException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                        }
+                    } catch (CsvValidationException | IOException e) {
+                        Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Reading CSV File", e.toString()));
+                    }
+                    return null;
+                }
+            };
+
+            Thread thread = new Thread(task);
+            thread.start();
+        }
     }
 
-    @FXML
-    void onUpdateSongs(MouseEvent event) {
+    public void onPendingIngestClick(MouseEvent mouseEvent) {
 
     }
-
 }

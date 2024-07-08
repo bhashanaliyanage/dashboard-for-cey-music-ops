@@ -44,6 +44,10 @@ public class DatabasePostgres {
         String user = "postgres";
         String pass = "ceymusic";
 
+        String ip2 = "jdbc:postgresql://203.143.21.111:5432/";
+        String user2 = "sudeshsan";
+        String pass2 = "sUDESH@#";
+
         try {
             Class.forName("org.postgresql.Driver");
             conn = DriverManager.getConnection(ip + dbname, user, pass);
@@ -59,7 +63,6 @@ public class DatabasePostgres {
             con.close();
         } catch (Exception e) {
             System.out.println("Error on Closing Connection: " + e);
-            // e.printStackTrace();
         }
     }
 
@@ -434,7 +437,7 @@ public class DatabasePostgres {
         return filename;
     }
 
-    public static int addIngest(LocalDate date, String userName, String filePath, String ingestFileName) throws SQLException {
+    public static int addManualClaimIngest(LocalDate date, String userName, String filePath, String ingestFileName) throws SQLException {
         Connection db = getConn();
         String query = String.format("INSERT INTO public.mc_ingests(ingest_date, user_name_note, root_folder, csv_filename) VALUES ('%s', '%s', '%s', '%s') RETURNING ingest_id;", date, userName, filePath, ingestFileName);
         Statement statement = db.createStatement();
@@ -1698,7 +1701,7 @@ public class DatabasePostgres {
         String sql = "UPDATE public.user SET password = ? WHERE username = ?;";
 
         try (Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, hasher.getHashedPass());
             ps.setString(2, hasher.getUserName());
 
@@ -1723,6 +1726,72 @@ public class DatabasePostgres {
             return count == 0;
         }
 
+    }
+
+    public static int addTempIngestMetadata(String ingestName, LocalDate date) throws SQLException {
+        String sql = "INSERT INTO public.temp_ingest_metadata(ingest_name, ingest_date, username) VALUES (?, ?, ?) RETURNING id;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, ingestName);
+            ps.setDate(2, Date.valueOf(date));
+            ps.setString(3, Main.userSession.getUserName());
+
+            if (ps.executeUpdate() > 0) {
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.isBeforeFirst()) {
+                    rs.next();
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    public static List<Ingest> getUnApprovedIngests() throws SQLException {
+        String sql = """
+                SELECT im.id, im.ingest_name, im.ingest_date, im.username, COUNT(i.isrc)
+                FROM public.temp_ingest_metadata im
+                LEFT OUTER JOIN temp_ingests i ON im.id = i.ingest_id
+                WHERE im.approved = FALSE
+                GROUP BY im.id
+                ORDER BY ingest_date DESC;
+                """;
+        List<Ingest> ingests = new ArrayList<>();
+
+        try (Connection con = getConn();
+        PreparedStatement ps = con.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.isBeforeFirst()) {
+                while (rs.next()) {
+                    Ingest ingest = new Ingest();
+
+                    ingest.setID(rs.getInt(1));
+                    ingest.setName(rs.getString(2));
+                    ingest.setDate(rs.getDate(3));
+                    ingest.setUser(rs.getString(4));
+                    ingest.setAssetCount(rs.getInt(5));
+
+                    ingests.add(ingest);
+                }
+            }
+        }
+
+        return ingests;
+    }
+
+    public static boolean checkDatabaseConnection() {
+        try {
+            Connection con = getConn();
+
+            if (con != null) {
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
     }
 
 
@@ -1866,8 +1935,8 @@ public class DatabasePostgres {
 
     }
 
-    public static void searchAndCopySongs(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
-        Connection db = DatabaseMySQL.getConn();
+    public static void searchAndCopySongs(String isrc, File directory, File destination) throws SQLException {
+        Connection db = getConn();
         ResultSet rs;
         String filename;
 
@@ -1908,7 +1977,7 @@ public class DatabasePostgres {
                         System.out.println("File not found for ISRC: " + isrc);
                     }
                 } catch (Exception e) {
-                    showErrorDialog("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
+                    AlertBuilder.sendErrorAlert("Error", "An error occurred during file copy.", e.getMessage() + "\n Please consider using an accessible location");
                     throw new RuntimeException(e);
                 }
             }
@@ -2395,29 +2464,29 @@ public class DatabasePostgres {
     public static List<CoWriterShare> getCoWriterPayments(String artist) throws SQLException {
         List<CoWriterShare> crLlist = new ArrayList<>();
         String sql = """
-                SELECT ip.isrc,
-                  rep.after_deduction_royalty,
-                  s.song_name,
-                  ip.payee,
-                  ip.share,
-                  CASE WHEN ip.payee = (SELECT ar.artist_name
-                                      FROM public.artists ar
-                                      WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name
-                                                                             FROM public.artists ar
-                                                                             WHERE ar.artist_id = s.lyricist)
-                                                                             ELSE (SELECT ar.artist_name
-                                                                                   FROM public.artists ar
-                                                                                   WHERE ar.artist_id = s.composer)
-                                                                                   END AS contributor,
-                  (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
-                  (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist,
-                  s.type
-                  FROM public.isrc_payees ip
-                  JOIN SONGS S ON IP.ISRC = S.ISRC
-                  JOIN public.summary_bd_02 rep ON IP.ISRC = rep.asset_isrc
-                  WHERE (ip.payee = ? AND ip.share = 100)
-                  ORDER BY rep.after_deduction_royalty DESC;
-               """;
+                 SELECT ip.isrc,
+                   rep.after_deduction_royalty,
+                   s.song_name,
+                   ip.payee,
+                   ip.share,
+                   CASE WHEN ip.payee = (SELECT ar.artist_name
+                                       FROM public.artists ar
+                                       WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name
+                                                                              FROM public.artists ar
+                                                                              WHERE ar.artist_id = s.lyricist)
+                                                                              ELSE (SELECT ar.artist_name
+                                                                                    FROM public.artists ar
+                                                                                    WHERE ar.artist_id = s.composer)
+                                                                                    END AS contributor,
+                   (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
+                   (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist,
+                   s.type
+                   FROM public.isrc_payees ip
+                   JOIN SONGS S ON IP.ISRC = S.ISRC
+                   JOIN public.summary_bd_02 rep ON IP.ISRC = rep.asset_isrc
+                   WHERE (ip.payee = ? AND ip.share = 100)
+                   ORDER BY rep.after_deduction_royalty DESC;
+                """;
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setString(1, artist);
