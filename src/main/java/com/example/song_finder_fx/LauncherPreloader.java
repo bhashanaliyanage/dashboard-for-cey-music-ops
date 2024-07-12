@@ -16,8 +16,6 @@ public class LauncherPreloader extends Preloader {
         Parent root = FXMLLoader.load(getClass().getResource("layouts/initPreloader.fxml"));
         Scene scene = new Scene(root);
 
-
-
         primaryStage.setScene(scene);
         primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();

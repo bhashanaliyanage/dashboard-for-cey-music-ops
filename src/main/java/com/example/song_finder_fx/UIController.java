@@ -1,8 +1,6 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.AlertBuilder;
-import com.example.song_finder_fx.Controller.NotificationBuilder;
-import com.example.song_finder_fx.Controller.SceneController;
+import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
 import com.example.song_finder_fx.Session.UserSession;
@@ -812,7 +810,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         }
     }
 
-    Connection checkDatabaseConnection() throws ClassNotFoundException {
+    void checkDatabaseConnection() throws ClassNotFoundException {
         lblDatabaseStatus.setText("Connecting");
 
         Connection con = null;
@@ -826,7 +824,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         } catch (SQLException e) {
             lblDatabaseStatus.setText("Offline");
             lblDatabaseStatus.setStyle("-fx-text-fill: '#931621'");
-            return con;
+            return;
         }
 
         if (con != null) {
@@ -834,7 +832,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             lblDatabaseStatus.setStyle("-fx-text-fill: '#00864E'");
         }
 
-        return con;
     }
     //</editor-fold>
 
@@ -1319,5 +1316,15 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
         }
+    }
+
+    @FXML
+    void testLogIn(ActionEvent event) {
+        OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "http://localhost/dashboard", "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", "https://www.googleapis.com/auth/userinfo.profile");
+        authGoogle.startLogin();
+
+
+
+        // System.out.println(authGoogle.getAccessToken());
     }
 }

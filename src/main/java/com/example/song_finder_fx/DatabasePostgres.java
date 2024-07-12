@@ -44,9 +44,12 @@ public class DatabasePostgres {
         String user = "postgres";
         String pass = "ceymusic";
 
-        String ip2 = "jdbc:postgresql://203.143.21.111:5432/";
-        String user2 = "sudeshsan";
-        String pass2 = "sUDESH@#";
+        String ip2 = "jdbc:postgresql://192.168.40.2:5432/";
+        String user2 = "cmops";
+        String pass2 = "CeyC0ff39@Moun#ta1n";
+
+        String user3 = "sudeshsan";
+        String pass3 = "sUDESH@#";
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -1177,6 +1180,34 @@ public class DatabasePostgres {
         }
     }
 
+    public static boolean createUserGoogle(String id, String displayName, String username) throws SQLException {
+        String sqlCheck = "SELECT COUNT(username) FROM public.user WHERE LOWER(username) = LOWER(?);";
+        String sql = "INSERT INTO public.user (id_google, display_name, username) VALUES (?, ?, ?);";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sqlCheck);
+             PreparedStatement psInsert = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                int count = rs.getInt(1);
+
+                if (count == 0) {
+                    psInsert.setString(1, id);
+                    psInsert.setString(2, displayName);
+                    psInsert.setString(3, username);
+
+                    int status = ps.executeUpdate();
+
+                    return status > 0;
+                }
+            }
+        }
+        return false;
+    }
+
     public static String getHashedPW_ForUsername(String username) throws SQLException {
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement("SELECT password FROM public.user WHERE LOWER(username) = LOWER(?);");
@@ -1761,17 +1792,13 @@ public class DatabasePostgres {
         List<Ingest> ingests = new ArrayList<>();
 
         try (Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.isBeforeFirst()) {
                 while (rs.next()) {
                     Ingest ingest = new Ingest();
 
-                    ingest.setID(rs.getInt(1));
-                    ingest.setName(rs.getString(2));
-                    ingest.setDate(rs.getDate(3));
-                    ingest.setUser(rs.getString(4));
-                    ingest.setAssetCount(rs.getInt(5));
+                    setIngestData(ingest, rs);
 
                     ingests.add(ingest);
                 }
@@ -1792,6 +1819,111 @@ public class DatabasePostgres {
             return false;
         }
         return false;
+    }
+
+    public static Ingest getIngest(int id) throws SQLException {
+        String sqlIngestMetadata = """
+                SELECT IM.ID,
+                	IM.INGEST_NAME,
+                	IM.INGEST_DATE,
+                	IM.USERNAME,
+                	COUNT(I.ISRC) AS asset_count
+                FROM PUBLIC.TEMP_INGEST_METADATA IM
+                LEFT OUTER JOIN TEMP_INGESTS I ON IM.ID = I.INGEST_ID
+                WHERE IM.APPROVED = FALSE AND IM.ID = ?
+                GROUP BY IM.ID
+                ORDER BY INGEST_DATE DESC;
+                """;
+        String sqlIngestData = """
+                SELECT ALBUM_TITLE,
+                	UPC,
+                	CATALOG_NUMBER,
+                	RELEASE_DATE,
+                	LABEL,
+                	CLINE_YEAR,
+                	CLINE_NAME,
+                	PLINE_NAME,
+                	PLINE_YEAR,
+                	RECORDING_YEAR,
+                	RECORDING_LOCATION,
+                	ALBUM_FORMAT,
+                	TRACK_TITLE,
+                	ISRC,
+                	TRACK_PRIMARY_ARTIST,
+                	COMPOSER,
+                	LYRICISTS,
+                	WRITERS,
+                	PUBLISHERS,
+                	ORIGINAL_FILENAME,
+                	INGEST_ID
+                FROM PUBLIC.TEMP_INGESTS
+                WHERE INGEST_ID = ?;
+                """;
+
+        // Get Ingest Metadata
+        try (Connection con = getConn();
+                PreparedStatement psIngestMetadata = con.prepareStatement(sqlIngestMetadata);
+                PreparedStatement psIngestData = con.prepareStatement(sqlIngestData)) {
+
+            psIngestMetadata.setInt(1, id);
+            ResultSet rsIngestMetadata = psIngestMetadata.executeQuery();
+
+            if (rsIngestMetadata.isBeforeFirst()) {
+                rsIngestMetadata.next();
+
+                Ingest ingest = new Ingest();
+
+                setIngestData(ingest, rsIngestMetadata);
+
+                // Get Ingest Data
+                psIngestData.setInt(1, id);
+                ResultSet rsIngestData = psIngestData.executeQuery();
+                if (rsIngestData.isBeforeFirst()) {
+                    List<IngestCSVData> ingestCSVDataList = new ArrayList<>();
+
+                    while (rsIngestData.next()) {
+                        IngestCSVData ingestCSVData = new IngestCSVData();
+
+                        ingestCSVData.setAlbumTitle(rsIngestData.getString(1));
+                        ingestCSVData.setUpc(rsIngestData.getString(2));
+                        ingestCSVData.setCatalogNumber(rsIngestData.getString(3));
+                        ingestCSVData.setReleaseData(rsIngestData.getString(4));
+                        ingestCSVData.setLabel(rsIngestData.getString(5));
+                        ingestCSVData.setClineYear(rsIngestData.getString(6));
+                        ingestCSVData.setClineName(rsIngestData.getString(7));
+                        ingestCSVData.setPlineYear(rsIngestData.getString(8));
+                        ingestCSVData.setPlineName(rsIngestData.getString(9));
+                        ingestCSVData.setRecordingYear(rsIngestData.getString(10));
+                        ingestCSVData.setRecordingLocation(rsIngestData.getString(11));
+                        ingestCSVData.setAlbumFormat(rsIngestData.getString(12));
+                        ingestCSVData.setTrackTitle(rsIngestData.getString(13));
+                        ingestCSVData.setIsrc(rsIngestData.getString(14));
+                        ingestCSVData.setTrackPrimaryArtist(rsIngestData.getString(15));
+                        ingestCSVData.setComposer(rsIngestData.getString(16));
+                        ingestCSVData.setLyricist(rsIngestData.getString(17));
+                        ingestCSVData.setWriters(rsIngestData.getString(18));
+                        ingestCSVData.setPublishers(rsIngestData.getString(19));
+                        ingestCSVData.setOriginalFileName(rsIngestData.getString(20));
+
+                        ingestCSVDataList.add(ingestCSVData);
+                    }
+
+                    ingest.setIngestCSVDataList(ingestCSVDataList);
+                    return ingest;
+                }
+            }
+        }
+
+        // Return Data
+        return null;
+    }
+
+    private static void setIngestData(Ingest ingest, ResultSet rs) throws SQLException {
+        ingest.setID(rs.getInt(1));
+        ingest.setName(rs.getString(2));
+        ingest.setDate(rs.getDate(3));
+        ingest.setUser(rs.getString(4));
+        ingest.setAssetCount(rs.getInt(5));
     }
 
 
@@ -1858,7 +1990,7 @@ public class DatabasePostgres {
 
                 py.setPayee1(rs.getString(1));
                 py.setPayee2(rs.getString(2));
-                py.setPayee03(rs.getString(3));
+                py.setPayee3(rs.getString(3));
                 py.setShare1(rs.getString(4));
                 py.setShare2(rs.getString(5));
                 py.setShare3(rs.getString(6));
@@ -2283,24 +2415,27 @@ public class DatabasePostgres {
     }
 
     public static Boolean searchArtistTable(String artist) throws SQLException {
-        ResultSet rs;
-        Connection conn = getConn();
-        int artistCount;
+        try (Connection conn = getConn();
+             PreparedStatement ps = conn.prepareStatement("SELECT COUNT(ARTIST_NAME) FROM artists WHERE ARTIST_NAME = ? AND status = 5;")) {
 
-        PreparedStatement ps = conn.prepareStatement("SELECT COUNT(ARTIST_NAME) FROM artists WHERE ARTIST_NAME = ? AND status = 5;");
-        ps.setString(1, artist);
-        rs = ps.executeQuery();
+            ps.setString(1, artist);
 
-        boolean status = false;
+            ResultSet rs;
+            int artistCount;
 
-        while (rs.next()) {
-            artistCount = rs.getInt(1);
-            if (artistCount > 0) {
-                status = true;
+            rs = ps.executeQuery();
+
+            boolean status = false;
+
+            while (rs.next()) {
+                artistCount = rs.getInt(1);
+                if (artistCount > 0) {
+                    status = true;
+                }
             }
-        }
 
-        return status;
+            return status;
+        }
     }
 
     public static ArrayList<String> getArtistList() throws SQLException, ClassNotFoundException {

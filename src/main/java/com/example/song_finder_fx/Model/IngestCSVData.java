@@ -3,7 +3,7 @@ package com.example.song_finder_fx.Model;
 public class IngestCSVData {
 
     private String albumTitle;
-    private String ups;
+    private String upc;
     private String catalogNumber;
     private String primaryArtist;
     private String featuringArtist;
@@ -21,10 +21,19 @@ public class IngestCSVData {
     private String isrc;
     private String trackPrimaryArtist;
     private String composer;
-    private String Lyricists;
+    private String lyricist;
     private String Writers;
     private String Publishers;
     private String originalFileName;
+    private Payee payee = new Payee();
+
+    public Payee getPayee() {
+        return payee;
+    }
+
+    public void setPayee(Payee payee) {
+        this.payee = payee;
+    }
 
     public String getAlbumTitle() {
         return albumTitle;
@@ -34,12 +43,12 @@ public class IngestCSVData {
         this.albumTitle = albumTitle;
     }
 
-    public String getUps() {
-        return ups;
+    public String getUpc() {
+        return upc;
     }
 
-    public void setUps(String ups) {
-        this.ups = ups;
+    public void setUpc(String upc) {
+        this.upc = upc;
     }
 
     public String getCatalogNumber() {
@@ -178,12 +187,12 @@ public class IngestCSVData {
         this.composer = composer;
     }
 
-    public String getLyricists() {
-        return Lyricists;
+    public String getLyricist() {
+        return lyricist;
     }
 
-    public void setLyricists(String lyricists) {
-        Lyricists = lyricists;
+    public void setLyricist(String lyricist) {
+        this.lyricist = lyricist;
     }
 
     public String getWriters() {

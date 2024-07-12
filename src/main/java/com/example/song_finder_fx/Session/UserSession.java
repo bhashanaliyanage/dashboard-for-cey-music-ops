@@ -1,5 +1,7 @@
 package com.example.song_finder_fx.Session;
 
+import com.example.song_finder_fx.Controller.OAuthAuthenticator;
+import com.example.song_finder_fx.Controller.OAuthGoogleAuthenticator;
 import com.example.song_finder_fx.DatabasePostgres;
 
 import java.sql.SQLException;
@@ -38,7 +40,7 @@ public class UserSession {
     }
 
     // Private method to set privileges based on user role
-    private void setPrivilegesAndEmail(String username) throws SQLException {
+    public void setPrivilegesAndEmail(String username) throws SQLException {
         this.user = DatabasePostgres.getUserData(username);
 
         if (this.user == null) {
@@ -72,7 +74,7 @@ public class UserSession {
     }
 
     // Method to save logged user details to preferences
-    private void saveSession(String username) {
+    public void saveSession(String username) {
         preferences.put("username", username);
         preferences.putBoolean("isLoggedIn", true);
     }
@@ -80,6 +82,34 @@ public class UserSession {
     // Method to simulate user signup
     public void signup(String username, String password, String email, String displayName) throws SQLException {
         boolean userCreated = DatabasePostgres.createUser(username, password, email, displayName);
+        if (userCreated) {
+            // Simulate user signup logic
+            // For demonstration purposes, let's assume signup always succeeds
+            isLoggedIn = true;
+            setPrivilegesAndEmail(username);
+            saveSession(username);
+            System.out.println("Signup successful. Welcome, " + username + "!");
+        } else {
+            System.out.println("Error!. Unable to create user for username: " + username);
+        }
+    }
+
+    // Method to simulate user signup
+    public void googleSignup(String id, String displayName) throws SQLException {
+        /*
+        * JSONObject userData = authGoogle.getJsonData();
+
+        Object id = userData.get("id");
+        Object name = userData.get("name");
+        Object given_name = userData.get("given_name");
+        Object family_name = userData.get("family_name");
+        Object picture = userData.get("picture");
+        * */
+
+        // boolean userCreated = DatabasePostgres.createUser(username, password, email, displayName);
+        String username = displayName.toLowerCase().replace(" ", "_");
+        boolean userCreated = DatabasePostgres.createUserGoogle(id, displayName, username);
+
         if (userCreated) {
             // Simulate user signup logic
             // For demonstration purposes, let's assume signup always succeeds
@@ -161,5 +191,10 @@ public class UserSession {
 
     public boolean checkUsernameAvailability(String username) throws SQLException {
         return DatabasePostgres.checkUsernameAvailability(username);
+    }
+
+    public void loginGoogle() {
+        OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "http://localhost/dashboard/", "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", "https://www.googleapis.com/auth/userinfo.profile");
+        authGoogle.startLogin();
     }
 }

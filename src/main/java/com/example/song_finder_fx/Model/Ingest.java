@@ -16,11 +16,14 @@ import java.util.Date;
 import java.util.List;
 
 public class Ingest {
+
     private int ingestID;
     private String name;
     private Date importedDate;
     private String importedUser;
     private int assetCount;
+
+    private List<IngestCSVData> ingestCSVDataList;
 
     private File csv;
     private int upcCount;
@@ -41,6 +44,34 @@ public class Ingest {
     private String artist04Type;
 
     public Ingest() {
+    }
+
+    public int getIngestID() {
+        return ingestID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Date getImportedDate() {
+        return importedDate;
+    }
+
+    public String getImportedUser() {
+        return importedUser;
+    }
+
+    public int getAssetCount() {
+        return assetCount;
+    }
+
+    public List<IngestCSVData> getIngestCSVDataList() {
+        return ingestCSVDataList;
+    }
+
+    public void setIngestCSVDataList(List<IngestCSVData> ingestCSVDataList) {
+        this.ingestCSVDataList = ingestCSVDataList;
     }
 
     public void setCSV(File csv) {

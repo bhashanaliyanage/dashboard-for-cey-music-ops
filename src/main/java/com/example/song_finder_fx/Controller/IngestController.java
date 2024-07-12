@@ -104,7 +104,7 @@ public class IngestController {
                 IngestCSVData csv = new IngestCSVData();
 
                 csv.setAlbumTitle(AlbumTitle);
-                csv.setUps(upc);
+                csv.setUpc(upc);
                 csv.setCatalogNumber(catalogNumber);
                 csv.setReleaseData(releaseDate);
                 csv.setLabel(label);
@@ -119,7 +119,7 @@ public class IngestController {
                 csv.setIsrc(isrc);
                 csv.setTrackPrimaryArtist(trackPrimaryArtist);
                 csv.setComposer(Composer);
-                csv.setLyricists(Lyricists);
+                csv.setLyricist(Lyricists);
                 csv.setWriters(Writers);
                 csv.setPublishers(Publishers);
                 csv.setOriginalFileName(OriginalFileName);
@@ -148,7 +148,7 @@ public class IngestController {
             for (IngestCSVData data : dataList) {
                 PreparedStatement ps = con.prepareStatement(sql);
                 ps.setString(1, data.getAlbumTitle());
-                ps.setString(2, data.getUps());
+                ps.setString(2, data.getUpc());
                 ps.setString(3, data.getCatalogNumber());
                 ps.setString(4, data.getReleaseData());
                 ps.setString(5, data.getLabel());
@@ -163,7 +163,7 @@ public class IngestController {
                 ps.setString(14, data.getIsrc());
                 ps.setString(15, data.getTrackPrimaryArtist());
                 ps.setString(16, data.getComposer());
-                ps.setString(17, data.getLyricists());
+                ps.setString(17, data.getLyricist());
                 ps.setString(18, data.getWriters());
                 ps.setString(19, data.getPublishers());
                 ps.setString(20, data.getOriginalFileName());

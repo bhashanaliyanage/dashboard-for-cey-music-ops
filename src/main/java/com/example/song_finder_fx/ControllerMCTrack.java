@@ -45,7 +45,12 @@ public class ControllerMCTrack {
     private Button btnAddTrack;
 
     @FXML
+    private Button btnEditTrack;
+
+    @FXML
     private TitledPane titledPane;
+
+    private int trackID;
 
     @FXML
     public void initialize() throws SQLException {
@@ -76,11 +81,11 @@ public class ControllerMCTrack {
 
     public void onAddTrack(ActionEvent event) throws IOException {
         // Getting Parent Object References
-        Node node = (Node) event.getSource();
-        Scene scene = node.getScene();
-        TextField txtURL = (TextField) scene.lookup("#txtURL");
-        VBox vboxTracks = (VBox) scene.lookup("#vboxTracks");
-        ComboBox<String> comboClaimType = (ComboBox<String>) scene.lookup("#comboClaimType");
+        // Node node = (Node) event.getSource();
+        // Scene scene = node.getScene();
+        // TextField txtURL = (TextField) scene.lookup("#txtURL");
+        // VBox vboxTracks = (VBox) scene.lookup("#vboxTracks");
+        // ComboBox<String> comboClaimType = (ComboBox<String>) scene.lookup("#comboClaimType");
 
         Node nodeTrack = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
 
@@ -90,8 +95,8 @@ public class ControllerMCTrack {
         String composer = txtComposer.getText();
         String trimStart = spinnerStart.getText();
         String trimEnd = spinnerEnd.getText();
-        String url = txtURL.getText();
-        String selectedItem = comboClaimType.getSelectionModel().getSelectedItem();
+        String url = ControllerManualClaims.txtURL_Static.getText();
+        String selectedItem = ControllerManualClaims.comboClaimTypeStatic.getSelectionModel().getSelectedItem();
         int claimType = getClaimType(selectedItem);
 
         // Front-End validation
@@ -133,30 +138,26 @@ public class ControllerMCTrack {
             }
 
             if (claimValidation) {
-                int size = ManualClaims.manualClaims.size();
-                System.out.println("Total Claims before adding track: " + size);
+                trackID = ManualClaims.manualClaims.size();
+
                 ManualClaims.manualClaims.add(track);
-                size = ManualClaims.manualClaims.size();
-                System.out.println("Total Claims after adding track: " + size);
-                // TODO: So the size variable before adding the track will be the index of the current track. Assign this to a label in manual-claims-track.fxml for later usages/ edits
+
                 titledPane.setText(trackName);
                 titledPane.setExpanded(false);
                 btnAddTrack.setDisable(true);
+                btnEditTrack.setDisable(false);
 
-                vboxTracks.getChildren().add(nodeTrack);
+                ControllerManualClaims.vboxTracksStatic.getChildren().add(nodeTrack);
             }
         }
     }
 
-    /*public void onAddTrackNew(ActionEvent event) throws IOException {
-        // Getting Parent Object References
-        Node node = (Node) event.getSource();
+    @FXML
+    void onEditTrack(ActionEvent event) {
+        /*Node node = (Node) event.getSource();
         Scene scene = node.getScene();
         TextField txtURL = (TextField) scene.lookup("#txtURL");
-        VBox vboxTracks = (VBox) scene.lookup("#vboxTracks");
-        ComboBox<String> comboClaimType = (ComboBox<String>) scene.lookup("#comboClaimType");
-
-        Node nodeTrack = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
+        ComboBox<String> comboClaimType = (ComboBox<String>) scene.lookup("#comboClaimType");*/
 
         // Fetching user values
         String trackName = txtTrackTitle.getText();
@@ -164,23 +165,68 @@ public class ControllerMCTrack {
         String composer = txtComposer.getText();
         String trimStart = spinnerStart.getText();
         String trimEnd = spinnerEnd.getText();
-        String url = txtURL.getText();
-        String selectedItem = comboClaimType.getSelectionModel().getSelectedItem();
+        String url = ControllerManualClaims.txtURL_Static.getText();
+        String selectedItem = ControllerManualClaims.comboClaimTypeStatic.getSelectionModel().getSelectedItem();
         int claimType = getClaimType(selectedItem);
 
         // Front-End validation
         boolean ifAnyNull = checkData();
 
-        Task<List<Songs>> taskLoadVideo = new Task<>() {
-            @Override
-            protected java.util.List<Songs> call() throws IOException, URISyntaxException {
-                return null;
-            }
-        };
+        if (!ifAnyNull) {
+            // Fetching YouTube ID
+            String youtubeID = TextFormatter.extractYoutubeID(url);
 
-        Thread threadLoadVideo = new Thread(taskLoadVideo);
-        threadLoadVideo.start();
-    }*/
+            // Getting Date
+            LocalDate date = LocalDate.now();
+
+            // Creating track model
+            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID, date, claimType);
+            MCTrackController mcTrackController = new MCTrackController(track);
+
+            try {
+                mcTrackController.checkNew();
+            } catch (SQLException e) {
+                ErrorDialog.showErrorDialog("Error!", "Error Adding Track Data", e.toString());
+            }
+
+            boolean claimValidation = true;
+
+            // Checking trim times
+            if (!trimStart.isEmpty() && !trimEnd.isEmpty()) {
+                // Validating trim times
+                boolean status = TextFormatter.validateTrimTimes(trimStart, trimEnd);
+                if (status) {
+                    // Adding trim times to model
+                    track.addTrimTime(trimStart, trimEnd);
+                } else {
+                    claimValidation = false;
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setContentText("Error Parsing Time");
+                    alert.showAndWait();
+                }
+            }
+
+            if (claimValidation) {
+                // ManualClaims.manualClaims.add(track);
+
+                titledPane.setText(trackName);
+                titledPane.setExpanded(false);
+                btnAddTrack.setDisable(true);
+                btnEditTrack.setDisable(false);
+
+                ManualClaimTrack trackOld = ManualClaims.manualClaims.set(trackID, track);
+
+                try {
+                    NotificationBuilder.displayTrayInfo("Manual Claim Edited", "Details of " + trackOld.getTrackName() + " are modified");
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
+
+                // vboxTracks.getChildren().add(nodeTrack);
+            }
+        }
+    }
 
     private int getClaimType(String selectedItem) {
         if (selectedItem == null) {

@@ -9,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -72,6 +71,15 @@ public class ControllerLogIn {
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString());
         }
+    }
+
+    @FXML
+    void onLogInGoogle(ActionEvent event) {
+        Main.userSession.loginGoogle();
+        /*
+        OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "https://ceymusic.com.au/", "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", "https://www.googleapis.com/auth/userinfo.profile");
+        authGoogle.startLogin();
+        */
     }
 
     @FXML

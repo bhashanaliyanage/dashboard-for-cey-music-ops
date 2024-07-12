@@ -1,10 +1,7 @@
 package com.example.song_finder_fx.Organizer;
 
 import com.example.song_finder_fx.Constants.SearchType;
-import com.example.song_finder_fx.Controller.IngestController;
-import com.example.song_finder_fx.Controller.ItemSwitcher;
-import com.example.song_finder_fx.Controller.ReportPDF;
-import com.example.song_finder_fx.Controller.RevenueReportController;
+import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.*;
 import com.example.song_finder_fx.Session.UserSession;
@@ -33,10 +30,12 @@ public class Test {
         // testArtistReportsNew();
 
         // testDashboard();
-//         UserSession us = new UserSession();
-//         us.signup();
-
+        // UserSession us = new UserSession();
+        // DatabasePostgres.changePassword("gimhaar", "admin");
         // us.signup("bhashanaliyanage", "ceymusic", "bhashanaliyanage@gmail.com", "Bhashana Liyanage");
+
+        /*OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "", "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", "https://www.googleapis.com/auth/userinfo.profile");
+        authGoogle.startLogin();*/
     }
 
     private static void testBulkReporting() throws SQLException, IOException {
@@ -271,7 +270,7 @@ public class Test {
     }
 
     private static void testArtistReportPDF(int artistID, double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
-        DatabasePostgres.refreshSummaryTable(month, year);
+        // DatabasePostgres.refreshSummaryTable(month, year);
 
         ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month);
 

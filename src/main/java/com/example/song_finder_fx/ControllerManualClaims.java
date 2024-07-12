@@ -38,11 +38,17 @@ public class ControllerManualClaims {
     @FXML
     public VBox vboxTracks;
 
+    public static VBox vboxTracksStatic;
+
     @FXML
     private TextField txtURL;
 
+    public static TextField txtURL_Static;
+
     @FXML
     private ComboBox<String> comboClaimType;
+
+    public static ComboBox<String> comboClaimTypeStatic;
 
     @FXML
     private Button btnAddClaim;
@@ -50,6 +56,10 @@ public class ControllerManualClaims {
     @FXML
     public void initialize() {
         comboClaimType.getItems().addAll("Unspecified", "TV Programs", "Manual Claim", "Single SR");
+
+        txtURL_Static = txtURL;
+        comboClaimTypeStatic = comboClaimType;
+        vboxTracksStatic = vboxTracks;
     }
 
     @FXML

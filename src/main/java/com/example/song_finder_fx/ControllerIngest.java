@@ -11,10 +11,11 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Window;
 
 import java.awt.*;
@@ -234,7 +235,12 @@ public class ControllerIngest {
         }
     }
 
-    public void onPendingIngestClick(MouseEvent mouseEvent) {
-
+    public void onPendingIngestClick() {
+        try {
+            Node node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/ingests/un-approved-ingests.fxml")));
+            UIController.mainVBoxStatic.getChildren().setAll(node);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString());
+        }
     }
 }
