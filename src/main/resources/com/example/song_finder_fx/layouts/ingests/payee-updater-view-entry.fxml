@@ -3,8 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -12,13 +10,25 @@
 
 <HBox prefWidth="200.0" spacing="5.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerPayeeUpdaterEntry">
    <children>
+      <VBox alignment="TOP_CENTER" minWidth="40.0" prefWidth="100.0">
+         <children>
+            <CheckBox fx:id="cbEntry" mnemonicParsing="false" />
+         </children>
+         <HBox.margin>
+            <Insets top="10.0" />
+         </HBox.margin>
+      </VBox>
       <VBox prefWidth="671.0" styleClass="textarea-bg" HBox.hgrow="ALWAYS">
          <children>
-            <AnchorPane styleClass="cp-light-blue-bg">
+            <AnchorPane onMouseClicked="#onTrackClick" styleClass="cp-light-blue-bg">
                <children>
-                  <CheckBox fx:id="cbEntry" layoutX="12.0" layoutY="10.0" mnemonicParsing="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                  <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="0.0">
+                  <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
                      <children>
+                        <Label fx:id="lblNumber" alignment="CENTER_RIGHT" prefWidth="20.0" text="99">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                        </Label>
                         <Label fx:id="lblISRC" text="LKA0XXXXXXXX">
                            <HBox.margin>
                               <Insets />
@@ -61,7 +71,7 @@
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Label fx:id="lblPayee01" layoutX="10.0" layoutY="21.0" prefWidth="115.0" text="Unassigned" textFill="#656565">
+                        <Label fx:id="lblPayee01" layoutX="10.0" layoutY="21.0" prefWidth="205.0" text="Unassigned" textFill="#656565">
                            <HBox.margin>
                               <Insets left="5.0" />
                            </HBox.margin>
@@ -71,33 +81,16 @@
                         </Label>
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER_LEFT" layoutX="50.0" layoutY="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="220.0" AnchorPane.topAnchor="10.0">
+                  <HBox alignment="CENTER_LEFT" layoutX="50.0" layoutY="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="310.0" AnchorPane.topAnchor="10.0">
                      <children>
                         <Label text="Payee 02:" textFill="#656565">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <Label fx:id="lblPayee02" layoutX="10.0" layoutY="21.0" prefWidth="115.0" text="Unassigned" textFill="#656565">
+                        <Label fx:id="lblPayee02" layoutX="10.0" layoutY="21.0" prefWidth="225.0" text="Unassigned" textFill="#656565">
                            <HBox.margin>
                               <Insets left="5.0" />
-                           </HBox.margin>
-                           <font>
-                              <Font name="System Italic" size="12.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER_LEFT" layoutX="230.0" layoutY="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="400.0" AnchorPane.topAnchor="10.0">
-                     <children>
-                        <Label text="Payee 03:" textFill="#656565">
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin>
-                        </Label>
-                        <Label fx:id="lblPayee03" layoutX="10.0" layoutY="21.0" prefWidth="115.0" text="Unassigned" textFill="#656565">
-                           <HBox.margin>
-                              <Insets left="5.0" right="10.0" />
                            </HBox.margin>
                            <font>
                               <Font name="System Italic" size="12.0" />
@@ -110,15 +103,6 @@
                   <Insets />
                </VBox.margin>
             </AnchorPane>
-         </children>
-      </VBox>
-      <VBox alignment="CENTER" prefWidth="100.0" styleClass="clickable-pane-bg">
-         <children>
-            <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/star.png" />
-               </image>
-            </ImageView>
          </children>
       </VBox>
    </children>

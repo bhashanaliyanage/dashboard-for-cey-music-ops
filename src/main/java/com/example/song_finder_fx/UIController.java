@@ -582,16 +582,30 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     @FXML
     protected void onSearchDetailsButtonClick() throws ClassNotFoundException, IOException {
-        // Connection con = checkDatabaseConnection();
-
+        // Load Search View
         mainVBox.getChildren().clear();
         mainVBox.getChildren().add(mainNodes[2]);
-        FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
-        Parent sidepanelNewContent = sidepanelLoader.load();
+
+        // Set SidePanel
+        FXMLLoader sidePanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+        Parent sidePanelNewContent = sidePanelLoader.load();
         sideVBox.getChildren().clear();
-        sideVBox.getChildren().add(sidepanelNewContent);
+        sideVBox.getChildren().add(sidePanelNewContent);
+
+        // Change Selector
         changeSelectorTo(rctSearchSongs);
 
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Platform.runLater(() -> lblDatabaseStatus.setText("Refreshing Song Table"));
+                DatabasePostgres.refreshSongMetadataTable();
+                Platform.runLater(() -> lblDatabaseStatus.setText("Online"));
+                return null;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     private void changeSelectorTo(Rectangle selector) {
@@ -1322,7 +1336,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     void testLogIn(ActionEvent event) {
         OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "http://localhost/dashboard", "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", "https://www.googleapis.com/auth/userinfo.profile");
         authGoogle.startLogin();
-
 
 
         // System.out.println(authGoogle.getAccessToken());

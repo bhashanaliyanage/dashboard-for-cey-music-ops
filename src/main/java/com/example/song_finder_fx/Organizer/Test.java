@@ -11,6 +11,10 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,9 +25,9 @@ public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
         // DatabasePostgres.refreshSummaryTable(1, 2024);
 
-        testBulkReporting();
+        // testBulkReporting();
 
-        // testArtistReportPDF(0, 0.6285, 186.78, "KDK Dharmawardena", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\test.pdf");
+        testArtistReportPDF(74, 0.6285, 186.78, "W.D. Amaradeva", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\WDAmaradeva.pdf");
 
         // testAddNewFugaReport();
 
@@ -36,6 +40,32 @@ public class Test {
 
         /*OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "", "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", "https://www.googleapis.com/auth/userinfo.profile");
         authGoogle.startLogin();*/
+
+        String string = testApiCall();
+        System.out.println("string = " + string);
+    }
+
+    public static String testApiCall() {
+        String s = "";
+        String url = "http://192.168.1.32:8080/artist";
+        String urlpart = "/allart";
+        url = url + urlpart;
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest req = HttpRequest.newBuilder().uri(URI.create(url)).build();
+
+        try {
+            HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response);
+            System.out.println("here");
+            s = response.body();
+
+            System.out.println("here1");
+            // return response.body();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return s;
     }
 
     private static void testBulkReporting() throws SQLException, IOException {
@@ -361,7 +391,7 @@ public class Test {
 
         for (Songs song : songs) {
             String trackTitle = song.getTrackTitle();
-            String songType = song.getType();
+            String songType = song.getTypeConverted();
             String isrc = song.getISRC();
             String singer = song.getSinger();
             String composer = song.getComposer();

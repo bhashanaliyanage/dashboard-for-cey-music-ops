@@ -75,7 +75,7 @@ public class IngestCSVData {
         this.featuringArtist = featuringArtist;
     }
 
-    public String getReleaseData() {
+    public String releaseDate() {
         return releaseData;
     }
 

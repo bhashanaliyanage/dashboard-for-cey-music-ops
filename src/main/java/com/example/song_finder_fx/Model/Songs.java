@@ -10,7 +10,6 @@ import java.util.Objects;
 public class Songs {
     private String isrc = "";
     private String trackTitle = "";
-    private String primaryArtist = "";
     private String singer = "";
     private String composer = "";
     private String lyricist = "";
@@ -221,7 +220,7 @@ public class Songs {
         return fileName;
     }
 
-    public String getType() {
+    public String getTypeConverted() {
         switch (type) {
             case "O" -> {
                 return "Sound Registration";
@@ -233,6 +232,10 @@ public class Songs {
                 return "Unspecified";
             }
         }
+    }
+
+    public String getType() {
+        return type;
     }
 
     public void setType(String string) {

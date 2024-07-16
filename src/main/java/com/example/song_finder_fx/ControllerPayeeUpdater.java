@@ -28,7 +28,7 @@ public class ControllerPayeeUpdater {
     @FXML
     private VBox vboxTracks;
 
-    List<PayeeUpdaterUI> payeeUpdaterUIS = new ArrayList<>();
+    public static List<PayeeUpdaterUI> payeeUpdaterUIS = new ArrayList<>();
 
     @FXML
     void initialize() {
@@ -36,6 +36,7 @@ public class ControllerPayeeUpdater {
         Ingest ingest = ControllerUnApprovedIngestEntry.ingest;
         List<IngestCSVData> csvData = ingest.getIngestCSVDataList();
 
+        final int[] count = {0};
 
         Task<Void> task = new Task<>() {
             @Override
@@ -43,6 +44,7 @@ public class ControllerPayeeUpdater {
                 Platform.runLater(() -> System.out.println("Looping through CSV rows"));
                 for (IngestCSVData data : csvData) {
                     try {
+
                         // Platform.runLater(() -> System.out.println("Loading Layout for: " + data.getTrackTitle()));
                         Node node = SceneController.loadLayout("layouts/ingests/payee-updater-view-entry.fxml");
 
@@ -52,18 +54,20 @@ public class ControllerPayeeUpdater {
                         Label lblISRC = (Label) node.lookup("#lblISRC");
                         Label lblPayee01 = (Label) node.lookup("#lblPayee01");
                         Label lblPayee02 = (Label) node.lookup("#lblPayee02");
-                        Label lblPayee03 = (Label) node.lookup("#lblPayee03");
                         Label lblTrackName = (Label) node.lookup("#lblTrackName");
+                        Label lblNumber = (Label) node.lookup("#lblNumber");
 
                         Platform.runLater(() -> {
+                            count[0]++;
                             lblISRC.setText(data.getIsrc());
                             lblTrackName.setText(data.getTrackTitle());
                             lblContributor01.setText(data.getComposer());
                             lblContributor02.setText(data.getLyricist());
+                            lblNumber.setText(String.valueOf(count[0]));
                             vboxTracks.getChildren().add(node);
                         });
 
-                        payeeUpdaterUIS.add(new PayeeUpdaterUI(checkBox, lblContributor01, lblContributor02, lblISRC, lblPayee01, lblPayee02, lblPayee03, lblTrackName, data));
+                        payeeUpdaterUIS.add(new PayeeUpdaterUI(checkBox, lblContributor01, lblContributor02, lblISRC, lblPayee01, lblPayee02, lblTrackName, data));
                     } catch (IOException e) {
                         Platform.runLater(() -> {
                             throw new RuntimeException();
@@ -80,7 +84,7 @@ public class ControllerPayeeUpdater {
 
     @FXML
     void onAssignPayees() {
-        Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 for (PayeeUpdaterUI uiElement : payeeUpdaterUIS) {

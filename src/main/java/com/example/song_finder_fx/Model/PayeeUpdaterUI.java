@@ -17,13 +17,13 @@ public class PayeeUpdaterUI {
 
     private Label lblPayee02;
 
-    private Label lblPayee03;
+    // private Label lblPayee03;
 
     private Label lblTrackName;
 
     private IngestCSVData data;
 
-    public PayeeUpdaterUI(CheckBox cbEntry, Label lblContributor01, Label lblContributor02, Label lblISRC, Label lblPayee01, Label lblPayee02, Label lblPayee03, Label lblTrackName, IngestCSVData data) {
+    public PayeeUpdaterUI(CheckBox cbEntry, Label lblContributor01, Label lblContributor02, Label lblISRC, Label lblPayee01, Label lblPayee02, Label lblTrackName, IngestCSVData data) {
 
         this.cbEntry = cbEntry;
 
@@ -37,7 +37,7 @@ public class PayeeUpdaterUI {
 
         this.lblPayee02 = lblPayee02;
 
-        this.lblPayee03 = lblPayee03;
+        // this.lblPayee03 = lblPayee03;
 
         this.lblTrackName = lblTrackName;
 
@@ -92,13 +92,13 @@ public class PayeeUpdaterUI {
         this.lblPayee02 = lblPayee02;
     }
 
-    public Label getLblPayee03() {
+    /*public Label getLblPayee03() {
         return lblPayee03;
-    }
+    }*/
 
-    public void setLblPayee03(Label lblPayee03) {
+    /*public void setLblPayee03(Label lblPayee03) {
         this.lblPayee03 = lblPayee03;
-    }
+    }*/
 
     public Label getLblTrackName() {
         return lblTrackName;

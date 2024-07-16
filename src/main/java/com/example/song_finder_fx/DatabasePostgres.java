@@ -22,6 +22,8 @@ import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.sql.Date;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,22 +40,15 @@ public class DatabasePostgres {
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     public static Connection getConn() {
-        // LocalHost
-        String ip = "jdbc:postgresql://192.168.1.200:5432/";
         String dbname = "songdata";
-        String user = "postgres";
-        String pass = "ceymusic";
 
         String ip2 = "jdbc:postgresql://192.168.40.2:5432/";
         String user2 = "cmops";
         String pass2 = "CeyC0ff39@Moun#ta1n";
 
-        String user3 = "sudeshsan";
-        String pass3 = "sUDESH@#";
-
         try {
             Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection(ip + dbname, user, pass);
+            conn = DriverManager.getConnection(ip2 + dbname, user2, pass2);
         } catch (Exception e) {
             System.out.println("Error Connecting to database = " + e);
         }
@@ -1133,10 +1128,13 @@ public class DatabasePostgres {
     }
 
     public static void addTempArtist(String artist) throws SQLException {
-        Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement("INSERT INTO public.temp_artists(name) VALUES (?);");
-        ps.setString(1, artist);
-        ps.executeUpdate();
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement("INSERT INTO public.temp_artists(name) VALUES (?);")) {
+
+
+            ps.setString(1, artist);
+            ps.executeUpdate();
+        }
     }
 
     public static String getClaimYouTubeID(int id) throws SQLException {
@@ -1862,8 +1860,8 @@ public class DatabasePostgres {
 
         // Get Ingest Metadata
         try (Connection con = getConn();
-                PreparedStatement psIngestMetadata = con.prepareStatement(sqlIngestMetadata);
-                PreparedStatement psIngestData = con.prepareStatement(sqlIngestData)) {
+             PreparedStatement psIngestMetadata = con.prepareStatement(sqlIngestMetadata);
+             PreparedStatement psIngestData = con.prepareStatement(sqlIngestData)) {
 
             psIngestMetadata.setInt(1, id);
             ResultSet rsIngestMetadata = psIngestMetadata.executeQuery();
@@ -1924,6 +1922,115 @@ public class DatabasePostgres {
         ingest.setDate(rs.getDate(3));
         ingest.setUser(rs.getString(4));
         ingest.setAssetCount(rs.getInt(5));
+    }
+
+    public static void addProduct(Product product) throws SQLException {
+        String sql = "INSERT INTO public.products(upc, product_title, catalog_number, release_date) " +
+                "VALUES (?, ?, ?, ?) " +
+                "ON CONFLICT (upc) DO NOTHING;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, product.getUpc());
+            ps.setString(2, product.getAlbumTitle());
+            ps.setString(3, product.getCatalogNumber());
+            ps.setDate(4, stringToDate(product.getReleaseDate()));
+
+            ps.executeUpdate();
+        }
+    }
+
+    private static Date stringToDate(String releaseDate) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            java.util.Date parsed = format.parse(releaseDate);
+            return new Date(parsed.getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void addSong(Songs song) throws SQLException {
+        String sql = "INSERT INTO public.songs(isrc, song_name, file_name, upc, composer, lyricist, featuring, type) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON CONFLICT (isrc) DO NOTHING;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, song.getISRC());
+            ps.setString(2, song.getTrackTitle());
+            ps.setString(3, song.getFileName());
+            ps.setString(4, song.getUPC());
+            ps.setInt(5, setArtistID(song.getComposer()));
+            ps.setInt(6, setArtistID(song.getLyricist()));
+            ps.setInt(7, setArtistID(song.getFeaturing()));
+            System.out.println("Song Type: " + song.getTypeConverted());
+            ps.setString(8, song.getType());
+
+            ps.executeUpdate();
+        }
+    }
+
+    private static int setArtistID(String name) throws SQLException {
+        System.out.println("DatabasePostgres.setArtistID");
+        System.out.println("name = " + name);
+
+        if (name != null) {
+            int id = fetchArtistID(name);
+
+            if (id != 0) {
+                return id;
+            } else {
+                addTempArtist(name);
+                return addArtist(name);
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    private static int addArtist(String name) throws SQLException {
+        String sql = "INSERT INTO public.artists(artist_name, status, validated) VALUES (?, ?, ?) RETURNING artist_id;";
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setInt(2, 3);
+            ps.setBoolean(3, false);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    public static void approveIngest(int ingestID) throws SQLException {
+        String approveSQL = "UPDATE public.temp_ingest_metadata SET approved=? WHERE id = ?;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(approveSQL)) {
+            ps.setBoolean(1, true);
+            ps.setInt(2, ingestID);
+
+            ps.executeUpdate();
+        }
+    }
+
+    public static void refreshSongMetadataTable() throws SQLException {
+        String refreshMaterializedView = "REFRESH MATERIALIZED VIEW song_metadata_new;";
+
+        try (Connection con = getConn();
+             PreparedStatement psRefresh = con.prepareStatement(refreshMaterializedView)) {
+
+            System.out.println("Refreshing Song Metadata Table");
+
+            psRefresh.executeUpdate();
+        }
     }
 
 
@@ -2524,16 +2631,22 @@ public class DatabasePostgres {
     }
 
     public static int fetchArtistID(String name) throws SQLException {
-        Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement("SELECT artist_id FROM public.artists WHERE artist_name = ?;");
-        ps.setString(1, name);
-        ResultSet rs = ps.executeQuery();
-        int artistID = 0;
-        if (rs.isBeforeFirst()) {
-            rs.next();
-            artistID = rs.getInt(1);
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement("SELECT artist_id FROM public.artists WHERE artist_name = ?;");) {
+
+            ps.setString(1, name);
+
+            ResultSet rs = ps.executeQuery();
+
+            int artistID = 0;
+
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                artistID = rs.getInt(1);
+            }
+
+            return artistID;
         }
-        return artistID;
     }
 
     public static void addIngestCSV(byte[] byteArray, int ingestID) throws SQLException {

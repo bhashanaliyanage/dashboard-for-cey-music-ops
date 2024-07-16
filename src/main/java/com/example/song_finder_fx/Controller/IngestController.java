@@ -3,6 +3,8 @@ package com.example.song_finder_fx.Controller;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.IngestCSVData;
 import com.example.song_finder_fx.Model.Ingest;
+import com.example.song_finder_fx.Model.Product;
+import com.example.song_finder_fx.Model.Songs;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
@@ -16,6 +18,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class IngestController {
 
@@ -150,7 +153,7 @@ public class IngestController {
                 ps.setString(1, data.getAlbumTitle());
                 ps.setString(2, data.getUpc());
                 ps.setString(3, data.getCatalogNumber());
-                ps.setString(4, data.getReleaseData());
+                ps.setString(4, data.releaseDate());
                 ps.setString(5, data.getLabel());
                 ps.setString(6, data.getClineYear());
                 ps.setString(7, data.getClineName());
@@ -195,4 +198,65 @@ public class IngestController {
         return "";
     }
 
+    public void approveIngest(Ingest ingest) throws SQLException {
+        List<IngestCSVData> csvRows = ingest.getIngestCSVDataList();
+
+        // Create Products
+        List<String> productNames = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
+
+        for (IngestCSVData row : csvRows) {
+            String currentProductName = row.getAlbumTitle();
+
+            if (!productNames.contains(currentProductName)) {
+                Product product = new Product(row.getUpc(),
+                        row.getAlbumTitle(),
+                        row.getCatalogNumber(),
+                        row.releaseDate());
+
+                products.add(product);
+                productNames.add(currentProductName);
+
+                DatabasePostgres.addProduct(product);
+                // System.out.println("Adding Product: " + product.getAlbumTitle());
+            }
+
+        }
+
+        // Insert Data
+        int songCount = 0;
+        for (IngestCSVData row : csvRows) {
+            songCount++;
+            Songs song = new Songs();
+            song.setISRC(row.getIsrc());
+            song.setTrackTitle(row.getTrackTitle());
+            song.setFileName(row.getOriginalFileName());
+            song.setUPC(row.getUpc());
+            song.setComposer(row.getComposer());
+            song.setLyricist(row.getLyricist());
+            song.setFeaturingArtist(row.getFeaturingArtist());
+            song.setType(getSongType(row.getIsrc()));
+
+            DatabasePostgres.addSong(song);
+            // System.out.println("Adding Song: " + song.getTrackTitle());
+        }
+
+        // Set ingest status to approved
+        DatabasePostgres.approveIngest(ingest.getIngestID());
+
+        // Refresh Song Metadata View
+        DatabasePostgres.refreshSongMetadataTable();
+
+        System.out.println(songCount + " Songs from " + products.size() + " Products are found.");
+    }
+
+    private String getSongType(String isrc) {
+        if (isrc.startsWith("LKA0W")) {
+            return "O";
+        } else if (isrc.startsWith("LKA0U")) {
+            return "C";
+        } else {
+            return "C";
+        }
+    }
 }

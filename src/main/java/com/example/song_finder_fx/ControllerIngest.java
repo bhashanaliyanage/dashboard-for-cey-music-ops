@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Window;
@@ -31,6 +32,9 @@ public class ControllerIngest {
 
     @FXML
     public Label lblCount;
+
+    @FXML
+    public Button btnImportIngest;
 
     @FXML
     private Label lblImportIngest;
@@ -145,9 +149,11 @@ public class ControllerIngest {
                     @Override
                     protected Void call() {
                         try {
+                            Platform.runLater(() -> btnImportIngest.setText("Importing Ingest"));
                             String status = ingestController.insertIngest(ingestName, date, file);
                             if (Objects.equals(status, "done")) {
                                 Platform.runLater(() -> {
+                                    btnImportIngest.setText("Import Ingest");
                                     txtName.setText("");
                                     txtFileLocation.setText("");
                                     file = null;
@@ -162,6 +168,7 @@ public class ControllerIngest {
                                 });
                             } else {
                                 Platform.runLater(() -> {
+                                    btnImportIngest.setText("Import Ingest");
                                     try {
                                         NotificationBuilder.displayTrayError("Error", "Ingest not imported");
                                     } catch (AWTException e) {
@@ -170,7 +177,10 @@ public class ControllerIngest {
                                 });
                             }
                         } catch (SQLException e) {
-                            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Importing Ingest", e.toString()));
+                            Platform.runLater(() -> {
+                                AlertBuilder.sendErrorAlert("Error", "Error Importing Ingest", e.toString());
+                                btnImportIngest.setText("Import Ingest");
+                            });
                         }
 
                         return null;

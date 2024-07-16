@@ -6,6 +6,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -41,27 +43,28 @@
          </HBox.margin>
       </Label>
     </HBox>
-   <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
-      <children>
-         <HBox spacing="5.0" HBox.hgrow="ALWAYS">
-            <children>
-               <Button mnemonicParsing="false" onAction="#onAssignPayees" prefHeight="30.0" prefWidth="165.0" styleClass="button_inside" text="Assign Payees" />
-            </children>
-         </HBox>
-         <HBox alignment="CENTER_RIGHT" spacing="5.0" HBox.hgrow="ALWAYS">
-            <children>
-               <Button disable="true" mnemonicParsing="false" onAction="#onApproveIngest" prefHeight="30.0" prefWidth="165.0" styleClass="button_inside_brown" text="Approve Ingest" />
-               <Button disable="true" mnemonicParsing="false" onAction="#onSaveEdits" prefHeight="30.0" prefWidth="165.0" styleClass="button_inside_brown" text="Save Edits" />
-            </children>
+    <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
+        <VBox.margin>
+            <Insets left="30.0" right="30.0" top="30.0" />
+        </VBox.margin>
+        <HBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Button mnemonicParsing="false" onAction="#onAssignPayees" prefHeight="30.0" prefWidth="165.0" styleClass="button_inside" text="Assign Payees" />
+        </HBox>
+        <HBox alignment="CENTER_RIGHT" spacing="5.0" HBox.hgrow="ALWAYS">
             <HBox.margin>
-               <Insets />
+                <Insets />
             </HBox.margin>
-         </HBox>
-      </children>
-      <VBox.margin>
-         <Insets left="30.0" right="30.0" top="30.0" />
-      </VBox.margin>
-   </HBox>
+            <ImageView fx:id="imgLoading" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true"
+                       visible="false">
+                <HBox.margin>
+                    <Insets right="10.0"/>
+                </HBox.margin>
+                <Image url="@../../images/loading_02.gif"/>
+            </ImageView>
+            <Button fx:id="btnApproveIngest" mnemonicParsing="false" onAction="#onApproveIngest" prefHeight="30.0" prefWidth="165.0" styleClass="button_inside_brown" text="Approve Ingest" />
+            <Button disable="true" mnemonicParsing="false" onAction="#onSaveEdits" prefHeight="30.0" prefWidth="165.0" styleClass="button_inside_brown" text="Save Edits" />
+        </HBox>
+    </HBox>
    <VBox maxWidth="688.0" minHeight="-Infinity" prefWidth="688.0" spacing="5.0" styleClass="textarea-bg" stylesheets="@../../styles.css" VBox.vgrow="ALWAYS">
       <VBox.margin>
          <Insets bottom="10.0" left="30.0" top="10.0" />
