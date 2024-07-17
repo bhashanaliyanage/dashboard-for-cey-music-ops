@@ -40,15 +40,23 @@ public class DatabasePostgres {
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     public static Connection getConn() {
+        // LocalHost
+        String ip = "jdbc:postgresql://192.168.1.200:5432/";
+        String user = "postgres";
+        String pass = "ceymusic";
+
         String dbname = "songdata";
 
         String ip2 = "jdbc:postgresql://192.168.40.2:5432/";
         String user2 = "cmops";
         String pass2 = "CeyC0ff39@Moun#ta1n";
 
+        String user3 = "sudeshsan";
+        String pass3 = "sUDESH@#";
+
         try {
             Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection(ip2 + dbname, user2, pass2);
+            conn = DriverManager.getConnection(ip2 + dbname, user3, pass3);
         } catch (Exception e) {
             System.out.println("Error Connecting to database = " + e);
         }

@@ -23,11 +23,11 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        // DatabasePostgres.refreshSummaryTable(1, 2024);
+        DatabasePostgres.refreshSummaryTable(4, 2024);
 
         // testBulkReporting();
 
-        testArtistReportPDF(74, 0.6285, 186.78, "W.D. Amaradeva", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\WDAmaradeva.pdf");
+        // testArtistReportPDF(74, 0.6285, 186.78, "W.D. Amaradeva", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\WDAmaradeva.pdf");
 
         // testAddNewFugaReport();
 
@@ -41,8 +41,8 @@ public class Test {
         /*OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "", "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", "https://www.googleapis.com/auth/userinfo.profile");
         authGoogle.startLogin();*/
 
-        String string = testApiCall();
-        System.out.println("string = " + string);
+        /*String string = testApiCall();
+        System.out.println("string = " + string);*/
     }
 
     public static String testApiCall() {

@@ -223,8 +223,8 @@ public class InitPreloader implements Initializable {
         databaseCheck.join();
         audioDatabaseCheck.start();
         audioDatabaseCheck.join();
-        revenueAnalysisCheck.start();
-        revenueAnalysisCheck.join();
+        // revenueAnalysisCheck.start();
+        // revenueAnalysisCheck.join();
         updatesCheck.start();
         updatesCheck.join();
         loadScenes.start();

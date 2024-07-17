@@ -70,7 +70,7 @@
                <VBox.margin>
                   <Insets top="5.0" />
                </VBox.margin>
-               <TextField fx:id="txtComposer" prefHeight="30.0" promptText="Composer" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
+               <TextField fx:id="txtComposer" onAction="#onAddTrack" prefHeight="30.0" promptText="Composer" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
             </HBox>
          </VBox>
       </HBox>
@@ -78,10 +78,8 @@
          <VBox.margin>
             <Insets top="10.0" />
          </VBox.margin>
-         <children>
-            <Button fx:id="btnAddTrack" mnemonicParsing="false" onAction="#onAddTrack" prefHeight="30.0" prefWidth="1054.0" styleClass="button_inside_brown" text="Add Track" />
-            <Button fx:id="btnEditTrack" disable="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onEditTrack" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Edit Track" />
-         </children>
+         <Button fx:id="btnAddTrack" mnemonicParsing="false" onAction="#onAddTrack" prefHeight="30.0" prefWidth="1054.0" styleClass="button_inside_brown" text="Add Track" />
+         <Button fx:id="btnEditTrack" disable="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onEditTrack" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Edit Track" />
       </HBox>
    </VBox>
 </TitledPane>

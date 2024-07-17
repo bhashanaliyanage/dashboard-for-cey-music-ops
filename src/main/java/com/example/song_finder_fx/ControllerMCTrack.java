@@ -4,20 +4,16 @@ import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import org.controlsfx.control.textfield.TextFields;
 
 import java.awt.*;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -79,14 +75,7 @@ public class ControllerMCTrack {
         });
     }
 
-    public void onAddTrack(ActionEvent event) throws IOException {
-        // Getting Parent Object References
-        // Node node = (Node) event.getSource();
-        // Scene scene = node.getScene();
-        // TextField txtURL = (TextField) scene.lookup("#txtURL");
-        // VBox vboxTracks = (VBox) scene.lookup("#vboxTracks");
-        // ComboBox<String> comboClaimType = (ComboBox<String>) scene.lookup("#comboClaimType");
-
+    public void onAddTrack() throws IOException {
         Node nodeTrack = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
 
         // Fetching user values
@@ -145,7 +134,7 @@ public class ControllerMCTrack {
                 titledPane.setText(trackName);
                 titledPane.setExpanded(false);
                 btnAddTrack.setDisable(true);
-                btnEditTrack.setDisable(false);
+                // btnEditTrack.setDisable(false);
 
                 ControllerManualClaims.vboxTracksStatic.getChildren().add(nodeTrack);
             }
@@ -153,13 +142,13 @@ public class ControllerMCTrack {
     }
 
     @FXML
-    void onEditTrack(ActionEvent event) {
+    void onEditTrack() {
         /*Node node = (Node) event.getSource();
         Scene scene = node.getScene();
         TextField txtURL = (TextField) scene.lookup("#txtURL");
         ComboBox<String> comboClaimType = (ComboBox<String>) scene.lookup("#comboClaimType");*/
 
-        // Fetching user values
+        /*// Fetching user values
         String trackName = txtTrackTitle.getText();
         String lyricist = txtLyricist.getText();
         String composer = txtComposer.getText();
@@ -225,7 +214,7 @@ public class ControllerMCTrack {
 
                 // vboxTracks.getChildren().add(nodeTrack);
             }
-        }
+        }*/
     }
 
     private int getClaimType(String selectedItem) {

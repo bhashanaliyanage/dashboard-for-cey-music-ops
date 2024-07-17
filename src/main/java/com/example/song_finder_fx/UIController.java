@@ -311,7 +311,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
         // Getting label from scene
         Label isrc = (Label) scene.lookup("#songISRC");
-        Label songListButtonSubtitle = (Label) scene.lookup("#lblSongListSub");
 
         // Adding songs to list
         Main.addSongToList(isrc.getText());
@@ -581,7 +580,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     }
 
     @FXML
-    protected void onSearchDetailsButtonClick() throws ClassNotFoundException, IOException {
+    protected void onSearchDetailsButtonClick() throws IOException {
         // Load Search View
         mainVBox.getChildren().clear();
         mainVBox.getChildren().add(mainNodes[2]);
@@ -595,7 +594,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         // Change Selector
         changeSelectorTo(rctSearchSongs);
 
-        Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 Platform.runLater(() -> lblDatabaseStatus.setText("Refreshing Song Table"));
@@ -1228,9 +1227,13 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             Node node = SceneController.loadLayout("layouts/user/login_signup.fxml");
             mainVBox.getChildren().setAll(node);
 
-            if (Main.versionInfo.updateAvailable()) {
-                loadUpdate();
-            }
+        }
+
+        System.out.println("UIController.onAboutButtonClicked");
+
+        if (Main.versionInfo.updateAvailable()) {
+            System.out.println("Update Available");
+            loadUpdate();
         }
     }
 

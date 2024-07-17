@@ -34,6 +34,8 @@ public class ProductVersion {
     }
 
     public boolean updateAvailable() {
+        System.out.println("currentVersion = " + currentVersion);
+        System.out.println("updateVersion = " + updateVersion);
         return currentVersion < updateVersion;
     }
 
