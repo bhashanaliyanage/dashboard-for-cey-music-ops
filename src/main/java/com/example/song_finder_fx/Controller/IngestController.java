@@ -1,13 +1,12 @@
 package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.DatabasePostgres;
-import com.example.song_finder_fx.Model.CsvData;
 import com.example.song_finder_fx.Model.Ingest;
+import com.example.song_finder_fx.Model.IngestCSVData;
 import com.example.song_finder_fx.Model.YouDownload;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -69,8 +68,8 @@ public class IngestController {
 
         }
 
-    public List<CsvData> readCsvData(String file) {
-        List<CsvData> dataList = new ArrayList<CsvData>();
+    public List<IngestCSVData> readCsvData(String file) {
+        List<IngestCSVData> dataList = new ArrayList<IngestCSVData>();
         try (CSVReader csvreader = new CSVReaderBuilder(new FileReader(file)).withSkipLines(1).build()) {
 
             String [] record;
@@ -97,10 +96,10 @@ public class IngestController {
                 String Publishers = record[52].trim();
                 String OriginalFileName = record[55].trim();
 //				String originalReleaseDate = record[56].trim();
-                CsvData csv =  new CsvData();
+                IngestCSVData csv =  new IngestCSVData();
 
                 csv.setAlbumTitle(AlbumTitle);
-                csv.setUps(upc);
+                csv.setUpc(upc);
                 csv.setCatalogNumber(catalogNumber);
                 csv.setReleaseData(releaseDate);
                 csv.setLabel(label);
@@ -115,7 +114,7 @@ public class IngestController {
                 csv.setIsrc(isrc);
                 csv.setTrackPrimaryArtist(trackPrimaryArtist);
                 csv.setComposer(Composer);
-                csv.setLyricists(Lyricists);
+                csv.setLyricist(Lyricists);
                 csv.setWriters(Writers);
                 csv.setPublishers(Publishers);
                 csv.setOriginalFileName(OriginalFileName);
@@ -128,7 +127,7 @@ public class IngestController {
         return dataList;
     }
 
-    public String insertTempTable(List<CsvData> dataList) {
+    public String insertTempTable(List<IngestCSVData> dataList) {
         Connection con = DatabasePostgres.getConn();
         String s= "";
         String sql  = "INSERT INTO temp_table ("
@@ -141,12 +140,12 @@ public class IngestController {
                 + "    ?, ?, ?, ?)";			//16 - 20
 
         try {
-            for(CsvData data :dataList) {
+            for(IngestCSVData data :dataList) {
                 PreparedStatement ps = con.prepareStatement(sql);
                 ps.setString(1, data.getAlbumTitle());
-                ps.setString(2, data.getUps());
+                ps.setString(2, data.getUpc());
                 ps.setString(3, data.getCatalogNumber());
-                ps.setString(4, data.getReleaseData());
+                ps.setString(4, data.releaseDate());
                 ps.setString(5, data.getLabel());
                 ps.setString(6, data.getClineYear());
                 ps.setString(7, data.getClineName());
@@ -159,7 +158,7 @@ public class IngestController {
                 ps.setString(14, data.getIsrc());
                 ps.setString(15, data.getTrackPrimaryArtist());
                 ps.setString(16, data.getComposer());
-                ps.setString(17, data.getLyricists());
+                ps.setString(17, data.getLyricist());
                 ps.setString(18, data.getWriters());
                 ps.setString(19, data.getPublishers());
                 ps.setString(20, data.getOriginalFileName());
@@ -178,7 +177,7 @@ public class IngestController {
     }
 
     public String insertTemp(YouDownload file){
-        List<CsvData> dataList = new ArrayList<CsvData>();
+        List<IngestCSVData> dataList;
         dataList = readCsvData(file.getFileLocation());
         String s =  insertTempTable(dataList);
         return  s;
