@@ -23,7 +23,8 @@ public class YoutubeDownload {
     public static void downloadAudioOnly(String url, String file) {
         try {
 
-            String nodeScriptPath = "libs/downloadAudio.js";
+//            String nodeScriptPath = "libs/downloadAudio.js";
+            String nodeScriptPath = "libs/jdown.js";
 
             System.out.println("url = " + url);
             System.out.println("file = " + file);
