@@ -60,10 +60,39 @@ const downloadVideo = async (videoURL, outputPath) => {
     }
 };
 
+const downloadAudio = async (videoURL, outputPath) => {
+    const executable = findExecutable();
+    console.log(`Using executable: ${executable}`);
+
+    const args = [
+        videoURL,
+        '-f', 'bestaudio[ext=m4a]/best',
+        '-x',  // Extract audio
+        '--audio-format', 'flac',  // Convert to mp3
+        '--audio-quality', '0',  // Best quality
+        '-o', outputPath,
+        '--no-check-certificate',
+        '--no-warnings',
+        '--add-header', 'referer:youtube.com',
+        '--add-header', 'user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    ];
+
+    try {
+        console.log('Starting audio download...');
+        await runCommand(executable, args);
+        console.log('Audio download complete!');
+    } catch (error) {
+        console.error('Audio download failed:', error.message);
+        throw error;
+    }
+};
+
 const main = async () => {
     const args = process.argv.slice(2);
     const videoURL = args[0];
+    console.log(videoURL)
     const outputPath = args[1];
+    console.log(outputPath)
 
     if (!videoURL || !outputPath) {
         console.error('Usage: node script.js <YouTube URL> <output file path>');
@@ -71,7 +100,7 @@ const main = async () => {
     }
 
     try {
-        await downloadVideo(videoURL, outputPath);
+        await downloadAudio(videoURL, outputPath);
     } catch (error) {
         console.error('Script execution failed:', error.message);
         process.exit(1);

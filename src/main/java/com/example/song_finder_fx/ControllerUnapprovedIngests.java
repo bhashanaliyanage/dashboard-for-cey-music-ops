@@ -20,6 +20,8 @@ public class ControllerUnapprovedIngests {
     @FXML
     private VBox vbIngestList;
 
+    // public static VBox vbIngestListStatic;
+
     @FXML
     void initialize() {
         int total = ControllerIngest.unApprovedIngests.size();

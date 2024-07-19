@@ -99,6 +99,9 @@ public class ControllerSearchSong {
     @FXML
     private VBox vboxSongSearch;
 
+    @FXML
+    private ImageView imgLoading;
+
     private boolean toggle = false;
 
     Songs songDetails;
@@ -379,6 +382,7 @@ public class ControllerSearchSong {
 
     @FXML
     void onSearchedSongClick(MouseEvent event) {
+
         Duration duration = Duration.seconds(0.100);
 
         // Create a timeline for increasing heights
@@ -388,63 +392,82 @@ public class ControllerSearchSong {
         );
 
         HBox hbox = new HBox();
-        Node node = null;
+        Node node;
         try {
             node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/search-song-expanded-view.fxml")));
+
+            hbox.getChildren().add(node);
+
+            if (!toggle) {
+                imgLoading.setVisible(true);
+                timelineIncreaseHeight.play();
+                timelineIncreaseHeight.setOnFinished(event2 -> {
+                    vboxSongDetails.getChildren().add(hbox);
+                    Label lblFeaturing = (Label) node.lookup("#lblFeaturing");
+                    Label lblProductName = (Label) node.lookup("#lblProductName");
+                    Label lblUPC = (Label) node.lookup("#lblUPC");
+                    Label lblShare = (Label) node.lookup("#lblShare");
+
+                    String isrc = searchResultISRC.getText();
+
+                    Task<Void> task = new Task<Void>() {
+                        @Override
+                        protected Void call() throws Exception {
+                            try {
+                                songDetails = DatabasePostgres.searchSongDetails(isrc);
+                                // songDetails = DatabaseMySQL.searchSongDetails(isrc);
+                            } catch (SQLException | ClassNotFoundException e) {
+                                Platform.runLater(() -> {
+                                    AlertBuilder.sendErrorAlert("Error!", "Error Loading Details", e.toString());
+                                });
+                            }
+
+                            String percentage = "Unspecified";
+                            try {
+                                if (songDetails.composerAndLyricistCeyMusic()) {
+                                    percentage = "100%";
+                                } else if (songDetails.composerOrLyricistCeyMusic()) {
+                                    percentage = "50%";
+                                } else {
+                                    percentage = "0%";
+                                }
+                            } catch (SQLException | ClassNotFoundException e) {
+                                Platform.runLater(() -> {
+                                    AlertBuilder.sendErrorAlert("Error!", "Error Loading Details", e.toString());
+                                });
+                            }
+                            songDetails.setPercentage(percentage);
+
+                            String finalPercentage = percentage;
+                            Platform.runLater(() -> {
+                                lblFeaturing.setText(songDetails.getFeaturing());
+                                lblProductName.setText(songDetails.getProductName());
+                                lblUPC.setText(songDetails.getUPC());
+                                lblShare.setText(finalPercentage);
+                                imgLoading.setVisible(false);
+                            });
+                            return null;
+                        }
+                    };
+
+                    Thread thread = new Thread(task);
+                    thread.start();
+                });
+                // Play the animation
+
+                toggle = true;
+            } else {
+                // Create a timeline for increasing heights
+                vboxSongDetails.getChildren().remove(3);
+                Timeline timelineDecreaseHeigt = new Timeline(
+                        new KeyFrame(duration, new KeyValue(vboxSongSearch.prefHeightProperty(), 100)),
+                        new KeyFrame(duration, new KeyValue(hboxSongSearch.prefHeightProperty(), 90))
+                );
+                timelineDecreaseHeigt.play();
+                toggle = false;
+            }
         } catch (IOException e) {
-            AlertBuilder.sendErrorAlert("Error!", "Error Loading Details", e.toString());
-        }
-        Scene scene = vboxSongSearch.getScene();
-        hbox.getChildren().add(node);
-
-        if (!toggle) {
-            timelineIncreaseHeight.play();
-            timelineIncreaseHeight.setOnFinished(event2 -> {
-                vboxSongDetails.getChildren().add(hbox);
-                Label lblFeaturing = (Label) scene.lookup("#lblFeaturing");
-                Label lblProductName = (Label) scene.lookup("#lblProductName");
-                Label lblUPC = (Label) scene.lookup("#lblUPC");
-                Label lblShare = (Label) scene.lookup("#lblShare");
-
-                String isrc = searchResultISRC.getText();
-                try {
-                    // songDetails = DatabaseMySQL.searchSongDetails(isrc);
-                    songDetails = DatabasePostgres.searchSongDetails(isrc);
-                } catch (SQLException | ClassNotFoundException e) {
-                    AlertBuilder.sendErrorAlert("Error!", "Error Loading Details", e.toString());
-                }
-
-                String percentage = "Unspecified";
-                try {
-                    if (songDetails.composerAndLyricistCeyMusic()) {
-                        percentage = "100%";
-                    } else if (songDetails.composerOrLyricistCeyMusic()) {
-                        percentage = "50%";
-                    } else {
-                        percentage = "0%";
-                    }
-                } catch (SQLException | ClassNotFoundException e) {
-                    AlertBuilder.sendErrorAlert("Error!", "Error Loading Details", e.toString());
-                }
-                songDetails.setPercentage(percentage);
-
-                lblFeaturing.setText(songDetails.getFeaturing());
-                lblProductName.setText(songDetails.getProductName());
-                lblUPC.setText(songDetails.getUPC());
-                lblShare.setText(percentage);
-            });
-            // Play the animation
-
-            toggle = true;
-        } else {
-            // Create a timeline for increasing heights
-            vboxSongDetails.getChildren().remove(3);
-            Timeline timelineDecreaseHeigt = new Timeline(
-                    new KeyFrame(duration, new KeyValue(vboxSongSearch.prefHeightProperty(), 100)),
-                    new KeyFrame(duration, new KeyValue(hboxSongSearch.prefHeightProperty(), 90))
-            );
-            timelineDecreaseHeigt.play();
-            toggle = false;
+            AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
         }
     }
 

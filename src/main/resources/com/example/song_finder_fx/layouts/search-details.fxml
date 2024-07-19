@@ -48,10 +48,10 @@
                <ToggleGroup fx:id="searchType" />
             </toggleGroup>
          </ToggleButton>
-         <ToggleButton fx:id="btnSearchISRC" disable="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeISRC" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="ISRC" toggleGroup="$searchType" />
-         <ToggleButton fx:id="btnSearchSinger" disable="true" layoutX="101.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeSinger" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Singer" toggleGroup="$searchType" />
-         <ToggleButton fx:id="btnSearchComposer" disable="true" layoutX="192.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeComposer" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Composer" toggleGroup="$searchType" />
-         <ToggleButton fx:id="btnSearchLyricist" disable="true" layoutX="283.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeLyricist" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Lyricist" toggleGroup="$searchType" />
+         <ToggleButton fx:id="btnSearchISRC" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeISRC" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="ISRC" toggleGroup="$searchType" />
+         <ToggleButton fx:id="btnSearchSinger" layoutX="101.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeSinger" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Singer" toggleGroup="$searchType" />
+         <ToggleButton fx:id="btnSearchComposer" layoutX="192.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeComposer" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Composer" toggleGroup="$searchType" />
+         <ToggleButton fx:id="btnSearchLyricist" layoutX="283.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeLyricist" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Lyricist" toggleGroup="$searchType" />
       </HBox>
       <HBox alignment="CENTER_LEFT" minHeight="50.0" prefHeight="50.0" styleClass="search-container" stylesheets="@../styles.css">
          <VBox.margin>

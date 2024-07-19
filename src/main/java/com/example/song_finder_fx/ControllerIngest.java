@@ -55,6 +55,8 @@ public class ControllerIngest {
 
     public static List<Ingest> unApprovedIngests;
 
+    public static Node unApprovedIngestsUI;
+
     @FXML
     void initialize() {
         Task<Void> task = new Task<>() {
@@ -248,6 +250,7 @@ public class ControllerIngest {
     public void onPendingIngestClick() {
         try {
             Node node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/ingests/un-approved-ingests.fxml")));
+            unApprovedIngestsUI = node;
             UIController.mainVBoxStatic.getChildren().setAll(node);
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString());

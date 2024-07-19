@@ -17,23 +17,21 @@
         <VBox.margin>
             <Insets left="30.0" right="30.0" top="30.0" />
         </VBox.margin>
-      <HBox minWidth="370.0" spacing="10.0">
-         <children>
-              <Label onMouseClicked="#onGoBack" text="Ingests" textFill="#656565">
-                 <font>
-                     <Font name="Segoe UI Semibold" size="28.0" />
-                 </font>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-              </Label>
-            <Label text="&gt; Ingests to Approve" textFill="#656565">
-               <font>
-                  <Font name="Segoe UI Semibold" size="28.0" />
-               </font>
+        <HBox minWidth="370.0" spacing="10.0">
+            <Label text="Ingests" textFill="#656565">
+                <font>
+                    <Font name="Segoe UI Semibold" size="28.0"/>
+                </font>
             </Label>
-         </children>
-      </HBox>
+            <Label onMouseClicked="#onGoBack" text="&gt; Ingests to Approve" textFill="#656565">
+                <font>
+                    <Font name="Segoe UI Semibold" size="28.0"/>
+                </font>
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+            </Label>
+        </HBox>
       <Label fx:id="lblIngestName" layoutX="111.0" layoutY="10.0" text="&gt; Ingest Name">
          <font>
             <Font name="Segoe UI Semibold" size="28.0" />
@@ -54,28 +52,26 @@
             <HBox.margin>
                 <Insets />
             </HBox.margin>
-            <ImageView fx:id="imgLoading" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true"
-                       visible="false">
+            <ImageView fx:id="imgLoading" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true" visible="false">
                 <HBox.margin>
-                    <Insets right="10.0"/>
+                    <Insets right="10.0" />
                 </HBox.margin>
-                <Image url="@../../images/loading_02.gif"/>
+                <Image url="@../../images/loading_02.gif" />
             </ImageView>
             <Button fx:id="btnApproveIngest" mnemonicParsing="false" onAction="#onApproveIngest" prefHeight="30.0" prefWidth="165.0" styleClass="button_inside_brown" text="Approve Ingest" />
             <Button disable="true" mnemonicParsing="false" onAction="#onSaveEdits" prefHeight="30.0" prefWidth="165.0" styleClass="button_inside_brown" text="Save Edits" />
         </HBox>
     </HBox>
-   <VBox maxWidth="688.0" minHeight="-Infinity" prefWidth="688.0" spacing="5.0" styleClass="textarea-bg" stylesheets="@../../styles.css" VBox.vgrow="ALWAYS">
-      <VBox.margin>
-         <Insets bottom="10.0" left="30.0" top="10.0" />
-      </VBox.margin>
-      <children>
-         <TableView fx:id="tableIngest" prefWidth="200.0" VBox.vgrow="ALWAYS">
-           <columns>
-             <TableColumn prefWidth="75.0" text="C1" />
-             <TableColumn prefWidth="75.0" text="C2" />
-           </columns>
-         </TableView>
-      </children>
-   </VBox>
+    <VBox maxWidth="688.0" minHeight="-Infinity" prefWidth="688.0" spacing="5.0" styleClass="textarea-bg"
+          stylesheets="@../../styles.css" VBox.vgrow="ALWAYS">
+        <VBox.margin>
+            <Insets bottom="10.0" left="30.0" top="10.0"/>
+        </VBox.margin>
+        <TableView fx:id="tableIngest" prefWidth="200.0" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn prefWidth="75.0" text="C1"/>
+                <TableColumn prefWidth="75.0" text="C2"/>
+            </columns>
+        </TableView>
+    </VBox>
 </VBox>

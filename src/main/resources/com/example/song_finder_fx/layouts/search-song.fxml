@@ -26,19 +26,35 @@
                     <Insets left="10.0" top="10.0" />
                 </HBox.margin>
                 <HBox>
-                    <Label fx:id="songName" text="Song Name">
-                        <font>
-                            <Font name="Segoe UI Semibold" size="14.0" />
-                        </font>
-                    </Label>
-                    <Label fx:id="songType" layoutX="10.0" layoutY="10.0" text="(Original)" textFill="#49a078" visible="false">
-                        <font>
-                            <Font name="Segoe UI Semibold" size="14.0" />
-                        </font>
+               <HBox prefWidth="550.0" HBox.hgrow="ALWAYS">
+                  <children>
+                          <Label fx:id="songName" text="Song Name">
+                              <font>
+                                  <Font name="Segoe UI Semibold" size="14.0" />
+                              </font>
+                          </Label>
+                          <Label fx:id="songType" text="(Original)" textFill="#49a078" visible="false">
+                              <font>
+                                  <Font name="Segoe UI Semibold" size="14.0" />
+                              </font>
+                              <HBox.margin>
+                                  <Insets left="5.0" />
+                              </HBox.margin>
+                          </Label>
+                  </children>
+               </HBox>
+               <HBox alignment="TOP_RIGHT" layoutX="10.0" layoutY="10.0" prefWidth="200.0">
+                  <children>
+                     <ImageView fx:id="imgLoading" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                        <image>
+                           <Image url="@../images/loading_02.gif" />
+                        </image>
                         <HBox.margin>
-                            <Insets left="5.0" />
+                           <Insets right="10.0" />
                         </HBox.margin>
-                    </Label>
+                     </ImageView>
+                  </children>
+               </HBox>
                 </HBox>
                 <HBox>
                     <VBox.margin>

@@ -212,10 +212,46 @@ public class ControllerSearch {
                 List<Songs> songList = search.searchSong(text, searchType);
                 // return searchOld.search(text);
 
-                Node[] nodes;
+                try {
+
+                    Platform.runLater(() -> vboxSong.getChildren().clear());
+
+                    for (Songs song : songList) {
+                        Node node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
+
+                        Label lblSongName = (Label) node.lookup("#songName");
+                        Label lblISRC = (Label) node.lookup("#searchResultISRC");
+                        Label lblArtist = (Label) node.lookup("#songSinger");
+                        Label lblComposer = (Label) node.lookup("#searchResultComposer");
+                        Label lblLyricist = (Label) node.lookup("#searchResultLyricist");
+                        Label songType = (Label) node.lookup("#songType");
+                        HBox hbox2 = (HBox) node.lookup("#hbox2");
+
+                        Platform.runLater(() -> {
+                            lblSongName.setText(song.getTrackTitle());
+                            lblISRC.setText(song.getISRC());
+                            lblArtist.setText(getSinger(song.getSinger()));
+                            lblComposer.setText(song.getComposer());
+                            lblLyricist.setText(song.getLyricist());
+
+                            if (song.isOriginal()) {
+                                songType.setVisible(true);
+                            }
+
+                            if (song.isInList()) {
+                                hbox2.setStyle("-fx-border-color: #6eb0e0");
+                            }
+
+                            vboxSong.getChildren().add(node);
+                        });
+                    }
+                } catch (IOException e) {
+                    Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error occurred when loading song", e.toString()));
+                }
+
+                /*Node[] nodes;
                 nodes = new Node[songList.size()];
                 // System.out.println("songList.size() = " + songList.size());
-                Platform.runLater(() -> vboxSong.getChildren().clear());
                 for (int i = 0; i < nodes.length; i++) {
                     try {
                         nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
@@ -248,9 +284,21 @@ public class ControllerSearch {
                             AlertBuilder.sendErrorAlert("Error", "Error occurred when loading song", ex.toString());
                         });
                     }
-                }
+                }*/
                 // return songList;
                 return null;
+            }
+
+            private String getSinger(String singer) {
+                if (singer == null) {
+                    return "Unspecified";
+                } else {
+                    if (singer.equals("null")) {
+                        return "Unspecified";
+                    } else {
+                        return singer;
+                    }
+                }
             }
         };
 
@@ -450,12 +498,12 @@ public class ControllerSearch {
     void copyComposer() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
-        
+
         content.putString(songDetails.getComposer());
         boolean status = clipboard.setContent(content);
-        
+
         System.out.println("status = " + status);
-        
+
         if (status) {
             btnCopy.setText("Copied");
             Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> btnCopy.setText("Copy")));

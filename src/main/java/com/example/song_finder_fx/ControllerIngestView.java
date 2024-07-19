@@ -12,12 +12,10 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Optional;
 
 public class ControllerIngestView {
 
@@ -34,7 +32,7 @@ public class ControllerIngestView {
     private Label lblIngestName;
 
     @FXML
-    void onApproveIngest(ActionEvent event) {
+    void onApproveIngest() {
         Ingest ingest = ControllerUnApprovedIngestEntry.ingest;
         IngestController ingestController = new IngestController();
 
@@ -42,7 +40,7 @@ public class ControllerIngestView {
         System.out.println("status = " + status);
 
         if (status) {
-            Task<Void> task = new Task<Void>() {
+            Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
                     try {
@@ -84,7 +82,8 @@ public class ControllerIngestView {
 
     @FXML
     void onGoBack(MouseEvent event) {
-
+        // Node node = SceneController.loadLayout("layouts/ingests/un-approved-ingests.fxml");
+        UIController.mainVBoxStatic.getChildren().setAll(ControllerIngest.unApprovedIngestsUI);
     }
 
     @FXML
