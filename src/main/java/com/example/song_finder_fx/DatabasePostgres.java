@@ -90,36 +90,6 @@ public class DatabasePostgres {
         return 0;
     }
 
-    /*public static List<Report> reporLi(List<String> isrcList) {
-        List<Report> repoList = new ArrayList<>();
-        String sql = "SELECT reported_royalty_for_ceymusic,reported_royalty_after_gst,other_territories_earnings,after_gst,au_earnings,reported_royalty_summary,asset_isrc " +
-                "FROM public.\"reportViewSummary1\" WHERE asset_isrc = ?";
-        Connection con = getConn();
-        try {
-            PreparedStatement ps = con.prepareStatement(sql);
-            for (String s : isrcList) {
-                ps.setString(1, s);
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    Report rp = new Report();
-                    rp.setReportedRoyaltyForCeyMusic(rs.getDouble(1));
-                    rp.setReportedRoyaltyAfterGST(rs.getDouble(2));
-                    rp.setOtherTerritoryEarnnings(rs.getDouble(3));
-                    rp.setAfterGST(rs.getDouble(4));
-                    rp.setEuEaring(rs.getDouble(5));
-                    rp.setReportedSummary(rs.getDouble(6));
-                    repoList.add(rp);
-
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return repoList;
-    }*/
-
 
     public static ResultSet getFullBreakdown() throws SQLException {
         Connection conn = getConn();
@@ -138,7 +108,7 @@ public class DatabasePostgres {
 
     public static List<String> getAllSongTitles() throws SQLException {
         Connection conn = getConn();
-        String query = "SELECT song_name FROM public.song_metadata GROUP BY song_name ORDER BY song_name ASC;";
+        String query = "SELECT song_name FROM public.song_metadata_new GROUP BY song_name ORDER BY song_name ASC;";
         Statement statement = conn.createStatement();
         List<String> songs = new ArrayList<>();
 
@@ -156,13 +126,19 @@ public class DatabasePostgres {
         Statement statement = conn.createStatement();
         Songs song = new Songs();
 
-        String query = String.format("SELECT song_name, artist, artist_type FROM public.song_metadata WHERE song_name = '%s' ORDER BY song_name ASC;", songName);
+        String query = String.format("SELECT song_name, composer, lyricist FROM public.song_metadata_new WHERE song_name = '%s' ORDER BY song_name ASC;", songName);
         ResultSet rs = statement.executeQuery(query);
-        song.getContributorsFromRS(rs);
+        if (rs.isBeforeFirst()) {
+            rs.next();
+            song.setComposer(rs.getString(2));
+            song.setLyricist(rs.getString(3));
+            // song.getContributorsFromRS(rs);
 
-        System.out.println("song.getLyricist() = " + song.getLyricist());
-        System.out.println("song.getComposer() = " + song.getComposer());
+            System.out.println("song.getLyricist() = " + song.getLyricist());
+            System.out.println("song.getComposer() = " + song.getComposer());
 
+            return song;
+        }
         return song;
     }
 
@@ -2431,71 +2407,47 @@ public class DatabasePostgres {
         return "null";
     }
 
-    public static List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException, ClassNotFoundException {
+    public static List<Songs> searchSongDetailsBySearchType(String searchText, String searchType) throws SQLException {
         List<Songs> songs = new ArrayList<>();
         ResultSet rs;
 
-        Connection conn = getConn();
+        /*PreparedStatement ps = conn.prepareStatement("SELECT song_metadata.isrc, song_metadata.song_name, song_metadata.upc," +
+                "song_metadata.artist, song_metadata.artist_type FROM song_metadata " +
+                "WHERE song_metadata." + searchType + " ILIKE ? Limit 15");*/
 
-//        PreparedStatement ps = conn.prepareStatement("SELECT TRACK_TITLE, ISRC, SINGER, COMPOSER, LYRICIST " +
-//                "FROM songs WHERE " + searchType + " LIKE ? LIMIT 15");
+        String sql = "SELECT song_metadata_new.isrc, song_metadata_new.song_name, song_metadata_new.upc, song_metadata_new.composer, song_metadata_new.lyricist, song_metadata_new.singer \n" +
+                "FROM song_metadata_new WHERE song_metadata_new." + searchType + " ILIKE ? Limit 15";
 
-        Platform.runLater(() -> {
+        try (Connection conn = getConn();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             System.out.println(searchType + "search type11111");
             System.out.println("searchText = " + searchText);
-        });
 
-//        String query = String.format("SELECT song_metadata.isrc, song_metadata.song_name, song_metadata.upc, song_metadata.artist, song_metadata.artist_type " +
-//                "FROM song_metadata WHERE song_metadata.%s LIKE '%s' Limit 15", searchType, searchText + "%");
-
-
-//        Statement statement = conn.createStatement();
-
-        PreparedStatement ps = conn.prepareStatement("SELECT song_metadata.isrc, song_metadata.song_name, song_metadata.upc," +
-                "song_metadata.artist, song_metadata.artist_type FROM song_metadata " +
-                "WHERE song_metadata." + searchType + " ILIKE ? Limit 15");
-
-        Platform.runLater(() -> {
+            ps.setString(1, searchText + "%");
             System.out.println("ps = " + ps);
-        });
 
-
-        ps.setString(1, searchText + "%");
-        try {
             rs = ps.executeQuery();
-//            rs = statement.executeQuery(query);
+            if (rs.isBeforeFirst()) {
+                while (rs.next()) {
+                    songs.add(new Songs(
+                            rs.getString(2), // TRACK_TITLE
+                            rs.getString(1),// ISRC
+                            rs.getString(6), // SINGER
+                            rs.getString(4), // COMPOSER
+                            rs.getString(5) // LYRICIST
+                    ));
 
-            while (rs.next()) {
-                songs.add(new Songs(
-                        rs.getString(2), // TRACK_TITLE
-                        rs.getString(1),// ISRC
-                        rs.getString(3), // SINGER
-                        rs.getString(4), // COMPOSER
-                        rs.getString(5) // LYRICIST
-                ));
+                    try {
+                        // Printing Searched Content
+                        System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getTrackTitle() + " | " + songs.get(0).getSinger());
+                        System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getTrackTitle() + " | " + songs.get(1).getSinger());
+                        System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getTrackTitle() + " | " + songs.get(2).getSinger());
+                        System.out.println("================");
+                    } catch (IndexOutOfBoundsException e) {
+                        System.out.println("End of results");
+                    }
+                }
             }
-        } catch (Exception e) {
-            Platform.runLater(() -> {
-                e.printStackTrace();
-            });
-        }
-
-        // rs = ps.executeQuery();
-
-
-        try {
-            // Printing Searched Content
-            System.out.println(songs.get(0).getISRC().trim() + " | " + songs.get(0).getTrackTitle() + " | " + songs.get(0).getSinger());
-            System.out.println(songs.get(1).getISRC().trim() + " | " + songs.get(1).getTrackTitle() + " | " + songs.get(1).getSinger());
-            System.out.println(songs.get(2).getISRC().trim() + " | " + songs.get(2).getTrackTitle() + " | " + songs.get(2).getSinger());
-//            String s =;
-            // Printing new line
-            System.out.println("================");
-        } catch (IndexOutOfBoundsException e) {
-            Platform.runLater(() -> {
-                e.printStackTrace();
-            });
-            System.out.println("End of results");
         }
 
         return songs;
@@ -2721,27 +2673,27 @@ public class DatabasePostgres {
         List<CoWriterShare> crLlist = new ArrayList<>();
         String sql = """
                  SELECT ip.isrc,
-                   rep.after_deduction_royalty,
-                   s.song_name,
-                   ip.payee,
-                   ip.share,
-                   CASE WHEN ip.payee = (SELECT ar.artist_name
-                                       FROM public.artists ar
-                                       WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name
-                                                                              FROM public.artists ar
-                                                                              WHERE ar.artist_id = s.lyricist)
-                                                                              ELSE (SELECT ar.artist_name
-                                                                                    FROM public.artists ar
-                                                                                    WHERE ar.artist_id = s.composer)
-                                                                                    END AS contributor,
-                   (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
-                   (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist,
-                   s.type
-                   FROM public.isrc_payees ip
-                   JOIN SONGS S ON IP.ISRC = S.ISRC
-                   JOIN public.summary_bd_02 rep ON IP.ISRC = rep.asset_isrc
-                   WHERE (ip.payee = ? AND ip.share = 100)
-                   ORDER BY rep.after_deduction_royalty DESC;
+                rep.after_deduction_royalty,
+                s.song_name,
+                ip.payee,
+                ip.share,
+                CASE WHEN ip.payee = (SELECT ar.artist_name
+                                    FROM public.artists ar
+                                    WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name
+                                                                           FROM public.artists ar
+                                                                           WHERE ar.artist_id = s.lyricist)
+                                                                           ELSE (SELECT ar.artist_name
+                                                                                 FROM public.artists ar
+                                                                                 WHERE ar.artist_id = s.composer)
+                                                                                 END AS contributor,
+                (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
+                (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist,
+                s.type
+                FROM public.isrc_payees ip
+                JOIN SONGS S ON IP.ISRC = S.ISRC
+                JOIN public.summary_bd_02 rep ON IP.ISRC = rep.asset_isrc
+                WHERE (ip.payee = ?)
+                ORDER BY rep.after_deduction_royalty DESC;
                 """;
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement(sql);

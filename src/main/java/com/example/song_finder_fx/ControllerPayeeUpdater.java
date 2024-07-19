@@ -1,18 +1,17 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.AlertBuilder;
+import com.example.song_finder_fx.Controller.IngestCSVDataController;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Model.Ingest;
 import com.example.song_finder_fx.Model.IngestCSVData;
+import com.example.song_finder_fx.Model.Payee;
 import com.example.song_finder_fx.Model.PayeeUpdaterUI;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -42,6 +41,9 @@ public class ControllerPayeeUpdater {
             @Override
             protected Void call() {
                 Platform.runLater(() -> System.out.println("Looping through CSV rows"));
+
+                payeeUpdaterUIS.clear();
+
                 for (IngestCSVData data : csvData) {
                     try {
 
@@ -86,13 +88,48 @@ public class ControllerPayeeUpdater {
     void onAssignPayees() {
         Task<Void> task = new Task<>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 for (PayeeUpdaterUI uiElement : payeeUpdaterUIS) {
+
                     CheckBox checkBox = uiElement.getCbEntry();
+
                     if (checkBox.isSelected()) {
+
+                        Platform.runLater(() -> System.out.println(uiElement.getLblISRC().getText()));
+
                         IngestCSVData data = uiElement.getData();
+                        IngestCSVDataController controller = new IngestCSVDataController(data);
                         try {
-                            if (DatabasePostgres.searchArtistTable(uiElement.getData().getComposer())) {
+                            // TODO: Show assigning payees waiting message in the UI
+                            IngestCSVData assignedData = controller.assignPayees();
+                            Payee payee = assignedData.getPayee();
+
+                            if (payee.getPayee1() != null) {
+                                Platform.runLater(() -> {
+                                    uiElement.getLblPayee01().setText(payee.getPayee1());
+                                    uiElement.getLblPayee01().setStyle("-fx-text-fill: '#72a276'");
+                                });
+                            }
+
+                            if (payee.getPayee2() != null) {
+                                Platform.runLater(() -> {
+                                    uiElement.getLblPayee02().setText(payee.getPayee2());
+                                    uiElement.getLblPayee02().setStyle("-fx-text-fill: '#72a276'");
+                                });
+                            }
+                        } catch (SQLException e) {
+                            throw new RuntimeException();
+                        }
+
+
+                        /*Platform.runLater(() -> {
+                            System.out.println("ISRC: " + assignedData.getIsrc());
+                        });
+
+
+                        */
+
+                            /*if (DatabasePostgres.searchArtistTable(uiElement.getData().getComposer())) {
                                 // Assign composer to payee 01
                                 uiElement.getData().getPayee().setPayee1(uiElement.getData().getComposer());
                                 uiElement.getData().getPayee().setShare1("50");
@@ -113,19 +150,15 @@ public class ControllerPayeeUpdater {
                                         uiElement.getLblPayee02().setStyle("-fx-text-fill: '#72a276'");
                                     });
                                 }
-                            } else if (DatabasePostgres.searchArtistTable(uiElement.getData().getComposer())) {
-                                uiElement.getData().getPayee().setPayee1(uiElement.getData().getComposer());
+                            } else if (DatabasePostgres.searchArtistTable(uiElement.getData().getLyricist())) {
+                                uiElement.getData().getPayee().setPayee1(uiElement.getData().getLyricist());
                                 uiElement.getData().getPayee().setShare1("50");
 
                                 Platform.runLater(() -> {
-                                    uiElement.getLblPayee01().setText(data.getComposer());
+                                    uiElement.getLblPayee01().setText(data.getLyricist());
                                     uiElement.getLblPayee01().setStyle("-fx-text-fill: '#72a276'");
                                 });
-                            }
-                        } catch (SQLException e) {
-                            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Searching Database", e.toString()));
-                            e.printStackTrace();
-                        }
+                            }*/
                     }
                 }
                 return null;
@@ -137,12 +170,12 @@ public class ControllerPayeeUpdater {
     }
 
     @FXML
-    void onGoBack(MouseEvent event) {
+    void onGoBack() {
 
     }
 
     @FXML
-    void onSave(ActionEvent event) {
+    void onSave() {
 
     }
 

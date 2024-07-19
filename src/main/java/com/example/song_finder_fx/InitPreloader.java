@@ -10,7 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
@@ -26,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -62,7 +60,7 @@ public class InitPreloader implements Initializable {
         final String[] message = {""};
 
         Thread databaseCheck = new Thread(() -> {
-            message[0] = "Checking Database Connection";
+            message[0] = "Checking Connection";
 
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
@@ -70,12 +68,12 @@ public class InitPreloader implements Initializable {
             System.out.println("con = " + con[0]);
 
             if (Objects.equals(con[0], "Connection Error")) {
-                Platform.runLater(() -> lblLoadingg.setText("Unable to connect to CeyMusic Database"));
+                Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Database Offline", "Dashboard cannot connect to database"));
             }
         });
 
         Thread audioDatabaseCheck = new Thread(() -> {
-            message[0] = "Getting Audio Database";
+            message[0] = "Checking Local Audio Database";
 
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
@@ -84,36 +82,6 @@ public class InitPreloader implements Initializable {
             } catch (SQLException | ClassNotFoundException e) {
                 Platform.runLater(() -> System.out.println("Cannot get audio database directory"));
             }
-        });
-
-        Thread revenueAnalysisCheck = new Thread(() -> {
-            message[0] = "Loading Revenue Analysis";
-
-            Platform.runLater(() -> lblLoadingg.setText(message[0]));
-
-            ResultSet top5Territories = null;
-            ResultSet top4DSPs = null;
-            String assetCount = null;
-            ResultSet top5StreamedAssets = null;
-            String salesDate;
-            String month = null;
-            try {
-                top5Territories = DatabasePostgres.getTop5Territories();
-                top4DSPs = DatabasePostgres.getTop4DSPs();
-                assetCount = DatabasePostgres.getTotalAssetCount();
-                top5StreamedAssets = DatabasePostgres.getTop5StreamedAssets();
-                salesDate = DatabasePostgres.getSalesDate();
-                String[] date = salesDate.split("-");
-                month = date[1];
-            } catch (SQLException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("An error occurred");
-                alert.setContentText(String.valueOf(e));
-                Platform.runLater(alert::showAndWait);
-            }
-
-            revenue.setValues(top5Territories, top4DSPs, assetCount, top5StreamedAssets, month);
         });
 
         Thread updatesCheck = new Thread(() -> {
@@ -129,12 +97,6 @@ public class InitPreloader implements Initializable {
                 // versionDetailsNew.getDetails()
                 Main.versionInfo.setServerVersion(versionDetailsNew.getVersion(), versionDetailsNew.getLocation(), versionDetailsNew.getDetails());
 
-                /*if (versionDetails != null) {
-                    versionDetails.next();
-                    System.out.println("versionDetails = " + versionDetails.getDouble(1));
-                    updateLocation = versionDetails.getString(2);
-                    Main.versionInfo.setServerVersion(versionDetails.getDouble(1), versionDetails.getString(2));
-                }*/
             } catch (SQLException e) {
                 Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Getting Updates", e.toString()));
             }
@@ -215,7 +177,7 @@ public class InitPreloader implements Initializable {
                 // Platform.runLater(() -> setupSystemTray(mainWindowStage));
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }));
 

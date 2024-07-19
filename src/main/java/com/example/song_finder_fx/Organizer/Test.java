@@ -23,11 +23,12 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        DatabasePostgres.refreshSummaryTable(4, 2024);
+        // DatabasePostgres.refreshSummaryTable(3, 2024);
+        // DatabasePostgres.refreshSongMetadataTable();
 
         // testBulkReporting();
 
-        // testArtistReportPDF(74, 0.6285, 186.78, "W.D. Amaradeva", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\WDAmaradeva.pdf");
+        // testArtistReportPDF(0, 0.6285, 186.78, "W.D. Amaradeva", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\WDAmaradeva.pdf");
 
         // testAddNewFugaReport();
 
@@ -36,13 +37,32 @@ public class Test {
         // testDashboard();
         // UserSession us = new UserSession();
         // DatabasePostgres.changePassword("gimhaar", "admin");
-        // us.signup("bhashanaliyanage", "ceymusic", "bhashanaliyanage@gmail.com", "Bhashana Liyanage");
 
         /*OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "", "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", "https://www.googleapis.com/auth/userinfo.profile");
         authGoogle.startLogin();*/
 
-        /*String string = testApiCall();
-        System.out.println("string = " + string);*/
+        // testAssignPayee();
+        DatabasePostgres.searchContributors("Ithin Hina Wemu");
+    }
+
+    private static void testAssignPayee() throws SQLException {
+        Ingest ingest = DatabasePostgres.getIngest(12);
+        assert ingest != null;
+        List<IngestCSVData> data = ingest.getIngestCSVDataList();
+        IngestCSVDataController controller = new IngestCSVDataController(data.getFirst());
+
+        System.out.println("Assigning Payees...");
+
+        IngestCSVData data2 = controller.assignPayees();
+
+        System.out.println("\nEdit Data on: " + data2.getTrackTitle());
+        System.out.println("Composer: " + data2.getComposer());
+        System.out.println("Lyricist: " + data2.getLyricist());
+        System.out.println("Payee 01: " + data2.getPayee().getPayee1());
+        System.out.println("Share: " + data2.getPayee().getShare1());
+        System.out.println("Payee 02: " + data2.getPayee().getPayee2());
+        System.out.println("Share: " + data2.getPayee().getShare2());
+        System.out.println("Payee 03: " + data2.getPayee().getPayee3());
     }
 
     public static String testApiCall() {
