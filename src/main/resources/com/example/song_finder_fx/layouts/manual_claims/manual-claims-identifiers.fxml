@@ -48,27 +48,27 @@
       </VBox.margin>
       <HBox alignment="CENTER_LEFT" spacing="10.0">
          <VBox.margin>
-            <Insets left="20.0" right="20.0" top="20.0" />
+            <Insets left="20.0" right="20.0" top="20.0"/>
          </VBox.margin>
-         <children>
-            <VBox HBox.hgrow="ALWAYS">
-               <Label text="Add Identifiers">
-                  <font>
-                     <Font name="Segoe UI Semibold" size="19.0" />
-                  </font>
-                  <cursor>
-                     <Cursor fx:constant="DEFAULT" />
-                  </cursor>
-               </Label>
-               <Label fx:id="lblClaimCount" text="(Claim Count)" textFill="#656565">
-                  <cursor>
-                     <Cursor fx:constant="DEFAULT" />
-                  </cursor>
-               </Label>
-            </VBox>
-            <Button mnemonicParsing="false" onAction="#onBulkPasteCatNos" prefHeight="30.0" styleClass="button_inside" text="Bulk Paste Catalog Numbers" />
-            <Button layoutX="553.0" layoutY="18.0" mnemonicParsing="false" onAction="#onBulkPaste" prefHeight="30.0" styleClass="button_inside" text="Bulk Paste UPCs" />
-         </children>
+         <VBox HBox.hgrow="ALWAYS">
+            <Label text="Add Identifiers">
+               <font>
+                  <Font name="Segoe UI Semibold" size="19.0"/>
+               </font>
+               <cursor>
+                  <Cursor fx:constant="DEFAULT"/>
+               </cursor>
+            </Label>
+            <Label fx:id="lblClaimCount" text="(Claim Count)" textFill="#656565">
+               <cursor>
+                  <Cursor fx:constant="DEFAULT"/>
+               </cursor>
+            </Label>
+         </VBox>
+         <Button mnemonicParsing="false" onAction="#onBulkPasteCatNos" prefHeight="30.0" styleClass="button_inside"
+                 text="Bulk Paste Catalog Numbers"/>
+         <Button layoutX="553.0" layoutY="18.0" mnemonicParsing="false" onAction="#onBulkPaste" prefHeight="30.0"
+                 styleClass="button_inside" text="Bulk Paste UPCs"/>
       </HBox>
       <ScrollPane hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
          <VBox.margin>

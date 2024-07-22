@@ -150,7 +150,7 @@ public class ControllerSongListNew {
     }
 
     @FXML
-    void onCopyToButtonClicked(ActionEvent event) {
+    void onCopyToButtonClicked() {
         Task<Void> task;
         // List<String> songList = Main.getSongList();
         List<Songs> songListNew = Main.getSongList();
@@ -230,39 +230,35 @@ public class ControllerSongListNew {
         System.out.println("\nControllerSongListNew.onExportSongList");
         List<Songs> songList = Main.getSongListNew();
 
-        // Getting User Location
         File pathTo = showSaveDialog(actionEvent);
+        if (pathTo == null) {
+            System.out.println("Destination not selected. Aborting task.");
+            return;
+        }
 
-        if (pathTo != null) {
-            String path = pathTo.getAbsolutePath();
-            System.out.println("File Destination: " + path);
+        String path = pathTo.getAbsolutePath();
+        if (!path.toLowerCase().endsWith(".csv")) {
+            path += ".csv";
+        }
+        System.out.println("File Destination: " + path);
 
-            // Creating CSV File
-            try {
-                CSVWriter writer = new CSVWriter(new FileWriter(path));
-                List<String[]> rows = new ArrayList<>();
-                String[] header = new String[]{"Product Title", "UPC", "Track Title", "ISRC", "Singer", "Lyrics", "Composer", "File Name"};
-                rows.add(header);
+        try (CSVWriter writer = new CSVWriter(new FileWriter(path))) {
+            List<String[]> rows = new ArrayList<>();
+            String[] header = {"Product Title", "UPC", "Track Title", "ISRC", "Singer", "Lyrics", "Composer", "File Name"};
+            rows.add(header);
 
-                for (Songs song :
-                        songList) {
-                    String[] row = getRow(song);
-                    rows.add(row);
-                }
-
-                writer.writeAll(rows);
-                writer.close();
-
-                File file = new File(path);
-
-                if (Desktop.isDesktopSupported()) {
-                    Desktop.getDesktop().open(file);
-                }
-            } catch (IOException e) {
-                AlertBuilder.sendErrorAlert("Error", "Error Creating CSV File", e.toString());
+            for (Songs song : songList) {
+                rows.add(getRow(song));
             }
-        } else {
-            System.out.println("Destination not selected. Aborting Task");
+
+            writer.writeAll(rows);
+
+            File file = new File(path);
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(file);
+            }
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Creating CSV File", e.toString());
         }
     }
 
@@ -327,7 +323,8 @@ public class ControllerSongListNew {
                     AlertBuilder.sendErrorAlert("Error", "Cannot Open CSV", e.toString());
                 }
             }
-        } if (importType == 2) {
+        }
+        if (importType == 2) {
             if (pathTo != null) {
                 String path = pathTo.getAbsolutePath();
                 System.out.println("File Destination: " + path);
@@ -356,7 +353,8 @@ public class ControllerSongListNew {
 
             if (importType == 1) {
                 Main.songListNew.addAll(songListNew);
-            } if (importType == 2) {
+            }
+            if (importType == 2) {
                 Main.songListNew.clear();
                 Main.songListNew.addAll(songListNew);
             }
@@ -416,7 +414,7 @@ public class ControllerSongListNew {
         return chooser.showOpenDialog(scene.getWindow());
     }
 
-    private static File showSaveDialog(ActionEvent actionEvent) {
+    static File showSaveDialog(ActionEvent actionEvent) {
         // Getting User Location
         Node node = (Node) actionEvent.getSource();
         Scene scene = node.getScene();

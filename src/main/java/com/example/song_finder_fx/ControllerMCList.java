@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
+import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -17,12 +18,20 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.List;
+
+import static com.example.song_finder_fx.ControllerSongListNew.showSaveDialog;
 
 public class ControllerMCList {
 
@@ -227,6 +236,80 @@ public class ControllerMCList {
         }
     }
 
+    public void onExportSelected(ActionEvent actionEvent) {
+        List<ManualClaimTrack> selectedClaims = new ArrayList<>();
+
+        for (int i = 0; i < checkBoxes.size(); i++) {
+            if (checkBoxes.get(i).isSelected()) {
+                selectedClaims.add(manualClaims.get(i));
+            }
+        }
+
+        if (selectedClaims.isEmpty()) {
+            System.out.println("No claims selected. Aborting export.");
+        } else {
+            File file = showSaveDialog(actionEvent);
+            if (file == null) {
+                System.out.println("No file selected. Aborting export.");
+            } else {
+                String path = file.getAbsolutePath();
+                if (!path.toLowerCase().endsWith(".csv")) {
+                    path += ".csv";
+                }
+
+                try (CSVWriter writer = new CSVWriter(new FileWriter(path))) {
+                    List<String[]> rows = getRows(selectedClaims);
+
+                    writer.writeAll(rows);
+                    System.out.println("CSV file created successfully: " + path);
+
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().open(new File(path));
+                    }
+                } catch (IOException e) {
+                    System.err.println("Error creating CSV file: " + e.getMessage());
+                    // You might want to show an error dialog to the user here
+                }
+            }
+        }
+    }
+
+    private static @NotNull List<String[]> getRows(List<ManualClaimTrack> selectedClaims) {
+        List<String[]> rows = new ArrayList<>();
+
+        // Add header
+        String[] header = {"ID", "Track Name", "Lyricist", "Composer", "YouTube ID", "YouTube URL", "Date", "Trim Start", "Trim End", "Claim Type"};
+        rows.add(header);
+
+        // Add data rows
+        for (ManualClaimTrack claim : selectedClaims) {
+            String[] row = {
+                    String.valueOf(claim.getId()),
+                    claim.getTrackName(),
+                    claim.getLyricist(),
+                    claim.getComposer(),
+                    claim.getYoutubeID(),
+                    claim.getYouTubeURL(),
+                    claim.getDate().toString(),
+                    claim.getTrimStart() != null ? claim.getTrimStart() : "",
+                    claim.getTrimEnd() != null ? claim.getTrimEnd() : "",
+                    claim.getClaimTypeString()
+            };
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    static File showSaveDialog(ActionEvent actionEvent) {
+        // Getting User Location
+        Node node = (Node) actionEvent.getSource();
+        Scene scene = node.getScene();
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
+        chooser.setTitle("Save As");
+        return chooser.showSaveDialog(scene.getWindow());
+    }
+
     @FXML
     void onArchiveSelected() {
         for (int i = 0; i < checkBoxes.size(); i++) {
@@ -247,5 +330,4 @@ public class ControllerMCList {
             }
         }
     }
-
 }

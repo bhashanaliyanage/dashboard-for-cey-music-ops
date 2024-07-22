@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -358,19 +359,20 @@ public class ControllerMCIdentifiers {
     }
 
     private static void downloadAudio(int claimID, String fileName, String[] fileLocation) {
+        String url = "";
+        String fileLocation1 = "";
+
         try {
-            String url = ControllerMCList.finalManualClaims.get(claimID).getYouTubeURL();
+            url = ControllerMCList.finalManualClaims.get(claimID).getYouTubeURL();
             Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audio");
-            String fileLocation1 = tempDir.toString();
+            fileLocation1 = tempDir.toString();
             YoutubeDownload.downloadAudio(url, fileLocation1, fileName);
             fileLocation[0] = fileLocation1;
-        } catch (IOException e1) {
+        } catch (IOException | InterruptedException e) {
+            String finalUrl = url;
+            String finalFileLocation = fileLocation1;
             Platform.runLater(() -> {
-                Alert alert1 = new Alert(Alert.AlertType.ERROR);
-                alert1.setTitle("Error");
-                alert1.setHeaderText("An error occurred");
-                alert1.setContentText(String.valueOf(e1));
-                Platform.runLater(alert1::showAndWait);
+                AlertBuilder.sendErrorAlert("Error", "Error Downloading Audio", String.format("YouTube URL: %s\nTemporary File Path: %s\nException: %s", finalUrl, finalFileLocation, e));
             });
         }
     }

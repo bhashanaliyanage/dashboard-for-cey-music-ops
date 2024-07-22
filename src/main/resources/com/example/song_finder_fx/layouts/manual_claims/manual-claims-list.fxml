@@ -69,17 +69,11 @@
       <children>
          <HBox spacing="10.0">
             <children>
-               <Button minWidth="328.0" mnemonicParsing="false" onAction="#onSelectNone" styleClass="button_inside" text="Select None" />
-               <Button minWidth="328.0" mnemonicParsing="false" onAction="#onSelectAll" styleClass="button_inside" text="Select All" />
-            </children>
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" top="10.0" />
-            </VBox.margin>
-         </HBox>
-         <HBox layoutX="11.0" layoutY="11.0" spacing="10.0">
-            <children>
-               <Button minWidth="328.0" mnemonicParsing="false" onAction="#onArchiveSelected" styleClass="button_inside_brown" text="Archive Selected" />
-               <Button minWidth="328.0" mnemonicParsing="false" onAction="#onCheck" styleClass="button_inside_brown" text="Create Ingest" />
+               <Button mnemonicParsing="false" onAction="#onSelectNone" prefWidth="130.0" styleClass="button_inside" text="Select None" />
+               <Button mnemonicParsing="false" onAction="#onSelectAll" prefWidth="130.0" styleClass="button_inside" text="Select All" />
+               <Button layoutX="348.0" layoutY="10.0" mnemonicParsing="false" onAction="#onExportSelected" prefWidth="130.0" styleClass="button_inside_brown" text="Export Selected" />
+               <Button mnemonicParsing="false" onAction="#onArchiveSelected" prefWidth="130.0" styleClass="button_inside_brown" text="Archive Selected" />
+               <Button mnemonicParsing="false" onAction="#onCheck" prefWidth="130.0" styleClass="button_inside_brown" text="Create Ingest" />
             </children>
             <VBox.margin>
                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

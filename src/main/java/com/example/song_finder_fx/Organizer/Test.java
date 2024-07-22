@@ -42,7 +42,7 @@ public class Test {
         authGoogle.startLogin();*/
 
         // testAssignPayee();
-        DatabasePostgres.searchContributors("Ithin Hina Wemu");
+        // DatabasePostgres.searchContributors("Ithin Hina Wemu");
     }
 
     private static void testAssignPayee() throws SQLException {
