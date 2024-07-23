@@ -5,6 +5,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
@@ -90,7 +91,10 @@ public class ManualClaimTrack {
     }
 
     public Image getPreviewImage() {
-        return SwingFXUtils.toFXImage(previewImage, null);
+        if (previewImage != null) {
+            return SwingFXUtils.toFXImage(previewImage, null);
+        }
+        return null;
     }
 
     public BufferedImage getBufferedImage() {

@@ -224,7 +224,8 @@ public class DatabasePostgres {
     public static List<ManualClaimTrack> getManualClaims() throws SQLException {
         Connection conn = getConn();
         // Statement statement = conn.createStatement();
-        PreparedStatement ps = conn.prepareStatement("SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, preview_image, artwork, date, claim_type FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY claim_type ASC, claim_id ASC;");
+        PreparedStatement ps = conn.prepareStatement("SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, date, claim_type " +
+                "FROM public.manual_claims WHERE ingest_status = false AND archive = false ORDER BY claim_type ASC, claim_id ASC;");
         // ps.setBoolean(1, type);
         ResultSet resultSet = ps.executeQuery();
         List<ManualClaimTrack> manualClaims = new ArrayList<>();
@@ -242,15 +243,15 @@ public class DatabasePostgres {
                 String youTubeLink = resultSet.getString(5);
                 String trimStart = resultSet.getString(6);
                 String trimEnd = resultSet.getString(7);
-                byte[] previewImageBytes = resultSet.getBytes(8);
-                byte[] artworkImageBytes = resultSet.getBytes(9);
-                Date date = resultSet.getDate(10);
-                int claimType = resultSet.getInt(11);
+                // byte[] previewImageBytes = resultSet.getBytes(8); // Remove
+                // byte[] artworkImageBytes = resultSet.getBytes(9); // Remove
+                Date date = resultSet.getDate(8);
+                int claimType = resultSet.getInt(9);
                 LocalDate localDate = sqlDateToLocalDate(date);
 
                 ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink, localDate, claimType);
 
-                // Set the images to model
+                /*// Set the images to model
                 try {
                     ByteArrayInputStream previewImageInputStream = new ByteArrayInputStream(previewImageBytes);
                     ByteArrayInputStream artworkImageInputStream = new ByteArrayInputStream(artworkImageBytes);
@@ -263,7 +264,7 @@ public class DatabasePostgres {
                     manualClaimTrack.setImage(artwork);
                 } catch (IOException e) {
                     Platform.runLater(e::printStackTrace);
-                }
+                }*/
 
                 if (trimStart != null && trimEnd != null) {
                     manualClaimTrack.addTrimTime(trimStart, trimEnd);
@@ -495,18 +496,18 @@ public class DatabasePostgres {
         Connection conn = getConn();
         PreparedStatement preparedStatement = conn.prepareStatement(
                 "INSERT INTO public.manual_claims " +
-                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, artwork, preview_image, date, claim_type) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, date, claim_type) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         // Get artwork
-        ByteArrayOutputStream binaryData = new ByteArrayOutputStream();
-        ImageIO.write(claim.getBufferedImage(), "jpg", binaryData);
-        byte[] artwork = binaryData.toByteArray();
+        // ByteArrayOutputStream binaryData = new ByteArrayOutputStream();
+        // ImageIO.write(claim.getBufferedImage(), "jpg", binaryData);
+        // byte[] artwork = binaryData.toByteArray();
 
         // Get previewImage
-        ImageIO.write(claim.getBufferedPreviewImage(), "jpg", binaryData);
-        byte[] previewImage = binaryData.toByteArray();
+        // ImageIO.write(claim.getBufferedPreviewImage(), "jpg", binaryData);
+        // byte[] previewImage = binaryData.toByteArray();
 
         // Set values for the prepared statement
         preparedStatement.setString(1, claim.getTrackName());
@@ -515,10 +516,10 @@ public class DatabasePostgres {
         preparedStatement.setString(4, claim.getYoutubeID());
         preparedStatement.setString(5, claim.getTrimStart());
         preparedStatement.setString(6, claim.getTrimEnd());
-        preparedStatement.setBytes(7, artwork);
-        preparedStatement.setBytes(8, previewImage);
-        preparedStatement.setDate(9, Date.valueOf(claim.getDate()));
-        preparedStatement.setInt(10, claim.getClaimType());
+        // preparedStatement.setBytes(7, artwork); // Remove
+        // preparedStatement.setBytes(8, previewImage); // Remove
+        preparedStatement.setDate(7, Date.valueOf(claim.getDate()));
+        preparedStatement.setInt(8, claim.getClaimType());
 
         // Execute the prepared statement
         return preparedStatement.executeUpdate();
@@ -1347,13 +1348,12 @@ public class DatabasePostgres {
              PreparedStatement ps = con.prepareStatement(query)) {
 
             ps.setString(1, composer);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int count = rs.getInt(1);
-                    return count > 0;
-                }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count > 0;
             }
-        } // The Connection, PreparedStatement, and ResultSet will be closed here.
+        } // The Connection, PreparedStatement will be closed here.
 
         return false; // Default return value in case the artist is not found.
     }
@@ -2015,6 +2015,45 @@ public class DatabasePostgres {
 
             psRefresh.executeUpdate();
         }
+    }
+
+    public static ManualClaimTrack getClaimArtwork(ManualClaimTrack track) throws SQLException {
+        String sql = "SELECT preview_image, artwork FROM public.manual_claims WHERE claim_id = ?;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, track.getId());
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                byte[] previewImageBytes = rs.getBytes(1);
+                byte[] artworkImageBytes = rs.getBytes(2);
+
+                // Set the images to model
+                try {
+                    if (previewImageBytes != null && artworkImageBytes != null) {
+                        ByteArrayInputStream previewImageInputStream = new ByteArrayInputStream(previewImageBytes);
+                        ByteArrayInputStream artworkImageInputStream = new ByteArrayInputStream(artworkImageBytes);
+
+                        BufferedImage previewImage = ImageIO.read(previewImageInputStream);
+                        BufferedImage artwork = ImageIO.read(artworkImageInputStream);
+                        // Platform.runLater(() -> System.out.println("artwork.getColorModel() = " + artwork.getColorModel()));
+
+                        track.setPreviewImage(previewImage);
+                        track.setImage(artwork);
+                    } else {
+                        System.out.println("No Artwork Found");
+                    }
+                } catch (IOException e) {
+                    System.out.println("Unable to download artwork");
+                }
+            }
+        }
+
+        System.out.println("DatabasePostgres.getClaimArtwork");
+
+        return track;
     }
 
 

@@ -1,11 +1,11 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.SceneController;
-import com.example.song_finder_fx.Controller.TextFormatter;
+import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -21,17 +22,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
-
-import static com.example.song_finder_fx.ControllerSongListNew.showSaveDialog;
 
 public class ControllerMCList {
 
@@ -73,6 +75,8 @@ public class ControllerMCList {
 
         lblClaimCount.setText("Loading...");
 
+        List<Node> claimEntries = new ArrayList<>();
+
         Task<Void> taskGetManualClaims = new Task<>() {
             @Override
             protected Void call() throws SQLException {
@@ -102,7 +106,7 @@ public class ControllerMCList {
                         hBoxes.add(hboxEntry);
                         ImageView image = (ImageView) node.lookup("#image");
                         ivArtworks.add(image);
-                        try {
+                        /*try {
                             image.setImage(claim.getPreviewImage());
                         } catch (Exception e) {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -110,7 +114,7 @@ public class ControllerMCList {
                             alert.setHeaderText("Error Loading Preview Image");
                             alert.setContentText(String.valueOf(e));
                             Platform.runLater(alert::showAndWait);
-                        }
+                        }*/
 
                         lblSongNo.setText(String.valueOf(claim.getId()));
                         lblSongName.setText(claim.getTrackName());
@@ -123,12 +127,12 @@ public class ControllerMCList {
                         int finalCount = count;
                         Platform.runLater(() -> {
                             vbClaimsList.getChildren().add(node);
+                            claimEntries.add(node);
                             lblClaimCount.setText(String.valueOf(finalCount));
                         });
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-
                 }
 
                 Platform.runLater(() -> {
@@ -143,7 +147,7 @@ public class ControllerMCList {
         };
 
         taskGetManualClaims.setOnSucceeded(event -> {
-            Thread thread = new Thread(() -> {
+            Thread threadValidation = new Thread(() -> {
                 try {
                     for (Label label : labelsComposer) {
                         String composer = label.getText();
@@ -164,12 +168,51 @@ public class ControllerMCList {
                     Platform.runLater(e::printStackTrace);
                 }
             });
-            thread.start();
+
+            Thread threadArtworks = new Thread(() -> {
+                for (int i = 0; i < manualClaims.size(); i++) {
+                    ImageView imageView = ivArtworks.get(i);
+                    MCTrackController controller = new MCTrackController(manualClaims.get(i));
+                    try {
+                        int finalI = i;
+                        Platform.runLater(() -> System.out.println("Fetching Artworks for: " + manualClaims.get(finalI).getTrackName()));
+                        manualClaims.set(i, controller.fetchArtwork());
+                        imageView.setImage(setImage(manualClaims.get(i)));
+                    } catch (SQLException | IOException | URISyntaxException e) {
+                        Platform.runLater(() -> e.printStackTrace());
+                    }
+                }
+            });
+
+            threadValidation.start();
+            threadArtworks.start();
         });
 
         Thread threadGetManualClaims = new Thread(taskGetManualClaims);
         threadGetManualClaims.start();
 
+    }
+
+    private Image setImage(ManualClaimTrack claim) throws IOException, URISyntaxException {
+        if (claim.getPreviewImage() != null) {
+            return claim.getPreviewImage();
+        } else {
+            // File uploadArtwork = new File("src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork.jpg");
+            // return SwingFXUtils.toFXImage(ImageIO.read(uploadArtwork), null);
+
+            // Fetching Thumbnail
+            // Platform.runLater(() -> btnAddClaim.setText("Fetching Artwork For: " + songName));
+            String youtubeID = claim.getYoutubeID();
+            String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
+            BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
+            image = ImageProcessor.cropImage(image);
+            return SwingFXUtils.toFXImage(image, null);
+
+            // Setting Thumbnail and Preview Images to the model
+            // claim.setPreviewImage(image);
+            // image = ImageProcessor.resizeImage(1400, 1400, image);
+            // claim.setImage(image);
+        }
     }
 
     private String setColor(LocalDate localDate) {
