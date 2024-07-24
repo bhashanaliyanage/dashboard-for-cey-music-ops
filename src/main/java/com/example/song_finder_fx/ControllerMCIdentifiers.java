@@ -1,7 +1,6 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.AlertBuilder;
-import com.example.song_finder_fx.Controller.ImageProcessor;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -390,9 +389,7 @@ public class ControllerMCIdentifiers {
         } catch (IOException | InterruptedException e) {
             String finalUrl = url;
             String finalFileLocation = fileLocation1;
-            Platform.runLater(() -> {
-                AlertBuilder.sendErrorAlert("Error", "Error Downloading Audio", String.format("YouTube URL: %s\nTemporary File Path: %s\nException: %s", finalUrl, finalFileLocation, e));
-            });
+            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Downloading Audio", String.format("YouTube URL: %s\nTemporary File Path: %s\nException: %s", finalUrl, finalFileLocation, e)));
         }
     }
 
@@ -553,21 +550,6 @@ public class ControllerMCIdentifiers {
                 return userISRC[0];
             }
         }
-    }
-
-    private String requestNewISRC() {
-        final String[] isrc = new String[1];
-        Platform.runLater(() -> {
-            TextInputDialog inputDialog = new TextInputDialog(null);
-            inputDialog.setTitle("Cannot find ISRC");
-            inputDialog.setHeaderText("Enter a new ISRC");
-            inputDialog.setContentText("ISRC:");
-            inputDialog.showAndWait().ifPresent(newISRC -> {
-                System.out.println("New ISRC: " + newISRC);
-                isrc[0] =  newISRC;
-            });
-        });
-        return isrc[0];
     }
 
     private String getPrimaryArtists(ManualClaimTrack manualClaimTrack) {
