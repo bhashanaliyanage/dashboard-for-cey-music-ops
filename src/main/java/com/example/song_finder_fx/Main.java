@@ -113,7 +113,10 @@ public class Main extends Application {
         } else {
             System.out.println("No audio database directory specified");
             selectedDirectory = Main.browseLocation();
-            System.out.println(selectedDirectory.getAbsolutePath());
+
+            if (selectedDirectory != null) {
+                System.out.println(selectedDirectory.getAbsolutePath());
+            }
         }
     }
 
@@ -251,7 +254,7 @@ public class Main extends Application {
 
 // Manual Claims
 // TODO: A view to view created ingests
-    // TODO: Update Payee table from created ingests upon request
+// TODO: Update Payee table from created ingests upon request
 // TODO: View archived manual claims (which will be helpful to un-archive them for later usages)
 // TODO: Edit details on an added manual claim in the add manual claim view
 // TODO: Remove an added manual claim in the add manual claim view (which currently uses the archive method)

@@ -71,18 +71,6 @@ public class ControllerSearch {
     private VBox vboxSong;
 
     @FXML
-    private Label lblFeaturing;
-
-    @FXML
-    private Label lblProductName;
-
-    @FXML
-    private Label lblShare;
-
-    @FXML
-    private Label lblUPC;
-
-    @FXML
     private Button btnCopy;
 
     private Parent newContent;
@@ -109,37 +97,172 @@ public class ControllerSearch {
 
     @FXML
     void btnSetSearchTypeComposer() {
-        lblSearchType.setText("Composer");
         searchOld.setType("artist");
         searchType = SearchType.COMPOSER;
+
+        /*searchArea.setPromptText("Enter Composer Name");
+        lblSearchType.setText("Composer");*/
+
+        Timeline timeline = new Timeline();
+
+        // Fade out
+        KeyFrame fadeOut = new KeyFrame(Duration.millis(300),
+                new KeyValue(searchArea.opacityProperty(), 0),
+                new KeyValue(lblSearchType.opacityProperty(), 0)
+        );
+
+        // Change text
+        KeyFrame changeText = new KeyFrame(Duration.millis(301),
+                e -> {
+                    searchArea.setPromptText("Enter Composer Name");
+                    lblSearchType.setText("Composer");
+                }
+        );
+
+        // Fade in
+        KeyFrame fadeIn = new KeyFrame(Duration.millis(600),
+                new KeyValue(searchArea.opacityProperty(), 1),
+                new KeyValue(lblSearchType.opacityProperty(), 1)
+        );
+
+        timeline.getKeyFrames().addAll(fadeOut, changeText, fadeIn);
+        timeline.play();
     }
 
     @FXML
     void btnSetSearchTypeISRC() {
-        lblSearchType.setText("ISRC");
         searchOld.setType("isrc");
         searchType = SearchType.ISRC;
+
+        /*searchArea.setPromptText("Enter ISRC");
+        lblSearchType.setText("ISRC");*/
+
+        Timeline timeline = new Timeline();
+
+        // Fade out
+        KeyFrame fadeOut = new KeyFrame(Duration.millis(300),
+                new KeyValue(searchArea.opacityProperty(), 0),
+                new KeyValue(lblSearchType.opacityProperty(), 0)
+        );
+
+        // Change text
+        KeyFrame changeText = new KeyFrame(Duration.millis(301),
+                e -> {
+                    searchArea.setPromptText("Enter ISRC");
+                    lblSearchType.setText("ISRC");
+                }
+        );
+
+        // Fade in
+        KeyFrame fadeIn = new KeyFrame(Duration.millis(600),
+                new KeyValue(searchArea.opacityProperty(), 1),
+                new KeyValue(lblSearchType.opacityProperty(), 1)
+        );
+
+        timeline.getKeyFrames().addAll(fadeOut, changeText, fadeIn);
+        timeline.play();
     }
 
     @FXML
     void btnSetSearchTypeLyricist() {
-        lblSearchType.setText("Lyricist");
         searchOld.setType("artist");
         searchType = SearchType.LYRICIST;
+
+        /*searchArea.setPromptText("Enter Lyricist Name");
+        lblSearchType.setText("Lyricist");*/
+
+        Timeline timeline = new Timeline();
+
+        // Fade out
+        KeyFrame fadeOut = new KeyFrame(Duration.millis(300),
+                new KeyValue(searchArea.opacityProperty(), 0),
+                new KeyValue(lblSearchType.opacityProperty(), 0)
+        );
+
+        // Change text
+        KeyFrame changeText = new KeyFrame(Duration.millis(301),
+                e -> {
+                    searchArea.setPromptText("Enter Lyricist Name");
+                    lblSearchType.setText("Lyricist");
+                }
+        );
+
+        // Fade in
+        KeyFrame fadeIn = new KeyFrame(Duration.millis(600),
+                new KeyValue(searchArea.opacityProperty(), 1),
+                new KeyValue(lblSearchType.opacityProperty(), 1)
+        );
+
+        timeline.getKeyFrames().addAll(fadeOut, changeText, fadeIn);
+        timeline.play();
     }
 
     @FXML
     void btnSetSearchTypeName() {
-        lblSearchType.setText("Name");
         searchOld.setType("song_name");
         searchType = SearchType.SONG_NAME;
+
+        /*searchArea.setPromptText("Enter Song Name");
+        lblSearchType.setText("Name");*/
+
+        Timeline timeline = new Timeline();
+
+        // Fade out
+        KeyFrame fadeOut = new KeyFrame(Duration.millis(300),
+                new KeyValue(searchArea.opacityProperty(), 0),
+                new KeyValue(lblSearchType.opacityProperty(), 0)
+        );
+
+        // Change text
+        KeyFrame changeText = new KeyFrame(Duration.millis(301),
+                e -> {
+                    searchArea.setPromptText("Enter Song Name");
+                    lblSearchType.setText("Name");
+                }
+        );
+
+        // Fade in
+        KeyFrame fadeIn = new KeyFrame(Duration.millis(600),
+                new KeyValue(searchArea.opacityProperty(), 1),
+                new KeyValue(lblSearchType.opacityProperty(), 1)
+        );
+
+        timeline.getKeyFrames().addAll(fadeOut, changeText, fadeIn);
+        timeline.play();
     }
 
     @FXML
     void btnSetSearchTypeSinger() {
-        lblSearchType.setText("Singer");
         searchOld.setType("artist");
         searchType = SearchType.SINGER;
+
+        /*searchArea.setPromptText("Enter Singer Name");
+        lblSearchType.setText("Singer");*/
+
+        Timeline timeline = new Timeline();
+
+        // Fade out
+        KeyFrame fadeOut = new KeyFrame(Duration.millis(300),
+                new KeyValue(searchArea.opacityProperty(), 0),
+                new KeyValue(lblSearchType.opacityProperty(), 0)
+        );
+
+        // Change text
+        KeyFrame changeText = new KeyFrame(Duration.millis(301),
+                e -> {
+                    searchArea.setPromptText("Enter Singer Name");
+                    lblSearchType.setText("Singer");
+                }
+        );
+
+        // Fade in
+        KeyFrame fadeIn = new KeyFrame(Duration.millis(600),
+                new KeyValue(searchArea.opacityProperty(), 1),
+                new KeyValue(lblSearchType.opacityProperty(), 1)
+        );
+
+        timeline.getKeyFrames().addAll(fadeOut, changeText, fadeIn);
+        timeline.play();
     }
 
     @FXML

@@ -40,58 +40,19 @@ public class ControllerSearchSong {
     private Button btnCopy;
 
     @FXML
-    private ImageView btnPlay;
-
-    @FXML
-    private ImageView btnPlay1;
-
-    @FXML
     private HBox hbox2;
 
     @FXML
     private HBox hboxSongSearch;
 
     @FXML
-    private MenuItem miComposer;
-
-    @FXML
-    private MenuItem miFeaturing;
-
-    @FXML
-    private MenuItem miLyricist;
-
-    @FXML
-    private MenuItem miProductName;
-
-    @FXML
-    private MenuItem miSinger;
-
-    @FXML
-    private MenuItem miSongName;
-
-    @FXML
-    private MenuItem miUPC;
-
-    @FXML
-    private MenuItem mi_ISRC;
-
-    @FXML
-    private Label searchResultComposer;
-
-    @FXML
     private Label searchResultISRC;
-
-    @FXML
-    private Label searchResultLyricist;
 
     @FXML
     private Label songName;
 
     @FXML
     private Label songSinger;
-
-    @FXML
-    private Label songType;
 
     @FXML
     private VBox vboxSongDetails;
@@ -369,7 +330,7 @@ public class ControllerSearchSong {
                 try {
                     status[0] = Main.playAudio(start, finalIsrc);
                 } catch (IOException e) {
-                    Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Playing Audio", e.toString()));
+                    Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Playing Audio", "Cannot access audio database location: " + start + "\n" + e));
                 }
                 return null;
             }
