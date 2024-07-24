@@ -1,17 +1,20 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.AlertBuilder;
+import com.example.song_finder_fx.Controller.ImageProcessor;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.MouseEvent;
@@ -25,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -102,8 +106,14 @@ public class ControllerMCIdentifiers {
             claimISRCs.add(claimISRC);
 
             ImageView imgClaimPreview = (ImageView) entry.lookup("#imgClaimPreview");
-            imgClaimPreview.setImage(claim.getPreviewImage());
+            try {
+                imgClaimPreview.setImage(setImage(claim));
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
         }
+
+
 
         /*TextField firstUPC_Field = upcs.getFirst();
         firstUPC_Field.setOnKeyReleased(event -> {
@@ -118,6 +128,15 @@ public class ControllerMCIdentifiers {
                 }
             }
         });*/
+    }
+
+    private Image setImage(ManualClaimTrack claim) throws IOException, URISyntaxException {
+        if (claim.getPreviewImage() != null) {
+            return claim.getPreviewImage();
+        } else {
+            File uploadArtwork = new File("src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork_90.jpg");
+            return SwingFXUtils.toFXImage(ImageIO.read(uploadArtwork), null);
+        }
     }
 
     @FXML

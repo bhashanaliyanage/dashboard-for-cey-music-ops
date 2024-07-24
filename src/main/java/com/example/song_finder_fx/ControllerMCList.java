@@ -22,7 +22,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -177,7 +176,7 @@ public class ControllerMCList {
                         int finalI = i;
                         Platform.runLater(() -> System.out.println("Fetching Artworks for: " + manualClaims.get(finalI).getTrackName()));
                         manualClaims.set(i, controller.fetchArtwork());
-                        imageView.setImage(setImage(manualClaims.get(i)));
+                        imageView.setImage(setImage(manualClaims.get(i), i));
                     } catch (SQLException | IOException | URISyntaxException e) {
                         Platform.runLater(() -> e.printStackTrace());
                     }
@@ -193,7 +192,7 @@ public class ControllerMCList {
 
     }
 
-    private Image setImage(ManualClaimTrack claim) throws IOException, URISyntaxException {
+    private Image setImage(ManualClaimTrack claim, int listIndex) throws IOException, URISyntaxException {
         if (claim.getPreviewImage() != null) {
             return claim.getPreviewImage();
         } else {
@@ -206,12 +205,16 @@ public class ControllerMCList {
             String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
             BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
             image = ImageProcessor.cropImage(image);
-            return SwingFXUtils.toFXImage(image, null);
 
             // Setting Thumbnail and Preview Images to the model
-            // claim.setPreviewImage(image);
-            // image = ImageProcessor.resizeImage(1400, 1400, image);
-            // claim.setImage(image);
+            claim.setPreviewImage(image);
+            image = ImageProcessor.resizeImage(1400, 1400, image);
+            claim.setImage(image);
+
+            manualClaims.set(listIndex, claim);
+
+            return SwingFXUtils.toFXImage(image, null);
+
         }
     }
 
