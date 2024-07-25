@@ -26,7 +26,7 @@ public class Test {
         // DatabasePostgres.refreshSummaryTable(4, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
-        // testArtistReportPDF(0, 0.6285, 186.78, "W.D. Amaradeva", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\WDAmaradeva.pdf");
+        // testArtistReportPDF(0.6305, 186.78, "Ajantha Ranasinghe", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\Ajantha Ranasinghe Edit.pdf");
         // testArtistReportsNew();
 
         // testDashboard();
@@ -39,8 +39,22 @@ public class Test {
         // testAssignPayee();
 
         // https://drive.google.com/uc?id=14wg8K3fqpov_zWTw3cOPhed__gB82njN&export=download
-        GoogleDriveDownloader googleDriveDownloader = new GoogleDriveDownloader("14wg8K3fqpov_zWTw3cOPhed__gB82njN", "C:\\Users\\bhash\\Documents\\Test.msi");
-        googleDriveDownloader.downloadFile();
+        // GoogleDriveDownloader googleDriveDownloader = new GoogleDriveDownloader("14wg8K3fqpov_zWTw3cOPhed__gB82njN", "C:\\Users\\bhash\\Documents\\Test.msi");
+        // googleDriveDownloader.downloadUpdate();
+
+        String owner = "bhashanaliyanage";
+        String repo = "dashboard-for-cey-music-ops";
+        GitHubController controller = new GitHubController(owner, repo);
+
+        // Check Update
+        String latestVersion = controller.getLatestVersion();
+        System.out.println("Version: " + latestVersion);
+
+        // Download Update
+        /*String assetName = "build1.msi";
+        String savePath = "C:\\Users\\bhash\\Documents\\TestGIT.msi";
+
+        controller.downloadUpdate(assetName, savePath);*/
     }
 
     private static void testAssignPayee() throws SQLException {
@@ -87,9 +101,9 @@ public class Test {
     }
 
     private static void testBulkReporting() throws SQLException, IOException {
-        int month = 3;
+        int month = 4;
         int year = 2024;
-        double eurToAudRate = 0.6285;
+        double eurToAudRate = 0.6305;
         double audToLkrRate = 186.78;
 
         ArrayList<String> names = new ArrayList<>(Arrays.asList(
@@ -175,7 +189,7 @@ public class Test {
             // System.out.println(payee);
             if (names.contains(payee)) {
                 System.out.println("Available in the list: " + payee);
-                testArtistReportPDF(0,
+                testArtistReportPDF(
                         eurToAudRate,
                         audToLkrRate,
                         payee,
@@ -226,7 +240,7 @@ public class Test {
         double partnerShare = report.getPartnerShareInLKR();
         ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
         List<CoWriterSummary> coWriterSummaries = report.getCoWriterPaymentSummary();
-        List<CoWriterShare> coWriterShares = report.getCoWritterList();
+        List<CoWriterShare> coWriterShares = report.getAssetBreakdown();
 
         // Printing calculated values
         System.out.println("\nCalculated Details for Selected Artist");
@@ -317,10 +331,10 @@ public class Test {
         System.out.println(summary.getReportDayCount());
     }
 
-    private static void testArtistReportPDF(int artistID, double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
+    private static void testArtistReportPDF(double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
         // DatabasePostgres.refreshSummaryTable(month, year);
 
-        ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month);
+        ArtistReport report = getArtistReportNew(0, eurToAudRate, audToLkrRate, artistName, year, month);
 
         // System.out.println("report.getGrossRevenue() = " + report.getGrossRevenue());
 
@@ -344,7 +358,7 @@ public class Test {
         double partnerShare = report.getPartnerShareInLKR();
         ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
         List<CoWriterSummary> coWriterSummaries = report.getCoWriterPaymentSummary();
-        List<CoWriterShare> coWriterShares = report.getCoWritterList();
+        List<CoWriterShare> coWriterShares = report.getAssetBreakdown();
 
         // Printing calculated values
         System.out.println("\nCalculated Details for Selected Artist");

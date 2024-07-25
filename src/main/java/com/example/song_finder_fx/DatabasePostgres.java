@@ -1262,7 +1262,7 @@ public class DatabasePostgres {
                 JOIN public.summary_bd_02 rep ON IP.ISRC = rep.asset_isrc
                 WHERE (ip.payee = ? AND ip.share = 100)
                 GROUP BY contributor
-                ORDER BY total_royalty DESC LIMIT 5;""");
+                ORDER BY total_royalty DESC;""");
         ps.setString(1, artistName);
 
         ResultSet rs = ps.executeQuery();
@@ -1271,9 +1271,11 @@ public class DatabasePostgres {
             String contributor = rs.getString(1);
             double royalty = rs.getDouble(2);
 
-            CoWriterSummary summary = new CoWriterSummary(contributor, royalty);
+            if (!Objects.equals(contributor, artistName)) {
+                CoWriterSummary summary = new CoWriterSummary(contributor, royalty);
+                list.add(summary);
+            }
 
-            list.add(summary);
         }
 
         return list;
@@ -2708,7 +2710,7 @@ public class DatabasePostgres {
 
     }
 
-    public static List<CoWriterShare> getCoWriterPayments(String artist) throws SQLException {
+    public static List<CoWriterShare> getAssetBreakdown(String artist) throws SQLException {
         List<CoWriterShare> crLlist = new ArrayList<>();
         String sql = """
                  SELECT ip.isrc,

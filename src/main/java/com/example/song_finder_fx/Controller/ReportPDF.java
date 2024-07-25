@@ -23,6 +23,7 @@ import java.util.List;
 
 import static com.example.song_finder_fx.Controller.Invoice.loadAutoScaledImage;
 import static com.example.song_finder_fx.Controller.Invoice.loadFont;
+import static com.itextpdf.kernel.pdf.PdfName.Colors;
 
 public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
     private static final Border BLUE_BORDER = new SolidBorder(INVOICE_BLUE, 0.5f);
@@ -102,7 +103,11 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                     .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
         }*/
 
+        int count = 0;
+
         for (CoWriterSummary summary : coWriterSummaryList) {
+            count++;
+
             double amount = summary.getRoyalty();
             double convertedRoyalty = amount / eurToAudRate * AudToLkrRate;
 
@@ -114,6 +119,10 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
                     .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(royaltyShare).setFont(FONT_POPPINS))
                     .setTextAlignment(TextAlignment.RIGHT).setPaddingRight(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+
+            if (count == 5) {
+                break;
+            }
         }
 
         return table;
@@ -194,7 +203,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
 
     private Table getCoWriterTable(ArtistReport report) {
         double conversionRate = report.getEurToAudRate();
-        List<CoWriterShare> coWriterShares = report.getCoWritterList();
+        List<CoWriterShare> coWriterShares = report.getAssetBreakdown();
 
         // Table
         float[] columnWidth = {200f, 50f, 50f, 200f, 100f};
@@ -342,75 +351,145 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         Table table03 = getTable03(report);
         Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
         Table tableCoWriterPaymentSummary = getCoWriterSummaryTable(report);
-        Table tableCoWriterPayments = getCoWriterPaymentsTable(report);
+        Table tableAssetBreakdown = getAssetBreakdownTable(report);
+        Table tableCoWriterPayments = coWriterPaymentsTable(report);
 
         document.add(tableHeader); // Letter Head
         document.add(table02); // Artist Name and Month
         document.add(table03);
         // document.add(table04);
         document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
-        document.add(tableTopPerformingSongsSummary); // Co-Writer Payment Summary
+        document.add(tableTopPerformingSongsSummary); // Top Performing Songs Summary
         document.add(tableFooter);
 
         document.add(new AreaBreak());
 
         document.add(tableHeader); // Letter Head
         document.add(table02); // Artist Name and Month
-        document.add(tableCoWriterPayments);
+        document.add(tableAssetBreakdown);
+
+        document.add(new AreaBreak());
+
+        document.add(tableHeader); // Letter Head
+        document.add(table02); // Artist Name and Month
+        document.add(tableCoWriterPayments); // Co-Writer Payments
 
         document.close();
 
         return document;
     }
 
-    private Table getCoWriterPaymentsTable(ArtistReport report) {
-        // Table
-        float[] columnWidth = {200f, 50f, 50f, 100f, 200f};
+    private Table coWriterPaymentsTable(ArtistReport report) {
+        float[] columnWidth = {500f, 200f};
         Table table = new Table(columnWidth);
         table.setMarginLeft(20f);
         table.setMarginRight(20f);
+        table.setMarginTop(10f);
 
-        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Title").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
-                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().setHeight(20f).add(new Paragraph("").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
-                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().setHeight(20f).add(new Paragraph("").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
-                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Artist Share").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
-                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Co-Writer").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
-                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
-
-        List<CoWriterShare> coWriterShares = report.getCoWritterList();
+        // ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
+        List<CoWriterSummary> coWriterSummaryList = report.getCoWriterPaymentSummary();
+        // int songCount = topPerformingSongs.size();
         double eurToAudRate = report.getEurToAudRate();
-        double audToLkrRate = report.getAudToLkrRate();
+        double AudToLkrRate = report.getAudToLkrRate();
 
-        for (CoWriterShare share : coWriterShares) {
-            String songName = share.getSongName();
-            String songType = share.getSongType();
-            String percentage = share.getShare();
-            double artistShare = share.getRoyalty();
-            String coWriter = share.getContributor();
+        // Table 02 Row 01
+        table.addCell(new Cell(1, 2).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell(1, 2).add(new Paragraph("CO-WRITER PAYMENT BREAKDOWN").setFont(FONT_RUBIK_SEMIBOLD))
+                .setVerticalAlignment(VerticalAlignment.BOTTOM).setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(10f).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell(1, 2).add(new Paragraph("")).setBorder(Border.NO_BORDER));
 
-            table.addCell(new Cell().add(new Paragraph(songName).setFont(FONT_POPPINS).setPaddingLeft(5f))
-                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));
-            table.addCell(new Cell().add(new Paragraph(songType).setFont(FONT_POPPINS))
-                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
-            table.addCell(new Cell().add(new Paragraph(percentage).setFont(FONT_POPPINS))
-                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
-            table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare / eurToAudRate * audToLkrRate) + "/-").setFont(FONT_POPPINS))
-                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
-            table.addCell(new Cell().add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f))
-                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().add(new Paragraph("ARTIST").setFont(FONT_RUBIK_SEMIBOLD).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.CENTER))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER).setBackgroundColor(INVOICE_BLUE));
+        table.addCell(new Cell().add(new Paragraph("AMOUNT").setFont(FONT_RUBIK_SEMIBOLD).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.CENTER))
+                .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER).setBackgroundColor(INVOICE_BLUE));
 
-            // System.out.println(songName + " | " + songType + " | " + percentage + " | " + artistShare + " | " + coWriter);
+        for (CoWriterSummary summary : coWriterSummaryList) {
+
+            double amount = summary.getRoyalty();
+            double convertedRoyalty = amount / eurToAudRate * AudToLkrRate;
+
+            String contributor = summary.getContributor();
+            // String royaltyShare = "LKR " + String.format("%,09.2f", convertedRoyalty) + "/=";
+            String royaltyShare = "LKR " + String.format("%,9.2f", convertedRoyalty) + "/-";
+
+            table.addCell(new Cell().add(new Paragraph(contributor).setFont(FONT_POPPINS))
+                    .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+            table.addCell(new Cell().add(new Paragraph(royaltyShare).setFont(FONT_POPPINS))
+                    .setTextAlignment(TextAlignment.RIGHT).setPaddingRight(10f).setFontSize(10f).setBorder(BLUE_BORDER));
+
         }
 
         return table;
     }
+
+private Table getAssetBreakdownTable(ArtistReport report) {
+    // Table
+    float[] columnWidth = {200f, 50f, 50f, 100f, 200f};
+    Table table = new Table(columnWidth);
+    table.setMarginLeft(20f);
+    table.setMarginRight(20f);
+
+    // Table 02 Row 01
+    table.addCell(new Cell(1, 5).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+    table.addCell(new Cell(1, 5).add(new Paragraph("ASSET BREAKDOWN").setFont(FONT_RUBIK_SEMIBOLD))
+            .setVerticalAlignment(VerticalAlignment.BOTTOM).setTextAlignment(TextAlignment.CENTER)
+            .setFontSize(10f).setBorder(Border.NO_BORDER));
+    table.addCell(new Cell(1, 5).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+
+    table.addCell(new Cell().setHeight(20f).add(new Paragraph("Title").setFont(FONT_RUBIK_SEMIBOLD))
+            .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+            setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+    table.addCell(new Cell().setHeight(20f).add(new Paragraph("").setFont(FONT_RUBIK_SEMIBOLD))
+            .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+            setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+    table.addCell(new Cell().setHeight(20f).add(new Paragraph("").setFont(FONT_RUBIK_SEMIBOLD))
+            .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+            setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+    table.addCell(new Cell().setHeight(20f).add(new Paragraph("Artist Share").setFont(FONT_RUBIK_SEMIBOLD))
+            .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+            setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+    table.addCell(new Cell().setHeight(20f).add(new Paragraph("Co-Writer").setFont(FONT_RUBIK_SEMIBOLD))
+            .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+            setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+
+    List<CoWriterShare> coWriterShares = report.getAssetBreakdown();
+    double eurToAudRate = report.getEurToAudRate();
+    double audToLkrRate = report.getAudToLkrRate();
+
+    for (CoWriterShare share : coWriterShares) {
+        String songName = share.getSongName();
+        String songType = share.getSongType();
+        String percentage = share.getShare();
+        double artistShare = share.getRoyalty();
+        String coWriter = share.getContributor();
+
+        table.addCell(new Cell().add(new Paragraph(songName).setFont(FONT_POPPINS).setPaddingLeft(5f))
+                .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().add(new Paragraph(songType).setFont(FONT_POPPINS))
+                .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().add(new Paragraph(percentage).setFont(FONT_POPPINS))
+                .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare / eurToAudRate * audToLkrRate) + "/-").setFont(FONT_POPPINS))
+                .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
+        /*table.addCell(new Cell().add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f))
+                .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));*/
+
+        // Modification
+        // Modified part for the last column
+        Cell coWriterCell = new Cell().setBorder(BLUE_BORDER);
+        if (percentage.equals("50%")) {
+            coWriterCell.add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f))
+                    .add(new Paragraph("PAID").setFont(FONT_POPPINS).setPaddingLeft(5f).setFontColor(INVOICE_GREEN));
+        } else {
+            coWriterCell.add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f));
+        }
+        coWriterCell.setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f);
+        table.addCell(coWriterCell);
+
+        // System.out.println(songName + " | " + songType + " | " + percentage + " | " + artistShare + " | " + coWriter);
+    }
+
+    return table;
+}
 }

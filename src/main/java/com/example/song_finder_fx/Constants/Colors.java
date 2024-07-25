@@ -10,5 +10,5 @@ public interface Colors {
     Color INVOICE_WHITE = new DeviceRgb(255, 255, 255);
     Color INVOICE_GRAY = new DeviceRgb(205, 205, 205);
     Color INVOICE_BLACK = new DeviceRgb(35, 31, 32);
-    Color INVOICE_RED = new DeviceRgb(178, 110, 99);
+    Color INVOICE_GREEN = new DeviceRgb(58, 173, 99);
 }

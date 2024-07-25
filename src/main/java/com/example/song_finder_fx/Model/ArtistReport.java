@@ -42,11 +42,11 @@ public class ArtistReport {
         }
     }
 
-    public List<CoWriterShare> getCoWritterList() {
+    public List<CoWriterShare> getAssetBreakdown() {
         return coWritterList;
     }
 
-    public void setCoWritterList(List<CoWriterShare> coWritterList) {
+    public void setAssetBreakdown(List<CoWriterShare> coWritterList) {
         this.coWritterList = coWritterList;
     }
 

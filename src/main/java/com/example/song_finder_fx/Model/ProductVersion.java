@@ -1,5 +1,7 @@
 package com.example.song_finder_fx.Model;
 
+import com.example.song_finder_fx.Controller.GitHubController;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,9 +15,9 @@ public class ProductVersion {
     private double updateVersion;
     private String location;
     private String details;
-    private final double currentVersion;
+    private final String currentVersion;
 
-    public ProductVersion(Double productVersion) {
+    public ProductVersion(String productVersion) {
         currentVersion = productVersion;
     }
 
@@ -29,18 +31,27 @@ public class ProductVersion {
         return "Build " + currentVersion;
     }
 
-    public double getCurrentVersionNumber() {
+    public String getCurrentVersionNumber() {
         return currentVersion;
     }
 
     public boolean updateAvailable() {
-        System.out.println("currentVersion = " + currentVersion);
-        System.out.println("updateVersion = " + updateVersion);
-        return currentVersion < updateVersion;
-    }
+        String owner = "bhashanaliyanage";
+        String repo = "dashboard-for-cey-music-ops";
+        GitHubController controller = new GitHubController(owner, repo);
 
-    public String getUpdateVersionInfo() {
-        return "Version " + updateVersion;
+        // Check Update
+        String latestVersion = controller.getLatestVersion();
+        if (latestVersion != null) {
+            System.out.println("Latest version: " + latestVersion);
+            System.out.println("Current version: " + currentVersion);
+
+            return controller.isNewVersionAvailable(currentVersion, latestVersion);
+        } else {
+            System.out.println("Updates unavailable");
+        }
+
+        return false;
     }
 
     public File getUpdate() throws URISyntaxException, IOException {
@@ -49,6 +60,10 @@ public class ProductVersion {
         Path tempFile = Files.createTempFile(tempDir, "update_cey_dash", ".msi");
         Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
         return new File(tempFile.toUri());
+    }
+
+    public String getUpdateVersionInfo() {
+        return "Version " + updateVersion;
     }
 
     public String getDetails() {
