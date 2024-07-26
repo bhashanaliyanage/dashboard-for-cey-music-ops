@@ -1,21 +1,19 @@
 package com.example.song_finder_fx.Model;
 
 import com.example.song_finder_fx.Controller.GitHubController;
+import javafx.concurrent.Task;
+import javafx.scene.control.Button;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 public class ProductVersion {
     private double updateVersion;
-    private String location;
     private String details;
     private final String currentVersion;
+    private GitHubController controller;
 
     public ProductVersion(String productVersion) {
         currentVersion = productVersion;
@@ -23,7 +21,6 @@ public class ProductVersion {
 
     public void setServerVersion(double serverVersion, String updateLocation, String details) {
         updateVersion = serverVersion;
-        location = updateLocation;
         this.details = details;
     }
 
@@ -38,7 +35,7 @@ public class ProductVersion {
     public boolean updateAvailable() {
         String owner = "bhashanaliyanage";
         String repo = "dashboard-for-cey-music-ops";
-        GitHubController controller = new GitHubController(owner, repo);
+        controller = new GitHubController(owner, repo);
 
         // Check Update
         String latestVersion = controller.getLatestVersion();
@@ -54,12 +51,28 @@ public class ProductVersion {
         return false;
     }
 
-    public File getUpdate() throws URISyntaxException, IOException {
-        Path tempDir = Files.createTempDirectory("CeyMusic_Dashboard_UpdateTemp");
-        InputStream in = new URI(location).toURL().openStream();
+    public File getUpdate(Button button, Task<File> task) throws IOException {
+        // Old code
+        /*Path tempDir = Files.createTempDirectory("CeyMusic_Dashboard_UpdateTemp");
+        // InputStream in = new URI(location).toURL().openStream();
         Path tempFile = Files.createTempFile(tempDir, "update_cey_dash", ".msi");
-        Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
-        return new File(tempFile.toUri());
+        // System.out.println("ProductVersion.getUpdate");
+
+        System.out.println("Temporary Update Directory: " + tempFile.toString());
+
+        String assetName = "build1.msi";
+        controller.downloadUpdate(assetName, tempFile.toString(), button, task);
+        // Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        return new File(tempFile.toUri());*/
+
+        // Modification
+        Path tempDir = Files.createTempDirectory("CeyMusic_Dashboard_UpdateTemp");
+        Path tempFile = Files.createTempFile(tempDir, "update_cey_dash", ".msi");
+
+        System.out.println("Temporary Update Directory: " + tempFile.toString());
+
+        String assetName = "build1.msi";
+        return controller.downloadUpdate(assetName, tempFile.toString(), button, task);
     }
 
     public String getUpdateVersionInfo() {
