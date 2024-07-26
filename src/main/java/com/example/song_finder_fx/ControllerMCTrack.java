@@ -275,11 +275,7 @@ public class ControllerMCTrack {
                             status = true;
                             spinnerEnd.setStyle("-fx-border-color: red;");
                             spinnerStart.setStyle("-fx-border-color: red;");
-                            try {
-                                NotificationBuilder.displayTrayError("Time Validation Error", "Please check trim start and end times");
-                            } catch (AWTException e) {
-                                e.printStackTrace();
-                            }
+                            NotificationBuilder.displayTrayError("Time Validation Error", "Please check trim start and end times");
                         } else {
                             spinnerEnd.setStyle("-fx-border-color: '#e9ebee';");
                             spinnerStart.setStyle("-fx-border-color: '#e9ebee';");

@@ -75,10 +75,13 @@ public class ControllerPayeeUpdaterEntry {
                         ControllerEditPayeeDetails.staticTxtPayee03.setText(data.getPayee().getPayee3());
                         ControllerEditPayeeDetails.staticTxtPayee03Share.setText(data.getPayee().getShare3());
 
+                        // ControllerEditPayeeDetails.parent = ControllerPayeeUpdaterEntry.this;
+
                         UIController.sideVBoxStatic.getChildren().setAll(node);
                     });
                 } catch (IOException e) {
                     Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString()));
+                    e.printStackTrace();
                 }
                 return null;
             }

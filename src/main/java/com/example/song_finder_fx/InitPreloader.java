@@ -1,7 +1,9 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.AlertBuilder;
+import com.example.song_finder_fx.Controller.GitHubController;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
+import com.example.song_finder_fx.Model.ReleaseInfo;
 import com.example.song_finder_fx.Model.Revenue;
 import com.example.song_finder_fx.Model.Updates;
 import javafx.application.Platform;
@@ -89,17 +91,21 @@ public class InitPreloader implements Initializable {
 
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
-            try {
-                // ResultSet versionDetails = DatabaseMySQL.checkUpdates();
-                Updates versionDetailsNew = DatabasePostgres.checkUpdatesNew();        //Connection for Postgress
+            // ResultSet versionDetails = DatabaseMySQL.checkUpdates();
+            String owner = "bhashanaliyanage";
+            String repo = "dashboard-for-cey-music-ops";
+            GitHubController controller = new GitHubController(owner, repo);
 
-                updateLocation = versionDetailsNew.getLocation();
-                // versionDetailsNew.getDetails()
-                Main.versionInfo.setServerVersion(versionDetailsNew.getVersion(), versionDetailsNew.getLocation(), versionDetailsNew.getDetails());
+            // Check Update
+            ReleaseInfo releaseInfo = controller.getLatestVersion();
+            // boolean updateAvailable = Main.versionInfo.updateAvailable();
+            // Updates versionDetailsNew = DatabasePostgres.checkUpdatesNew();        //Connection for Postgress
 
-            } catch (SQLException e) {
-                Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Getting Updates", e.toString()));
-            }
+            // updateLocation = versionDetailsNew.getLocation();
+            // versionDetailsNew.getDetails()
+            Platform.runLater(() -> System.out.println("releaseInfo.version = " + releaseInfo.version));
+            Main.versionInfo.setServerVersion(releaseInfo.version, releaseInfo.releaseNotes);
+
         });
 
         Thread loadScenes = new Thread(() -> {
@@ -272,11 +278,7 @@ public class InitPreloader implements Initializable {
 
     private void closeWindowEvent(WindowEvent windowEvent) {
         Platform.runLater(() -> {
-            try {
-                NotificationBuilder.displayTrayInfo("CeyMusic Dashboard", "CeyMusic Dashboard is minimized to system tray");
-            } catch (AWTException e) {
-                System.out.println("Error Sending Notification: " + e);
-            }
+            NotificationBuilder.displayTrayInfo("CeyMusic Dashboard", "CeyMusic Dashboard is minimized to system tray");
         });
     }
 

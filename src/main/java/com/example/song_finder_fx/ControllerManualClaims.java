@@ -148,7 +148,7 @@ public class ControllerManualClaims {
                                     vboxTracks.getChildren().clear();
                                     vboxTracks.getChildren().add(node);
                                 }
-                            } catch (AWTException | IOException e) {
+                            } catch (IOException e) {
                                 Platform.runLater(() -> {
                                     throw new RuntimeException(e);
                                 });

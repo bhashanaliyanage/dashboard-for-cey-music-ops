@@ -77,12 +77,8 @@ public class ControllerIngest {
             Platform.runLater(() -> lblCount.setText(String.valueOf(unApprovedIngests.size())));
         } catch (SQLException e) {
             Platform.runLater(() -> {
-                try {
-                    NotificationBuilder.displayTrayError("Error", "Error Fetching Un-Approved Ingests");
-                    e.printStackTrace();
-                } catch (AWTException ex) {
-                    System.out.println("Error Fetching Un-Approved Ingests\nStack Trace: " + e);
-                }
+                NotificationBuilder.displayTrayError("Error", "Error Fetching Un-Approved Ingests");
+                e.printStackTrace();
             });
         }
     }
@@ -162,20 +158,12 @@ public class ControllerIngest {
 
                                     getUnApprovedIngests();
 
-                                    try {
-                                        NotificationBuilder.displayTrayInfo("Ingest Imported", "Please check and approve " + unApprovedIngests.size() + " un-approved ingests");
-                                    } catch (AWTException e) {
-                                        System.out.println("Unable to send notifications: " + e);
-                                    }
+                                    NotificationBuilder.displayTrayInfo("Ingest Imported", "Please check and approve " + unApprovedIngests.size() + " un-approved ingests");
                                 });
                             } else {
                                 Platform.runLater(() -> {
                                     btnImportIngest.setText("Import Ingest");
-                                    try {
-                                        NotificationBuilder.displayTrayError("Error", "Ingest not imported");
-                                    } catch (AWTException e) {
-                                        System.out.println("Unable to send notifications: " + e);
-                                    }
+                                    NotificationBuilder.displayTrayError("Error", "Ingest not imported");
                                 });
                             }
                         } catch (SQLException e) {
@@ -219,20 +207,12 @@ public class ControllerIngest {
 
                         if (rowLength == 63) {
                             Platform.runLater(() -> {
-                                try {
-                                    NotificationBuilder.displayTrayInfo("CSV Validated", "You can proceed to import");
-                                    txtFileLocation.setText(file.getAbsolutePath());
-                                } catch (AWTException e) {
-                                    throw new RuntimeException(e);
-                                }
+                                NotificationBuilder.displayTrayInfo("CSV Validated", "You can proceed to import");
+                                txtFileLocation.setText(file.getAbsolutePath());
                             });
                         } else {
                             Platform.runLater(() -> {
-                                try {
-                                    NotificationBuilder.displayTrayError("Invalid CSV Format", "Expected 63 columns but found " + rowLength);
-                                } catch (AWTException e) {
-                                    throw new RuntimeException(e);
-                                }
+                                NotificationBuilder.displayTrayError("Invalid CSV Format", "Expected 63 columns but found " + rowLength);
                             });
                         }
                     } catch (CsvValidationException | IOException e) {

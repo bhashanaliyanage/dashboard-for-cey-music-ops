@@ -7,17 +7,23 @@ import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 
 public class NotificationBuilder {
-    public static void displayTrayInfo(String caption, String message) throws AWTException {
+    public static void displayTrayInfo(String caption, String message) {
         Platform.runLater(() -> {
-            Main.trayIcon.displayMessage(caption, message, MessageType.INFO);
-            // Main.trayIcon.displayMessage(caption, message, MessageType.ERROR);
+            try {
+                Main.trayIcon.displayMessage(caption, message, MessageType.INFO);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 
-    public static void displayTrayError(String caption, String message) throws AWTException {
+    public static void displayTrayError(String caption, String message) {
         Platform.runLater(() -> {
-            // Main.trayIcon.displayMessage(caption, message, MessageType.INFO);
-            Main.trayIcon.displayMessage(caption, message, MessageType.ERROR);
+            try {
+                Main.trayIcon.displayMessage(caption, message, MessageType.ERROR);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 }

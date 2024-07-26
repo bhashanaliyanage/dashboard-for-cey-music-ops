@@ -108,7 +108,7 @@ public class DatabasePostgres {
 
     public static List<String> getAllSongTitles() throws SQLException {
         Connection conn = getConn();
-        String query = "SELECT song_name FROM public.song_metadata_new GROUP BY song_name ORDER BY song_name ASC;";
+        String query = "SELECT song_name FROM public.song_metadata_new WHERE type = 'O' GROUP BY song_name ORDER BY song_name ASC;";
         Statement statement = conn.createStatement();
         List<String> songs = new ArrayList<>();
 
@@ -2601,18 +2601,15 @@ public class DatabasePostgres {
     public static List<String> getAllSongs() throws SQLException, ClassNotFoundException {
         List<String> songTitles = new ArrayList<>();
 
-        Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement("SELECT TRACK_TITLE FROM `songs`");
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement("SELECT TRACK_TITLE FROM `songs`")) {
 
-        try {
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String trackTitle = rs.getString("TRACK_TITLE");
-                songTitles.add(trackTitle);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String trackTitle = rs.getString("TRACK_TITLE");
+                    songTitles.add(trackTitle);
+                }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
 
         return songTitles;

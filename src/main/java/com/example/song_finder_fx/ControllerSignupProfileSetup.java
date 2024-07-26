@@ -68,11 +68,7 @@ public class ControllerSignupProfileSetup {
                     }
                 } else {
                     txtEmail.setStyle("-fx-border-color: red;");
-                    try {
-                        NotificationBuilder.displayTrayError("Invalid Email", "Please enter a valid email address");
-                    } catch (AWTException e) {
-                        e.printStackTrace();
-                    }
+                    NotificationBuilder.displayTrayError("Invalid Email", "Please enter a valid email address");
                 }
             } else {
                 txtEmail.setStyle("-fx-border-color: red;");

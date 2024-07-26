@@ -47,8 +47,9 @@ public class Test {
         GitHubController controller = new GitHubController(owner, repo);
 
         // Check Update
-        String latestVersion = controller.getLatestVersion();
-        System.out.println("Version: " + latestVersion);
+        ReleaseInfo latestVersion = controller.getLatestVersion();
+        System.out.println("Release Info: " + latestVersion.releaseNotes);
+        System.out.println("Version: " + latestVersion.version);
 
         // Download Update
         /*String assetName = "build1.msi";

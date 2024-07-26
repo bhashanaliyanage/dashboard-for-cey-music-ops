@@ -809,17 +809,9 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         boolean status = DatabasePostgres.checkDatabaseConnection();
 
         if (status) {
-            try {
-                NotificationBuilder.displayTrayInfo("Database Connected", "Database Connection Success");
-            } catch (AWTException e) {
-                e.printStackTrace();
-            }
+            NotificationBuilder.displayTrayInfo("Database Connected", "Database Connection Success");
         } else {
-            try {
-                NotificationBuilder.displayTrayError("Error", "Error connecting database");
-            } catch (AWTException e) {
-                e.printStackTrace();
-            }
+            NotificationBuilder.displayTrayError("Error", "Error connecting database");
         }
     }
 
@@ -1160,13 +1152,9 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 }
 
                 // Send a notification when task is completed
-                NotificationBuilder nb = new NotificationBuilder();
+                // NotificationBuilder nb = new NotificationBuilder();
 
-                try {
-                    nb.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
-                } catch (AWTException exception) {
-                    throw new RuntimeException(exception);
-                }
+                NotificationBuilder.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
             });
         }
 

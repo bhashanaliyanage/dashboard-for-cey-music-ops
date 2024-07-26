@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ProductVersion {
-    private double updateVersion;
+    private String updateVersion;
     private String details;
     private final String currentVersion;
     private GitHubController controller;
@@ -19,7 +19,7 @@ public class ProductVersion {
         currentVersion = productVersion;
     }
 
-    public void setServerVersion(double serverVersion, String updateLocation, String details) {
+    public void setServerVersion(String serverVersion, String details) {
         updateVersion = serverVersion;
         this.details = details;
     }
@@ -38,12 +38,13 @@ public class ProductVersion {
         controller = new GitHubController(owner, repo);
 
         // Check Update
-        String latestVersion = controller.getLatestVersion();
-        if (latestVersion != null) {
-            System.out.println("Latest version: " + latestVersion);
+        ReleaseInfo releaseInfo = controller.getLatestVersion();
+
+        if (releaseInfo != null) {
+            System.out.println("Latest version: " + releaseInfo.version);
             System.out.println("Current version: " + currentVersion);
 
-            return controller.isNewVersionAvailable(currentVersion, latestVersion);
+            return controller.isNewVersionAvailable(currentVersion, releaseInfo.version);
         } else {
             System.out.println("Updates unavailable");
         }
@@ -76,7 +77,7 @@ public class ProductVersion {
     }
 
     public String getUpdateVersionInfo() {
-        return "Version " + updateVersion;
+        return updateVersion;
     }
 
     public String getDetails() {

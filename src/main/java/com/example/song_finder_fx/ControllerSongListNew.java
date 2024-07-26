@@ -189,11 +189,7 @@ public class ControllerSongListNew {
                                 ErrorDialog.showErrorDialogWithLog("File Not Found Error", "Error! Some files are missing in your audio database", DatabaseMySQL.errorBuffer.toString());
                             }
 
-                            try {
-                                NotificationBuilder.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
-                            } catch (AWTException exception) {
-                                throw new RuntimeException(exception);
-                            }
+                            NotificationBuilder.displayTrayInfo("Execution Completed", "Please check your destination folder for the copied audio files");
                         });
 
                         new Thread(task).start();
