@@ -11,6 +11,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import org.postgresql.util.PSQLException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -336,8 +337,9 @@ public class DatabasePostgres {
 
                 manualClaims.add(manualClaimTrack);
 
-                System.out.println("count = " + count);
             }
+
+            System.out.println("\rTotal: " + count);
         }
 
         resultSet.close();
@@ -2020,42 +2022,92 @@ public class DatabasePostgres {
     }
 
     public static ManualClaimTrack getClaimArtwork(ManualClaimTrack track) throws SQLException {
-        String sql = "SELECT preview_image, artwork FROM public.manual_claims WHERE claim_id = ?;";
+        int maxRetries = 3;
+        int retryCount = 0;
 
-        try (Connection con = getConn();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, track.getId());
+        while (retryCount < maxRetries) {
+            try {
+                // Your existing code here
+                String sql = "SELECT preview_image, artwork FROM public.manual_claims WHERE claim_id = ?;";
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.isBeforeFirst()) {
-                rs.next();
-                byte[] previewImageBytes = rs.getBytes(1);
-                byte[] artworkImageBytes = rs.getBytes(2);
+                try (Connection con = getConn();
+                     PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setInt(1, track.getId());
 
-                // Set the images to model
-                try {
-                    if (previewImageBytes != null && artworkImageBytes != null) {
-                        ByteArrayInputStream previewImageInputStream = new ByteArrayInputStream(previewImageBytes);
-                        ByteArrayInputStream artworkImageInputStream = new ByteArrayInputStream(artworkImageBytes);
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.isBeforeFirst()) {
+                        rs.next();
+                        byte[] previewImageBytes = rs.getBytes(1);
+                        byte[] artworkImageBytes = rs.getBytes(2);
 
-                        BufferedImage previewImage = ImageIO.read(previewImageInputStream);
-                        BufferedImage artwork = ImageIO.read(artworkImageInputStream);
-                        // Platform.runLater(() -> System.out.println("artwork.getColorModel() = " + artwork.getColorModel()));
+                        // Set the images to model
+                        try {
+                            if (previewImageBytes != null && artworkImageBytes != null) {
+                                ByteArrayInputStream previewImageInputStream = new ByteArrayInputStream(previewImageBytes);
+                                ByteArrayInputStream artworkImageInputStream = new ByteArrayInputStream(artworkImageBytes);
 
-                        track.setPreviewImage(previewImage);
-                        track.setImage(artwork);
-                    } else {
-                        System.out.println("No Artwork Found");
+                                BufferedImage previewImage = ImageIO.read(previewImageInputStream);
+                                BufferedImage artwork = ImageIO.read(artworkImageInputStream);
+                                // Platform.runLater(() -> System.out.println("artwork.getColorModel() = " + artwork.getColorModel()));
+
+                                track.setPreviewImage(previewImage);
+                                track.setImage(artwork);
+                            } else {
+                                System.out.println("No Artwork Found");
+                            }
+                        } catch (IOException e) {
+                            System.out.println("Unable to download artwork");
+                        }
                     }
-                } catch (IOException e) {
-                    System.out.println("Unable to download artwork");
+                }
+
+                System.out.println("DatabasePostgres.getClaimArtwork");
+                return track;
+            } catch (PSQLException e) {
+                if (e.getMessage().contains("An I/O error occurred")) {
+                    retryCount++;
+                    if (retryCount >= maxRetries) {
+                        throw e;
+                    }
+                    System.out.println("Retrying database operation, attempt " + retryCount);
+                    // You might want to add a small delay here
+                    try {
+                        Thread.sleep(1000); // 1 second delay
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    throw e;
                 }
             }
         }
 
-        System.out.println("DatabasePostgres.getClaimArtwork");
-
         return track;
+    }
+
+    public static int getAMClaimCountFor(LocalDate startDate, LocalDate endDate) throws SQLException {
+        String sql = "SELECT COUNT(claim_id) FROM public.manual_claims WHERE ingest_status = false AND archive = true AND date BETWEEN ? AND ? LIMIT 100;";
+
+        try (Connection conn = getConn();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setDate(1, Date.valueOf(startDate));
+            ps.setDate(2, Date.valueOf(endDate));
+
+            ResultSet resultSet = ps.executeQuery();
+
+            int count = 0;
+
+            if (resultSet.isBeforeFirst()) {
+                resultSet.next();
+
+                count = resultSet.getInt(1);
+
+                System.out.println("\rTotal: " + count);
+            }
+
+            return count;
+        }
     }
 
 

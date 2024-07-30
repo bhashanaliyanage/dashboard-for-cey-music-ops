@@ -1,24 +1,28 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.AlertBuilder;
+import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ArchivedMCUI;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
-import com.itextpdf.kernel.pdf.PdfTextArray;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.util.Duration;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,18 +32,18 @@ import java.util.Objects;
 public class ControllerSPFilterArchive {
 
     @FXML
+    public Button btnFilter;
+
+    @FXML
     private DatePicker dpEnd;
 
     @FXML
     private DatePicker dpStart;
 
-    @FXML
-    private Label lblTrackName;
-
     public static List<ArchivedMCUI> archivedMCUIS = new ArrayList<>();
 
     @FXML
-    void onFilter(ActionEvent event) throws InterruptedException {
+    void onFilter() {
         // Clearing current claims
         if (archivedMCUIS != null) {
             archivedMCUIS.clear();
@@ -71,14 +75,38 @@ public class ControllerSPFilterArchive {
                 @Override
                 protected Void call() {
                     try {
+
+                        int count = DatabasePostgres.getAMClaimCountFor(startDate, endDate);
+
+                        Platform.runLater(() -> {
+                            // Create Timeline for animation
+                            Timeline timeline = new Timeline();
+
+                            // Animate width change
+                            KeyValue kvWidth = new KeyValue(btnFilter.prefWidthProperty(), 180);
+                            KeyFrame kfWidth = new KeyFrame(Duration.millis(300), kvWidth);
+
+                            // Fade out text
+                            KeyValue kvTextFadeOut = new KeyValue(btnFilter.opacityProperty(), 0);
+                            KeyFrame kfTextFadeOut = new KeyFrame(Duration.millis(150), kvTextFadeOut);
+
+                            // Change text and fade in
+                            KeyValue kvTextFadeIn = new KeyValue(btnFilter.opacityProperty(), 1);
+                            KeyFrame kfTextChange = new KeyFrame(Duration.millis(151),
+                                    e -> btnFilter.setText("Loading " + count + " Claims"));
+                            KeyFrame kfTextFadeIn = new KeyFrame(Duration.millis(300), kvTextFadeIn);
+
+                            // Add all keyframes to the timeline
+                            timeline.getKeyFrames().addAll(kfWidth, kfTextFadeOut, kfTextChange, kfTextFadeIn);
+
+                            // Play the animation
+                            timeline.play();
+                        });
+
                         archivedManualClaims[0] = DatabasePostgres.getArchivedManualClaims(startDate, endDate);
 
-                        System.out.println("\nTotal: " + archivedManualClaims[0].size());
-                        System.out.println("\n");
                     } catch (SQLException e) {
-                        Platform.runLater(() -> {
-                            AlertBuilder.sendErrorAlert("Error", "Error Filtering Manual Claims", e.toString());
-                        });
+                        Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Filtering Manual Claims", e.toString()));
                     }
 
                     return null;
@@ -87,21 +115,19 @@ public class ControllerSPFilterArchive {
 
             Thread threadGetClaims = new Thread(taskGetClaims);
             threadGetClaims.start();
-            threadGetClaims.join();
 
-            Task<Void> taskSHowClaims = new Task<>() {
-                @Override
-                protected Void call() throws Exception {
-                    if (!archivedManualClaims[0].isEmpty()) {
-                        for (ManualClaimTrack track : archivedManualClaims[0]) {
-                            int claimID = track.getId();
-                            Image previewImage = track.getPreviewImage();
-                            String title = track.getTrackName();
-                            String composer = track.getComposer();
-                            String lyricist = track.getLyricist();
-                            LocalDate date = track.getDate();
-                            String claimType = track.getClaimTypeString();
+            taskGetClaims.setOnSucceeded(event1 -> {
+                if (!archivedManualClaims[0].isEmpty()) {
+                    for (ManualClaimTrack track : archivedManualClaims[0]) {
+                        int claimID = track.getId();
+                        Image previewImage = track.getPreviewImage();
+                        String title = track.getTrackName();
+                        String composer = track.getComposer();
+                        String lyricist = track.getLyricist();
+                        LocalDate date = track.getDate();
+                        String claimType = track.getClaimTypeString();
 
+                        try {
                             Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/archived-claims-list-entry.fxml")));
 
                             // Lookup entry items
@@ -143,18 +169,32 @@ public class ControllerSPFilterArchive {
                             hBoxes.add(hboxEntry);*/
 
                             Platform.runLater(() -> ControllerMCArchiveList.vbClaimsListStatic.getChildren().add(node));
+                        } catch (IOException e) {
+                            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString()));
+                            break;
                         }
                     }
 
-                    return null;
+                    Platform.runLater(() -> {
+                        try {
+                            resetSidePanel();
+                        } catch (IOException e) {
+                            e.toString();
+                        }
+                    });
                 }
-            };
+            });
 
-            Thread threadShowClaims = new Thread(taskSHowClaims);
-            threadShowClaims.start();
+            // Thread threadShowClaims = new Thread(taskSHowClaims);
+            // threadShowClaims.start();
 
         }
 
+    }
+
+    private void resetSidePanel() throws IOException {
+        Node node2 = SceneController.loadLayout("layouts/sidepanel-blank.fxml");
+        UIController.sideVBoxStatic.getChildren().setAll(node2);
     }
 
     private static List<ManualClaimTrack> filterManualClaims(LocalDate startDate, LocalDate endDate) {
@@ -174,9 +214,7 @@ public class ControllerSPFilterArchive {
                         // Platform.runLater(() -> System.out.println("Name: " + track.getTrackName()));
                     }*/
                 } catch (SQLException e) {
-                    Platform.runLater(() -> {
-                        AlertBuilder.sendErrorAlert("Error", "Error Filtering Manual Claims", e.toString());
-                    });
+                    Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Filtering Manual Claims", e.toString()));
                 }
 
                 return null;

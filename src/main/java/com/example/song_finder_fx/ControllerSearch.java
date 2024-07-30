@@ -7,6 +7,7 @@ import com.example.song_finder_fx.Model.Songs;
 import com.example.song_finder_fx.Organizer.SongSearch;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -85,6 +86,8 @@ public class ControllerSearch {
 
     private String searchType = SearchType.SONG_NAME;
 
+    private final PauseTransition pause = new PauseTransition(Duration.millis(300));
+
     public ControllerSearch() {
 
     }
@@ -93,6 +96,12 @@ public class ControllerSearch {
     void initialize() {
         // DatabaseHandler databaseHandler = new DatabaseHandler();
         search = new SongSearch();
+
+        // Set up the debounced search
+        searchArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            pause.setOnFinished(event -> getText2(newValue));
+            pause.playFromStart();
+        });
     }
 
     @FXML
@@ -265,66 +274,9 @@ public class ControllerSearch {
         timeline.play();
     }
 
-    @FXML
-    void getText() {
+    private void getText2(String text) {
         // Getting search keywords
-        String text = searchArea.getText();
-
-        scrlpneSong.setVisible(true);
-        scrlpneSong.setContent(vboxSong);
-
-        Task<List<Songs>> task = new Task<>() {
-            @Override
-            protected java.util.List<Songs> call() {
-                return search.searchSong(text, searchType);
-                // return searchOld.search(text);
-            }
-        };
-
-        task.setOnSucceeded(e -> {
-            List<Songs> songList = task.getValue();
-            Node[] nodes;
-            nodes = new Node[songList.size()];
-            vboxSong.getChildren().clear();
-            for (int i = 0; i < nodes.length; i++) {
-                try {
-                    nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
-                    Label lblSongName = (Label) nodes[i].lookup("#songName");
-                    Label lblISRC = (Label) nodes[i].lookup("#searchResultISRC");
-                    Label lblArtist = (Label) nodes[i].lookup("#songSinger");
-                    Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
-                    Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
-                    Label songType = (Label) nodes[i].lookup("#songType");
-                    HBox hbox2 = (HBox) nodes[i].lookup("#hbox2");
-                    lblSongName.setText(songList.get(i).getTrackTitle());
-                    lblISRC.setText(songList.get(i).getISRC().trim());
-                    lblArtist.setText(songList.get(i).getSinger().trim());
-                    lblComposer.setText(songList.get(i).getComposer().trim());
-                    lblLyricist.setText(songList.get(i).getLyricist().trim());
-
-                    if (songList.get(i).isOriginal()) {
-                        songType.setVisible(true);
-                    }
-
-                    if (songList.get(i).isInList()) {
-                        hbox2.setStyle("-fx-border-color: #6eb0e0");
-                    }
-
-                    vboxSong.getChildren().add(nodes[i]);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-
-        Thread thread = new Thread(task);
-        thread.start();
-    }
-
-    @FXML
-    void getText2() {
-        // Getting search keywords
-        String text = searchArea.getText();
+        // String text = searchArea.getText();
 
         scrlpneSong.setVisible(true);
         scrlpneSong.setContent(vboxSong);
