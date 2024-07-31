@@ -2110,6 +2110,84 @@ public class DatabasePostgres {
         }
     }
 
+    public static void updatePayee(Payee payee) throws SQLException {
+        String selectSQL = "SELECT COUNT(*) FROM public.isrc_payees WHERE isrc = ?";
+        String insertSQL = "INSERT INTO public.isrc_payees (isrc, payee, share, payee01, payee01share, payee02, payee02share, update_user) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String updateSQL = "UPDATE public.isrc_payees SET payee = ?, share = ?, payee01 = ?, payee01share = ?, payee02 = ?, payee02share = ?, update_user = ? " +
+                "WHERE isrc = ?";
+
+        try (Connection con = getConn()) {
+            // Check if the ISRC exists in the table
+            try (PreparedStatement psSelect = con.prepareStatement(selectSQL)) {
+                psSelect.setString(1, payee.getIsrc());
+                ResultSet rs = psSelect.executeQuery();
+                rs.next();
+                boolean exists = rs.getInt(1) > 0;
+
+                if (exists) {
+                    // Update the existing record
+                    try (PreparedStatement psUpdate = con.prepareStatement(updateSQL)) {
+                        psUpdate.setString(1, payee.getPayee1());
+                        psUpdate.setInt(2, parseShareSafely(payee.getShare1()));
+                        psUpdate.setString(3, payee.getPayee2());
+                        psUpdate.setInt(4, parseShareSafely(payee.getShare2()));
+                        psUpdate.setString(5, payee.getPayee3());
+                        psUpdate.setInt(6, parseShareSafely(payee.getShare3()));
+                        psUpdate.setString(7, Main.userSession.getUserName()); // replace with actual update user if available
+                        psUpdate.setString(8, payee.getIsrc());
+
+                        psUpdate.executeUpdate();
+                    }
+                } else {
+                    // Insert a new record
+                    try (PreparedStatement psInsert = con.prepareStatement(insertSQL)) {
+                        psInsert.setString(1, payee.getIsrc());
+                        psInsert.setString(2, payee.getPayee1());
+                        psInsert.setInt(3, parseShareSafely(payee.getShare1()));
+                        psInsert.setString(4, payee.getPayee2());
+                        psInsert.setInt(5, parseShareSafely(payee.getShare2()));
+                        psInsert.setString(6, payee.getPayee3());
+                        psInsert.setInt(7, parseShareSafely(payee.getShare3()));
+                        psInsert.setString(8, Main.userSession.getUserName()); // replace with actual update user if available
+
+                        psInsert.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
+    private static int parseShareSafely(String share) {
+        try {
+            return Integer.parseInt(share);
+        } catch (NumberFormatException | NullPointerException e) {
+            return 0;
+        }
+    }
+
+    public static List<String> getAllPayees() throws SQLException {
+        String sql = "SELECT artist_name FROM public.artists WHERE status = 5 ORDER BY artist_name ASC;";
+        List<String> artists = new ArrayList<>();
+
+        try (Connection con = getConn()) {
+            // Check if the ISRC exists in the table
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.isBeforeFirst()) {
+                        while (rs.next()) {
+                            String artistName = rs.getString(1);
+                            artists.add(artistName);
+                        }
+                        return artists;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
 
     public List<Payee> check(String name) {
 //        String name = "Victor Rathnayake";

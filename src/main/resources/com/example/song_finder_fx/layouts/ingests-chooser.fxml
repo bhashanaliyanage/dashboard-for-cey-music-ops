@@ -46,33 +46,30 @@
       </HBox>
       <HBox spacing="10.0">
          <VBox.margin>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="30.0"/>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
          </VBox.margin>
          <VBox spacing="10.0" HBox.hgrow="ALWAYS">
             <VBox spacing="10.0">
-               <Label text="Ingestion Name" textFill="#656565"/>
-               <TextField fx:id="txtName" promptText="Ingestion Name" styleClass="textarea-bg"/>
+               <Label text="Ingestion Name" textFill="#656565" />
+               <TextField fx:id="txtName" promptText="Ingestion Name" styleClass="textarea-bg" />
             </VBox>
             <VBox layoutX="10.0" layoutY="10.0" spacing="10.0">
-               <Label text="Browse File" textFill="#656565"/>
+               <Label text="Browse File" textFill="#656565" />
                <HBox spacing="10.0">
-                  <TextField fx:id="txtFileLocation" editable="false" promptText="File"
-                             styleClass="textarea-bg" HBox.hgrow="ALWAYS"/>
-                  <Button mnemonicParsing="false" onAction="#onBrowse" prefWidth="100.0"
-                          styleClass="button_inside" text="Browse"/>
+                  <TextField fx:id="txtFileLocation" editable="false" promptText="File" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" onAction="#onBrowse" prefWidth="100.0" styleClass="button_inside" text="Browse" />
                </HBox>
             </VBox>
             <VBox alignment="TOP_RIGHT" layoutX="10.0" layoutY="74.0" spacing="10.0">
                <VBox.margin>
-                  <Insets top="10.0"/>
+                  <Insets top="10.0" />
                </VBox.margin>
-               <Button fx:id="btnImportIngest" mnemonicParsing="false" onAction="#onImportNew" prefWidth="150.0"
-                       styleClass="button_inside_brown" text="Import Ingest"/>
+               <Button fx:id="btnImportIngest" mnemonicParsing="false" onAction="#onImportNew" prefWidth="150.0" styleClass="button_inside_brown" text="Import Ingest" />
             </VBox>
          </VBox>
       </HBox>
    </VBox>
-   <HBox alignment="CENTER_LEFT" onMouseClicked="#onPendingIngestClick" prefHeight="70.0" styleClass="clickable-pane-bg">
+   <HBox fx:id="hboxApproveIngests" alignment="CENTER_LEFT" onMouseClicked="#onPendingIngestClick" prefHeight="70.0" styleClass="clickable-pane-bg">
       <Label text="Click to Approve Ingests">
          <HBox.margin>
             <Insets left="20.0" />

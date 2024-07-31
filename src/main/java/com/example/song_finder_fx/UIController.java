@@ -190,6 +190,15 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     public static HBox btnSongListStatic;
 
+    public static void blankSidePanel() {
+        try {
+            Node node2 = SceneController.loadLayout("layouts/sidepanel-blank.fxml");
+            sideVBoxStatic.getChildren().setAll(node2);
+        } catch (IOException e) {
+            System.out.println("Unable to load side panel");
+        }
+    }
+
     //</editor-fold>
     //</editor-fold>
 

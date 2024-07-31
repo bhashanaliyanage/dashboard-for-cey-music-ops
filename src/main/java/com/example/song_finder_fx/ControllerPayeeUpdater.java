@@ -1,6 +1,8 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.IngestCSVDataController;
+import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Model.Ingest;
 import com.example.song_finder_fx.Model.IngestCSVData;
@@ -10,6 +12,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -20,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ControllerPayeeUpdater {
+
+    @FXML
+    private Button btnAssignPayees;
 
     @FXML
     private Label lblIngestName;
@@ -76,6 +82,7 @@ public class ControllerPayeeUpdater {
                         });
                     }
                 }
+
                 return null;
             }
         };
@@ -89,6 +96,12 @@ public class ControllerPayeeUpdater {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
+
+                Platform.runLater(() -> {
+                    btnAssignPayees.setText("Assigning");
+                    btnAssignPayees.setDisable(true);
+                });
+
                 for (PayeeUpdaterUI uiElement : payeeUpdaterUIS) {
 
                     CheckBox checkBox = uiElement.getCbEntry();
@@ -106,14 +119,14 @@ public class ControllerPayeeUpdater {
 
                             if (payee.getPayee1() != null) {
                                 Platform.runLater(() -> {
-                                    uiElement.getLblPayee01().setText(payee.getPayee1());
+                                    uiElement.getLblPayee01().setText(payee.getPayee1() + " (" + payee.getShare1() + "%)");
                                     uiElement.getLblPayee01().setStyle("-fx-text-fill: '#72a276'");
                                 });
                             }
 
                             if (payee.getPayee2() != null) {
                                 Platform.runLater(() -> {
-                                    uiElement.getLblPayee02().setText(payee.getPayee2());
+                                    uiElement.getLblPayee02().setText(payee.getPayee2() + " (" + payee.getShare2() + "%)");
                                     uiElement.getLblPayee02().setStyle("-fx-text-fill: '#72a276'");
                                 });
                             }
@@ -122,45 +135,14 @@ public class ControllerPayeeUpdater {
                         }
 
 
-                        /*Platform.runLater(() -> {
-                            System.out.println("ISRC: " + assignedData.getIsrc());
-                        });
-
-
-                        */
-
-                            /*if (DatabasePostgres.searchArtistTable(uiElement.getData().getComposer())) {
-                                // Assign composer to payee 01
-                                uiElement.getData().getPayee().setPayee1(uiElement.getData().getComposer());
-                                uiElement.getData().getPayee().setShare1("50");
-
-                                Platform.runLater(() -> {
-                                    uiElement.getLblPayee01().setText(data.getComposer());
-                                    uiElement.getLblPayee01().setStyle("-fx-text-fill: '#72a276'");
-                                    // #72a276
-                                });
-
-                                if (DatabasePostgres.searchArtistTable(uiElement.getData().getLyricist())) {
-                                    // Assign lyricist to payee 01
-                                    uiElement.getData().getPayee().setPayee2(uiElement.getData().getLyricist());
-                                    uiElement.getData().getPayee().setShare2("50");
-
-                                    Platform.runLater(() -> {
-                                        uiElement.getLblPayee02().setText(data.getLyricist());
-                                        uiElement.getLblPayee02().setStyle("-fx-text-fill: '#72a276'");
-                                    });
-                                }
-                            } else if (DatabasePostgres.searchArtistTable(uiElement.getData().getLyricist())) {
-                                uiElement.getData().getPayee().setPayee1(uiElement.getData().getLyricist());
-                                uiElement.getData().getPayee().setShare1("50");
-
-                                Platform.runLater(() -> {
-                                    uiElement.getLblPayee01().setText(data.getLyricist());
-                                    uiElement.getLblPayee01().setStyle("-fx-text-fill: '#72a276'");
-                                });
-                            }*/
                     }
                 }
+
+                Platform.runLater(() -> {
+                    btnAssignPayees.setText("Assign Payees");
+                    btnAssignPayees.setDisable(false);
+                });
+
                 return null;
             }
         };
@@ -176,7 +158,44 @@ public class ControllerPayeeUpdater {
 
     @FXML
     void onSave() {
+        String payeeDetails = null;
+        try {
+            int count = 0;
+            for (PayeeUpdaterUI ui : payeeUpdaterUIS) {
+                count++;
+                IngestCSVData data = ui.getData();
+                Payee payee = data.getPayee();
+                payee.setIsrc(data.getIsrc());
+                CheckBox checkBox = ui.getCbEntry();
 
+                if (checkBox.isSelected()) {
+                    //<editor-fold desc="Print Payee Details">
+                    payeeDetails = String.format(
+                            "Song: %s\n" +
+                                    "Payee 1: %s, Share 1: %s\n" +
+                                    "Payee 2: %s, Share 2: %s\n" +
+                                    "Payee 3: %s, Share 3: %s\n",
+                            ui.getData().getTrackTitle(),
+                            payee.getPayee1(), payee.getShare1(),
+                            payee.getPayee2(), payee.getShare2(),
+                            payee.getPayee3(), payee.getShare3()
+                    );
+
+                    System.out.println(payeeDetails);
+                    //</editor-fold>
+
+                    if (payee.getPayee1() != null) {
+                        DatabasePostgres.updatePayee(payee);
+                    } else {
+                        AlertBuilder.sendInfoAlert("Error", "Could not save payee details for null values", payeeDetails);
+                        break;
+                    }
+                }
+            }
+            NotificationBuilder.displayTrayInfo(count + " payee details added", "Payee details for selected songs were added");
+        } catch (SQLException e) {
+            AlertBuilder.sendErrorAlert("Error Saving Payee", null, "Error Saving Payee for: " + payeeDetails + "\n\n" + e);
+        }
     }
 
     @FXML

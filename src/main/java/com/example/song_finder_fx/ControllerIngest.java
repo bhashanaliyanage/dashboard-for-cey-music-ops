@@ -17,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 
 import java.awt.*;
@@ -29,6 +30,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class ControllerIngest {
+
+    @FXML
+    private HBox hboxApproveIngests;
 
     @FXML
     public Label lblCount;
@@ -62,7 +66,9 @@ public class ControllerIngest {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
+                Platform.runLater(() -> hboxApproveIngests.setDisable(true));
                 getUnApprovedIngests();
+                Platform.runLater(() -> hboxApproveIngests.setDisable(false));
                 return null;
             }
         };
