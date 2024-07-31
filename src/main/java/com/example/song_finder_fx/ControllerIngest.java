@@ -20,7 +20,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -217,9 +216,7 @@ public class ControllerIngest {
                                 txtFileLocation.setText(file.getAbsolutePath());
                             });
                         } else {
-                            Platform.runLater(() -> {
-                                NotificationBuilder.displayTrayError("Invalid CSV Format", "Expected 63 columns but found " + rowLength);
-                            });
+                            Platform.runLater(() -> NotificationBuilder.displayTrayError("Invalid CSV Format", "Expected 63 columns but found " + rowLength));
                         }
                     } catch (CsvValidationException | IOException e) {
                         Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Reading CSV File", e.toString()));

@@ -8,15 +8,12 @@ import com.example.song_finder_fx.Model.PayeeUpdaterUI;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import org.controlsfx.control.textfield.TextFields;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 public class ControllerEditPayeeDetails {
 
@@ -104,9 +101,7 @@ public class ControllerEditPayeeDetails {
                         setupAutoCompletion(txtTrackName, songs);
                     });
                 } catch (SQLException e) {
-                    Platform.runLater(() -> {
-                        NotificationBuilder.displayTrayInfo("Unable to fetch catalog", e.toString());
-                    });
+                    Platform.runLater(() -> NotificationBuilder.displayTrayInfo("Unable to fetch catalog", e.toString()));
                 }
                 return null;
             }
