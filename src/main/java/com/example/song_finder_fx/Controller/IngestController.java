@@ -1,10 +1,7 @@
 package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.DatabasePostgres;
-import com.example.song_finder_fx.Model.Ingest;
-import com.example.song_finder_fx.Model.IngestCSVData;
-import com.example.song_finder_fx.Model.Product;
-import com.example.song_finder_fx.Model.YouDownload;
+import com.example.song_finder_fx.Model.*;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
@@ -246,24 +243,53 @@ public class IngestController {
 
         // Create Products
         List<String> productNames = new ArrayList<>();
-        List<Product> products = new ArrayList<>();
+        // List<Product> products = new ArrayList<>();
+        // List<Songs> songs = new ArrayList<>();
 
         for (IngestCSVData row : csvRows) {
+            // Process Products
             String currentProductName = row.getAlbumTitle();
-
             if (!productNames.contains(currentProductName)) {
                 Product product = new Product(row.getUpc(),
                         row.getAlbumTitle(),
                         row.getCatalogNumber(),
                         row.releaseDate());
 
-                products.add(product);
+                // products.add(product);
                 productNames.add(currentProductName);
 
                 DatabasePostgres.addProduct(product);
                 // System.out.println("Adding Product: " + product.getAlbumTitle());
             }
 
+            // Process Assets
+            Songs song = new Songs();
+            song.setISRC(row.getIsrc());
+            song.setTrackTitle(row.getTrackTitle());
+            song.setFileName(row.getOriginalFileName());
+            song.setUPC(row.getUpc());
+            // Composer, Lyricist, Featuring, Singer, Type
+            song.setComposer(row.getComposer());
+            song.setLyricist(row.getLyricist());
+            song.setFeaturingArtist(row.getFeaturingArtist());
+            // song.setSinger();
+            song.setType(getType(row.getIsrc()));
+
+            // songs.add(song);
+
+            DatabasePostgres.addSong(song);
+        }
+
+        // TODO: Make the ingest go to approved state
+    }
+
+    private String getType(String isrc) {
+        if (isrc.startsWith("LKA0W")) {
+            return "O";
+        } else if (isrc.startsWith("LKA0U")) {
+            return "C";
+        } else {
+            return ""; // or throw an exception, or return a default value
         }
     }
 }

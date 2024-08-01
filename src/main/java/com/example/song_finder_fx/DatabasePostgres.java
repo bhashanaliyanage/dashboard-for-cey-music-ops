@@ -1940,23 +1940,47 @@ public class DatabasePostgres {
     }
 
     public static void addSong(Songs song) throws SQLException {
-        String sql = "INSERT INTO public.songs(isrc, song_name, file_name, upc, composer, lyricist, featuring, type) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
-                "ON CONFLICT (isrc) DO NOTHING;";
+        String selectSql = "SELECT * FROM public.songs WHERE isrc = ?";
+        String insertSql = "INSERT INTO public.songs(isrc, song_name, file_name, upc, composer, lyricist, featuring, type) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String updateSql = "UPDATE public.songs SET song_name = ?, file_name = ?, upc = ?, composer = ?, lyricist = ?, featuring = ?, type = ? " +
+                "WHERE isrc = ?";
 
         try (Connection con = getConn();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, song.getISRC());
-            ps.setString(2, song.getTrackTitle());
-            ps.setString(3, song.getFileName());
-            ps.setString(4, song.getUPC());
-            ps.setInt(5, setArtistID(song.getComposer()));
-            ps.setInt(6, setArtistID(song.getLyricist()));
-            ps.setInt(7, setArtistID(song.getFeaturing()));
-            System.out.println("Song Type: " + song.getTypeConverted());
-            ps.setString(8, song.getType());
+             PreparedStatement selectPs = con.prepareStatement(selectSql);
+             PreparedStatement insertPs = con.prepareStatement(insertSql);
+             PreparedStatement updatePs = con.prepareStatement(updateSql)) {
 
-            ps.executeUpdate();
+            selectPs.setString(1, song.getISRC());
+            ResultSet rs = selectPs.executeQuery();
+
+            if (rs.next()) {
+                // ISRC exists, update the record
+                updatePs.setString(1, song.getTrackTitle());
+                updatePs.setString(2, song.getFileName());
+                updatePs.setString(3, song.getUPC());
+                updatePs.setInt(4, setArtistID(song.getComposer()));
+                updatePs.setInt(5, setArtistID(song.getLyricist()));
+                updatePs.setInt(6, setArtistID(song.getFeaturing()));
+                updatePs.setString(7, song.getType());
+                updatePs.setString(8, song.getISRC());
+
+                updatePs.executeUpdate();
+                System.out.println("Song updated: " + song.getISRC());
+            } else {
+                // ISRC doesn't exist, insert new record
+                insertPs.setString(1, song.getISRC());
+                insertPs.setString(2, song.getTrackTitle());
+                insertPs.setString(3, song.getFileName());
+                insertPs.setString(4, song.getUPC());
+                insertPs.setInt(5, setArtistID(song.getComposer()));
+                insertPs.setInt(6, setArtistID(song.getLyricist()));
+                insertPs.setInt(7, setArtistID(song.getFeaturing()));
+                insertPs.setString(8, song.getType());
+
+                insertPs.executeUpdate();
+                System.out.println("Song inserted: " + song.getISRC());
+            }
         }
     }
 
