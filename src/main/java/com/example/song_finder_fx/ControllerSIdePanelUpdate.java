@@ -49,7 +49,7 @@ public class ControllerSIdePanelUpdate {
     @FXML
     public void onUpdateBtnClick(ActionEvent event) {
         // Current Code
-    /*Scene scene = SceneController.getSceneFromEvent(event);
+        /*Scene scene = SceneController.getSceneFromEvent(event);
     Button btnUpdate = (Button) scene.lookup("#btnUpdate");
     Task<Void> task = new Task<>() {
         @Override
@@ -84,6 +84,8 @@ public class ControllerSIdePanelUpdate {
         // Claude.ai modification
         Scene scene = SceneController.getSceneFromEvent(event);
         Button btnUpdate = (Button) scene.lookup("#btnUpdate");
+        Label lblUpdate = UIController.lblUserEmailAndUpdateStatic;
+        btnUpdate.setText("Preparing");
         // ProgressBar progressBar = (ProgressBar) scene.lookup("#progressBar"); // Assume you've added this to your FXML
 
         if (task != null && task.isRunning()) {
@@ -97,7 +99,7 @@ public class ControllerSIdePanelUpdate {
             protected File call() throws Exception {
                 updateProgress(0, 100);
 
-                File updateFile = Main.versionInfo.getUpdate(btnUpdate, task);
+                File updateFile = Main.versionInfo.getUpdate(btnUpdate, lblUpdate, task);
 
                 if (updateFile != null && !isCancelled()) {
                     Platform.runLater(() -> btnUpdate.setText("Installing..."));
@@ -115,6 +117,7 @@ public class ControllerSIdePanelUpdate {
                 try {
                     Desktop.getDesktop().open(updateFile);
                     Platform.exit();
+                    System.exit(0);
                     // btnUpdate.setText("Restart to complete update");
                 } catch (IOException ex) {
                     AlertBuilder.sendErrorAlert("Error", "Error Opening Update Package", "Path: " + updateFile.getAbsolutePath() + "\n\n" + ex);

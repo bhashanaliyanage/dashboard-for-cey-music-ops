@@ -8,9 +8,11 @@ import com.example.song_finder_fx.Session.Hasher;
 import com.example.song_finder_fx.Session.User;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.util.Duration;
 import org.postgresql.util.PSQLException;
 
 import javax.imageio.ImageIO;
@@ -359,10 +361,13 @@ public class DatabasePostgres {
         }
     }
 
-    public static void editManualClaim(String songID, String trackName, String composer, String lyricist) throws SQLException {
+    public static void editManualClaim(String songID, String trackName, String composer, String lyricist, String trimStart, String trimEnd) throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
-        String query = String.format("UPDATE public.manual_claims SET song_name = '%s', composer = '%s', lyricist = '%s' WHERE claim_id = %s;", trackName, composer, lyricist, songID);
+
+        String query = String.format("UPDATE public.manual_claims SET song_name = '%s', composer = '%s', lyricist = '%s', trim_start = '%s', trim_end = '%s' WHERE claim_id = %s;",
+                trackName, composer, lyricist, trimStart, trimEnd, songID);
+
         statement.executeUpdate(query);
     }
 
@@ -986,7 +991,11 @@ public class DatabasePostgres {
 
     }
 
-    public static List<PayeeForReport> getPayeeReport(ArtistReport report) {
+    public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQLException {
+        int maxRetries = 3;
+        int retryCount = 0;
+        List<PayeeForReport> pReport = new ArrayList<>();
+        // Connection con = getConn();
         String sql = """
                 SELECT ip.isrc,\s
                 SUM(CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_payee_share,
@@ -994,36 +1003,50 @@ public class DatabasePostgres {
                 FROM isrc_payees ip JOIN public.summary_bd_02 rv ON ip.isrc = rv.asset_isrc
                 WHERE ip.payee = ? OR ip.payee01 = ? OR ip.payee02 = ? GROUP BY ip.isrc
                 """;
-        List<PayeeForReport> pReport = new ArrayList<>();
-        Connection con = getConn();
 
-        try {
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, report.getArtist().getName());
-            ps.setString(2, report.getArtist().getName());
-            ps.setString(3, report.getArtist().getName());
-            ps.setString(4, report.getArtist().getName());
-            ps.setString(5, report.getArtist().getName());
-            ps.setString(6, report.getArtist().getName());
-            ps.setString(7, report.getArtist().getName());
-//			System.out.println(ps);
-            ResultSet rs = ps.executeQuery();
+        while (retryCount < maxRetries) {
+            try (Connection con = getConn();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                PayeeForReport pr = new PayeeForReport();
-                pr.setIsrc(rs.getString(1));
-                pr.setShare(rs.getInt(2));
-                pr.setValue(rs.getDouble(3));
-                pReport.add(pr);
+                ps.setString(1, report.getArtist().getName());
+                ps.setString(2, report.getArtist().getName());
+                ps.setString(3, report.getArtist().getName());
+                ps.setString(4, report.getArtist().getName());
+                ps.setString(5, report.getArtist().getName());
+                ps.setString(6, report.getArtist().getName());
+                ps.setString(7, report.getArtist().getName());
+    //			System.out.println(ps);
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    PayeeForReport pr = new PayeeForReport();
+                    pr.setIsrc(rs.getString(1));
+                    pr.setShare(rs.getInt(2));
+                    pr.setValue(rs.getDouble(3));
+                    pReport.add(pr);
+                }
+
+                return pReport;
+            } catch (PSQLException e) {
+                if (e.getMessage().contains("An I/O error occurred")) {
+                    retryCount++;
+
+                    if (retryCount >= maxRetries) {
+                        throw e;
+                    }
+
+                    System.out.println("\nRetrying database operation, attempt " + retryCount);
+
+                    try {
+                        Thread.sleep(1000L * retryCount); // Exponential backoff
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection(con);
         }
 
-        return pReport;
-
+        return null;
     }
 
     public static ResultSet getCoWriterShares(String artistName) throws SQLException, ClassNotFoundException {
@@ -1299,7 +1322,14 @@ public class DatabasePostgres {
             Date date = rs.getDate(9);
             LocalDate localDate = sqlDateToLocalDate(date);
             int claimType = rs.getInt(10);
-            return new ManualClaimTrack(claimIDInt, trackName, lyricist, composer, ytID, localDate, claimType);
+            String trimStart = rs.getString(5);
+            String trimEnd = rs.getString(6);
+
+            ManualClaimTrack claim = new ManualClaimTrack(claimIDInt, trackName, lyricist, composer, ytID, localDate, claimType);
+            claim.setTrimStart(trimStart);
+            claim.setTrimEnd(trimEnd);
+
+            return claim;
         }
         return null;
     }
@@ -1532,12 +1562,10 @@ public class DatabasePostgres {
     }
 
     public static int importReport(ReportMetadata report, Label lblImport, Label lblReportProgress) {
-        Platform.runLater(() -> {
+        /*Platform.runLater(() -> {
             lblImport.setText("Working on...");
             lblReportProgress.setText("0%");
         });
-
-        int key = 0;
 
         // Insert metadata and get the generated report_id
         int reportId = 0;
@@ -1590,17 +1618,12 @@ public class DatabasePostgres {
                     pstmt.setString(6, fugaReport.getDsp());
                     pstmt.setString(7, fugaReport.getProductLabel());
                     pstmt.setString(8, String.valueOf(fugaReport.getProductUPC()));
-                    // pstmt.addBatch();
 
-                    // addRowFUGAReport(fugaReport, con);
                     pstmt.executeUpdate();
 
                     Platform.runLater(() -> lblReportProgress.setText(df.format(percentage) + "%"));
                 }
                 // pstmt.executeBatch();
-                /*ResultSet rs = pstmt.getGeneratedKeys();
-                rs.next();
-                key = rs.getInt(1);*/
             }
             Platform.runLater(() -> lblImport.setText("Report Imported. Please Check Missing ISRCs"));
         } catch (IOException | CsvValidationException e) {
@@ -1617,7 +1640,130 @@ public class DatabasePostgres {
             e.printStackTrace();
         }
 
+        return reportId;*/
+
+        Label lblUpdate = UIController.lblUserEmailAndUpdateStatic;
+        final boolean[] updatedBefore = {false};
+
+        // Create fade-out transition
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(500), lblUpdate);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+
+        // Create fade-in transition
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(500), lblUpdate);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+
+        // Play fade-out, then change text and fade-in
+        fadeOut.setOnFinished(e -> {
+            lblUpdate.setText("Importing Report: 0%");
+            updatedBefore[0] = true;
+            fadeIn.play();
+        });
+
+        Platform.runLater(() -> {
+            lblImport.setText("Working on...");
+            lblReportProgress.setText("0%");
+            Platform.runLater(fadeOut::play);
+        });
+
+        int reportId = 0;
+
+        try (Connection con = getConn()) {
+            con.setAutoCommit(false);
+
+            // Insert metadata and get the generated report_id
+            String insertMetadataSQL = "INSERT INTO report_metadata (report_name, report_month, report_year, created_at) VALUES (?, ?, ?, ?) RETURNING id";
+            try (PreparedStatement pstmt = con.prepareStatement(insertMetadataSQL, Statement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, report.getName());
+                pstmt.setInt(2, report.getReportMonth());
+                pstmt.setInt(3, report.getReportYear());
+                pstmt.setObject(4, report.getCreatedAt());
+                pstmt.executeUpdate();
+
+                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        reportId = rs.getInt(1);
+                    } else {
+                        throw new SQLException("Failed to retrieve report_id.");
+                    }
+                }
+            }
+
+            // Insert report data
+            Platform.runLater(() -> {
+                lblImport.setText("Importing");
+                lblReportProgress.setVisible(true);
+            });
+
+            String insertReportSQL = "INSERT INTO reports_new (report_id, asset_isrc, reported_royalty, territory, sale_start_date, dsp, product_label, upc) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            try (BufferedReader bReader = new BufferedReader(new FileReader(report.getCsvFile()));
+                 CSVReader reader = new CSVReader(bReader);
+                 PreparedStatement pstmt = con.prepareStatement(insertReportSQL)) {
+
+                int totalRowCount = getReportTotalRowCount(new BufferedReader(new FileReader(report.getCsvFile())));
+                int rowcount2 = 0;
+                String[] nextLine;
+                reader.readNext(); // Skip header
+
+                while ((nextLine = reader.readNext()) != null) {
+                    rowcount2++;
+                    FUGAReport fugaReport = CSVController.getFUGAReport(nextLine);
+                    pstmt.setInt(1, reportId);
+                    pstmt.setString(2, fugaReport.getAssetISRC());
+                    pstmt.setDouble(3, fugaReport.getReportedRoyalty());
+                    pstmt.setString(4, fugaReport.getTerritory());
+                    pstmt.setDate(5, fugaReport.getSaleStartDateNew());
+                    pstmt.setString(6, fugaReport.getDsp());
+                    pstmt.setString(7, fugaReport.getProductLabel());
+                    pstmt.setString(8, String.valueOf(fugaReport.getProductUPC()));
+                    pstmt.addBatch();
+
+                    if (rowcount2 % 1000 == 0) {
+                        pstmt.executeBatch();
+                        pstmt.clearBatch();
+                        con.commit();
+
+                        double percentage = ((double) rowcount2 / totalRowCount) * 100;
+                        Platform.runLater(() -> {
+                            lblReportProgress.setText(df.format(percentage) + "%");
+                            lblUpdate.setText("Importing Report: " + df.format(percentage) + "%");
+                        });
+                    }
+                }
+                // Execute and commit any remaining batch
+                pstmt.executeBatch();
+                con.commit();
+                Platform.runLater(() -> {
+                    lblReportProgress.setText("100%");
+                    FadeTransition fadeOutFinal = new FadeTransition(Duration.millis(500), lblUpdate);
+                    fadeOutFinal.setFromValue(1.0);
+                    fadeOutFinal.setToValue(0.0);
+                    fadeOutFinal.setOnFinished(e -> {
+                        lblUpdate.setText(Main.userSession.getEmail());
+                        lblUpdate.setStyle("");
+                        FadeTransition fadeInFinal = new FadeTransition(Duration.millis(500), lblUpdate);
+                        fadeInFinal.setFromValue(0.0);
+                        fadeInFinal.setToValue(1.0);
+                        fadeInFinal.play();
+                    });
+                    fadeOutFinal.play();
+                });
+            }
+
+            Platform.runLater(() -> lblImport.setText("Report Imported. Please Check Missing ISRCs"));
+        } catch (IOException | SQLException | CsvValidationException e) {
+            Platform.runLater(() -> {
+                lblImport.setText("Error Importing CSV");
+                lblImport.setStyle("-fx-text-fill: red");
+                AlertBuilder.sendErrorAlert("Error", "Error Importing CSV", e.toString());
+                e.printStackTrace();
+            });
+        }
+
         return reportId;
+
     }
 
     public static int getMissingPayeeCount(int key) throws SQLException {
@@ -2064,7 +2210,7 @@ public class DatabasePostgres {
                 System.out.println("DatabasePostgres.getClaimArtwork");
                 return track;
             } catch (PSQLException e) {
-                if (e.getMessage().contains("An I/O error occurred")) {
+                if (e.getMessage().contains("An I/O error occurred") || e.getMessage().contains("This connection has been closed")) {
                     retryCount++;
                     if (retryCount >= maxRetries) {
                         throw e;
@@ -2840,7 +2986,7 @@ public class DatabasePostgres {
     public static List<CoWriterShare> getAssetBreakdown(String artist) throws SQLException {
         List<CoWriterShare> crLlist = new ArrayList<>();
         String sql = """
-                 SELECT ip.isrc,
+                SELECT ip.isrc,
                 rep.after_deduction_royalty,
                 s.song_name,
                 ip.payee,
@@ -2863,9 +3009,31 @@ public class DatabasePostgres {
                 WHERE (ip.payee = ?)
                 ORDER BY rep.after_deduction_royalty DESC;
                 """;
+        String sqlNew = """
+                SELECT R.ASSET_ISRC,
+                R.AFTER_DEDUCTION_ROYALTY,
+                S.SONG_NAME, IP.PAYEE, IP.SHARE,
+                CASE WHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) ELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) END AS contributor,
+                (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
+                (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist, S.TYPE
+                FROM PUBLIC.summary_bd_02 AS R
+                JOIN (SELECT ASSET_ISRC, MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
+                FROM PUBLIC.summary_bd_02
+                WHERE ASSET_ISRC IN (SELECT ISRC
+                FROM PUBLIC.ISRC_PAYEES
+                WHERE PAYEE01 = ?
+                OR PAYEE = ?
+                OR PAYEE02 = ?)
+                GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
+                LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
+                LEFT JOIN PUBLIC.isrc_payees ip ON ip.isrc = R.asset_isrc
+                ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
+                """;
         Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement(sql);
+        PreparedStatement ps = con.prepareStatement(sqlNew);
         ps.setString(1, artist);
+        ps.setString(2, artist);
+        ps.setString(3, artist);
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             CoWriterShare cr = new CoWriterShare();

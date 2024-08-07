@@ -32,7 +32,7 @@ public class Main extends Application {
     static List<Songs> songListNew = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion("v23.18.0");
+    public static ProductVersion versionInfo = new ProductVersion("v23.19.1");
     public static TrayIcon trayIcon;
 
     public static void main(String[] args) {

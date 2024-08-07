@@ -5,7 +5,6 @@ import com.example.song_finder_fx.Controller.GitHubController;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Model.ReleaseInfo;
 import com.example.song_finder_fx.Model.Revenue;
-import com.example.song_finder_fx.Model.Updates;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -45,8 +44,6 @@ public class InitPreloader implements Initializable {
     public static Label lblBuildNumberr;
 
     public static boolean starting;
-
-    public static String updateLocation;
 
     public static Revenue revenue = new Revenue();
 
@@ -158,6 +155,7 @@ public class InitPreloader implements Initializable {
                         MenuItem exit = new MenuItem("Exit Dashboard");
                         exit.addActionListener(event -> {
                             Platform.exit();
+                            System.exit(0);
                             tray.remove(trayIcon);
                         });
                         exit.setFont(defaultFont);
