@@ -37,6 +37,9 @@ import java.util.List;
 public class ControllerMCList {
 
     @FXML
+    public javafx.scene.control.Button btnArchive;
+
+    @FXML
     private Label lblClaimCount;
 
     @FXML
@@ -358,22 +361,41 @@ public class ControllerMCList {
 
     @FXML
     void onArchiveSelected() {
-        for (int i = 0; i < checkBoxes.size(); i++) {
-            if (checkBoxes.get(i).isSelected()) {
-                String songNo = labelsSongNo.get(i).getText();
-                try {
-                    DatabasePostgres.archiveSelectedClaim(songNo);
-                    hBoxes.get(i).setDisable(true);
-                } catch (SQLException e) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("An error occurred");
-                    alert.setContentText(String.valueOf(e));
-                    Platform.runLater(alert::showAndWait);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
 
-                    // e.printStackTrace();
+                Platform.runLater(() -> {
+                    btnArchive.setText("Archiving Claims");
+                    btnArchive.setDisable(true);
+                });
+
+                for (int i = 0; i < checkBoxes.size(); i++) {
+                    if (checkBoxes.get(i).isSelected()) {
+                        String songNo = labelsSongNo.get(i).getText();
+                        try {
+                            DatabasePostgres.archiveSelectedClaim(songNo);
+                            int finalI = i;
+                            Platform.runLater(() -> hBoxes.get(finalI).setDisable(true));
+                        } catch (SQLException e) {
+                            Platform.runLater(() -> {
+                                AlertBuilder.sendErrorAlert("Error", "An Error Occurred While Archiving Claim", e.toString());
+                                e.printStackTrace();
+                            });
+                        }
+                    }
                 }
+
+                Platform.runLater(() -> {
+                    btnArchive.setText("Archive Selected");
+                    btnArchive.setDisable(false);
+                });
+
+                return null;
             }
-        }
+        };
+
+        Thread thread = new Thread(task);
+        thread.start();
     }
 }

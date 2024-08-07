@@ -3,6 +3,7 @@ package com.example.song_finder_fx.Model;
 import com.example.song_finder_fx.Controller.GitHubController;
 import javafx.concurrent.Task;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class ProductVersion {
         return false;
     }
 
-    public File getUpdate(Button button, Task<File> task) throws IOException {
+    public File getUpdate(Button button, Label label, Task<File> task) throws IOException {
         // Old code
         /*Path tempDir = Files.createTempDirectory("CeyMusic_Dashboard_UpdateTemp");
         // InputStream in = new URI(location).toURL().openStream();
@@ -73,7 +74,7 @@ public class ProductVersion {
         System.out.println("Temporary Update Directory: " + tempFile.toString());
 
         String assetName = "build1.msi";
-        return controller.downloadUpdate(assetName, tempFile.toString(), button, task);
+        return controller.downloadUpdate(assetName, tempFile.toString(), button, label, task);
     }
 
     public String getUpdateVersionInfo() {

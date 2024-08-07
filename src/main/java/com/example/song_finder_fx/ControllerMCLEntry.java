@@ -1,6 +1,10 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.SceneController;
+import com.example.song_finder_fx.Model.ManualClaimTrack;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -11,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -48,25 +53,51 @@ public class ControllerMCLEntry {
         sideVBox.getChildren().clear();
         sideVBox.getChildren().add(layoutNode);
 
-        Label lblClaimID = SceneController.getLabelFromScene(scene, "lblClaimID");
-        Label lblTrackName = SceneController.getLabelFromScene(scene, "lblTrackName");
-        Label lblLink = SceneController.getLabelFromScene(scene, "lblLink");
-        TextField txtSongName = SceneController.getTextFieldFromScene(scene, "txtSongName");
-        TextField txtComposer = SceneController.getTextFieldFromScene(scene, "txtComposer");
-        TextField txtLyricist = SceneController.getTextFieldFromScene(scene, "txtLyricist");
-        ImageView imgPreview = (ImageView) scene.lookup("#imgPreview");
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Label lblClaimID = SceneController.getLabelFromScene(scene, "lblClaimID");
+                Label lblTrackName = SceneController.getLabelFromScene(scene, "lblTrackName");
+                Label lblLink = SceneController.getLabelFromScene(scene, "lblLink");
+                ImageView imgPreview = (ImageView) scene.lookup("#imgPreview");
+                TextField txtSongName = SceneController.getTextFieldFromScene(scene, "txtSongName");
+                TextField txtComposer = SceneController.getTextFieldFromScene(scene, "txtComposer");
+                TextField txtLyricist = SceneController.getTextFieldFromScene(scene, "txtLyricist");
+                TextField txtStartTime = SceneController.getTextFieldFromScene(scene, "txtStartTime");
+                TextField txtEndTime = SceneController.getTextFieldFromScene(scene, "txtEndTime");
 
-        int claimID = Integer.parseInt(lblSongNo.getText());
-        String youtubeID = DatabasePostgres.getClaimYouTubeID(claimID);
-        String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
+                int claimID = Integer.parseInt(lblSongNo.getText());
+                ManualClaimTrack track = DatabasePostgres.getManualClaim(claimID);
+                String youtubeID = track.getYoutubeID();
+                String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
 
-        imgPreview.setImage(image.getImage());
-        lblClaimID.setText(lblSongNo.getText());
-        lblTrackName.setText(lblSongName.getText());
-        txtSongName.setText(lblSongName.getText());
-        txtComposer.setText(lblComposer.getText());
-        txtLyricist.setText(lblLyricist.getText());
-        lblLink.setText(thumbnailURL);
+                Platform.runLater(() -> {
+                    imgPreview.setImage(image.getImage());
+                    lblClaimID.setText(lblSongNo.getText());
+                    lblTrackName.setText(lblSongName.getText());
+                    txtSongName.setText(lblSongName.getText());
+                    txtComposer.setText(lblComposer.getText());
+                    txtLyricist.setText(lblLyricist.getText());
+                    lblLink.setText(thumbnailURL);
+
+                    System.out.println("Trim Start: " + track.getTrimStart());
+                    System.out.println("Trim End: " + track.getTrimEnd());
+
+                    txtStartTime.setText(track.getTrimStart());
+                    txtEndTime.setText(track.getTrimEnd());
+                });
+
+                return null;
+            }
+        };
+
+        task.setOnFailed(e -> {
+            Throwable exception = task.getException();
+            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Loading Claim", exception.toString()));
+        });
+
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @FXML

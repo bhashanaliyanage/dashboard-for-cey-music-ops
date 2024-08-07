@@ -66,44 +66,44 @@ public class ControllerAddReport {
         comboMonth.getItems().addAll(months);
     }
 
-    @FXML
-    void onLoadReport(ActionEvent event) {
-        boolean ifAnyNull = checkData();
+@FXML
+void onLoadReport(ActionEvent event) {
+    boolean ifAnyNull = checkData();
 
-        if (!ifAnyNull) {
-            int month = comboMonth.getSelectionModel().getSelectedIndex();
-            int year = Integer.parseInt(txtYear.getText());
-            final String[] reportName = new String[1];
+    if (!ifAnyNull) {
+        int month = comboMonth.getSelectionModel().getSelectedIndex();
+        int year = Integer.parseInt(txtYear.getText());
+        final String[] reportName = new String[1];
 
-            // Getting report name
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Report Name");
-            dialog.setHeaderText("Enter a name for report");
-            dialog.setContentText("Name: ");
-            dialog.showAndWait().ifPresent(name -> reportName[0] = name);
-            // Setting report name if not exists
-            if (reportName[0] != null) {
-                if (reportName[0].isEmpty()) {
-                    reportName[0] = ItemSwitcher.setMonth(month + 1).toLowerCase() + "_" + year;
-                }
+        // Getting report name
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Report Name");
+        dialog.setHeaderText("Enter a name for report");
+        dialog.setContentText("Name: ");
+        dialog.showAndWait().ifPresent(name -> reportName[0] = name);
+        // Setting report name if not exists
+        if (reportName[0] != null) {
+            if (reportName[0].isEmpty()) {
+                reportName[0] = ItemSwitcher.setMonth(month + 1).toLowerCase() + "_" + year;
             }
-
-            // Getting report location
-            Scene scene = SceneController.getSceneFromEvent(event);
-            File file = Main.browseForCSV(SceneController.getWindowFromScene(scene));
-
-            if (file != null) {
-                System.out.println("Report Month Chooser Index: " + month);
-                System.out.println("Report Name: " + reportName[0]);
-
-                ReportMetadata report = new ReportMetadata(reportName[0], month + 1, year, file);
-
-                Thread thread = getThread(report);
-                thread.start();
-            }
-
         }
+
+        // Getting report location
+        Scene scene = SceneController.getSceneFromEvent(event);
+        File file = Main.browseForCSV(SceneController.getWindowFromScene(scene));
+
+        if (file != null) {
+            System.out.println("Report Month Chooser Index: " + month);
+            System.out.println("Report Name: " + reportName[0]);
+
+            ReportMetadata report = new ReportMetadata(reportName[0], month + 1, year, file);
+
+            Thread thread = getThread(report);
+            thread.start();
+        }
+
     }
+}
 
     private @NotNull Thread getThread(ReportMetadata report) {
         Task<Void> task;

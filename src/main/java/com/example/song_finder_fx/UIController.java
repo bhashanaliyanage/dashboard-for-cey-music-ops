@@ -301,7 +301,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar.fxml")));
         // NavBar Collapsed
         mainNodes[5] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar-small.fxml")));
-        // Edit
+        // Updates
+        // mainNodes[6] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/sidepanel-update.fxml")));
     }
 
     public void backButtonImplementationForSearchSong(MouseEvent event) {

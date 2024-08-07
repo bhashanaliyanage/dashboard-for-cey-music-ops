@@ -23,10 +23,10 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        // DatabasePostgres.refreshSummaryTable(4, 2024);
+        // DatabasePostgres.refreshSummaryTable(6, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
-        // testArtistReportPDF(0.6305, 186.78, "Ajantha Ranasinghe", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\Ajantha Ranasinghe Edit.pdf");
+        testArtistReportPDF(0.6305, 184.65, "Sarath De Alwis", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_sarath_de_alwis_02.pdf");
         // testArtistReportsNew();
 
         // testDashboard();
@@ -42,14 +42,14 @@ public class Test {
         // GoogleDriveDownloader googleDriveDownloader = new GoogleDriveDownloader("14wg8K3fqpov_zWTw3cOPhed__gB82njN", "C:\\Users\\bhash\\Documents\\Test.msi");
         // googleDriveDownloader.downloadUpdate();
 
-        String owner = "bhashanaliyanage";
+        /*String owner = "bhashanaliyanage";
         String repo = "dashboard-for-cey-music-ops";
         GitHubController controller = new GitHubController(owner, repo);
 
         // Check Update
         ReleaseInfo latestVersion = controller.getLatestVersion();
         System.out.println("Release Info: " + latestVersion.releaseNotes);
-        System.out.println("Version: " + latestVersion.version);
+        System.out.println("Version: " + latestVersion.version);*/
 
         // Download Update
         /*String assetName = "build1.msi";
@@ -105,7 +105,7 @@ public class Test {
         int month = 4;
         int year = 2024;
         double eurToAudRate = 0.6305;
-        double audToLkrRate = 186.78;
+        double audToLkrRate = 184.65;
 
         ArrayList<String> names = new ArrayList<>(Arrays.asList(
                 "Ajantha Ranasinghe",
@@ -178,7 +178,7 @@ public class Test {
         ));
 
         // Refreshing Tables
-        DatabasePostgres.refreshSummaryTable(month, year);
+        // DatabasePostgres.refreshSummaryTable(month, year);
 
         List<String> payees = DatabasePostgres.getPayees(month, year);
 

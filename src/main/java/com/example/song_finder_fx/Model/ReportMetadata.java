@@ -38,14 +38,6 @@ public class ReportMetadata {
         this.id = id;
     }
 
-    /*public String getReportName() {
-        return reportName;
-    }*/
-
-    /*public void setReportName(String reportName) {
-        this.reportName = reportName;
-    }*/
-
     public int getReportMonth() {
         return reportMonth;
     }

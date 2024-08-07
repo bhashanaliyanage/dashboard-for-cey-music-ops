@@ -5,15 +5,14 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class ManualClaimTrack {
     private final int id;
-    private final String trackName;
-    private final String lyricist;
-    private final String composer;
+    private String trackName;
+    private String lyricist;
+    private String composer;
     private final String youtubeID;
     private final LocalDate date;
     private boolean status = false;
@@ -101,10 +100,6 @@ public class ManualClaimTrack {
         return image;
     }
 
-    public BufferedImage getBufferedPreviewImage() {
-        return previewImage;
-    }
-
     public LocalDate getDate() {
         return date;
     }
@@ -123,7 +118,26 @@ public class ManualClaimTrack {
     }
 
     public int unArchive() throws SQLException {
-        int status = DatabasePostgres.unArchiveManualClaim(id);
-        return status;
+        return DatabasePostgres.unArchiveManualClaim(id);
+    }
+
+    public void setTrimStart(String trimStart) {
+        this.trimStart = trimStart;
+    }
+
+    public void setTrimEnd(String trimEnd) {
+        this.trimEnd = trimEnd;
+    }
+
+    public void setTrackName(String trackName) {
+        this.trackName = trackName;
+    }
+
+    public void setComposer(String composer) {
+        this.composer = composer;
+    }
+
+    public void setLyricist(String lyricist) {
+        this.lyricist = lyricist;
     }
 }
