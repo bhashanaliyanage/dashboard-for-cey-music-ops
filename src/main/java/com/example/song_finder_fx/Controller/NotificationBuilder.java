@@ -1,33 +1,29 @@
 package com.example.song_finder_fx.Controller;
 
-import javax.swing.*;
+import com.example.song_finder_fx.Main;
+import javafx.application.Platform;
+
 import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 
 public class NotificationBuilder {
-    public static void displayTrayInfo(String caption, String message) throws AWTException {
-        SystemTray tray = SystemTray.getSystemTray();
-
-        Image image = new ImageIcon("com/example/song_finder_fx/icons/icon.png").getImage();
-
-        TrayIcon trayIcon = new TrayIcon(image, "CeyMusic Toolkit");
-        trayIcon.setImageAutoSize(true);
-        trayIcon.setToolTip("CeyMusic Toolkit");
-        tray.add(trayIcon);
-
-        trayIcon.displayMessage(caption, message, MessageType.INFO);
+    public static void displayTrayInfo(String caption, String message) {
+        Platform.runLater(() -> {
+            try {
+                Main.trayIcon.displayMessage(caption, message, MessageType.INFO);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    public static void displayTrayError(String caption, String message) throws AWTException {
-        SystemTray tray = SystemTray.getSystemTray();
-
-        Image image = new ImageIcon("com/example/song_finder_fx/icons/icon.png").getImage();
-
-        TrayIcon trayIcon = new TrayIcon(image, "CeyMusic Toolkit");
-        trayIcon.setImageAutoSize(true);
-        trayIcon.setToolTip("CeyMusic Toolkit");
-        tray.add(trayIcon);
-
-        trayIcon.displayMessage(caption, message, MessageType.ERROR);
+    public static void displayTrayError(String caption, String message) {
+        Platform.runLater(() -> {
+            try {
+                Main.trayIcon.displayMessage(caption, message, MessageType.ERROR);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

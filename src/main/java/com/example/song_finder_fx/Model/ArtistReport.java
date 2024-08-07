@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArtistReport {
+    private double audToLkrRate = 0;
+    private int year = 0;
+    private int monthInt = 0;
     private Artist artist = null;
-    private double conversionRate = 0;
-    private String month = "";
+    private double eurToAudRate = 0;
     private final ArrayList<String> coWriters = new ArrayList<>();
     private final ArrayList<String> coWriterShare = new ArrayList<>();
     private Double grossRevenue;
@@ -16,17 +18,41 @@ public class ArtistReport {
     private List<CoWriterShare> coWritterList;
     private List<CoWriterSummary> coWriterPaymentSummary;
 
-    public List<CoWriterShare> getCoWritterList() {
+    public ArtistReport(Artist artist, double eurToAudRate, double audToLkrRate, int year, int month) {
+        System.out.println("Creating Artist Report for " + artist.getName());
+        System.out.println("Year: " + year);
+        System.out.println("Month: " + getMonth(month));
+
+        this.artist = artist;
+        this.eurToAudRate = eurToAudRate;
+        this.audToLkrRate = audToLkrRate;
+        this.year = year;
+        this.monthInt = month;
+    }
+
+    private String getMonth(int month) {
+        try {
+            String[] monthNames = new String[]{
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+            };
+            return monthNames[month - 1];
+        } catch (NumberFormatException e) {
+            return "Unspecified";
+        }
+    }
+
+    public List<CoWriterShare> getAssetBreakdown() {
         return coWritterList;
     }
 
-    public void setCoWritterList(List<CoWriterShare> coWritterList) {
+    public void setAssetBreakdown(List<CoWriterShare> coWritterList) {
         this.coWritterList = coWritterList;
     }
 
-    public ArtistReport(Artist artist, double conversionRate) {
+    public ArtistReport(Artist artist, double eurToAudRate) {
         this.artist = artist;
-        this.conversionRate = conversionRate;
+        this.eurToAudRate = eurToAudRate;
     }
 
     public ArtistReport() {
@@ -42,11 +68,11 @@ public class ArtistReport {
     }*/
 
     public double getGrossRevenueInLKR() {
-        return grossRevenue * conversionRate;
+        return grossRevenue / eurToAudRate * audToLkrRate;
     }
 
     public double getPartnerShareInLKR() {
-        return partnerShare * conversionRate;
+        return partnerShare / eurToAudRate * audToLkrRate;
     }
 
     public String getPayee() {
@@ -54,12 +80,16 @@ public class ArtistReport {
     }
 
     public String getMonth() {
-        int monthInt = Integer.parseInt(month);
-        String[] monthNames = new String[] {
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-        };
-        return monthNames[monthInt];
+        try {
+            // int monthInt = Integer.parseInt(month);
+            String[] monthNames = new String[]{
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+            };
+            return monthNames[monthInt - 1];
+        } catch (NumberFormatException e) {
+            return "Unspecified";
+        }
     }
 
     public ArrayList<String> getCoWriters() {
@@ -78,8 +108,8 @@ public class ArtistReport {
         this.artist = artist;
     }
 
-    public double getConversionRate() {
-        return conversionRate;
+    public double getEurToAudRate() {
+        return eurToAudRate;
     }
 
     public void setGrossRevenue(Double grossRevenue) {
@@ -114,7 +144,9 @@ public class ArtistReport {
     }
 
     public void setMonth(String month) {
-        this.month = month;
+        System.out.println("ArtistReport.setMonth");
+        System.out.println("month = " + month);
+        System.out.println("Artist Name: " + artist.getName());
     }
 
     public void setPayee(String payee) {
@@ -126,5 +158,25 @@ public class ArtistReport {
 
     public List<CoWriterSummary> getCoWriterPaymentSummary() {
         return coWriterPaymentSummary;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public int getMonthInt() {
+        return monthInt;
+    }
+
+    public double getAudToLkrRate() {
+        return audToLkrRate;
+    }
+
+    public double getGrossRevenueInAUD() {
+        return grossRevenue / eurToAudRate;
+    }
+
+    public double getPartnerShareInAUD() {
+        return partnerShare / eurToAudRate;
     }
 }

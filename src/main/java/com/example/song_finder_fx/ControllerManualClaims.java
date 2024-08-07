@@ -1,6 +1,5 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.ImageProcessor;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -21,9 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -38,11 +35,17 @@ public class ControllerManualClaims {
     @FXML
     public VBox vboxTracks;
 
+    public static VBox vboxTracksStatic;
+
     @FXML
     private TextField txtURL;
 
+    public static TextField txtURL_Static;
+
     @FXML
     private ComboBox<String> comboClaimType;
+
+    public static ComboBox<String> comboClaimTypeStatic;
 
     @FXML
     private Button btnAddClaim;
@@ -50,6 +53,10 @@ public class ControllerManualClaims {
     @FXML
     public void initialize() {
         comboClaimType.getItems().addAll("Unspecified", "TV Programs", "Manual Claim", "Single SR");
+
+        txtURL_Static = txtURL;
+        comboClaimTypeStatic = comboClaimType;
+        vboxTracksStatic = vboxTracks;
     }
 
     @FXML
@@ -100,7 +107,8 @@ public class ControllerManualClaims {
             comboClaimType.requestFocus();
 
             Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
-            vboxTracks.getChildren().setAll(node);
+            vboxTracks.getChildren().clear();
+            vboxTracks.getChildren().add(node);
 
             manualClaims.clear();
         } else {
@@ -117,18 +125,16 @@ public class ControllerManualClaims {
                         String songName = claim.getTrackName();
 
                         // Fetching Thumbnail
-                        Platform.runLater(() -> {
-                            btnAddClaim.setText("Fetching Artwork For: " + songName);
-                        });
-                        String youtubeID = claim.getYoutubeID();
-                        String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
-                        BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
-                        image = ImageProcessor.cropImage(image);
+                        // Platform.runLater(() -> btnAddClaim.setText("Fetching Artwork For: " + songName));
+                        // String youtubeID = claim.getYoutubeID();
+                        // String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
+                        // BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
+                        // image = ImageProcessor.cropImage(image);
 
                         // Setting Thumbnail and Preview Images to the model
-                        claim.setPreviewImage(image);
-                        image = ImageProcessor.resizeImage(1400, 1400, image);
-                        claim.setImage(image);
+                        // claim.setPreviewImage(image);
+                        // image = ImageProcessor.resizeImage(1400, 1400, image);
+                        // claim.setImage(image);
 
                         int status = DatabasePostgres.addManualClaim(claim);
 
@@ -139,23 +145,17 @@ public class ControllerManualClaims {
                                 } else {
                                     NotificationBuilder.displayTrayInfo("Manual Claim Added", "Your Claim for " + songName + " is successfully added");
                                     Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
-                                    vboxTracks.getChildren().setAll(node);
+                                    vboxTracks.getChildren().clear();
+                                    vboxTracks.getChildren().add(node);
                                 }
-                            } catch (AWTException | IOException e) {
+                            } catch (IOException e) {
                                 Platform.runLater(() -> {
                                     throw new RuntimeException(e);
                                 });
                             }
                         });
-                    } catch (URISyntaxException e) {
-                        Platform.runLater(() -> {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Error");
-                            alert.setHeaderText("Error Downloading Artwork");
-                            alert.setContentText(e.toString());
-                            alert.showAndWait();
-                        });
                     } catch (IOException | SQLException e) {
+                        e.printStackTrace();
                         Platform.runLater(() -> {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Error");

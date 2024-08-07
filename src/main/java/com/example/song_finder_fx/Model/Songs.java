@@ -1,6 +1,6 @@
 package com.example.song_finder_fx.Model;
 
-import com.example.song_finder_fx.DatabaseMySQL;
+import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Main;
 
 import java.sql.ResultSet;
@@ -21,6 +21,7 @@ public class Songs {
 
     private String fileName;
     private double royalty;
+    private String type;
 
     public String getFeaturingArtist() {
         return featuringArtist;
@@ -64,11 +65,12 @@ public class Songs {
         this.lyricist = lyricist;
     }
 
-    public Songs(String isrc, String song_name) {
+    public Songs(String isrc, String trackTitle) {
         this.isrc = isrc;
+        this.trackTitle = trackTitle;
     }
 
-    public void setIsrc(String isrc) {
+    public void setISRC(String isrc) {
         this.isrc = isrc;
     }
 
@@ -105,21 +107,33 @@ public class Songs {
     }
 
     public boolean composerAndLyricistCeyMusic() throws SQLException, ClassNotFoundException {
-        boolean composerCeyMusic = DatabaseMySQL.searchArtistTable(composer);
-        boolean lyricistCeyMusic = DatabaseMySQL.searchArtistTable(lyricist);
+        System.out.println("\nSongs.composerAndLyricistCeyMusic");
 
+        boolean composerCeyMusic = DatabasePostgres.searchArtistTable(composer);
+        // System.out.println("Composer CeyMusic: " + composerCeyMusic);
+
+        boolean lyricistCeyMusic = DatabasePostgres.searchArtistTable(lyricist);
+        // System.out.println("Lyricist CeyMusic: " + lyricistCeyMusic);
+
+        System.out.println("Composer and Lyricist CeyMusic: " + (composerCeyMusic && lyricistCeyMusic));
         return composerCeyMusic && lyricistCeyMusic;
     }
 
     public boolean composerOrLyricistCeyMusic() throws SQLException, ClassNotFoundException {
-        boolean composerCeyMusic = DatabaseMySQL.searchArtistTable(composer);
-        boolean lyricistCeyMusic = DatabaseMySQL.searchArtistTable(lyricist);
+        System.out.println("\nSongs.composerOrLyricistCeyMusic");
 
+        boolean composerCeyMusic = DatabasePostgres.searchArtistTable(composer);
+        // System.out.println("Composer CeyMusic: " + composerCeyMusic);
+
+        boolean lyricistCeyMusic = DatabasePostgres.searchArtistTable(lyricist);
+        // System.out.println("Lyricist CeyMusic: " + lyricistCeyMusic);
+
+        System.out.println("Composer or Lyricist CeyMusic: " + (composerCeyMusic || lyricistCeyMusic));
         return composerCeyMusic || lyricistCeyMusic;
     }
 
     public boolean composerCeyMusic() throws SQLException, ClassNotFoundException {
-        return DatabaseMySQL.searchArtistTable(composer);
+        return DatabasePostgres.searchArtistTable(composer);
     }
 
     public String getProductName() {
@@ -147,11 +161,12 @@ public class Songs {
     }
 
     public String getCopyrightOwner() {
-        return copyrightOwner;
+        return Objects.requireNonNullElse(copyrightOwner, "");
     }
 
     public boolean isOriginal() {
-        return !Objects.equals(singer, "");
+        return Objects.equals(type, "O");
+        // return !Objects.equals(singer, "");
     }
 
     public boolean isInList() {
@@ -159,8 +174,8 @@ public class Songs {
         String targetIsrc = isrc.trim().replaceAll("\\p{C}", "");
 
 
-        for (String isrc2 : Main.getSongList()) {
-            String trimmedSong = isrc2.trim().replaceAll("\\p{C}", "");
+        for (Songs song : Main.getSongList()) {
+            String trimmedSong = song.getISRC().trim().replaceAll("\\p{C}", "");
 
             if (trimmedSong.equalsIgnoreCase(targetIsrc)) {
                 isIsrcPresent = true;
@@ -205,6 +220,29 @@ public class Songs {
         return fileName;
     }
 
-    public void setSong_name(String song_name) {
+    public String getTypeConverted() {
+        switch (type) {
+            case "O" -> {
+                return "Sound Registration";
+            }
+            case "C" -> {
+                return "UGC";
+            }
+            case null, default -> {
+                return "Unspecified";
+            }
+        }
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String string) {
+        this.type = string;
+    }
+
+    public void setProductTitle(String string) {
+        this.productTitle = string;
     }
 }

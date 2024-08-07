@@ -9,7 +9,10 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -38,28 +41,113 @@
          <Image url="@../images/loading.gif" />
       </ImageView>
    </HBox>
-   <HBox alignment="CENTER_LEFT" prefWidth="200.0">
+   <GridPane vgap="10.0">
+      <columnConstraints>
+         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints/>
+         <RowConstraints vgrow="SOMETIMES"/>
+      </rowConstraints>
       <VBox.margin>
-         <Insets left="30.0" right="30.0" top="30.0" />
+         <Insets left="30.0" right="30.0" top="30.0"/>
       </VBox.margin>
-      <ComboBox fx:id="comboPayees" minHeight="30.0" onKeyReleased="#OnComboPayeeKeyPress" prefWidth="383.0" promptText="Select Artist" style="-fx-background-color: #FFFFFF;" HBox.hgrow="ALWAYS" />
-      <Label text="EUR to LKR rate">
-         <HBox.margin>
-            <Insets left="10.0" />
-         </HBox.margin>
-      </Label>
-      <TextField fx:id="txtRate" prefHeight="30.0" prefWidth="85.0" promptText="LKR" styleClass="textarea-bg">
-         <HBox.margin>
-            <Insets left="10.0" />
-         </HBox.margin>
-      </TextField>
-      <Button minHeight="30.0" minWidth="110.0" mnemonicParsing="false" onAction="#onLoadReportBtnClick" styleClass="button_inside_brown" text="Load Report">
-         <HBox.margin>
-            <Insets left="10.0" />
-         </HBox.margin>
-      </Button>
+      <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="222.0">
+         <Label disable="true" prefWidth="83.0" text="Month">
+            <HBox.margin>
+               <Insets/>
+            </HBox.margin>
+         </Label>
+         <ComboBox fx:id="comboMonth" disable="true" minHeight="30.0" onKeyReleased="#OnComboPayeeKeyPress"
+                   prefWidth="289.0" promptText="Select Month" style="-fx-background-color: #FFFFFF;"
+                   HBox.hgrow="ALWAYS">
+            <HBox.margin>
+               <Insets left="10.0"/>
+            </HBox.margin>
+         </ComboBox>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1">
+         <children>
+            <Label disable="true" prefWidth="25.0" text="Year">
+               <HBox.margin>
+                  <Insets left="10.0"/>
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="txtYear" prefHeight="30.0" promptText="Year" styleClass="textarea-bg" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="10.0"/>
+               </HBox.margin>
+            </TextField>
+         </children>
+      </HBox>
+   </GridPane>
+   <HBox alignment="CENTER_RIGHT" prefWidth="200.0">
+      <children>
+         <Button disable="true" minHeight="30.0" mnemonicParsing="false" onAction="#onLoadReportBtnClick" prefHeight="30.0" prefWidth="171.0" styleClass="button_inside" text="Load Available Payees" HBox.hgrow="ALWAYS">
+            <HBox.margin>
+               <Insets />
+            </HBox.margin>
+         </Button>
+      </children>
+      <VBox.margin>
+         <Insets left="30.0" right="30.0" />
+      </VBox.margin>
    </HBox>
-   <HBox alignment="CENTER" layoutX="40.0" layoutY="110.0" prefHeight="70.0" prefWidth="200.0" spacing="130.0">
+   <GridPane layoutX="40.0" layoutY="110.0" vgap="10.0">
+      <columnConstraints>
+         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints vgrow="SOMETIMES" />
+      </rowConstraints>
+      <children>
+         <HBox alignment="CENTER_LEFT">
+            <children>
+               <Label disable="true" text="EUR to LKR rate">
+                  <HBox.margin>
+                     <Insets />
+                  </HBox.margin>
+               </Label>
+               <TextField fx:id="txtRate" prefHeight="30.0" promptText="LKR" styleClass="textarea-bg" HBox.hgrow="ALWAYS">
+                  <HBox.margin>
+                     <Insets left="10.0" />
+                  </HBox.margin>
+               </TextField>
+            </children>
+         </HBox>
+         <HBox alignment="CENTER_LEFT" prefWidth="345.0" GridPane.columnIndex="1">
+            <Label disable="true" text="Artist">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <ComboBox fx:id="comboPayees" disable="true" minHeight="30.0" onKeyReleased="#OnComboPayeeKeyPress" prefHeight="30.0" prefWidth="296.0" promptText="Select Artist" style="-fx-background-color: #FFFFFF;" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </ComboBox>
+         </HBox>
+      </children>
+      <VBox.margin>
+         <Insets left="30.0" right="30.0" top="10.0" />
+      </VBox.margin>
+   </GridPane>
+   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="187.0" prefWidth="200.0">
+      <children>
+         <Button disable="true" minHeight="30.0" mnemonicParsing="false" onAction="#onLoadReportBtnClick" prefHeight="30.0" prefWidth="704.0" styleClass="button_inside_brown" text="Load Report" HBox.hgrow="ALWAYS">
+            <HBox.margin>
+               <Insets />
+            </HBox.margin>
+         </Button>
+      </children>
+      <VBox.margin>
+         <Insets left="30.0" right="30.0" top="10.0" />
+      </VBox.margin>
+   </HBox>
+   <HBox alignment="CENTER" disable="true" layoutX="40.0" layoutY="110.0" prefHeight="70.0" prefWidth="200.0" spacing="130.0">
       <VBox.margin>
          <Insets left="30.0" right="30.0" top="30.0" />
       </VBox.margin>
@@ -229,7 +317,7 @@
             </VBox.margin>
          </HBox>
       </VBox>
-      <VBox fx:id="vboxTopStreams1" layoutX="185.0" layoutY="10.0" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
+      <VBox fx:id="vboxTopStreams1" disable="true" layoutX="185.0" layoutY="10.0" maxWidth="400.0" prefHeight="222.0" styleClass="clickable-pane-bg" stylesheets="@../styles.css">
          <children>
             <Group>
                <VBox.margin>
@@ -377,9 +465,9 @@
          </children>
       </VBox>
    </HBox>
-   <Button fx:id="btnGetPDFReport" minHeight="30.0" minWidth="690.0" mnemonicParsing="false" onMouseClicked="#onGetReportBtnClick" styleClass="button_inside_brown" text="Get PDF Report">
+   <Button fx:id="btnGetPDFReport" disable="true" minHeight="30.0" minWidth="690.0" mnemonicParsing="false" onMouseClicked="#onGetReportBtnClick" styleClass="button_inside_brown" text="Get PDF Report">
       <VBox.margin>
-         <Insets left="30.0" right="30.0" top="20.0" />
+         <Insets bottom="30.0" left="30.0" right="30.0" top="20.0" />
       </VBox.margin>
    </Button>
 </VBox>

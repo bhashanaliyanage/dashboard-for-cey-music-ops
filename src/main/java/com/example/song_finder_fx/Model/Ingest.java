@@ -14,17 +14,23 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class Ingest {
+
     private int ingestID;
-    private Date ingestDate;
-    private String createdUser;
-    private int songCount;
+    private String name;
+    private Date importedDate;
+    private String importedUser;
+    private int assetCount;
+
+    private List<IngestCSVData> ingestCSVDataList;
+
     private File csv;
     private int upcCount;
+
     private File destination;
     private String[] upcArray;
+
     private String productTitle;
     private String primaryArtist;
     private int upc;
@@ -40,50 +46,40 @@ public class Ingest {
     public Ingest() {
     }
 
+    public int getIngestID() {
+        return ingestID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Date getImportedDate() {
+        return importedDate;
+    }
+
+    public String getImportedUser() {
+        return importedUser;
+    }
+
+    public int getAssetCount() {
+        return assetCount;
+    }
+
+    public List<IngestCSVData> getIngestCSVDataList() {
+        return ingestCSVDataList;
+    }
+
+    public void setIngestCSVDataList(List<IngestCSVData> ingestCSVDataList) {
+        this.ingestCSVDataList = ingestCSVDataList;
+    }
+
     public void setCSV(File csv) {
         this.csv = csv;
     }
 
-    public boolean validate() throws IOException, CsvValidationException {
-        CSVReader csvReader = new CSVReader(new FileReader(csv.getAbsolutePath()));
-        String[] header = csvReader.readNext();
-
-        String col01 = header[0].trim().replaceAll("\\p{C}", "");
-        String col02 = header[1].trim().replaceAll("\\p{C}", "");
-        String col03 = header[2].trim().replaceAll("\\p{C}", "");
-        String col04 = header[3].trim().replaceAll("\\p{C}", "");
-        String col05 = header[4].trim().replaceAll("\\p{C}", "");
-
-        String Title = "Title".trim().replaceAll("\\p{C}", "");
-        String File_Name = "File Name".trim().replaceAll("\\p{C}", "");
-        String Singer = "Singer".trim().replaceAll("\\p{C}", "");
-        String Lyrics = "Lyrics".trim().replaceAll("\\p{C}", "");
-        String Composer = "Composer".trim().replaceAll("\\p{C}", "");
-
-        return Objects.equals(col01, Title) && Objects.equals(col02, File_Name) && Objects.equals(col03, Singer) && Objects.equals(col04, Lyrics) && Objects.equals(col05, Composer);
-    }
-
-    public String[] getUPCArray() throws IOException, CsvValidationException {
-        CSVReader csvReader = new CSVReader(new FileReader(csv.getAbsolutePath()));
-        csvReader.readNext(); // Skip Header
-        int rowCount = 0;
-        String[] upc;
-
-        while (csvReader.readNext() != null) {
-            rowCount++;
-        }
-
-        upc = new String[rowCount];
-
-        return upc;
-    }
-
     public void setUPCCount(int upcCount) {
         this.upcCount = upcCount;
-    }
-
-    public int getUPCCount() {
-        return upcCount;
     }
 
     public boolean isCSV() {
@@ -239,16 +235,8 @@ public class Ingest {
         return songList;
     }
 
-    public void setUPCArray(String[] upcArray) {
-        this.upcArray = upcArray;
-    }
-
     public void setProductTitle(String productTitle) {
         this.productTitle = productTitle;
-    }
-
-    public void setPrimaryArtist(String primaryArtist) {
-        this.primaryArtist = primaryArtist;
     }
 
     public void setProductUPC(String upc) {
@@ -292,14 +280,22 @@ public class Ingest {
     }
 
     public void setUser(String user) {
-        this.createdUser = user;
+        this.importedUser = user;
     }
 
     public void setDate(java.sql.Date ingestDate) {
-        this.ingestDate = ingestDate;
+        this.importedDate = ingestDate;
     }
 
     public void setID(int ingestID) {
         this.ingestID = ingestID;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAssetCount(int assetCount) {
+        this.assetCount = assetCount;
     }
 }

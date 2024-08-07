@@ -13,32 +13,27 @@ import java.util.List;
 public record RevenueReportController(ArtistReport report) {
 
     public ArtistReport calculateRevenue() throws SQLException {
-        // Getting artist name
-        ArtistController artistController = new ArtistController(report.getArtist());
-        String artistName = artistController.fetchArtistName();
-        report.getArtist().setName(artistName);
+        // Refreshing Tables
+        // DatabasePostgres.refreshSummaryTable(report.getMonthInt(), report.getYear());
 
         // Getting gross revenue and partner share
-        RevenueReport grossNPartnerShare = DatabasePostgres.getPayeeGrossRev1(artistName);
+        System.out.println("Getting gross revenue and partner share");
+        RevenueReport grossNPartnerShare = DatabasePostgres.getPayeeGrossRevNew(report);
         Double grossRevenue = grossNPartnerShare.getReportedRoyalty();
         Double partnerShare = grossNPartnerShare.getAfterDeductionRoyalty();
         report.setGrossRevenue(grossRevenue);
         report.setPartnerShare(partnerShare);
 
         // Getting top 5 most performing songs
-        // TODO: 4/16/2024 Make this query gets data from ReportViewSummary1 view
-        ArrayList<Songs> topP_Songs = DatabasePostgres.getTopPerformingSongs(artistName); // This object only contains ISRC and Revenue for now. Need to get Song Name
+        System.out.println("Getting top performing songs");
+        ArrayList<Songs> topP_Songs = DatabasePostgres.getTopPerformingSongs(report.getArtist().getName()); // This object only contains ISRC and Revenue for now. Need to get Song Name
         report.setTopPerformingSongs(topP_Songs);
 
-        // Getting report month
-        String dateString = DatabasePostgres.getSalesDate();
-        String[] date = dateString.split("-");
-        String month = date[1];
-        report.setMonth(month);
-
         // Getting Co-Writer Payments
-        report.setCoWritterList(DatabasePostgres.getCoWriterPayments(artistName));
-        List<CoWriterSummary> coWriterSummaryList = DatabasePostgres.getCoWriterPaymentSummary(artistName);
+        System.out.println("Getting Asset Breakdown");
+        report.setAssetBreakdown(DatabasePostgres.getAssetBreakdown(report.getArtist().getName()));
+        System.out.println("Summarizing co-writer payments");
+        List<CoWriterSummary> coWriterSummaryList = DatabasePostgres.getCoWriterPaymentSummary(report.getArtist().getName());
         report.setCoWriterPaymentSummary(coWriterSummaryList);
 
         return report;

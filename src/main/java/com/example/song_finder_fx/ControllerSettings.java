@@ -1,10 +1,6 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.UserSettingsManager;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -12,23 +8,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Properties;
 
 public class ControllerSettings {
     private UIController mainUIController = null;
     public Button btnAudioDatabase;
     public Button btnSave;
-    public Button btnImportArtists;
     public Label lblVersion;
     public Label lblVersionInfoAboutPage;
 
@@ -75,27 +64,6 @@ public class ControllerSettings {
     }
 
 
-    //not  use in Fxml
-    public void onImportArtistsButtonClick() throws SQLException, ClassNotFoundException, IOException {
-        System.out.println("ControllerSettings.onImportArtistsButtonClick");
-
-        // Prompt user to import CSV
-        FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
-        fileChooser.getExtensionFilters().add(extFilter);
-        File csv = fileChooser.showOpenDialog(btnAudioDatabase.getScene().getWindow());
-        btnImportArtists.setText("   " + csv.getName());
-
-        // Make table
-//        DatabaseMySQL.createTableArtists();
-
-        // Import to table in a separate thread
-//        DatabaseMySQL.importToArtistsTable(csv);
-
-        // Update user interface
-        btnImportArtists.setText("   Execution Complete");
-    }
-
     public void onSaveButtonClicked() throws SQLException, ClassNotFoundException {
         // System.out.println("Save Button Clicked");
         File directory = Main.getSelectedDirectory();
@@ -112,19 +80,6 @@ public class ControllerSettings {
             }
         }
 
-        /*if (directory.isDirectory()) {
-            // Boolean status = Database.saveDirectory(directoryString);
-
-            if (status) {
-                btnSave.setText("Saved");
-                System.out.println("Saved");
-            } else {
-                btnSave.setText("Error Saving!");
-                System.out.println("Error Saving");
-            }
-        } else {
-            System.out.println("Selected Directory is Null");
-        }*/
     }
 
     public void loadAbout(Node aboutView) throws IOException {
@@ -142,36 +97,13 @@ public class ControllerSettings {
 
     private void loadUpdate() throws IOException {
         FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-update.fxml"));
-        loader.setController(this);
+        // loader.setController(this);
         Parent sidepanelContent = loader.load();
 
         mainUIController.sideVBox.getChildren().clear();
         mainUIController.sideVBox.getChildren().add(sidepanelContent);
 
-        lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
+        // lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
     }
 
-    public void onUpdateBtnClick(ActionEvent event) throws IOException, URISyntaxException {
-        Scene scene = SceneController.getSceneFromEvent(event);
-        Button btnUpdate = (Button) scene.lookup("#btnUpdate");
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                Platform.runLater(() -> btnUpdate.setText("Downloading"));
-                File updateFile = Main.versionInfo.getUpdate();
-                Platform.runLater(() -> {
-                    try {
-                        Desktop.getDesktop().open(updateFile);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-                Platform.runLater(() -> btnUpdate.setText("Installing..."));
-                return null;
-            }
-        };
-
-        Thread thread = new Thread(task);
-        thread.start();
-    }
 }

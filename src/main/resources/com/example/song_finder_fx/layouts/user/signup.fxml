@@ -4,12 +4,13 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxWidth="688.0" prefWidth="688.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxWidth="688.0" prefWidth="688.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerSignUp">
    <children>
       <VBox>
          <VBox.margin>
@@ -24,7 +25,7 @@
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
             </Label>
-            <Label text="(Create a new account)" textFill="#656565">
+            <Label text="Create Your Account" textFill="#656565">
                <cursor>
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
@@ -36,20 +37,44 @@
             <Insets left="20.0" right="20.0" top="30.0" />
          </VBox.margin>
          <children>
-            <TextField fx:id="txtUsername1" onAction="#urlOnAction" prefHeight="30.0" promptText="Username" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
-            <TextField fx:id="txtPassword1" onAction="#urlOnAction" prefHeight="30.0" promptText="Nickname" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
+            <VBox HBox.hgrow="ALWAYS">
+               <children>
+                  <Label text="Username">
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="txtUsername" prefHeight="30.0" promptText="Username (Choose a unique username that represents you)" styleClass="textarea-bg">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+               </children>
+            </VBox>
          </children>
       </HBox>
       <HBox layoutX="31.0" layoutY="106.0" spacing="10.0">
          <children>
-            <TextField fx:id="txtUsername11" onAction="#urlOnAction" prefHeight="30.0" promptText="Email" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
-            <TextField fx:id="txtPassword11" onAction="#urlOnAction" prefHeight="30.0" promptText="Password" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
+            <VBox HBox.hgrow="ALWAYS">
+               <children>
+                  <Label text="Password">
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <PasswordField fx:id="passwordField" promptText="Password (Create a strong password with at least 8 characters, including a number and a special character)" styleClass="textarea-bg">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </PasswordField>
+               </children>
+            </VBox>
          </children>
          <VBox.margin>
             <Insets left="20.0" right="20.0" top="10.0" />
          </VBox.margin>
       </HBox>
-      <Button fx:id="btnAddClaim1" mnemonicParsing="false" onAction="#onAddManualClaim" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Sign Up">
+      <Button mnemonicParsing="false" onAction="#onSetUpProfile" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Next: Set Up Profile">
          <VBox.margin>
             <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
          </VBox.margin>

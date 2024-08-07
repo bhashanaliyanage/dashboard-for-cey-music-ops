@@ -1,15 +1,21 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,6 +45,9 @@ public class ControllerMCIdentifiers {
     @FXML
     private VBox vbClaimsList;
 
+    @FXML
+    private Label lblClaimCount;
+
     public static List<TextField> upcs = new ArrayList<>();
 
     public static List<TextField> claimCNumbers = new ArrayList<>();
@@ -53,8 +63,13 @@ public class ControllerMCIdentifiers {
         claimCNumbers.clear();
         claimISRCs.clear();
 
-        for (int i = 0; i < ControllerMCList.finalManualClaims.size(); i++) {
-            ManualClaimTrack claim = ControllerMCList.finalManualClaims.get(i);
+        List<ManualClaimTrack> claims = ControllerMCList.finalManualClaims;
+        int claimCount = claims.size();
+
+        lblClaimCount.setText("Total: " + claimCount);
+
+        for (int i = 0; i < claimCount; i++) {
+            ManualClaimTrack claim = claims.get(i);
 
             Node entry = SceneController.loadLayout("layouts/manual_claims/mci-entry.fxml");
 
@@ -88,12 +103,48 @@ public class ControllerMCIdentifiers {
 
             TextField claimISRC = (TextField) entry.lookup("#claimISRC");
             claimISRCs.add(claimISRC);
+
+            ImageView imgClaimPreview = (ImageView) entry.lookup("#imgClaimPreview");
+            try {
+                imgClaimPreview.setImage(setImage(claim));
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+        /*TextField firstUPC_Field = upcs.getFirst();
+        firstUPC_Field.setOnKeyReleased(event -> {
+            if (event.isShortcutDown() && event.getCode().equals(KeyCode.V)) {
+                String inputText = firstUPC_Field.getText();
+                String test = "8721093238195\n" +
+                        "8721093238201\n" +
+                        "8721093238218";
+                String[] values = inputText.split("\n");
+                for (String value : values) {
+                    System.out.println("value = " + value);
+                }
+            }
+        });*/
+    }
+
+    private Image setImage(ManualClaimTrack claim) throws IOException, URISyntaxException {
+        if (claim.getPreviewImage() != null) {
+            return claim.getPreviewImage();
+        } else {
+            File uploadArtwork = new File("src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork_90.jpg");
+            return SwingFXUtils.toFXImage(ImageIO.read(uploadArtwork), null);
         }
     }
 
     @FXML
-    void onBack() {
-
+    void onBack(MouseEvent event) {
+        Node nodeMCIdentifiers = ControllerManualClaimsMain.nodeMC_List;
+        Scene scene = SceneController.getSceneFromEvent(event);
+        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
+        mainVBox.getChildren().setAll(nodeMCIdentifiers);
+        System.out.println("ControllerMCIdentifiers.onBack");
     }
 
     @FXML
@@ -120,6 +171,7 @@ public class ControllerMCIdentifiers {
         for (int claimID = 0; claimID < totalClaims; claimID++) {
             final String[] upc = {upcs.get(claimID).getText()};
             String catNo = claimCNumbers.get(claimID).getText();
+            // currentISRC = claimISRCs.get(claimID).getText();
 
             // Validating UPCs
             if (upc[0].isEmpty()) {
@@ -159,6 +211,11 @@ public class ControllerMCIdentifiers {
             }
         }
 
+        /*currentISRC = claimISRCs.getFirst().getText();
+        if (currentISRC.isEmpty()) {
+            currentISRC = requestNewISRC();
+        }*/
+
         // Switching scenes
         Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests/generate_ingest.fxml")));
         Scene scene = SceneController.getSceneFromEvent(event);
@@ -181,7 +238,7 @@ public class ControllerMCIdentifiers {
         CsvListWriter csvWriter = getCsvListWriter(destination, ingestFileName[0]);
 
         // Creating entry in ingests database and getting ingest ID
-        int ingestID = DatabasePostgres.addIngest(date, userName, destination.getAbsolutePath(), ingestFileName[0]);
+        int ingestID = DatabasePostgres.addManualClaimIngest(date, userName, destination.getAbsolutePath(), ingestFileName[0]);
 
         if (ingestID > 0) {
             // Updating UI with ingest ID
@@ -224,8 +281,15 @@ public class ControllerMCIdentifiers {
                                 Platform.runLater(e::printStackTrace);
                             }
                         } else {
-                            Platform.runLater(() -> lblProcess.setText("Error Getting Artwork"));
-                            break;
+                            try {
+                                String path = "src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork.jpg";
+                                BufferedImage tempArtwork = ImageIO.read(new File(path));
+                                Platform.runLater(() -> lblProcess.setText("Error Getting Artwork. Copying Temporary Artwork: " + albumTitle));
+                                String outputPath = folder.getAbsolutePath() + "\\" + upc[0] + ".jpg";
+                                ImageIO.write(tempArtwork, "jpg", new File(outputPath));
+                            } catch (IOException e) {
+                                System.out.println("Error in Artwork: " + e);
+                            }
                         }
 
                         // Downloading audio to a temporary directory
@@ -313,20 +377,19 @@ public class ControllerMCIdentifiers {
     }
 
     private static void downloadAudio(int claimID, String fileName, String[] fileLocation) {
+        String url = "";
+        String fileLocation1 = "";
+
         try {
-            String url = ControllerMCList.finalManualClaims.get(claimID).getYouTubeURL();
+            url = ControllerMCList.finalManualClaims.get(claimID).getYouTubeURL();
             Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audio");
-            String fileLocation1 = tempDir.toString();
+            fileLocation1 = tempDir.toString();
             YoutubeDownload.downloadAudio(url, fileLocation1, fileName);
             fileLocation[0] = fileLocation1;
-        } catch (IOException e1) {
-            Platform.runLater(() -> {
-                Alert alert1 = new Alert(Alert.AlertType.ERROR);
-                alert1.setTitle("Error");
-                alert1.setHeaderText("An error occurred");
-                alert1.setContentText(String.valueOf(e1));
-                Platform.runLater(alert1::showAndWait);
-            });
+        } catch (IOException | InterruptedException e) {
+            String finalUrl = url;
+            String finalFileLocation = fileLocation1;
+            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Downloading Audio", String.format("YouTube URL: %s\nTemporary File Path: %s\nException: %s", finalUrl, finalFileLocation, e)));
         }
     }
 
@@ -367,6 +430,7 @@ public class ControllerMCIdentifiers {
         String releaseDate = getDate();
         String year = getYear(releaseDate);
         String isrc = getISRC(i, currentISRC);
+        Platform.runLater(() -> System.out.println("isrc = " + isrc));
         String writers = String.format("%s | %s", composer, lyricist);
 
         List<String> row = new ArrayList<>();
@@ -454,11 +518,12 @@ public class ControllerMCIdentifiers {
         );
     }
 
-    private String getISRC(int i, String isrc) throws SQLException {
+    private String getISRC(int i, String isrc) {
         final String[] userISRC = {claimISRCs.get(i).getText()};
         if (Objects.equals(isrc, "")) {
             if (userISRC[0].isEmpty()) {
-                userISRC[0] = DatabasePostgres.getNewUGCISRC();
+                // userISRC[0] = requestNewISRC();
+                userISRC[0] = "";
                 System.out.println("isrc[0] = " + userISRC[0]);
             }
 
@@ -563,6 +628,35 @@ public class ControllerMCIdentifiers {
             String catNo = claimCNumbers.get(claimID).getText();
             final String[] userISRC = {claimISRCs.get(claimID).getText()};
             System.out.println((claimID + 1) + " | " + upc[0] + " | " + catNo + " | " + userISRC[0]);
+        }
+    }
+
+    @FXML
+    void onBulkPaste(ActionEvent event) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        if (clipboard.hasString()) {
+            String inputText = clipboard.getString();
+            String[] values = inputText.split("\n");
+
+            // Assign each value to the corresponding text field
+            for (int i = 0; i < Math.min(values.length, upcs.size()); i++) {
+                upcs.get(i).setText(values[i]);
+            }
+        }
+    }
+
+    @FXML
+    void onBulkPasteCatNos(ActionEvent event) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+
+        if (clipboard.hasString()) {
+            String inputText = clipboard.getString();
+            String[] values = inputText.split("\n");
+
+            // Assign each value to the corresponding text field
+            for (int i = 0; i < Math.min(values.length, claimCNumbers.size()); i++) {
+                claimCNumbers.get(i).setText(values[i]);
+            }
         }
     }
 }

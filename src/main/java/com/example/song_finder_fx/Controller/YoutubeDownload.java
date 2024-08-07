@@ -10,20 +10,14 @@ import java.nio.file.Path;
 
 public class YoutubeDownload {
 
-    public static void downloadAudio(String url, String fileLocation, String fileName) {
+    public static void downloadAudio(String url, String fileLocation, String fileName) throws IOException, InterruptedException {
         String file = fileLocation + "\\" + fileName;
-        try {
-            downloadAudioOnly(url, file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        downloadAudioOnly(url, file);
 
     }
 
-    public static void downloadAudioOnly(String url, String file) {
-        try {
-
-            String nodeScriptPath = "libs/downloadAudio.js";
+    public static void downloadAudioOnly(String url, String file) throws IOException, InterruptedException {
+            String nodeScriptPath = "libs/jdown.js";
 
             System.out.println("url = " + url);
             System.out.println("file = " + file);
@@ -52,14 +46,6 @@ public class YoutubeDownload {
                     Platform.runLater(alert::showAndWait);
                 });
             }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public static void main(String[] args) {
-        downloadAudio("hjk", "hjk", "hjk");
     }
 
     public static void trimAudio(String filePath, String outputPath, String startTime, String EndTime) throws IOException, InterruptedException {
@@ -103,14 +89,14 @@ public class YoutubeDownload {
                 alert.setTitle("Error Trimming Audio");
                 alert.setHeaderText("An error occurred while trimming audio");
                 String message = String.format("""
-                        File Path: '%s'
-                                               \s
-                        Output Path: '%s'
-                                               \s
-                        Trim Start: '%s'
-                                               \s
-                        Trim End: '%s'
-                       \s""", filePath, outputPath, startTime, EndTime);
+                         File Path: '%s'
+                                                \s
+                         Output Path: '%s'
+                                                \s
+                         Trim Start: '%s'
+                                                \s
+                         Trim End: '%s'
+                        \s""", filePath, outputPath, startTime, EndTime);
                 alert.setContentText(message);
                 Platform.runLater(alert::showAndWait);
             });

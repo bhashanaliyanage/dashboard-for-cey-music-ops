@@ -4,9 +4,8 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -15,48 +14,87 @@
       <VBox.margin>
          <Insets left="30.0" top="30.0" />
       </VBox.margin>
-      <Label layoutX="10.0" layoutY="10.0" text="Generate Ingest">
+      <Label layoutX="10.0" layoutY="10.0" text="Ingests">
          <font>
             <Font name="Segoe UI Semibold" size="28.0" />
          </font>
       </Label>
    </HBox>
-   <ScrollPane fx:id="scrlpneMain" hbarPolicy="NEVER" prefWidth="460.0" stylesheets="@../styles.css" vbarPolicy="NEVER">
-      <Pane prefHeight="928.0" prefWidth="744.0">
-         <VBox layoutX="30.0" layoutY="30.0" maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../styles.css">
-            <HBox>
+   <VBox maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../styles.css">
+      <VBox.margin>
+         <Insets left="30.0" right="30.0" top="30.0" />
+      </VBox.margin>
+      <HBox>
+         <VBox.margin>
+            <Insets left="20.0" right="20.0" top="20.0" />
+         </VBox.margin>
+         <VBox HBox.hgrow="ALWAYS">
+            <Label text="Import New Ingestion">
+               <font>
+                  <Font name="Segoe UI Semibold" size="19.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+            </Label>
+            <Label text="Enter Ingest Details">
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+            </Label>
+         </VBox>
+      </HBox>
+      <HBox spacing="10.0">
+         <VBox.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
+         </VBox.margin>
+         <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+            <VBox spacing="10.0">
+               <Label text="Ingestion Name" textFill="#656565" />
+               <TextField fx:id="txtName" promptText="Ingestion Name" styleClass="textarea-bg" />
+            </VBox>
+            <VBox layoutX="10.0" layoutY="10.0" spacing="10.0">
+               <Label text="Browse File" textFill="#656565" />
+               <HBox spacing="10.0">
+                  <TextField fx:id="txtFileLocation" editable="false" promptText="File" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" onAction="#onBrowse" prefWidth="100.0" styleClass="button_inside" text="Browse" />
+               </HBox>
+            </VBox>
+            <VBox alignment="TOP_RIGHT" layoutX="10.0" layoutY="74.0" spacing="10.0">
                <VBox.margin>
-                  <Insets left="20.0" right="20.0" top="20.0" />
+                  <Insets top="10.0" />
                </VBox.margin>
-               <VBox HBox.hgrow="ALWAYS">
-                  <Label text="Choose Ingest Type">
-                     <font>
-                        <Font name="Segoe UI Semibold" size="19.0" />
-                     </font>
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                  </Label>
-                  <Label text="(Chose ingest type and add to ingest queue to generate ingest)" textFill="#656565">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                  </Label>
-               </VBox>
-            </HBox>
-            <VBox prefWidth="100.0">
-               <VBox.margin>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
-               </VBox.margin>
-               <Button mnemonicParsing="false" onAction="#onIngestSingle" prefHeight="30.0" prefWidth="646.0" styleClass="button_inside" text="Create Ingest for Single Song and add to Queue" />
-               <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onIngestAlbum" prefHeight="30.0" prefWidth="646.0" styleClass="button_inside" text="Create Ingest for Album and add to Queue">
-                  <VBox.margin>
-                     <Insets top="15.0" />
-                  </VBox.margin>
-               </Button>
+               <Button fx:id="btnImportIngest" mnemonicParsing="false" onAction="#onImportNew" prefWidth="150.0" styleClass="button_inside_brown" text="Import Ingest" />
             </VBox>
          </VBox>
-         <VBox fx:id="vboxIngest" layoutX="30.0" layoutY="232.0" styleClass="textarea-bg" />
-      </Pane>
-   </ScrollPane>
+      </HBox>
+   </VBox>
+   <HBox fx:id="hboxApproveIngests" alignment="CENTER_LEFT" onMouseClicked="#onPendingIngestClick" prefHeight="70.0" styleClass="clickable-pane-bg">
+      <Label text="Click to Approve Ingests">
+         <HBox.margin>
+            <Insets left="20.0" />
+         </HBox.margin>
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+         <Label fx:id="lblCount" layoutX="456.0" layoutY="34.0" text="-">
+            <font>
+               <Font size="14.0" />
+            </font>
+         </Label>
+         <Label text="Pending">
+            <font>
+               <Font size="14.0" />
+            </font>
+            <HBox.margin>
+               <Insets left="5.0" right="20.0" />
+            </HBox.margin>
+         </Label>
+      </HBox>
+      <VBox.margin>
+         <Insets left="30.0" right="30.0" top="20.0" />
+      </VBox.margin>
+   </HBox>
 </VBox>

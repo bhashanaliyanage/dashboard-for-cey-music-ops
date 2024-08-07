@@ -1,6 +1,5 @@
 package com.example.song_finder_fx;
 
-import com.itextpdf.kernel.color.Lab;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -13,10 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 
-import java.awt.*;
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Objects;
 
 public class NavigationController {
@@ -112,7 +108,8 @@ public class NavigationController {
         Scene scene = ((Node) event.getSource()).getScene();
         VBox mainVBox = (VBox) scene.lookup("#mainVBox");
 
-        mainVBox.getChildren().setAll(aboutNode);
+        mainVBox.getChildren().clear();
+        mainVBox.getChildren().add(aboutNode);
 
         Label lblVersionInfoAboutPage = (Label) scene.lookup("#lblVersionInfoAboutPage");
         lblVersionInfoAboutPage.setText(Main.versionInfo.getCurrentVersionInfo());
@@ -133,11 +130,6 @@ public class NavigationController {
         sideVBox.getChildren().add(sidepanelContent);
 
         lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
-    }
-
-    public void onUpdateBtnClick() throws IOException, URISyntaxException {
-        File updateFile = Main.versionInfo.getUpdate();
-        Desktop.getDesktop().open(updateFile);
     }
 
     @FXML

@@ -17,6 +17,7 @@
    <children>
       <GridPane>
         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="0.0" prefWidth="35.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="302.0" minWidth="10.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
@@ -27,25 +28,25 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="2">
+            <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="3">
                <children>
                   <Label text="UPC: " />
                   <TextField fx:id="claimUPC" promptText="8XXXXXXXXXXXX" styleClass="textarea-bg" />
                </children>
             </HBox>
-            <HBox alignment="CENTER_RIGHT" prefWidth="226.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
+            <HBox alignment="CENTER_RIGHT" prefWidth="226.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
                <children>
                   <Label text="Catalog Number: " />
                   <TextField fx:id="claimCNumber" promptText="XXX-CEY-XXX" styleClass="textarea-bg" />
                </children>
             </HBox>
-            <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="2" GridPane.rowIndex="2">
+            <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="3" GridPane.rowIndex="2">
                <children>
                   <Label text="ISRC: " />
                   <TextField fx:id="claimISRC" promptText="LKA0U24XXXXX" styleClass="textarea-bg" />
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" prefHeight="30.0" GridPane.columnIndex="1">
+            <HBox alignment="CENTER_LEFT" prefHeight="30.0" GridPane.columnIndex="2">
                <children>
                   <Label fx:id="claimName" layoutX="10.0" layoutY="10.0" text="Song Name">
                      <HBox.margin>
@@ -57,8 +58,8 @@
                   <Insets bottom="5.0" top="5.0" />
                </padding>
             </HBox>
-            <Label fx:id="claimID" alignment="CENTER_RIGHT" contentDisplay="RIGHT" minWidth="20.0" prefWidth="40.0" text="100." textAlignment="RIGHT" GridPane.hgrow="ALWAYS" />
-            <HBox alignment="CENTER_LEFT" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <Label fx:id="claimID" alignment="CENTER_RIGHT" contentDisplay="RIGHT" minWidth="20.0" prefWidth="40.0" text="100." textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+            <HBox alignment="CENTER_LEFT" prefHeight="30.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
                <children>
                   <ImageView fitHeight="18.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -81,7 +82,7 @@
                   <Insets bottom="5.0" top="5.0" />
                </padding>
             </HBox>
-            <HBox alignment="CENTER_LEFT" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <HBox alignment="CENTER_LEFT" prefHeight="30.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
                <children>
                   <ImageView fitHeight="18.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -104,6 +105,11 @@
                   <Insets bottom="5.0" top="5.0" />
                </padding>
             </HBox>
+            <ImageView fx:id="imgClaimPreview" fitHeight="140.0" fitWidth="99.0" pickOnBounds="true" preserveRatio="true" GridPane.rowSpan="3">
+               <image>
+                  <Image url="@../../images/Green%20Gradient.jpg" />
+               </image>
+            </ImageView>
          </children>
       </GridPane>
    </children>

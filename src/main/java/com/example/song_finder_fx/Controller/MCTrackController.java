@@ -6,7 +6,7 @@ import com.example.song_finder_fx.Model.ManualClaimTrack;
 import java.sql.SQLException;
 
 public class MCTrackController {
-    private final ManualClaimTrack track;
+    private ManualClaimTrack track;
 
     public MCTrackController(ManualClaimTrack track) {
         this.track = track;
@@ -31,5 +31,10 @@ public class MCTrackController {
         if (!lyricistStatus) {
             DatabasePostgres.addTempArtist(lyricist);
         }
+    }
+
+    public ManualClaimTrack fetchArtwork() throws SQLException {
+        track = DatabasePostgres.getClaimArtwork(track);
+        return track;
     }
 }

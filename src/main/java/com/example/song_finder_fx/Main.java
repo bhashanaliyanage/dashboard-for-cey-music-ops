@@ -2,6 +2,7 @@ package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.UserSettingsManager;
 import com.example.song_finder_fx.Model.ProductVersion;
+import com.example.song_finder_fx.Model.Songs;
 import com.example.song_finder_fx.Session.UserSession;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
@@ -20,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -27,9 +29,11 @@ public class Main extends Application {
     public static Stage primaryStage = null;
     public static UserSession userSession;
     static List<String> songList = new ArrayList<>();
+    static List<Songs> songListNew = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion(23.12);
+    public static ProductVersion versionInfo = new ProductVersion("v23.19.1");
+    public static TrayIcon trayIcon;
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(Main.class, LauncherPreloader.class, args);
@@ -51,6 +55,14 @@ public class Main extends Application {
         return fileChooser.showOpenDialog(window);
     }
 
+    public static void addSongToList(Songs song) {
+        songListNew.add(song);
+    }
+
+    public static List<Songs> getSongListNew() {
+        return songListNew;
+    }
+
     @Override
     public void init() throws Exception {
         InitPreloader init = new InitPreloader();
@@ -63,7 +75,16 @@ public class Main extends Application {
     }
 
     public static boolean deleteSongFromList(String isrc) {
-        boolean status = songList.remove(isrc);
+        boolean status = false;
+
+        for (Iterator<Songs> iterator = songListNew.iterator(); iterator.hasNext();) {
+            Songs song = iterator.next();
+            if (song.getISRC().equals(isrc.trim())) {
+                iterator.remove();
+                status = true;
+            }
+        }
+
         if (status) {
             System.out.println("ISRC: " + isrc + " Removed from Song List");
         }
@@ -82,8 +103,8 @@ public class Main extends Application {
         }
     }
 
-    public static List<String> getSongList() {
-        return songList;
+    public static List<Songs> getSongList() {
+        return songListNew;
     }
 
     public static void directoryCheck() {
@@ -92,7 +113,10 @@ public class Main extends Application {
         } else {
             System.out.println("No audio database directory specified");
             selectedDirectory = Main.browseLocation();
-            System.out.println(selectedDirectory.getAbsolutePath());
+
+            if (selectedDirectory != null) {
+                System.out.println(selectedDirectory.getAbsolutePath());
+            }
         }
     }
 
@@ -175,8 +199,8 @@ public class Main extends Application {
     }
 
     public static void copyAudio(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
-        DatabaseMySQL.searchAndCopySongs(isrc, directory, destination);
-//        DatabasePostgre.searchAndCopySongs(isrc, directory, destination);     //Postgress
+//        DatabaseMySQL.searchAndCopySongs(isrc, directory, destination);
+        DatabasePostgres.searchAndCopySongs(isrc, directory, destination);     //Postgress
 
     }
 
@@ -198,16 +222,17 @@ public class Main extends Application {
 // TODO: 11/27/2023 Edit list in the invoice view
 
 // Song List
-// TODO: Export Song List data to a CSV
 // TODO: 2/5/2024 Add a delete all button to the list
+// TODO: Copy details by clicking song in song list
+// TODO: Auto Save and Restore Song List
+// TODO: Need a view to add a song, edit song
 
 // User Experience
+// TODO: 2/14/2024 Make it play FLACs
+// TODO: Create a notification panel for software reminders like: Update artist name validation table
 // TODO: 11/27/2023 Save last invoice details in the database and retrieve when the user is going back to the invoice
 // TODO: Offer cancel method after proceed button clicked
 // TODO: 12/15/2023 Change alert dialogs of all functions as check missing ISRCs
-// TODO: 2/8/2024 System Tray
-// TODO: 2/14/2024 Make it play FLACs
-// TODO: Create a notification panel for software reminders like: Update artist name validation table
 
 // Performance
 // TODO: If copy to button clicked and user not chose any location the application starts to search
@@ -216,27 +241,27 @@ public class Main extends Application {
 // TODO: 12/9/2023 Side-Panel design for all pages
 
 // Revenue Analysis
-// TODO: 12/9/2023 Sub views of revenue analysis UI
-// TODO: Retrieve artist names from Postgres
 // TODO: A view to edit payee list
+// TODO: ISRC Payee Updater
 
 // Search
 // TODO: 2/8/2024 Edit Song Details
 // TODO: Change song list retrieval process to Postgres
+// TODO: Sidebar for search
 
 // Ingests
 // TODO: 3/26/2024 Debug Ingest CSV
 
 // Manual Claims
 // TODO: A view to view created ingests
-    // TODO: Update Payee table from created ingests upon request
-// TODO: Tags For Manual Claims List (for Group Claims , Tv Programmes , Covers)
+// TODO: Update Payee table from created ingests upon request
+// TODO: View archived manual claims (which will be helpful to un-archive them for later usages)
 // TODO: Edit details on an added manual claim in the add manual claim view
-// TODO: Remove an added manual claim in the add manual claim view
+// TODO: Remove an added manual claim in the add manual claim view (which currently uses the archive method)
 // TODO: Reset add manual claim view after adding a manual claim
 // TODO: Batch Edit Artworks
-// TODO: Show artwork in identifier view
-// TODO: Batch Paste UPCs
+// TODO: Show artwork when switching to identifier view (will be helpful to identify the manual claim)
+// TODO: Offer a save button or periodically auto save in identifier view for better user experience
 
 // User Accounts
 // TODO: Make the user experience of login and signup much better.

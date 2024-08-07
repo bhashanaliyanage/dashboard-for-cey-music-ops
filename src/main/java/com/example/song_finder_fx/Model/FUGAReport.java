@@ -1,5 +1,7 @@
 package com.example.song_finder_fx.Model;
 
+import java.sql.Date;
+
 public class FUGAReport {
     private String saleStartDate;
     private String saleEndDate;
@@ -343,5 +345,9 @@ public class FUGAReport {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Date getSaleStartDateNew() {
+        return Date.valueOf(saleStartDate);
     }
 }

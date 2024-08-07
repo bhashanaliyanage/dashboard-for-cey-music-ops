@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<TitledPane fx:id="titledPane" prefWidth="600.0" stylesheets="@../../styles.css" text="Song Name" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCTrack">
+<TitledPane fx:id="titledPane" prefWidth="600.0" stylesheets="@../../styles.css" text="Song Name" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCTrack">
    <font>
       <Font size="14.0" />
    </font>
@@ -74,9 +78,8 @@
          <VBox.margin>
             <Insets top="10.0" />
          </VBox.margin>
-         <children>
-            <Button fx:id="btnAddTrack" mnemonicParsing="false" onAction="#onAddTrack" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Add Track" />
-         </children>
+         <Button fx:id="btnAddTrack" mnemonicParsing="false" onAction="#onAddTrack" prefHeight="30.0" prefWidth="1054.0" styleClass="button_inside_brown" text="Add Track" />
+         <Button fx:id="btnEditTrack" disable="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onEditTrack" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Edit Track" />
       </HBox>
    </VBox>
 </TitledPane>

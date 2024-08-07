@@ -1,258 +1,242 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
+import com.example.song_finder_fx.Controller.IngestController;
+import com.example.song_finder_fx.Controller.NotificationBuilder;
+import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Model.Ingest;
+import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.scene.layout.HBox;
+import javafx.stage.Window;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 public class ControllerIngest {
-    public TextField txtProductTitle;
-    public TextField txtPrimaryArtist;
-    public Label lblUPCCount;
-    public TextArea txtAreaUPC;
-    public Label lblDestination;
-    public VBox vboxIngest;
-    public VBox vboxSongDetails;
-    @FXML
-    private ImageView imgFeedback;
 
     @FXML
-    private ImageView imgPayeeUpdate;
+    private HBox hboxApproveIngests;
 
     @FXML
-    private ImageView imgSongDB_Status;
+    public Label lblCount;
 
     @FXML
-    private Label lblCountMissingISRCs;
+    public Button btnImportIngest;
 
     @FXML
-    private Label lblFeedbackProgress;
+    private Label lblImportIngest;
 
     @FXML
-    private Label lblNIFeedback;
+    private Label lblMissingISRCs;
 
     @FXML
-    private Label lblPayeeProgress;
+    private Label lblMissingPayees;
 
     @FXML
-    private Label lblPayeeUpdate;
+    private TextField txtFileLocation;
 
     @FXML
-    private Label lblSongDB_Progress;
+    private TextField txtName;
+
+    private File file;
+
+    public static List<Ingest> unApprovedIngests;
+
+    public static Node unApprovedIngestsUI;
 
     @FXML
-    private Label lblSongDB_Update;
+    void initialize() {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> hboxApproveIngests.setDisable(true));
+                getUnApprovedIngests();
+                Platform.runLater(() -> hboxApproveIngests.setDisable(false));
+                return null;
+            }
+        };
 
-    @FXML
-    private Label lblUpdateNote;
-
-    @FXML
-    private ScrollPane scrlpneMain;
-
-    @FXML
-    private VBox vboxUpdateSongDB;
-    private final Ingest ingest = new Ingest();
-
-    public ControllerIngest(ImageView imgPayeeUpdate, ImageView imgSongDBStatus, Label lblCountMissingISRCs, Label lblPayeeProgress, Label lblPayeeUpdate, Label lblSongDBProgress, Label lblSongDBUpdate, Label lblUpdateNote, VBox vboxUpdateSongDB) {
-        this.imgPayeeUpdate = imgPayeeUpdate;
-        imgSongDB_Status = imgSongDBStatus;
-        this.lblCountMissingISRCs = lblCountMissingISRCs;
-        this.lblPayeeProgress = lblPayeeProgress;
-        this.lblPayeeUpdate = lblPayeeUpdate;
-        lblSongDB_Progress = lblSongDBProgress;
-        lblSongDB_Update = lblSongDBUpdate;
-        this.lblUpdateNote = lblUpdateNote;
-        this.vboxUpdateSongDB = vboxUpdateSongDB;
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
+    private void getUnApprovedIngests() {
+        try {
+            unApprovedIngests = DatabasePostgres.getUnApprovedIngests();
+            Platform.runLater(() -> lblCount.setText(String.valueOf(unApprovedIngests.size())));
+        } catch (SQLException e) {
+            Platform.runLater(() -> {
+                NotificationBuilder.displayTrayError("Error", "Error Fetching Un-Approved Ingests");
+                e.printStackTrace();
+            });
+        }
+    }
+
+    /*@FXML
+    void onImportIngest(MouseEvent event) {
+        Scene scene = SceneController.getSceneFromEvent(event);
+        Window window = SceneController.getWindowFromScene(scene);
+        File file = Main.browseForCSV(window);
+
+        if (file != null) {
+            // System.out.println("True");
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    try {
+                        Platform.runLater(() -> lblImportIngest.setText("Validating CSV"));
+
+                        CSVReader reader = new CSVReader(new FileReader(file));
+                        String[] row = reader.readNext();
+
+                        int rowLength = row.length;
+
+                        System.out.println("Column Count: " + rowLength);
+
+                        if (rowLength == 63) {
+                            IngestController ingestController = new IngestController();
+
+                            System.out.println("ControllerIngest.call | Using Old Importing Method");
+
+                            // String status = ingestController.insertIngest(ingestName, date, file);
+                            // Platform.runLater(() -> System.out.println("\nImport Status: " + status));
+                            *//*if (Objects.equals(status, "done")) {
+                                Platform.runLater(() -> lblImportIngest.setText("Import Ingest"));
+                            }*//*
+                        } else {
+                            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Invalid CSV Format", "Expected 63 columns but found " + rowLength));
+                            Platform.runLater(() -> lblImportIngest.setText("Import Ingest"));
+                        }
+                    } catch (CsvValidationException | IOException e) {
+                        Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Reading CSV File", e.toString()));
+                    }
+                    return null;
+                }
+            };
+
+            Thread thread = new Thread(task);
+            thread.start();
+        }
+    }*/
+
     @FXML
-    void onImportCSVBtnClick(ActionEvent event) throws IOException, CsvValidationException {
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Select FUGA Report");
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Image imgCaution = new Image("com/example/song_finder_fx/images/caution.png");
-        String[] upcs;
-        int upcCount;
+    public void onImportNew() {
+        String ingestName = txtName.getText();
+        LocalDate date = LocalDate.now();
 
-        File csv = chooser.showOpenDialog(stage);
+        if (!txtName.getText().isEmpty()) {
+            txtName.setStyle("-fx-border-color: '#e9ebee';");
 
-        if (csv != null) {
-            System.out.println("Report Imported");
-            ingest.setCSV(csv);
-            lblNIFeedback.setText("Validating CSV");
-            boolean validate = ingest.validate();
+            if (file != null) {
+                txtFileLocation.setStyle("-fx-border-color: '#e9ebee';");
 
-            if (validate) {
-                System.out.println("Validated!");
-                lblNIFeedback.setText("CSV Validated");
-                lblNIFeedback.setStyle("-fx-text-fill: #000000");
-                upcs = ingest.getUPCArray();
-                upcCount = (upcs.length / 25) + 1;
-                ingest.setUPCCount(upcCount);
-                lblUPCCount.setText(String.valueOf(upcCount));
+                IngestController ingestController = new IngestController();
+
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call() {
+                        try {
+                            Platform.runLater(() -> btnImportIngest.setText("Importing Ingest"));
+                            String status = ingestController.insertIngest(ingestName, date, file);
+                            if (Objects.equals(status, "done")) {
+                                Platform.runLater(() -> {
+                                    btnImportIngest.setText("Import Ingest");
+                                    txtName.setText("");
+                                    txtFileLocation.setText("");
+                                    file = null;
+
+                                    getUnApprovedIngests();
+
+                                    NotificationBuilder.displayTrayInfo("Ingest Imported", "Please check and approve " + unApprovedIngests.size() + " un-approved ingests");
+                                });
+                            } else {
+                                Platform.runLater(() -> {
+                                    btnImportIngest.setText("Import Ingest");
+                                    NotificationBuilder.displayTrayError("Error", "Ingest not imported");
+                                });
+                            }
+                        } catch (SQLException e) {
+                            Platform.runLater(() -> {
+                                AlertBuilder.sendErrorAlert("Error", "Error Importing Ingest", e.toString());
+                                btnImportIngest.setText("Import Ingest");
+                            });
+                        }
+
+                        return null;
+                    }
+                };
+
+                Thread thread = new Thread(task);
+                thread.start();
             } else {
-                System.out.println("Not Validated!");
-                lblNIFeedback.setText("Invalid CSV Structure Please Check Columns");
-                imgFeedback.setImage(imgCaution);
-                imgFeedback.setVisible(true);
+                txtFileLocation.setStyle("-fx-border-color: red;");
             }
         } else {
-            System.out.println("No Report Imported");
+            txtName.setStyle("-fx-border-color: red;");
         }
     }
 
-    public void generate() throws CsvValidationException, IOException {
-        String productTitle = txtProductTitle.getText();
-        String primaryArtist = txtPrimaryArtist.getText();
-        String upcs = txtAreaUPC.getText();
+    @FXML
+    void onBrowse(ActionEvent event) {
+        Scene scene = SceneController.getSceneFromEvent(event);
+        Window window = SceneController.getWindowFromScene(scene);
+        file = Main.browseForCSV(window);
 
-        System.out.println("productTitle = " + productTitle);
-        System.out.println("primaryArtist = " + primaryArtist);
-        System.out.println("upcs = " + upcs);
+        if (file != null) {
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    try {
+                        CSVReader reader = new CSVReader(new FileReader(file));
+                        String[] row = reader.readNext();
 
-        boolean anyEmpty = false;
+                        int rowLength = row.length;
 
-        anyEmpty = isAnyEmpty(productTitle, anyEmpty, primaryArtist, upcs);
+                        System.out.println("Column Count: " + rowLength);
 
-        if (!anyEmpty) {
-            System.out.println("Proceed!");
-            ingest.writeCSV();
+                        if (rowLength == 63) {
+                            Platform.runLater(() -> {
+                                NotificationBuilder.displayTrayInfo("CSV Validated", "You can proceed to import");
+                                txtFileLocation.setText(file.getAbsolutePath());
+                            });
+                        } else {
+                            Platform.runLater(() -> NotificationBuilder.displayTrayError("Invalid CSV Format", "Expected 63 columns but found " + rowLength));
+                        }
+                    } catch (CsvValidationException | IOException e) {
+                        Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Reading CSV File", e.toString()));
+                    }
+                    return null;
+                }
+            };
+
+            Thread thread = new Thread(task);
+            thread.start();
         }
     }
 
-    private boolean isAnyEmpty(String productTitle, boolean anyEmpty, String primaryArtist, String upcs) {
-        //<editor-fold desc="CSV">
-        if (!ingest.isCSV()) {
-            lblNIFeedback.setStyle("-fx-text-fill: red");
-            lblNIFeedback.setText("Please Add CSV");
-            anyEmpty = true;
-        } else {
-            lblNIFeedback.setStyle("-fx-text-fill: #000000");
+    public void onPendingIngestClick() {
+        try {
+            Node node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/ingests/un-approved-ingests.fxml")));
+            unApprovedIngestsUI = node;
+            UIController.mainVBoxStatic.getChildren().setAll(node);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString());
         }
-        //</editor-fold>
-
-        //<editor-fold desc="Product Title">
-        if (productTitle.isEmpty()) {
-            txtProductTitle.setStyle("-fx-border-color: red;");
-            anyEmpty = true;
-        } else {
-            txtProductTitle.setStyle("-fx-border-color: '#e9ebee';");
-            ingest.setProductTitle(productTitle);
-        }
-        //</editor-fold>
-
-        //<editor-fold desc="Primary Artist">
-        if (primaryArtist.isEmpty()) {
-            txtPrimaryArtist.setStyle("-fx-border-color: red;");
-            anyEmpty = true;
-        } else {
-            txtPrimaryArtist.setStyle("-fx-border-color: '#e9ebee';");
-            ingest.setPrimaryArtist(primaryArtist);
-        }
-        //</editor-fold>
-
-        //<editor-fold desc="UPCs">
-        if (upcs.isEmpty()) {
-            txtAreaUPC.setStyle("-fx-border-color: red;");
-            anyEmpty = true;
-        } else {
-            int upcCount = ingest.getUPCCount();
-            System.out.println("upcCount = " + upcCount);
-            String[] upcArray = upcs.split("\\n");
-            System.out.println("upcArray.length = " + upcArray.length);
-            if (upcArray.length != upcCount) {
-                txtAreaUPC.setStyle("-fx-border-color: red;");
-                anyEmpty = true;
-            } else {
-                txtAreaUPC.setStyle("-fx-border-color: '#e9ebee';");
-                ingest.setUPCArray(upcArray);
-            }
-        }
-        //</editor-fold>
-
-        //<editor-fold desc="Destination">
-        if (!ingest.isDestination()) {
-            anyEmpty = true;
-            lblDestination.setText("Please select destination");
-            lblDestination.setStyle("-fx-text-fill: red");
-        } else {
-            lblDestination.setStyle("-fx-text-fill: #000000");
-        }
-        //</editor-fold>
-
-        return anyEmpty;
-    }
-
-    public void onBrowseForDestinationBtnClicked(ActionEvent event) {
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Select Destination");
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        File destination = chooser.showDialog(stage);
-        lblDestination.setText(destination.getAbsolutePath());
-        lblDestination.setStyle("-fx-text-fill: #000000");
-        ingest.setDestination(destination);
-    }
-
-    public void onIngestSingle() throws IOException {
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single.fxml")));
-        vboxIngest.getChildren().setAll(node);
-    }
-
-    public void onIngestAlbum() throws IOException {
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-album.fxml")));
-        vboxIngest.getChildren().setAll(node);
-    }
-
-    public void onSingleOriginal() throws IOException {
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single-original.fxml")));
-        vboxSongDetails.getChildren().setAll(node);
-
-        /*Scene scene = vboxSongDetails.getScene();*/
-
-        // Binding auto-completion to artist name text fields
-        /*TextField txtArtist01 = (TextField) scene.lookup("#txtArtist01");
-        TextField txtArtist02 = (TextField) scene.lookup("#txtArtist02");
-        TextField txtArtist03 = (TextField) scene.lookup("#txtArtist03");
-        TextField txtArtist04 = (TextField) scene.lookup("#txtArtist04");
-        ArrayList<String> artistNames = DatabaseMySQL.getArtistList();
-        TextFields.bindAutoCompletion(txtArtist01, artistNames);
-        TextFields.bindAutoCompletion(txtArtist02, artistNames);
-        TextFields.bindAutoCompletion(txtArtist03, artistNames);
-        TextFields.bindAutoCompletion(txtArtist04, artistNames);*/
-
-        // Setting combo box options
-        /*@SuppressWarnings("unchecked")
-        ComboBox<String> comboArtist01Type = (ComboBox) scene.lookup("#comboArtist01Type");
-        comboArtist01Type.setItems(FXCollections.observableArrayList("Composer","Lyricist","Singer"));
-        @SuppressWarnings("unchecked")
-        ComboBox<String> comboArtist02Type = (ComboBox) scene.lookup("#comboArtist02Type");
-        comboArtist02Type.setItems(FXCollections.observableArrayList("Composer","Lyricist","Singer"));
-        @SuppressWarnings("unchecked")
-        ComboBox<String> comboArtist03Type = (ComboBox) scene.lookup("#comboArtist03Type");
-        comboArtist03Type.setItems(FXCollections.observableArrayList("Composer","Lyricist","Singer"));
-        @SuppressWarnings("unchecked")
-        ComboBox<String> comboArtist04Type = (ComboBox) scene.lookup("#comboArtist04Type");
-        comboArtist04Type.setItems(FXCollections.observableArrayList("Composer","Lyricist","Singer"));*/
-    }
-
-    public void onSingleUGC() throws IOException {
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerIngest.class.getResource("layouts/ingest-single-ugc.fxml")));
-        vboxSongDetails.getChildren().setAll(node);
     }
 }

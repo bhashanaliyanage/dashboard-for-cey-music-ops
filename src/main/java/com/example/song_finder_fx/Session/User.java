@@ -1,6 +1,7 @@
 package com.example.song_finder_fx.Session;
 
 public class User {
+    private int id;
     private int privilegeLevel;
     private String email;
     private String nickName;
@@ -27,5 +28,13 @@ public class User {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public int getUserID() {
+        return id;
+    }
+
+    public void setUserID(int userID) {
+        this.id = userID;
     }
 }

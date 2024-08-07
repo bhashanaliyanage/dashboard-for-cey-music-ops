@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefWidth="250.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerSPFilterArchive">
+   <Label text="Filter Claims">
+      <font>
+         <Font name="Segoe UI Semibold" size="19.0" />
+      </font>
+      <VBox.margin>
+         <Insets left="20.0" top="20.0" />
+      </VBox.margin>
+   </Label>
+   <HBox>
+      <VBox.margin>
+         <Insets left="20.0" />
+      </VBox.margin>
+      <Label fx:id="lblTrackName" layoutX="10.0" layoutY="10.0" minWidth="20.0" text="Archived Manual Claims" textFill="#656565">
+         <HBox.margin>
+            <Insets />
+         </HBox.margin></Label>
+   </HBox>
+   <VBox prefWidth="344.0">
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="30.0" />
+      </VBox.margin>
+      <Label text="Start Date" textFill="#656565">
+         <cursor>
+            <Cursor fx:constant="DEFAULT" />
+         </cursor>
+      </Label>
+      <DatePicker fx:id="dpStart" prefHeight="30.0" prefWidth="296.0" promptText="Start Date">
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
+      </DatePicker>
+   </VBox>
+   <VBox layoutX="30.0" layoutY="105.0" prefWidth="344.0">
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="10.0" />
+      </VBox.margin>
+      <Label text="End Date" textFill="#656565">
+         <cursor>
+            <Cursor fx:constant="DEFAULT" />
+         </cursor>
+      </Label>
+      <DatePicker fx:id="dpEnd" prefHeight="30.0" prefWidth="296.0" promptText="Start Date">
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
+      </DatePicker>
+   </VBox>
+   <Pane>
+      <VBox.margin>
+         <Insets bottom="10.0" left="20.0" right="20.0" top="15.0" />
+      </VBox.margin>
+      <ImageView fitHeight="15.0" fitWidth="15.0" layoutX="189.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+         <Image url="@../../images/loading_02.gif" />
+      </ImageView>
+      <Button fx:id="btnFilter" mnemonicParsing="false" onAction="#onFilter" prefHeight="27.0" prefWidth="210.0" styleClass="button_inside" text="Filter" />
+   </Pane>
+</VBox>

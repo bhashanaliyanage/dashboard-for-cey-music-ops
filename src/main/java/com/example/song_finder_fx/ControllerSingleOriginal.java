@@ -91,8 +91,8 @@ public class ControllerSingleOriginal {
             comboArtist04Type.setDisable(!newValue);
         });
 
-        ArrayList<String> artistNames = DatabaseMySQL.getArtistList();
-//        ArrayList<String> artistNames = DatabasePostgre.getArtistList();      //Postgress
+        // ArrayList<String> artistNames = DatabaseMySQL.getArtistList();
+        ArrayList<String> artistNames = DatabasePostgres.getArtistList();      //Postgress
 
 
         TextFields.bindAutoCompletion(txtArtist01, artistNames);
@@ -230,7 +230,7 @@ public class ControllerSingleOriginal {
 
     private void handleArtistValidation(String artist, boolean[] status, int artistNumber, TextField artistTextField) throws SQLException, ClassNotFoundException {
         if (!(artist.matches(".*\\d.*"))) { // Rejecting input if any numerical characters are available
-            if (DatabaseMySQL.searchArtistTable(artist)) { // Checking the artist in artist table
+            if (DatabasePostgres.searchArtistTable(artist)) { // Checking the artist in artist table
                 ingest.setArtist(artist, artistNumber);
                 artistTextField.setStyle("-fx-border-color: '#e9ebee';");
             } else {
@@ -248,8 +248,8 @@ public class ControllerSingleOriginal {
                     if (response == buttonTypeYes) { // Adding artist to the artist table if user clicks yes
                         System.out.println("Add artist to the database");
                         try {
-                            DatabaseMySQL.registerNewCeyMusicArtist(artist);
-//                            DatabasePostgre.registerNewCeyMusicArtist(artist);        //Postgress
+                            // DatabaseMySQL.registerNewCeyMusicArtist(artist);
+                            DatabasePostgres.registerNewCeyMusicArtist(artist);        //Postgress
 
                             ingest.setArtist(artist, artistNumber);
                         } catch (SQLException | ClassNotFoundException e) {
@@ -273,8 +273,8 @@ public class ControllerSingleOriginal {
         if (mainArtist.isEmpty()) { // Checking the artist TextField if empty
             txtArtist01.setStyle("-fx-border-color: red;");
         } else {
-            String catNo = DatabaseMySQL.getCatNoFor(mainArtist);
-//            String catNo = DatabasePostgre.getCatNoFor(mainArtist);       //Postgerss
+//            String catNo = DatabaseMySQL.getCatNoFor(mainArtist);
+            String catNo = DatabasePostgres.getCatNoFor(mainArtist);       //Postgerss
 
 
             // System.out.println("catNo = " + catNo);

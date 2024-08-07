@@ -1,16 +1,18 @@
 package com.example.song_finder_fx.Model;
 
+import com.example.song_finder_fx.DatabasePostgres;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import java.awt.image.BufferedImage;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class ManualClaimTrack {
     private final int id;
-    private final String trackName;
-    private final String lyricist;
-    private final String composer;
+    private String trackName;
+    private String lyricist;
+    private String composer;
     private final String youtubeID;
     private final LocalDate date;
     private boolean status = false;
@@ -88,15 +90,14 @@ public class ManualClaimTrack {
     }
 
     public Image getPreviewImage() {
-        return SwingFXUtils.toFXImage(previewImage, null);
+        if (previewImage != null) {
+            return SwingFXUtils.toFXImage(previewImage, null);
+        }
+        return null;
     }
 
     public BufferedImage getBufferedImage() {
         return image;
-    }
-
-    public BufferedImage getBufferedPreviewImage() {
-        return previewImage;
     }
 
     public LocalDate getDate() {
@@ -114,5 +115,29 @@ public class ManualClaimTrack {
             case 4 -> "Single SR";
             default -> "Unspecified";
         };
+    }
+
+    public int unArchive() throws SQLException {
+        return DatabasePostgres.unArchiveManualClaim(id);
+    }
+
+    public void setTrimStart(String trimStart) {
+        this.trimStart = trimStart;
+    }
+
+    public void setTrimEnd(String trimEnd) {
+        this.trimEnd = trimEnd;
+    }
+
+    public void setTrackName(String trackName) {
+        this.trackName = trackName;
+    }
+
+    public void setComposer(String composer) {
+        this.composer = composer;
+    }
+
+    public void setLyricist(String lyricist) {
+        this.lyricist = lyricist;
     }
 }
