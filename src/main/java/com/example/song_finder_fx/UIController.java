@@ -120,6 +120,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //<editor-fold desc="Label">
     public Label songShare;
     public Label lblDatabaseStatus;
+    public static Label lblDatabaseStatusStatic;
     public Label srchRsArtist;
     public Label lblPlayerSongName;
     public Label lblPlayerSongArtst;
@@ -220,6 +221,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         btnManualClaimsStatic = btnManualClaims;
         btnSettingsStatic = btnSettings;
         btnSongListStatic = btnSongList;
+        lblDatabaseStatusStatic = lblDatabaseStatus;
 
         // Loading user
         loadUser();

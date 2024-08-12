@@ -192,10 +192,11 @@ public class ControllerManualClaimEdit {
     @FXML
     void onYoutubeRequested() {
         String claimID = lblClaimID.getText();
-        int claimIDInt = Integer.parseInt(claimID);
-        ManualClaimTrack track;
 
         try {
+            int claimIDInt = Integer.parseInt(claimID);
+            ManualClaimTrack track;
+
             track = DatabasePostgres.getManualClaim(claimIDInt);
 
             if (track != null) {
@@ -218,6 +219,8 @@ public class ControllerManualClaimEdit {
             alert.setHeaderText("Error Loading Youtube Link");
             alert.setContentText(e.toString());
             alert.showAndWait();
+        } catch (NumberFormatException ignore) {
+
         }
 
     }

@@ -28,7 +28,7 @@ public class Test {
         // testBulkReporting();
         // testArtistReportPDF(0.6305, 184.65, "Sarath De Alwis", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_sarath_de_alwis_02.pdf");
         // testArtistReportsNew();
-        testNewArtistReportPDF(0.6305, 184.65, "Ridma Weerawardena", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_april_ridma.pdf");
+        testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
@@ -37,12 +37,12 @@ public class Test {
         
     }
 
-    private static void testNewArtistReportPDF(double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
-        ArtistReport report = getArtistReportNew(0, eurToAudRate, audToLkrRate, artistName, year, month);
+    private static void testNewArtistReportPDF() throws SQLException, IOException {
+        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Ridma Weerawardena", 2024, 4);
 
         ReportPDFNew pdf = new ReportPDFNew();
-        pdf.generateReport(path, report);
-        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + path);
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_april_ridma.pdf", report);
+        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + "C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_april_ridma.pdf");
     }
 
     private static void testAssignPayee() throws SQLException {
@@ -407,7 +407,7 @@ public class Test {
         // DatabaseHandler databaseHandler = new DatabaseHandler();
         SongSearch songSearch = new SongSearch();
 
-        List<Songs> songs = songSearch.searchSong("Mawathe", SearchType.SONG_NAME);
+        List<Songs> songs = songSearch.searchSong("Mawathe", SearchType.SONG_NAME, true);
 
         for (Songs song : songs) {
             String trackTitle = song.getTrackTitle();

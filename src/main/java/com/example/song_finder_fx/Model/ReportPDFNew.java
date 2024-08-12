@@ -1,5 +1,6 @@
 package com.example.song_finder_fx.Model;
 
+import com.example.song_finder_fx.Constants.Colors;
 import com.example.song_finder_fx.Controller.PDFDocument;
 import com.itextpdf.io.font.FontProgramFactory;
 import com.itextpdf.io.font.PdfEncodings;
@@ -19,10 +20,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Objects;
 
-public class ReportPDFNew implements com.example.song_finder_fx.Constants.Colors {
+public class ReportPDFNew implements Colors {
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
     private static PdfFont FONT_POPPINS_MEDIUM = null;
+    private static final Border DARK_BLUE_BORDER = new SolidBorder(INVOICE_DARK_BLUE, 0.5f);
 
     public void generateReport(String path, ArtistReport report) throws IOException {
         PDFDocument pdfDocument = new PDFDocument();
@@ -41,7 +43,7 @@ public class ReportPDFNew implements com.example.song_finder_fx.Constants.Colors
         Table reportSummary = getReportSummaryTable(report);
         reportSummary.setFixedPosition(35, 570, 540);
         Table songBreakdown = getSongBreakdownTable(report);
-        songBreakdown.setFixedPosition(35, 540, 540);
+        // songBreakdown.setFixedPosition(35, 10, 540);
 
         SolidLine line = new SolidLine(90f);
         line.setColor(INVOICE_DARK_BLUE);
@@ -56,35 +58,67 @@ public class ReportPDFNew implements com.example.song_finder_fx.Constants.Colors
         document.add(tableHeader); // Letter Head
         document.add(reportMonthAndYear); // Report Month and Year
         document.add(reportSummary);
-        document.add(songBreakdown);
+        document.add(getSongBreakdownTable(report));
 
         document.close();
     }
 
-    private Table getSongBreakdownTable(ArtistReport report) {
-        float[] columnWidth = {50f, 350f, 50f, 50f, 50f, 50f};
+    private Table getSongBreakdownTable(ArtistReport report) throws MalformedURLException {
+        /*float[] columnWidth = {50f, 350f, 50f, 50f, 50f, 50f};
         Table table = new Table(columnWidth);
         table.setMarginLeft(20f);
         table.setMarginRight(20f);
         table.setMarginTop(10f);
 
-        PdfFont titleFont = FONT_POPPINS_MEDIUM;
+        PdfFont titleFont = FONT_POPPINS;
         float titleFontSize = 10f;
+        Border border = DARK_BLUE_BORDER;
 
-        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(border));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(border));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("Splits"))
                         .setFontSize(titleFontSize)
-                .setFont(titleFont).setBorder(Border.NO_BORDER));
+                        .setFontColor(INVOICE_DARK_BLUE)
+                .setFont(titleFont).setBorder(border));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("Tracks"))
                         .setFontSize(titleFontSize)
-                .setFont(titleFont).setBorder(Border.NO_BORDER));
+                        .setFontColor(INVOICE_DARK_BLUE)
+                .setFont(titleFont).setBorder(border));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("Artist Share (AUD)"))
                         .setFontSize(titleFontSize)
-                .setFont(titleFont).setBorder(Border.NO_BORDER));
+                        .setFontColor(INVOICE_DARK_BLUE)
+                .setFont(titleFont).setBorder(border));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("Artist Share (LKR)"))
                         .setFontSize(titleFontSize)
-                .setFont(titleFont).setBorder(Border.NO_BORDER));
+                        .setFontColor(INVOICE_DARK_BLUE)
+                .setFont(titleFont).setBorder(border));
+
+        return table;*/
+
+        // Table
+        float[] columnWidth = {50f, 350f, 50f, 50f, 50f, 50f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+        table.setMarginTop(10f);
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        float fontSizeSubTitle = 15f;
+        PdfFont subtitleFont = FONT_POPPINS_MEDIUM;
+
+        Image image = loadImage("src/main/resources/com/example/song_finder_fx/images/reports/icon_grow.png", false);
+        image.setWidth(10);
+
+        // Row 01
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Splits")).setBorder(Border.NO_BORDER));
+        // table.addCell(new Cell().setHeight(20f).add(image).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Tracks").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_DARK_BLUE).setFontSize(10f).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Artist Share (AUD)")).setBorder(Border.NO_BORDER));
+        // table.addCell(new Cell().setHeight(20f).add(image).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Artist Share (LKR)").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_DARK_BLUE).setFontSize(10f).setBorder(Border.NO_BORDER));
 
         return table;
     }
