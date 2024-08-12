@@ -33,41 +33,6 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
 
-    /*public void generateReport(Window window, ArtistReport report) throws IOException {
-        String path = getSaveLocation(window);
-
-        PDFDocument pdfDocument = new PDFDocument();
-        Document document = pdfDocument.getDocument(path);
-
-        // Images
-        Image reportHeading = loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png");
-
-        // Fonts
-        FONT_RUBIK_SEMIBOLD = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf");
-        FONT_POPPINS = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf");
-
-        // Table 01
-        Table tableHeader = getHeaderTable(reportHeading);
-        Table table02 = getTable02(report);
-        Table table03 = getTable03(report);
-        Table table04 = getTable04(report);
-        Table tableCoWriterPaymentSummary = getCoWriterSummaryTable(report);
-        Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
-        Table tableFooter = getFooterTable();
-
-        tableFooter.setFixedPosition(20f, document.getBottomMargin(), document.getWidth());
-
-        document.add(tableHeader); // Header
-        document.add(table02);
-        document.add(table03);
-        document.add(table04);
-        document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
-        document.add(tableTopPerformingSongsSummary); // Co-Writer Payment Summary
-        document.add(tableFooter);
-
-        document.close();
-    }*/
-
     private Table getCoWriterSummaryTable(ArtistReport report) {
         float[] columnWidth = {500f, 200f};
         Table table = new Table(columnWidth);
@@ -315,12 +280,8 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         // Table 01 Row 01
         table.addCell(new Cell().add(reportHeading).setBorder(Border.NO_BORDER).setMargin(0f));
         // Table 01 Row 02
-        /*table.addCell(new Cell()
-                .add(new Paragraph(""))
-                .setBackgroundColor(INVOICE_LIGHT_BLUE)
-                .setBorder(Border.NO_BORDER)
-        );*/
         //</editor-fold>
+
         return table;
     }
 

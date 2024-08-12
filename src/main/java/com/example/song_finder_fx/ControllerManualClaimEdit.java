@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
 
 public class ControllerManualClaimEdit {

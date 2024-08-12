@@ -113,6 +113,26 @@ public class ManualClaimTrack {
             case 2 -> "TV Programs";
             case 3 -> "Manual Claim";
             case 4 -> "Single SR";
+            case 7 -> "Channel One";
+            case 8 -> "Charana";
+            case 9 -> "Chat Programmes";
+            case 10 -> "Dawasak Da Handawaka";
+            case 11 -> "Derana";
+            case 12 -> "Derana 60+";
+            case 13 -> "Derana Little Star";
+            case 14 -> "Dream Star";
+            case 15 -> "Hiru";
+            case 16 -> "Hiru Star";
+            case 17 -> "Imorich Tunes";
+            case 18 -> "ITN";
+            case 19 -> "Ma Nowana Mama";
+            case 20 -> "Monara TV";
+            case 21 -> "Roo Tunes";
+            case 22 -> "Roopawahini";
+            case 23 -> "Sirasa";
+            case 24 -> "Siyatha";
+            case 25 -> "Supreme TV";
+            case 26 -> "Swarnawahini";
             default -> "Unspecified";
         };
     }

@@ -14,10 +14,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import org.controlsfx.control.textfield.TextFields;
 
 import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 public class ControllerMCLEntry {
 
@@ -70,6 +72,8 @@ public class ControllerMCLEntry {
                 ManualClaimTrack track = DatabasePostgres.getManualClaim(claimID);
                 String youtubeID = track.getYoutubeID();
                 String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
+                List<String> songTitles = DatabasePostgres.getAllSongTitles();
+                List<String> artistValidation = DatabasePostgres.getAllValidatedArtists();
 
                 Platform.runLater(() -> {
                     imgPreview.setImage(image.getImage());
@@ -79,6 +83,9 @@ public class ControllerMCLEntry {
                     txtComposer.setText(lblComposer.getText());
                     txtLyricist.setText(lblLyricist.getText());
                     lblLink.setText(thumbnailURL);
+                    TextFields.bindAutoCompletion(txtSongName, songTitles);
+                    TextFields.bindAutoCompletion(txtComposer, artistValidation);
+                    TextFields.bindAutoCompletion(txtLyricist, artistValidation);
 
                     System.out.println("Trim Start: " + track.getTrimStart());
                     System.out.println("Trim End: " + track.getTrimEnd());
@@ -86,6 +93,7 @@ public class ControllerMCLEntry {
                     txtStartTime.setText(track.getTrimStart());
                     txtEndTime.setText(track.getTrimEnd());
                 });
+
 
                 return null;
             }
