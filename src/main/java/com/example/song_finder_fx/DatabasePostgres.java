@@ -88,7 +88,7 @@ public class DatabasePostgres {
             Statement statement = conn.createStatement();
             return statement.executeUpdate(query);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error Inserting row into report: " + e);
         }
         return 0;
     }
@@ -1376,20 +1376,45 @@ public class DatabasePostgres {
     }
 
     public static boolean checkIfArtistValidated(String composer) throws SQLException {
-        String query = "SELECT COUNT(artist_id) FROM public.artists WHERE artist_name = ? AND validated = true;";
+        int maxRetries = 3;
+        int retryCount = 0;
 
-        try (Connection con = getConn();
-             PreparedStatement ps = con.prepareStatement(query)) {
+        while (retryCount < maxRetries) {
+            try {
+                String query = "SELECT COUNT(artist_id) FROM public.artists WHERE artist_name = ? AND validated = true;";
 
-            ps.setString(1, composer);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                int count = rs.getInt(1);
-                return count > 0;
+                try (Connection con = getConn();
+                     PreparedStatement ps = con.prepareStatement(query)) {
+
+                    ps.setString(1, composer);
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) {
+                        int count = rs.getInt(1);
+                        return count > 0;
+                    }
+                } // The Connection, PreparedStatement will be closed here.
+
+                return false; // Default return value in case the artist is not found.
+            } catch (PSQLException e) {
+                if (e.getMessage().contains("An I/O error occurred") || e.getMessage().contains("This connection has been closed")) {
+                    retryCount++;
+                    if (retryCount >= maxRetries) {
+                        throw e;
+                    }
+                    System.out.println("Retrying database operation, attempt " + retryCount);
+                    // You might want to add a small delay here
+                    try {
+                        Thread.sleep(1000); // 1 second delay
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    throw e;
+                }
             }
-        } // The Connection, PreparedStatement will be closed here.
+        }
 
-        return false; // Default return value in case the artist is not found.
+        return false;
     }
 
     public static ArrayList<Songs> getMissingISRCs(int report_id) throws SQLException {

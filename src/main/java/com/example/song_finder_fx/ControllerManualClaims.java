@@ -162,9 +162,12 @@ public class ControllerManualClaims {
                                     NotificationBuilder.displayTrayError("Error!", "Error Adding Manual Claim");
                                 } else {
                                     NotificationBuilder.displayTrayInfo("Manual Claim Added", "Your Claim for " + songName + " is successfully added");
-                                    Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
-                                    vboxTracks.getChildren().clear();
-                                    vboxTracks.getChildren().add(node);
+                                    // Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
+                                    Node node = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/manual_claims/manual-claims.fxml")));
+                                    UIController.mainNodes[6] = node;
+                                    UIController.mainVBoxStatic.getChildren().setAll(node);
+                                    // vboxTracks.getChildren().clear();
+                                    // vboxTracks.getChildren().add(node);
                                 }
                             } catch (IOException e) {
                                 Platform.runLater(() -> {

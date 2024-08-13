@@ -11,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -370,13 +369,24 @@ public class ControllerMCList {
                     btnArchive.setDisable(true);
                 });
 
+                int count;
+                int archivedCount = 0;
+
+                count = (int) checkBoxes.stream().filter(CheckBox::isSelected).count();
+
                 for (int i = 0; i < checkBoxes.size(); i++) {
                     if (checkBoxes.get(i).isSelected()) {
                         String songNo = labelsSongNo.get(i).getText();
                         try {
                             DatabasePostgres.archiveSelectedClaim(songNo);
+                            archivedCount++;
                             int finalI = i;
-                            Platform.runLater(() -> hBoxes.get(finalI).setDisable(true));
+                            int finalArchivedCount = archivedCount;
+                            Platform.runLater(() -> {
+                                hBoxes.get(finalI).setDisable(true);
+                                checkBoxes.get(finalI).setSelected(false);
+                                btnArchive.setText("Archiving " + finalArchivedCount + " of " + count);
+                            });
                         } catch (SQLException e) {
                             Platform.runLater(() -> {
                                 AlertBuilder.sendErrorAlert("Error", "An Error Occurred While Archiving Claim", e.toString());
