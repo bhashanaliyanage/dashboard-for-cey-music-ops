@@ -225,8 +225,6 @@ public File downloadUpdate(String assetName, String savePath, Button button, Lab
         // return !currentVersion.equals(latestVersion);
 
         // Remove the 'v' prefix if it exists
-        String gitTest = "Test";
-
         currentVersion = currentVersion.startsWith("v") ? currentVersion.substring(1) : currentVersion;
         latestVersion = latestVersion.startsWith("v") ? latestVersion.substring(1) : latestVersion;
 

@@ -12,7 +12,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import org.controlsfx.control.textfield.TextFields;
 
-import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -221,10 +220,31 @@ public class ControllerMCTrack {
         if (selectedItem == null) {
             return 1; // Default value when the selected item is null
         }
+
         return switch (selectedItem) {
             case "TV Programs" -> 2;
             case "Manual Claim" -> 3;
             case "Single SR" -> 4;
+            case "Channel One" -> 7;
+            case "Charana" -> 8;
+            case "Chat Programmes" -> 9;
+            case "Dawasak Da Handawaka" -> 10;
+            case "Derana" -> 11;
+            case "Derana 60+" -> 12;
+            case "Derana Little Star" -> 13;
+            case "Dream Star" -> 14;
+            case "Hiru" -> 15;
+            case "Hiru Star" -> 16;
+            case "Imorich Tunes" -> 17;
+            case "ITN" -> 18;
+            case "Ma Nowana Mama" -> 19;
+            case "Monara TV" -> 20;
+            case "Roo Tunes" -> 21;
+            case "Roopawahini" -> 22;
+            case "Sirasa" -> 23;
+            case "Siyatha" -> 24;
+            case "Supreme TV" -> 25;
+            case "Swarnawahini" -> 26;
             default -> 1;
         };
     }

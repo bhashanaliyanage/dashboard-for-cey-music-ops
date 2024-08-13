@@ -13,29 +13,29 @@ public class SongSearch {
         databaseHandler = new DatabaseHandler();
     }
 
-    public List<Songs> searchSong(String criteria, String searchType) {
+    public List<Songs> searchSong(String criteria, String searchType, boolean excludeUGC) {
         List<Songs> searchResults = null;
 
         // Check the search type and perform the appropriate search query
         switch (searchType) {
             case SearchType.SONG_NAME:
                 // System.out.println("SongSearch.searchSong");
-                searchResults = databaseHandler.searchSongsByTitle(criteria);
+                searchResults = databaseHandler.searchSongsByTitle(criteria, excludeUGC);
                 break;
             case SearchType.ISRC:
-                searchResults = databaseHandler.searchSongsByISRC(criteria);
+                searchResults = databaseHandler.searchSongsByISRC(criteria, excludeUGC);
                 break;
             case SearchType.COMPOSER:
-                searchResults = databaseHandler.searchSongsByComposer(criteria);
+                searchResults = databaseHandler.searchSongsByComposer(criteria, excludeUGC);
                 break;
             case SearchType.SINGER:
-                searchResults = databaseHandler.searchSongsBySinger(criteria);
+                searchResults = databaseHandler.searchSongsBySinger(criteria, excludeUGC);
                 break;
             case SearchType.LYRICIST:
-                searchResults = databaseHandler.searchSongsByLyricist(criteria);
+                searchResults = databaseHandler.searchSongsByLyricist(criteria, excludeUGC);
                 break;
             case SearchType.PRODUCT_NAME:
-                searchResults = databaseHandler.searchSongsByProductName(criteria);
+                searchResults = databaseHandler.searchSongsByProductName(criteria, excludeUGC);
                 break;
             default:
                 System.out.println("Invalid search type");

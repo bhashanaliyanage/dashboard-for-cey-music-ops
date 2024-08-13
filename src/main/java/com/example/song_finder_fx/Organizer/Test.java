@@ -23,39 +23,26 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        // DatabasePostgres.refreshSummaryTable(6, 2024);
+        // DatabasePostgres.refreshSummaryTable(4, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
-        testArtistReportPDF(0.6305, 184.65, "Sarath De Alwis", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_sarath_de_alwis_02.pdf");
+        // testArtistReportPDF(0.6305, 184.65, "Sarath De Alwis", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_sarath_de_alwis_02.pdf");
         // testArtistReportsNew();
+        testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
         // DatabasePostgres.changePassword("gimhaar", "admin");
 
-        /*OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "", "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", "https://www.googleapis.com/auth/userinfo.profile");
-        authGoogle.startLogin();*/
+        
+    }
 
-        // testAssignPayee();
+    private static void testNewArtistReportPDF() throws SQLException, IOException {
+        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Ridma Weerawardena", 2024, 4);
 
-        // https://drive.google.com/uc?id=14wg8K3fqpov_zWTw3cOPhed__gB82njN&export=download
-        // GoogleDriveDownloader googleDriveDownloader = new GoogleDriveDownloader("14wg8K3fqpov_zWTw3cOPhed__gB82njN", "C:\\Users\\bhash\\Documents\\Test.msi");
-        // googleDriveDownloader.downloadUpdate();
-
-        /*String owner = "bhashanaliyanage";
-        String repo = "dashboard-for-cey-music-ops";
-        GitHubController controller = new GitHubController(owner, repo);
-
-        // Check Update
-        ReleaseInfo latestVersion = controller.getLatestVersion();
-        System.out.println("Release Info: " + latestVersion.releaseNotes);
-        System.out.println("Version: " + latestVersion.version);*/
-
-        // Download Update
-        /*String assetName = "build1.msi";
-        String savePath = "C:\\Users\\bhash\\Documents\\TestGIT.msi";
-
-        controller.downloadUpdate(assetName, savePath);*/
+        ReportPDFNew pdf = new ReportPDFNew();
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_april_ridma.pdf", report);
+        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + "C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_april_ridma.pdf");
     }
 
     private static void testAssignPayee() throws SQLException {
@@ -420,7 +407,7 @@ public class Test {
         // DatabaseHandler databaseHandler = new DatabaseHandler();
         SongSearch songSearch = new SongSearch();
 
-        List<Songs> songs = songSearch.searchSong("Mawathe", SearchType.SONG_NAME);
+        List<Songs> songs = songSearch.searchSong("Mawathe", SearchType.SONG_NAME, true);
 
         for (Songs song : songs) {
             String trackTitle = song.getTrackTitle();

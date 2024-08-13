@@ -11,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -76,12 +75,67 @@ public class ControllerMCList {
         ivArtworks.clear();
 
         lblClaimCount.setText("Loading...");
+        String databaseStatusText = UIController.lblDatabaseStatusStatic.getText();
 
+        Task<Void> taskGetManualClaims = getTaskLoadManualClaims();
+
+        taskGetManualClaims.setOnSucceeded(event -> {
+            Thread threadValidation = new Thread(() -> {
+                try {
+                    Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText("Validating Artists"));
+                    for (Label label : labelsComposer) {
+                        String composer = label.getText();
+                        boolean status = DatabasePostgres.checkIfArtistValidated(composer);
+                        if (!status) {
+                            Platform.runLater(() -> label.setStyle("-fx-text-fill: red"));
+                        }
+                    }
+
+                    Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText("Fetching Artworks"));
+                    for (Label label : labelsLyricist) {
+                        String composer = label.getText();
+                        boolean status = DatabasePostgres.checkIfArtistValidated(composer);
+                        if (!status) {
+                            Platform.runLater(() -> label.setStyle("-fx-text-fill: red"));
+                        }
+                    }
+                    Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText(databaseStatusText));
+                } catch (SQLException e) {
+                    Platform.runLater(e::printStackTrace);
+                }
+            });
+
+            Thread threadArtworks = new Thread(() -> {
+                for (int i = 0; i < manualClaims.size(); i++) {
+                    ImageView imageView = ivArtworks.get(i);
+                    MCTrackController controller = new MCTrackController(manualClaims.get(i));
+                    try {
+                        int finalI = i;
+                        Platform.runLater(() -> System.out.println("Fetching Artworks for: " + manualClaims.get(finalI).getTrackName()));
+                        manualClaims.set(i, controller.fetchArtwork());
+                        imageView.setImage(setImage(manualClaims.get(i), i));
+                    } catch (SQLException | IOException | URISyntaxException e) {
+                        Platform.runLater(e::printStackTrace);
+                    }
+                }
+            });
+
+            threadValidation.start();
+            threadArtworks.start();
+        });
+
+        Thread threadGetManualClaims = new Thread(taskGetManualClaims);
+        threadGetManualClaims.start();
+
+    }
+
+    private @NotNull Task<Void> getTaskLoadManualClaims() {
         List<Node> claimEntries = new ArrayList<>();
 
-        Task<Void> taskGetManualClaims = new Task<>() {
+        return new Task<>() {
             @Override
             protected Void call() throws SQLException {
+                Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText("Loading Manual Claims"));
                 manualClaims = DatabasePostgres.getManualClaims();
 
                 int count = 0;
@@ -108,15 +162,6 @@ public class ControllerMCList {
                         hBoxes.add(hboxEntry);
                         ImageView image = (ImageView) node.lookup("#image");
                         ivArtworks.add(image);
-                        /*try {
-                            image.setImage(claim.getPreviewImage());
-                        } catch (Exception e) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Error");
-                            alert.setHeaderText("Error Loading Preview Image");
-                            alert.setContentText(String.valueOf(e));
-                            Platform.runLater(alert::showAndWait);
-                        }*/
 
                         lblSongNo.setText(String.valueOf(claim.getId()));
                         lblSongName.setText(claim.getTrackName());
@@ -147,52 +192,6 @@ public class ControllerMCList {
                 return null;
             }
         };
-
-        taskGetManualClaims.setOnSucceeded(event -> {
-            Thread threadValidation = new Thread(() -> {
-                try {
-                    for (Label label : labelsComposer) {
-                        String composer = label.getText();
-                        boolean status = DatabasePostgres.checkIfArtistValidated(composer);
-                        if (!status) {
-                            Platform.runLater(() -> label.setStyle("-fx-text-fill: red"));
-                        }
-                    }
-
-                    for (Label label : labelsLyricist) {
-                        String composer = label.getText();
-                        boolean status = DatabasePostgres.checkIfArtistValidated(composer);
-                        if (!status) {
-                            Platform.runLater(() -> label.setStyle("-fx-text-fill: red"));
-                        }
-                    }
-                } catch (SQLException e) {
-                    Platform.runLater(e::printStackTrace);
-                }
-            });
-
-            Thread threadArtworks = new Thread(() -> {
-                for (int i = 0; i < manualClaims.size(); i++) {
-                    ImageView imageView = ivArtworks.get(i);
-                    MCTrackController controller = new MCTrackController(manualClaims.get(i));
-                    try {
-                        int finalI = i;
-                        Platform.runLater(() -> System.out.println("Fetching Artworks for: " + manualClaims.get(finalI).getTrackName()));
-                        manualClaims.set(i, controller.fetchArtwork());
-                        imageView.setImage(setImage(manualClaims.get(i), i));
-                    } catch (SQLException | IOException | URISyntaxException e) {
-                        Platform.runLater(() -> e.printStackTrace());
-                    }
-                }
-            });
-
-            threadValidation.start();
-            threadArtworks.start();
-        });
-
-        Thread threadGetManualClaims = new Thread(taskGetManualClaims);
-        threadGetManualClaims.start();
-
     }
 
     private Image setImage(ManualClaimTrack claim, int listIndex) throws IOException, URISyntaxException {
@@ -370,13 +369,24 @@ public class ControllerMCList {
                     btnArchive.setDisable(true);
                 });
 
+                int count;
+                int archivedCount = 0;
+
+                count = (int) checkBoxes.stream().filter(CheckBox::isSelected).count();
+
                 for (int i = 0; i < checkBoxes.size(); i++) {
                     if (checkBoxes.get(i).isSelected()) {
                         String songNo = labelsSongNo.get(i).getText();
                         try {
                             DatabasePostgres.archiveSelectedClaim(songNo);
+                            archivedCount++;
                             int finalI = i;
-                            Platform.runLater(() -> hBoxes.get(finalI).setDisable(true));
+                            int finalArchivedCount = archivedCount;
+                            Platform.runLater(() -> {
+                                hBoxes.get(finalI).setDisable(true);
+                                checkBoxes.get(finalI).setSelected(false);
+                                btnArchive.setText("Archiving " + finalArchivedCount + " of " + count);
+                            });
                         } catch (SQLException e) {
                             Platform.runLater(() -> {
                                 AlertBuilder.sendErrorAlert("Error", "An Error Occurred While Archiving Claim", e.toString());

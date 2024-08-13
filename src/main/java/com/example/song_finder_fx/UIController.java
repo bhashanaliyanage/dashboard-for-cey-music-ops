@@ -120,6 +120,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //<editor-fold desc="Label">
     public Label songShare;
     public Label lblDatabaseStatus;
+    public static Label lblDatabaseStatusStatic;
     public Label srchRsArtist;
     public Label lblPlayerSongName;
     public Label lblPlayerSongArtst;
@@ -220,6 +221,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         btnManualClaimsStatic = btnManualClaims;
         btnSettingsStatic = btnSettings;
         btnSongListStatic = btnSongList;
+        lblDatabaseStatusStatic = lblDatabaseStatus;
 
         // Loading user
         loadUser();
@@ -259,12 +261,24 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                     throw new RuntimeException(e);
                 }
             } else if (privilegeLevel == 2) {
+                // btnRevenueAnalysisStatic.setDisable(false);
+                // btnArtistReportsStatic.setDisable(false);
+                btnIngestsStatic.setDisable(false);
+
+                btnSeachSongsStatic.setDisable(false);
+                // btnCollectSongsStatic.setDisable(false);
+                btnManualClaimsStatic.setDisable(false);
+                btnSettingsStatic.setDisable(false);
+                btnSongListStatic.setDisable(false);
+
+                mainVBoxStatic.setDisable(false);
+            } else if (privilegeLevel == 1) {
                 btnRevenueAnalysisStatic.setDisable(false);
                 btnArtistReportsStatic.setDisable(false);
                 btnIngestsStatic.setDisable(false);
 
                 btnSeachSongsStatic.setDisable(false);
-                // btnCollectSongsStatic.setDisable(false);
+                btnCollectSongsStatic.setDisable(false);
                 btnManualClaimsStatic.setDisable(false);
                 btnSettingsStatic.setDisable(false);
                 btnSongListStatic.setDisable(false);
@@ -290,20 +304,20 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         }
     }
 
-    public static void setAllScenes() throws IOException {
-        // About
-        mainNodes[1] = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/about.fxml")));
-        // Search
-        mainNodes[2] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/search-details.fxml")));
-        // Search and collect songs
-        mainNodes[3] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/collect-songs.fxml")));
-        // NavBar
-        mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar.fxml")));
-        // NavBar Collapsed
-        mainNodes[5] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar-small.fxml")));
-        // Updates
-        // mainNodes[6] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/sidepanel-update.fxml")));
-    }
+public static void setAllScenes() throws IOException {
+    // About
+    mainNodes[1] = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/about.fxml")));
+    // Search
+    mainNodes[2] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/search-details.fxml")));
+    // Search and collect songs
+    mainNodes[3] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/collect-songs.fxml")));
+    // NavBar
+    mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar.fxml")));
+    // NavBar Collapsed
+    mainNodes[5] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar-small.fxml")));
+    // Add Manual Claims
+    mainNodes[6] = null;
+}
 
     public void backButtonImplementationForSearchSong(MouseEvent event) {
         Node node = (Node) event.getSource();

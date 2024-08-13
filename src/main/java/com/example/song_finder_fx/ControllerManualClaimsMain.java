@@ -27,7 +27,17 @@ public class ControllerManualClaimsMain {
 
     @FXML
     void onAddManualClaim(MouseEvent event) throws IOException {
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims.fxml")));
+        Node node;
+
+        if (UIController.mainNodes[6] == null) {
+            System.out.println("Loading Add Manual Claims UI");
+            node = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/manual_claims/manual-claims.fxml")));
+            UIController.mainNodes[6] = node;
+        } else {
+            System.out.println("Accessing Add Manual Claims UI From UI Controller Reference");
+            node = UIController.mainNodes[6];
+        }
+
         Scene scene = ((Node) event.getSource()).getScene();
         VBox mainVBox = (VBox) scene.lookup("#mainVBox");
         mainVBox.getChildren().clear();

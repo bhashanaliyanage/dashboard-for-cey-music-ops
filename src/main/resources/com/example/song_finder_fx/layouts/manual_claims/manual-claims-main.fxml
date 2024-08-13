@@ -49,76 +49,67 @@
          <Insets left="30.0" top="30.0" />
       </VBox.margin>
    </VBox>
-   <HBox alignment="CENTER_LEFT" maxWidth="688.0" minWidth="688.0" onMouseClicked="#onAddManualClaim" prefHeight="70.0" prefWidth="100.0" styleClass="clickable-pane-bg">
+   <HBox alignment="CENTER_LEFT" maxWidth="688.0" minWidth="688.0" onMouseClicked="#onAddManualClaim" prefHeight="70.0"
+         prefWidth="100.0" styleClass="clickable-pane-bg">
       <HBox.margin>
-         <Insets left="30.0" right="30.0" />
+         <Insets left="30.0" right="30.0"/>
       </HBox.margin>
       <VBox.margin>
-         <Insets left="30.0" top="5.0" />
+         <Insets left="30.0" top="5.0"/>
       </VBox.margin>
-      <children>
-         <ImageView fitHeight="23.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@../../images/icon_plus_circle.png" />
-            </image>
-            <HBox.margin>
-               <Insets left="30.0" />
-            </HBox.margin>
-         </ImageView>
-         <Label text="Add Manual Claim">
-            <HBox.margin>
-               <Insets left="20.0" />
-            </HBox.margin>
-            <font>
-               <Font size="14.0" />
-            </font>
-         </Label>
-      </children>
+      <ImageView fitHeight="23.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+         <HBox.margin>
+            <Insets left="30.0"/>
+         </HBox.margin>
+         <Image url="@../../images/icon_plus_circle.png"/>
+      </ImageView>
+      <Label text="Add Manual Claim">
+         <HBox.margin>
+            <Insets left="20.0"/>
+         </HBox.margin>
+         <font>
+            <Font size="14.0"/>
+         </font>
+      </Label>
    </HBox>
-   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="214.0" maxWidth="688.0" minWidth="688.0" onMouseClicked="#onIngestManualClaims" prefHeight="70.0" prefWidth="100.0" styleClass="clickable-pane-bg">
-      <children>
-         <ImageView fitHeight="23.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@../../images/star.png" />
-            </image>
-            <HBox.margin>
-               <Insets left="30.0" />
-            </HBox.margin>
-         </ImageView>
-         <Label text="Create Ingest for Manual Claims">
-            <HBox.margin>
-               <Insets left="20.0" />
-            </HBox.margin>
-            <font>
-               <Font size="14.0" />
-            </font>
-         </Label>
-      </children>
+   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="214.0" maxWidth="688.0" minWidth="688.0"
+         onMouseClicked="#onIngestManualClaims" prefHeight="70.0" prefWidth="100.0" styleClass="clickable-pane-bg">
       <VBox.margin>
-         <Insets left="30.0" top="5.0" />
+         <Insets left="30.0" top="5.0"/>
       </VBox.margin>
+      <ImageView fitHeight="23.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+         <HBox.margin>
+            <Insets left="30.0"/>
+         </HBox.margin>
+         <Image url="@../../images/star.png"/>
+      </ImageView>
+      <Label text="Create Ingest for Manual Claims">
+         <HBox.margin>
+            <Insets left="20.0"/>
+         </HBox.margin>
+         <font>
+            <Font size="14.0"/>
+         </font>
+      </Label>
    </HBox>
-   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="294.0" maxWidth="688.0" minWidth="688.0" onMouseClicked="#onArchivedClaims" prefHeight="70.0" prefWidth="100.0" styleClass="clickable-pane-bg">
-      <children>
-         <ImageView fitHeight="23.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@../../images/archive.png" />
-            </image>
-            <HBox.margin>
-               <Insets left="30.0" />
-            </HBox.margin>
-         </ImageView>
-         <Label text="Archived Manual Claims">
-            <HBox.margin>
-               <Insets left="20.0" />
-            </HBox.margin>
-            <font>
-               <Font size="14.0" />
-            </font>
-         </Label>
-      </children>
+   <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="294.0" maxWidth="688.0" minWidth="688.0"
+         onMouseClicked="#onArchivedClaims" prefHeight="70.0" prefWidth="100.0" styleClass="clickable-pane-bg">
       <VBox.margin>
-         <Insets bottom="20.0" left="30.0" top="5.0" />
+         <Insets bottom="20.0" left="30.0" top="5.0"/>
       </VBox.margin>
+      <ImageView fitHeight="23.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+         <HBox.margin>
+            <Insets left="30.0"/>
+         </HBox.margin>
+         <Image url="@../../images/archive.png"/>
+      </ImageView>
+      <Label text="Archived Manual Claims">
+         <HBox.margin>
+            <Insets left="20.0"/>
+         </HBox.margin>
+         <font>
+            <Font size="14.0"/>
+         </font>
+      </Label>
    </HBox>
 </VBox>
