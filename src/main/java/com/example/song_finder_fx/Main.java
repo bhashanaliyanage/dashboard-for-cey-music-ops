@@ -198,7 +198,7 @@ public class Main extends Application {
         return chooser.showDialog(ownerWindow);
     }
 
-    public static void copyAudio(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
+    public static void copyAudio(String isrc, File directory, File destination) throws SQLException {
 //        DatabaseMySQL.searchAndCopySongs(isrc, directory, destination);
         DatabasePostgres.searchAndCopySongs(isrc, directory, destination);     //Postgress
 

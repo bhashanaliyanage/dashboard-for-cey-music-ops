@@ -38,7 +38,7 @@ public class ImageProcessor {
         return resizedImage;
     }
 
-    public static BufferedImage cropImage(BufferedImage image) throws IOException {
+    public static BufferedImage cropImage(BufferedImage image) {
         // Calculate the square dimensions (1:1 ratio)
         int size = Math.min(image.getWidth(), image.getHeight());
 
