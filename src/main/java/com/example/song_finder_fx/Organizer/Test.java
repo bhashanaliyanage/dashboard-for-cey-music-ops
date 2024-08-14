@@ -37,7 +37,7 @@ public class Test {
         
     }
 
-    private static void testNewArtistReportPDF() throws SQLException, IOException {
+    private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
         ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Ridma Weerawardena", 2024, 4);
 
         ReportPDFNew pdf = new ReportPDFNew();

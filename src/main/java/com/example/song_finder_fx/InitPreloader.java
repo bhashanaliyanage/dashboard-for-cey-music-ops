@@ -105,17 +105,17 @@ public class InitPreloader implements Initializable {
 
         });
 
-Thread loadScenes = new Thread(() -> {
-    message[0] = "Loading Scenes";
+        Thread loadScenes = new Thread(() -> {
+            message[0] = "Loading Scenes";
 
-    Platform.runLater(() -> lblLoadingg.setText(message[0]));
+            Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
-    try {
-        UIController.setAllScenes();
-    } catch (Exception e) {
-        throw new RuntimeException(e);
-    }
-});
+            try {
+                UIController.setAllScenes();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         Thread mainWindow = new Thread(() -> Platform.runLater(() -> {
             try {

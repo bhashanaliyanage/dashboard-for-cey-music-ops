@@ -31,8 +31,9 @@ public class ImageProcessor {
         Graphics2D graphics2D = resizedImage.createGraphics();
 
         // Create a new resized image with the calculated dimensions
-        Image scaledImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-        graphics2D.drawImage(scaledImage, 0, 0, null);
+        // Image scaledImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+        // graphics2D.drawImage(scaledImage, 0, 0, null);
+        graphics2D.drawImage(image, 0, 0, targetWidth, targetHeight, null);
         graphics2D.dispose();
         return resizedImage;
     }
