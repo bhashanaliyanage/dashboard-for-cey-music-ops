@@ -2359,6 +2359,27 @@ public class DatabasePostgres {
         return null;
     }
 
+    public static List<String> getIngestNames() throws SQLException {
+        String sql = "SELECT ingest_name FROM public.temp_ingest_metadata;";
+        List<String> ingestNames = new ArrayList<>();
+
+        try (Connection con = getConn()) {
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.isBeforeFirst()) {
+                        while (rs.next()) {
+                            String ingestName = rs.getString(1);
+                            ingestNames.add(ingestName);
+                        }
+                        return ingestNames;
+                    }
+                }
+            }
+        }
+
+        return ingestNames;
+    }
+
 
     public List<Payee> check(String name) {
 //        String name = "Victor Rathnayake";

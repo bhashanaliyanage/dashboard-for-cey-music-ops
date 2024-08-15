@@ -32,11 +32,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
+import static com.google.common.io.Files.getFileExtension;
+
 public class ReportPDFNew implements Colors {
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
     private static PdfFont FONT_POPPINS_MEDIUM = null;
     private static final Border DARK_BLUE_BORDER = new SolidBorder(INVOICE_DARK_BLUE, 0.5f);
+    private String reportPath;
 
     public void generateReport(String path, ArtistReport report) throws IOException, SQLException, ClassNotFoundException {
         PDFDocument pdfDocument = new PDFDocument();
@@ -80,6 +83,8 @@ public class ReportPDFNew implements Colors {
         document.add(songBreakdown);
 
         document.close();
+
+        this.reportPath = path;
     }
 
     private static void setBackgroundColor(Document document) {
@@ -159,13 +164,13 @@ public class ReportPDFNew implements Colors {
         String searchLocation = Main.getAudioDatabaseLocation();
         String imagePath = findUPCImage(searchLocation, upc);
 
-        // System.out.println("imagePath = " + imagePath);
+        System.out.println("Image Search Location: " + searchLocation);
 
         return loadImageSmall(Objects.requireNonNullElse(imagePath, "src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork_90.jpg"), true);
         // String location = "src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork_90.jpg";
     }
 
-    public static String findUPCImage(String searchLocation, String upc) {
+    public static String findUPCImage(String searchLocation, String upc) throws IOException {
         // Create a File object for the search location
         File searchDir = new File(searchLocation);
 
@@ -195,14 +200,68 @@ public class ReportPDFNew implements Colors {
         return (folders != null && folders.length > 0) ? folders[0] : null;
     }
 
-    private static File findUPCImageFile(File upcFolder, String upc) {
-        File[] imageFiles = upcFolder.listFiles((dir, name) -> {
+    private static File findUPCImageFile(File upcFolder, String upc) throws IOException {
+        /*File[] imageFiles = upcFolder.listFiles((dir, name) -> {
             String lowercaseName = name.toLowerCase();
             return (lowercaseName.startsWith(upc.toLowerCase()) &&
                     (lowercaseName.endsWith(".png") || lowercaseName.endsWith(".jpg") || lowercaseName.endsWith(".jpeg")));
         });
 
-        return (imageFiles != null && imageFiles.length > 0) ? imageFiles[0] : null;
+        return (imageFiles != null && imageFiles.length > 0) ? imageFiles[0] : null;*/
+
+        String miniFileName = upc.toLowerCase() + "_mini";
+        File miniFile = findFile(upcFolder, miniFileName);
+
+        if (miniFile != null) {
+            System.out.println("Found Mini File for " + upc + ": " + miniFile.getAbsolutePath());
+            return miniFile;
+        }
+
+        // If mini file doesn't exist, look for the original file
+        File originalFile = findFile(upcFolder, upc.toLowerCase());
+
+        if (originalFile != null) {
+            // Resize the original file and save as mini
+            System.out.println("Mini File not found for " + upc + ", resizing and saving as " + miniFileName);
+            return resizeAndSaveMini(originalFile, upcFolder, miniFileName);
+        }
+
+        return null;
+    }
+
+    private static File resizeAndSaveMini(File originalFile, File folder, String miniFileName) throws IOException {
+        BufferedImage originalImage = ImageIO.read(originalFile);
+
+        // Define your desired dimensions for the mini image
+        int targetWidth = 300;  // Example value, adjust as needed
+        int targetHeight = 200; // Example value, adjust as needed
+
+        // Calculate scaling factors
+        double widthScale = (double) targetWidth / originalImage.getWidth();
+        double heightScale = (double) targetHeight / originalImage.getHeight();
+        double scale = Math.min(widthScale, heightScale);
+
+        int scaledWidth = (int) (originalImage.getWidth() * scale);
+        int scaledHeight = (int) (originalImage.getHeight() * scale);
+
+        BufferedImage resizedImage = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_RGB);
+        resizedImage.getGraphics().drawImage(originalImage.getScaledInstance(scaledWidth, scaledHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+
+        String fileExtension = getFileExtension(originalFile.getName());
+        File miniFile = new File(folder, miniFileName + "." + fileExtension);
+        ImageIO.write(resizedImage, fileExtension, miniFile);
+
+        return miniFile;
+    }
+
+    private static File findFile(File folder, String baseFileName) {
+        File[] matchingFiles = folder.listFiles((dir, name) -> {
+            String lowercaseName = name.toLowerCase();
+            return lowercaseName.startsWith(baseFileName) &&
+                    (lowercaseName.endsWith(".png") || lowercaseName.endsWith(".jpg") || lowercaseName.endsWith(".jpeg"));
+        });
+
+        return (matchingFiles != null && matchingFiles.length > 0) ? matchingFiles[0] : null;
     }
 
     private static void addSongSummaryRow(Table table, Image songImage, String songName, String splits, String tracks, String artistShareAUD, String artistShareLKR) {
@@ -210,7 +269,7 @@ public class ReportPDFNew implements Colors {
         Color backgroundColor = new DeviceRgb(226, 229, 233);
         PdfFont subtitleFont = FONT_POPPINS;
         TextAlignment textAlignment = TextAlignment.CENTER;
-        Border border = DARK_BLUE_BORDER;
+        Border border = Border.NO_BORDER;
 
         table.addCell(new Cell().setHeight(1f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
         table.addCell(new Cell().setHeight(1f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
@@ -303,21 +362,13 @@ public class ReportPDFNew implements Colors {
         return invoiceHeading;
     }
 
-static Image loadImage(String location, boolean autoscale) throws MalformedURLException {
-    Image image = new Image(ImageDataFactory.create(location));
-    image.setAutoScale(autoscale);
-    return image;
-}
+    static Image loadImage(String location, boolean autoscale) throws MalformedURLException {
+        Image image = new Image(ImageDataFactory.create(location));
+        image.setAutoScale(autoscale);
+        return image;
+    }
 
     static Image loadImageSmall(String location, boolean autoscale) throws IOException {
-        /*BufferedImage bufferedImage = ImageIO.read(new File(location));
-        BufferedImage resizedImage = ImageProcessor.resizeImage(100, 100, bufferedImage);
-        String format = location.toLowerCase().endsWith(".png") ? "png" : "jpeg";
-        byte[] imageBytes = convertToByteArray(resizedImage, format);
-        Image image = new Image(ImageDataFactory.create(imageBytes));
-        image.setAutoScale(autoscale);
-        return image;*/
-
         Image image = new Image(ImageDataFactory.create(location));
 
         // Set the new dimensions
@@ -328,6 +379,14 @@ static Image loadImage(String location, boolean autoscale) throws MalformedURLEx
 
         return image;
     }
+
+    /*BufferedImage bufferedImage = ImageIO.read(new File(location));
+    BufferedImage resizedImage = ImageProcessor.resizeImage(100, 100, bufferedImage);
+    String format = location.toLowerCase().endsWith(".png") ? "png" : "jpeg";
+    byte[] imageBytes = convertToByteArray(resizedImage, format);
+    Image image = new Image(ImageDataFactory.create(imageBytes));
+    image.setAutoScale(autoscale);
+    return image;*/
 
     public static byte[] convertToByteArray(BufferedImage image, String format) throws IOException {
         if (image == null) {
@@ -360,5 +419,9 @@ static Image loadImage(String location, boolean autoscale) throws MalformedURLEx
         } else {
             return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
         }
+    }
+
+    public String getReportPath() {
+        return this.reportPath;
     }
 }

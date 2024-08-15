@@ -33,16 +33,14 @@ public class Test {
         // testDashboard();
         // UserSession us = new UserSession();
         // DatabasePostgres.changePassword("gimhaar", "admin");
-
-        
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
-        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Ridma Weerawardena", 2024, 4);
+        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Senanga Dissanayake", 2024, 4);
 
         ReportPDFNew pdf = new ReportPDFNew();
-        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_april_ridma.pdf", report);
-        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + "C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_april_ridma.pdf");
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_april_senanga.pdf", report);
+        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
     }
 
     private static void testAssignPayee() throws SQLException {
@@ -211,21 +209,20 @@ public class Test {
     }
 
     private static void testArtistReportsNew() throws SQLException {
+        // String.format("%,9.2f", report.getGrossRevenueInAUD())
         int artistID = 47;
-        double eurToAudRate = 0.6285;
-        double audToLkrRate = 186.78;
-        String artistName = "Ajantha Ranasinghe";
+        double eurToAudRate = 0.6305;
+        double audToLkrRate = 184.65;
+        String artistName = "Methun SK";
         int year = 2024;
-        int month = 3;
-
-        DatabasePostgres.refreshSummaryTable(3, 2024);
+        int month = 4;
 
         // Creating artist model by passing artistID
         ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month);
 
         // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
-        double grossRevenue = report.getGrossRevenueInLKR();
-        double partnerShare = report.getPartnerShareInLKR();
+        double grossRevenue = report.getGrossRevenueInAUD();
+        double partnerShare = report.getPartnerShareInAUD();
         ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
         List<CoWriterSummary> coWriterSummaries = report.getCoWriterPaymentSummary();
         List<CoWriterShare> coWriterShares = report.getAssetBreakdown();
@@ -242,13 +239,13 @@ public class Test {
 
         System.out.println("\n========");
 
-        System.out.println("\nGross Revenue: LKR " + grossRevenue);
-        System.out.println("Partner Share: LKR " + partnerShare);
-        System.out.println("========");
+        System.out.println("\nGross Revenue: AUD " + String.format("%,9.2f", grossRevenue));
+        System.out.println("Partner Share: AUD " + String.format("%,9.2f", partnerShare));
+        System.out.println("\n========");
 
         System.out.println("\nTop Performing Songs");
         for (Songs song : topPerformingSongs) {
-            System.out.println(song.getTrackTitle() + " | " + (song.getRoyalty() * eurToAudRate * audToLkrRate));
+            System.out.println(song.getTrackTitle() + " | AUD: " + String.format("%,9.2f", (song.getRoyalty() * eurToAudRate)));
         }
 
         System.out.println("\n========");
@@ -257,7 +254,7 @@ public class Test {
         for (CoWriterSummary summary : coWriterSummaries) {
             String contributor = summary.getContributor();
             double royalty = summary.getRoyalty();
-            System.out.println(contributor + " | " + royalty * eurToAudRate * audToLkrRate);
+            System.out.println(contributor + " | AUD: " + String.format("%,9.2f", royalty * eurToAudRate));
         }
 
         System.out.println("\nCo-Writer Share Detailed");
@@ -265,10 +262,10 @@ public class Test {
             String songName = share.getSongName();
             String songType = share.getSongType();
             String percentage = share.getShare();
-            double artistShare = share.getRoyalty() * eurToAudRate * audToLkrRate;
+            double artistShare = share.getRoyalty() * eurToAudRate;
             String coWriter = share.getContributor();
 
-            System.out.println(songName + " | " + songType + " | " + percentage + " | " + artistShare + " | " + coWriter);
+            System.out.println(songName + " | " + songType + " | " + percentage + " | AUD" + String.format("%,9.2f", artistShare) + " | " + coWriter);
         }
     }
 
