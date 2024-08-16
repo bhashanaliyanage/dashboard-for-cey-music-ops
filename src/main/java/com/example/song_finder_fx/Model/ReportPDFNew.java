@@ -105,7 +105,6 @@ public class ReportPDFNew implements Colors {
         PdfFont subtitleFont = FONT_POPPINS_MEDIUM;
         VerticalAlignment verticalAlignment = VerticalAlignment.MIDDLE;
         Border border = Border.NO_BORDER;
-        Color backgroundColor = new DeviceRgb(226, 229, 233);
 
         // Heading
         table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
