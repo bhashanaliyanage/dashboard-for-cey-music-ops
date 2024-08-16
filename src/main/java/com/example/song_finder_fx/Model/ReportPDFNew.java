@@ -13,7 +13,6 @@ import com.itextpdf.kernel.color.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
-import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.border.SolidBorder;
@@ -21,10 +20,11 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
+import com.itextpdf.layout.renderer.CellRenderer;
+import com.itextpdf.layout.renderer.DrawContext;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -35,40 +35,31 @@ import java.util.Objects;
 import static com.google.common.io.Files.getFileExtension;
 
 public class ReportPDFNew implements Colors {
+    private static PdfFont FONT_POPPINS_SEMIBOLD = null;
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
     private static PdfFont FONT_POPPINS_MEDIUM = null;
     private static final Border DARK_BLUE_BORDER = new SolidBorder(INVOICE_DARK_BLUE, 0.5f);
     private String reportPath;
+    private static final int PAGE01 = 1;
+    private static final int PAGE02 = 2;
 
     public void generateReport(String path, ArtistReport report) throws IOException, SQLException, ClassNotFoundException {
+        // Create document
         PDFDocument pdfDocument = new PDFDocument();
         Document document = pdfDocument.getDocument(path);
 
         setBackgroundColor(document);
 
         // Images
-        Image reportHeading = getArtistHeading(report.getArtist().getName());
+        Image reportHeading = getArtistHeading(report.getArtist().getName(), PAGE01);
+        Image reportHeadingSmall = getArtistHeading(report.getArtist().getName(), PAGE02);
 
         // Fonts
         FONT_RUBIK_SEMIBOLD = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf");
         FONT_POPPINS = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf");
         FONT_POPPINS_MEDIUM = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Medium.ttf");
-
-        if (FONT_POPPINS_MEDIUM == null) {
-            System.out.println("Poppins Medium Null");
-        }
-
-        // Tables
-        Table tableHeader = getHeaderTable(reportHeading);
-        Table reportSummary = getReportSummaryTable(report);
-        reportSummary.setFixedPosition(35, 570, 540);
-        Table songBreakdown = getSongBreakdownTable(report);
-        // songBreakdown.setFixedPosition(35, 500, 540);
-        songBreakdown.setWidth(540f);
-
-        SolidLine line = new SolidLine(90f);
-        line.setColor(INVOICE_DARK_BLUE);
+        FONT_POPPINS_SEMIBOLD = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-SemiBold.ttf");
 
         // Add text on top of the letter head
         Paragraph reportMonthAndYear = new Paragraph(report.getMonth().toUpperCase() + " " + report.getYear())
@@ -77,14 +68,98 @@ public class ReportPDFNew implements Colors {
                 .setFontColor(INVOICE_BLUE);
         reportMonthAndYear.setFixedPosition(28, 760, 600);
 
+        // Tables
+        Table tableHeader = getHeaderTable(reportHeading);
+        Table reportSummary = getReportSummaryTable(report);
+        reportSummary.setFixedPosition(35, 570, 540);
+        Table songBreakdown = getSongBreakdownTable(report);
+        songBreakdown.setWidth(540f);
+        Table streamingBreakdown = getStreamingBreakdownTable(report);
+        streamingBreakdown.setWidth(540f);
+
         document.add(tableHeader); // Letter Head
         document.add(reportMonthAndYear); // Report Month and Year
         document.add(reportSummary);
         document.add(songBreakdown);
 
+        // Page 02 /////////////////////////////////////////////////////////////////////////////////////////////////////
+        document.add(new AreaBreak());
+
+        document.add(reportHeadingSmall);
+        document.add(streamingBreakdown);
+
         document.close();
 
         this.reportPath = path;
+    }
+
+    private Table getStreamingBreakdownTable(ArtistReport report) throws MalformedURLException {
+        float[] columnWidth = {50f, 300f, 125f, 125f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+        table.setMarginTop(10f);
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        float fontSizeSubTitle = 10f;
+        PdfFont titleFont = FONT_POPPINS_SEMIBOLD;
+        PdfFont subtitleFont = FONT_POPPINS_MEDIUM;
+        VerticalAlignment verticalAlignment = VerticalAlignment.MIDDLE;
+        Border border = Border.NO_BORDER;
+        Color backgroundColor = new DeviceRgb(226, 229, 233);
+
+        // Heading
+        table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
+        table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
+        table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
+        table.addCell(new Cell(1, 4)
+                .setBorder(border)
+                .add(new Paragraph("Streaming Breakdown")
+                        .setFont(titleFont)
+                        .setTextAlignment(TextAlignment.LEFT)
+                        .setFontColor(INVOICE_BLUE)
+                        .setFontSize(15f)
+                )
+        );
+
+        // Header
+        // Values
+        table.addCell(new Cell(1, 2).setHeight(30f).setBorder(border).add(new Paragraph("").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Amount").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Streams").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+
+        // Cell cell = new Cell().setBackgroundColor(backgroundColor).setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/spotify.png")).setAutoScale(true));
+
+        /*Cell cell = new Cell()
+                .setBackgroundColor(backgroundColor)
+                .setHeight(30f)
+                .setBorder(border)
+                .add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/spotify.png")).setAutoScale(true));
+
+        cell.setNextRenderer(new RoundedBorderCellRenderer(cell));
+
+        table.addCell(cell);*/
+
+        // Values
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/spotify.png")).setAutoScale(true)));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Spotify").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("00.00").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("0").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+
+        table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
+
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/itunes.png")).setAutoScale(true)));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Apple Music").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("00.00").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("0").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+
+        table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
+
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/tiktok.png")).setAutoScale(true)));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("YouTube").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("00.00").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("0").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+
+        return table;
     }
 
     private static void setBackgroundColor(Document document) {
@@ -356,8 +431,8 @@ public class ReportPDFNew implements Colors {
         return PdfFontFactory.createFont(FontProgramFactory.createFont(location), PdfEncodings.WINANSI, true);
     }
 
-    static Image getArtistHeading(String artistName) throws MalformedURLException {
-        Image invoiceHeading = new Image(ImageDataFactory.create(getArtistHeadingImage(artistName)));
+    static Image getArtistHeading(String artistName, int pageNumber) throws MalformedURLException {
+        Image invoiceHeading = new Image(ImageDataFactory.create(getArtistHeadingImage(artistName, pageNumber)));
         invoiceHeading.setAutoScale(true);
         return invoiceHeading;
     }
@@ -380,48 +455,31 @@ public class ReportPDFNew implements Colors {
         return image;
     }
 
-    /*BufferedImage bufferedImage = ImageIO.read(new File(location));
-    BufferedImage resizedImage = ImageProcessor.resizeImage(100, 100, bufferedImage);
-    String format = location.toLowerCase().endsWith(".png") ? "png" : "jpeg";
-    byte[] imageBytes = convertToByteArray(resizedImage, format);
-    Image image = new Image(ImageDataFactory.create(imageBytes));
-    image.setAutoScale(autoscale);
-    return image;*/
-
-    public static byte[] convertToByteArray(BufferedImage image, String format) throws IOException {
-        if (image == null) {
-            return null;
-        }
-
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            ImageIO.write(image, format, baos);
-            return baos.toByteArray();
-        }
-    }
-
-    public static BufferedImage loadImage(String imagePath) {
-        if (imagePath == null) {
-            return null;
-        }
-
-        try {
-            File imageFile = new File(imagePath);
-            return ImageIO.read(imageFile);
-        } catch (IOException e) {
-            System.err.println("Error loading image: " + e.getMessage());
-            return null;
-        }
-    }
-
-    private static String getArtistHeadingImage(String artistName) {
+    private static String getArtistHeadingImage(String artistName, int pageNumber) {
         if (Objects.equals(artistName, "Ridma Weerawardena")) {
-            return "src/main/resources/com/example/song_finder_fx/images/reports/artists/ridmaw.png";
-        } else {
-            return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
-        }
+            if (pageNumber == 1)
+                return "src/main/resources/com/example/song_finder_fx/images/reports/artists/ridmaw.png";
+            else if (pageNumber == 2)
+                return "src/main/resources/com/example/song_finder_fx/images/reports/artists/ridmaw_head_small.png";
+            else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
+        } else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
     }
 
     public String getReportPath() {
         return this.reportPath;
+    }
+
+    private static class RoundedBorderCellRenderer extends CellRenderer {
+        public RoundedBorderCellRenderer(Cell modelElement) {
+            super(modelElement);
+        }
+
+        @Override
+        public void draw(DrawContext drawContext) {
+            drawContext.getCanvas().roundRectangle(getOccupiedAreaBBox().getX() + 1.5f, getOccupiedAreaBBox().getY() + 1.5f,
+                    getOccupiedAreaBBox().getWidth() - 3, getOccupiedAreaBBox().getHeight() - 3, 10);
+            drawContext.getCanvas().stroke();
+            super.draw(drawContext);
+        }
     }
 }
