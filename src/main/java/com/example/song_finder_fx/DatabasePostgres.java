@@ -3057,23 +3057,33 @@ public class DatabasePostgres {
                 """;
         String sqlNew = """
                 SELECT R.ASSET_ISRC,
-                R.AFTER_DEDUCTION_ROYALTY,
-                S.SONG_NAME, IP.PAYEE, IP.SHARE,
-                CASE WHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) ELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) END AS contributor,
-                (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
-                (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist, S.TYPE
-                FROM PUBLIC.summary_bd_02 AS R
-                JOIN (SELECT ASSET_ISRC, MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
-                FROM PUBLIC.summary_bd_02
-                WHERE ASSET_ISRC IN (SELECT ISRC
-                FROM PUBLIC.ISRC_PAYEES
-                WHERE PAYEE01 = ?
-                OR PAYEE = ?
-                OR PAYEE02 = ?)
-                GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
-                LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
-                LEFT JOIN PUBLIC.isrc_payees ip ON ip.isrc = R.asset_isrc
-                ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
+                                                            R.AFTER_DEDUCTION_ROYALTY,
+                                                            S.SONG_NAME, IP.PAYEE, IP.SHARE,
+                                                            CASE\s
+                                                                WHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)\s
+                                                                THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist)\s
+                                                                ELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)\s
+                                                            END AS contributor,
+                                                            (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
+                                                            (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist,\s
+                                                            S.TYPE,
+                                                            R.AFTER_DEDUCTION_ROYALTY * IP.SHARE / 100 AS calculated_royalty
+                                                        FROM PUBLIC.summary_bd_02 AS R
+                                                        JOIN (
+                                                            SELECT ASSET_ISRC, MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
+                                                            FROM PUBLIC.summary_bd_02
+                                                            WHERE ASSET_ISRC IN (
+                                                                SELECT ISRC
+                                                                FROM PUBLIC.ISRC_PAYEES
+                                                                WHERE PAYEE01 = ?
+                                                                OR PAYEE = ?
+                                                                OR PAYEE02 = ?
+                                                            )
+                                                            GROUP BY ASSET_ISRC
+                                                        ) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
+                                                        LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
+                                                        LEFT JOIN PUBLIC.isrc_payees ip ON ip.isrc = R.asset_isrc
+                                                        ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
                 """;
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement(sqlNew);
@@ -3084,7 +3094,7 @@ public class DatabasePostgres {
         while (rs.next()) {
             CoWriterShare cr = new CoWriterShare();
             cr.setIsrc(rs.getString(1));
-            cr.setRoyalty(rs.getDouble(2));
+            cr.setRoyalty(rs.getDouble(10));
             cr.setSongName(rs.getString(3));
             cr.setContributor(rs.getString(6));
             cr.setComposer(rs.getString(7));

@@ -39,10 +39,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ControllerMCIdentifiers {
 
@@ -152,11 +149,45 @@ public class ControllerMCIdentifiers {
     }
 
     @FXML
-    void onGenerate(MouseEvent event) throws IOException, SQLException {
+    void onGenerate(MouseEvent event) throws IOException, SQLException, InterruptedException {
+        oldCode(event);
+        /*try {
+            newCode(event);
+        } catch (Exception e) {
+            // e.printStackTrace();
+            oldCode(event);
+        }*/
+
+    }
+
+    private void newCode(MouseEvent event) {
         currentISRC = "";
         LocalDate date = LocalDate.now();
         String userName = System.getProperty("user.name");
         final String[] ingestFileName = {"ingest.csv"};
+        Map<String, String> downloadedVideos = new HashMap<>();
+
+        // Getting total claims for the loop
+        int totalClaims = ControllerMCList.finalManualClaims.size();
+
+        // Getting ingest file name
+        TextInputDialog inputIngestFileName = new TextInputDialog("ingest");
+        inputIngestFileName.setTitle("Ingest CSV File Name");
+        inputIngestFileName.setHeaderText("Enter a file name for ingest");
+        inputIngestFileName.setContentText("File Name: ");
+        inputIngestFileName.showAndWait().ifPresent(fileName -> {
+            ingestFileName[0] = fileName + ".csv";
+            System.out.println("Ingest Filename Entered: " + fileName);
+        });
+    }
+
+    private void oldCode(MouseEvent event) throws SQLException, IOException, InterruptedException {
+        currentISRC = "";
+        LocalDate date = LocalDate.now();
+        String userName = System.getProperty("user.name");
+        final String[] ingestFileName = {"ingest.csv"};
+        Map<String, String> downloadedVideos = new HashMap<>();
+        Map<String, String> downloadedFileNames = new HashMap<>();
 
         // Getting total claims for the loop
         int totalClaims = ControllerMCList.finalManualClaims.size();
@@ -243,11 +274,13 @@ public class ControllerMCIdentifiers {
             // Updating UI with ingest ID
             lblIngestID.setText(String.valueOf(ingestID));
 
+
             // Executing rest of the tasks as a background task
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
                     // Looping through claims
+                    final String[] fileLocation = new String[1];
                     for (int claimID = 0; claimID < totalClaims; claimID++) {
                         // Getting progress
                         double progress = (double) (claimID + 1) / totalClaims;
@@ -292,13 +325,26 @@ public class ControllerMCIdentifiers {
                         }
 
                         // Downloading audio to a temporary directory
-                        Platform.runLater(() -> lblProcess.setText("Downloading Audio for: " + albumTitle));
-                        final String[] fileLocation = new String[1];
+                        Platform.runLater(() -> lblProcess.setText("Processing Audio for: " + albumTitle));
                         String fileName = CSV_Row.get(55);
-                        downloadAudio(claimID, fileName, fileLocation);
+
+                        // Check if the video is already downloaded and use it
+                        if (downloadedVideos.containsKey(youtubeID)) {
+                            // fileLocation[0] = downloadedVideos.get(youtubeID);
+                            fileName = downloadedFileNames.get(fileLocation[0]);
+                            Platform.runLater(() -> lblProcess.setText("Using existing audio for: " + albumTitle));
+                        } else {
+                            Platform.runLater(() -> lblProcess.setText("Downloading audio for: " + albumTitle));
+                            downloadAudio(claimID, fileName, fileLocation);
+                            // Store the downloaded file location
+                            downloadedVideos.put(youtubeID, fileLocation[0]);
+                            downloadedFileNames.put(fileLocation[0], fileName);
+                        }
+
+                        // downloadAudio(claimID, fileName, fileLocation);
 
                         // Trimming audio if needed and copying it to the sub-folder created
-                        trimAndCopyAudio(claimID, albumTitle, fileLocation, fileName, folder, lblProcess);
+                        trimAndCopyAudio(claimID, albumTitle, fileLocation, fileName, folder, lblProcess, originalFileName);
 
                         Platform.runLater(() -> {
                             // progressBar.setProgress(progress)
@@ -347,7 +393,7 @@ public class ControllerMCIdentifiers {
         });
     }
 
-    private static void trimAndCopyAudio(int claimID, String albumTitle, String[] fileLocation, String fileName, File folder, Label lblProcess) throws IOException, InterruptedException {
+    private static void trimAndCopyAudio(int claimID, String albumTitle, String[] fileLocation, String fileName, File folder, Label lblProcess, String originalFileName) throws IOException, InterruptedException {
         if (ControllerMCList.finalManualClaims.get(claimID).getTrimStart() != null) {
             System.out.println("Trim Start: " + ControllerMCList.finalManualClaims.get(claimID).getTrimStart());
             Platform.runLater(() -> lblProcess.setText("Trimming Audio for: " + albumTitle));
@@ -356,7 +402,7 @@ public class ControllerMCIdentifiers {
             String trimEnd = ControllerMCList.finalManualClaims.get(claimID).getTrimEnd();
 
             String sourceFilePath = fileLocation[0] + "\\" + fileName;
-            String outputPath = folder.getAbsolutePath() + "\\" + fileName;
+            String outputPath = folder.getAbsolutePath() + "\\" + originalFileName;
             try {
                 YoutubeDownload.trimAudio(sourceFilePath, outputPath, trimStart, trimEnd);
                 Platform.runLater(() -> lblProcess.setText("Done"));
