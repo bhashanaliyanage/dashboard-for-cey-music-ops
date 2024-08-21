@@ -23,12 +23,12 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-         DatabasePostgres.refreshSummaryTable(3, 2024);
+        // DatabasePostgres.refreshSummaryTable(3, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
-        testArtistReportPDF(0.6285, 186.78, "Sarath De Alwis", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_march_sarath_de_alwis.pdf");
+        testArtistReportPDF(0.6285, 186.78, "Ajantha Ranasinghe", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_march_ajantha_ranasinghe.pdf");
         // testArtistReportsNew();
         // testNewArtistReportPDF();
 

@@ -9,9 +9,8 @@ public class Payee {
     private String share1;
     private String share2;
     private String share3;
+
     private String isrc;
-    private double payee1amount;
-    private double payee2Amount;
 
     public String getPayee1() {
         return payee1;
@@ -70,11 +69,9 @@ public class Payee {
     }
 
     public void setPayee1amount(double payee1amount) {
-        this.payee1amount = payee1amount;
     }
 
     public void setPayee2Amount(double payee2Amount) {
-        this.payee2Amount = payee2Amount;
     }
 
 }

@@ -26,22 +26,12 @@ public class Ingest {
     private List<IngestCSVData> ingestCSVDataList;
 
     private File csv;
-    private int upcCount;
 
     private File destination;
     private String[] upcArray;
 
     private String productTitle;
     private String primaryArtist;
-    private int upc;
-    private String artist01;
-    private String artist02;
-    private String artist03;
-    private String artist04;
-    private String artist01Type;
-    private String artist02Type;
-    private String artist03Type;
-    private String artist04Type;
 
     public Ingest() {
     }
@@ -79,7 +69,6 @@ public class Ingest {
     }
 
     public void setUPCCount(int upcCount) {
-        this.upcCount = upcCount;
     }
 
     public boolean isCSV() {
@@ -240,42 +229,33 @@ public class Ingest {
     }
 
     public void setProductUPC(String upc) {
-        this.upc = Integer.parseInt(upc);
     }
 
     public void setArtist(String artist01, int artistNumber) {
         if (artistNumber == 1) {
-            this.artist01 = artist01;
         }
 
         if (artistNumber == 2) {
-            this.artist02 = artist01;
         }
 
         if (artistNumber == 3) {
-            this.artist03 = artist01;
         }
 
         if (artistNumber == 4) {
-            this.artist04 = artist01;
         }
     }
 
     public void setArtistType(int artistNumber, String type) {
         if (artistNumber == 1) {
-            this.artist01Type = type;
         }
 
         if (artistNumber == 2) {
-            this.artist02Type = type;
         }
 
         if (artistNumber == 3) {
-            this.artist03Type = type;
         }
 
         if (artistNumber == 4) {
-            this.artist04Type = type;
         }
     }
 
