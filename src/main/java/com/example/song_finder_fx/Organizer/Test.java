@@ -23,39 +23,26 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        // DatabasePostgres.refreshSummaryTable(6, 2024);
+         DatabasePostgres.refreshSummaryTable(3, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
-        testArtistReportPDF(0.6305, 184.65, "Sarath De Alwis", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_sarath_de_alwis_02.pdf");
+        // April 0.6305, 184.65
+        // March 0.6285, 186.78
+        testArtistReportPDF(0.6285, 186.78, "Sarath De Alwis", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_march_sarath_de_alwis.pdf");
         // testArtistReportsNew();
+        // testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
         // DatabasePostgres.changePassword("gimhaar", "admin");
+    }
 
-        /*OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "", "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", "https://www.googleapis.com/auth/userinfo.profile");
-        authGoogle.startLogin();*/
+    private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
+        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Ridma Weerawardena", 2024, 4);
 
-        // testAssignPayee();
-
-        // https://drive.google.com/uc?id=14wg8K3fqpov_zWTw3cOPhed__gB82njN&export=download
-        // GoogleDriveDownloader googleDriveDownloader = new GoogleDriveDownloader("14wg8K3fqpov_zWTw3cOPhed__gB82njN", "C:\\Users\\bhash\\Documents\\Test.msi");
-        // googleDriveDownloader.downloadUpdate();
-
-        /*String owner = "bhashanaliyanage";
-        String repo = "dashboard-for-cey-music-ops";
-        GitHubController controller = new GitHubController(owner, repo);
-
-        // Check Update
-        ReleaseInfo latestVersion = controller.getLatestVersion();
-        System.out.println("Release Info: " + latestVersion.releaseNotes);
-        System.out.println("Version: " + latestVersion.version);*/
-
-        // Download Update
-        /*String assetName = "build1.msi";
-        String savePath = "C:\\Users\\bhash\\Documents\\TestGIT.msi";
-
-        controller.downloadUpdate(assetName, savePath);*/
+        ReportPDFNew pdf = new ReportPDFNew();
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_april_ridma.pdf", report);
+        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
     }
 
     private static void testAssignPayee() throws SQLException {
@@ -224,21 +211,20 @@ public class Test {
     }
 
     private static void testArtistReportsNew() throws SQLException {
+        // String.format("%,9.2f", report.getGrossRevenueInAUD())
         int artistID = 47;
-        double eurToAudRate = 0.6285;
-        double audToLkrRate = 186.78;
-        String artistName = "Ajantha Ranasinghe";
+        double eurToAudRate = 0.6305;
+        double audToLkrRate = 184.65;
+        String artistName = "Methun SK";
         int year = 2024;
-        int month = 3;
-
-        DatabasePostgres.refreshSummaryTable(3, 2024);
+        int month = 4;
 
         // Creating artist model by passing artistID
         ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month);
 
         // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
-        double grossRevenue = report.getGrossRevenueInLKR();
-        double partnerShare = report.getPartnerShareInLKR();
+        double grossRevenue = report.getGrossRevenueInAUD();
+        double partnerShare = report.getPartnerShareInAUD();
         ArrayList<Songs> topPerformingSongs = report.getTopPerformingSongs();
         List<CoWriterSummary> coWriterSummaries = report.getCoWriterPaymentSummary();
         List<CoWriterShare> coWriterShares = report.getAssetBreakdown();
@@ -255,13 +241,13 @@ public class Test {
 
         System.out.println("\n========");
 
-        System.out.println("\nGross Revenue: LKR " + grossRevenue);
-        System.out.println("Partner Share: LKR " + partnerShare);
-        System.out.println("========");
+        System.out.println("\nGross Revenue: AUD " + String.format("%,9.2f", grossRevenue));
+        System.out.println("Partner Share: AUD " + String.format("%,9.2f", partnerShare));
+        System.out.println("\n========");
 
         System.out.println("\nTop Performing Songs");
         for (Songs song : topPerformingSongs) {
-            System.out.println(song.getTrackTitle() + " | " + (song.getRoyalty() * eurToAudRate * audToLkrRate));
+            System.out.println(song.getTrackTitle() + " | AUD: " + String.format("%,9.2f", (song.getRoyalty() * eurToAudRate)));
         }
 
         System.out.println("\n========");
@@ -270,7 +256,7 @@ public class Test {
         for (CoWriterSummary summary : coWriterSummaries) {
             String contributor = summary.getContributor();
             double royalty = summary.getRoyalty();
-            System.out.println(contributor + " | " + royalty * eurToAudRate * audToLkrRate);
+            System.out.println(contributor + " | AUD: " + String.format("%,9.2f", royalty * eurToAudRate));
         }
 
         System.out.println("\nCo-Writer Share Detailed");
@@ -278,10 +264,10 @@ public class Test {
             String songName = share.getSongName();
             String songType = share.getSongType();
             String percentage = share.getShare();
-            double artistShare = share.getRoyalty() * eurToAudRate * audToLkrRate;
+            double artistShare = share.getRoyalty() * eurToAudRate;
             String coWriter = share.getContributor();
 
-            System.out.println(songName + " | " + songType + " | " + percentage + " | " + artistShare + " | " + coWriter);
+            System.out.println(songName + " | " + songType + " | " + percentage + " | AUD" + String.format("%,9.2f", artistShare) + " | " + coWriter);
         }
     }
 
@@ -420,7 +406,7 @@ public class Test {
         // DatabaseHandler databaseHandler = new DatabaseHandler();
         SongSearch songSearch = new SongSearch();
 
-        List<Songs> songs = songSearch.searchSong("Mawathe", SearchType.SONG_NAME);
+        List<Songs> songs = songSearch.searchSong("Mawathe", SearchType.SONG_NAME, true);
 
         for (Songs song : songs) {
             String trackTitle = song.getTrackTitle();

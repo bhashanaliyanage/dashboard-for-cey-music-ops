@@ -6,7 +6,6 @@ import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -18,8 +17,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
+import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -52,7 +51,33 @@ public class ControllerManualClaims {
 
     @FXML
     public void initialize() {
-        comboClaimType.getItems().addAll("Unspecified", "TV Programs", "Manual Claim", "Single SR");
+        // comboClaimType.getItems().addAll("Unspecified", "TV Programs", "Manual Claim", "Single SR");
+        comboClaimType.getItems().addAll(
+                "Unspecified",
+                "TV Programs",
+                "Manual Claim",
+                "Single SR",
+                "Channel One",
+                "Charana",
+                "Chat Programmes",
+                "Dawasak Da Handawaka",
+                "Derana",
+                "Derana 60+",
+                "Derana Little Star",
+                "Dream Star",
+                "Hiru",
+                "Hiru Star",
+                "Imorich Tunes",
+                "ITN",
+                "Ma Nowana Mama",
+                "Monara TV",
+                "Roo Tunes",
+                "Roopawahini",
+                "Sirasa",
+                "Siyatha",
+                "Supreme TV",
+                "Swarnawahini"
+        );
 
         txtURL_Static = txtURL;
         comboClaimTypeStatic = comboClaimType;
@@ -70,27 +95,7 @@ public class ControllerManualClaims {
         if (!Objects.equals(URL, "")) {
             String ID2 = TextFormatter.extractYoutubeID(URL);
 
-            Task<List<Songs>> taskLoadVideo = new Task<>() {
-                @Override
-                protected java.util.List<Songs> call() {
-                    try {
-                        String embedID = "https://www.youtube.com/embed/" + ID2;
-                        Platform.runLater(() -> ytPlayer.getEngine().load(embedID));
-                        // ytPlayer.getEngine().load(embedID);
-                    } catch (Exception e) {
-                        Platform.runLater(() -> {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Error!");
-                            alert.setHeaderText("Error Loading URL");
-                            alert.setContentText(e.toString());
-                            alert.showAndWait();
-                        });
-                    }
-                    return null;
-                }
-            };
-
-            Thread threadLoadVideo = new Thread(taskLoadVideo);
+            Thread threadLoadVideo = getThreadLoadVideo(ID2);
             threadLoadVideo.start();
 
             // If this ID is in the manual claims database, show an alert.
@@ -116,6 +121,31 @@ public class ControllerManualClaims {
         }
     }
 
+    private @NotNull Thread getThreadLoadVideo(String ID2) {
+        Task<List<Songs>> taskLoadVideo = new Task<>() {
+            @Override
+            protected List<Songs> call() {
+                try {
+                    String embedID = "https://www.youtube.com/embed/" + ID2;
+                    Platform.runLater(() -> ytPlayer.getEngine().load(embedID));
+                    // ytPlayer.getEngine().load(embedID);
+                } catch (Exception e) {
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error!");
+                        alert.setHeaderText("Error Loading URL");
+                        alert.setContentText(e.toString());
+                        alert.showAndWait();
+                    });
+                }
+                return null;
+            }
+        };
+
+        Thread threadLoadVideo = new Thread(taskLoadVideo);
+        return threadLoadVideo;
+    }
+
     public void onAddManualClaim() {
         Task<List<Songs>> taskAddClaim = new Task<>() {
             @Override
@@ -123,18 +153,6 @@ public class ControllerManualClaims {
                 for (ManualClaimTrack claim : manualClaims) {
                     try {
                         String songName = claim.getTrackName();
-
-                        // Fetching Thumbnail
-                        // Platform.runLater(() -> btnAddClaim.setText("Fetching Artwork For: " + songName));
-                        // String youtubeID = claim.getYoutubeID();
-                        // String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
-                        // BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
-                        // image = ImageProcessor.cropImage(image);
-
-                        // Setting Thumbnail and Preview Images to the model
-                        // claim.setPreviewImage(image);
-                        // image = ImageProcessor.resizeImage(1400, 1400, image);
-                        // claim.setImage(image);
 
                         int status = DatabasePostgres.addManualClaim(claim);
 
@@ -144,9 +162,12 @@ public class ControllerManualClaims {
                                     NotificationBuilder.displayTrayError("Error!", "Error Adding Manual Claim");
                                 } else {
                                     NotificationBuilder.displayTrayInfo("Manual Claim Added", "Your Claim for " + songName + " is successfully added");
-                                    Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
-                                    vboxTracks.getChildren().clear();
-                                    vboxTracks.getChildren().add(node);
+                                    // Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
+                                    Node node = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/manual_claims/manual-claims.fxml")));
+                                    UIController.mainNodes[6] = node;
+                                    UIController.mainVBoxStatic.getChildren().setAll(node);
+                                    // vboxTracks.getChildren().clear();
+                                    // vboxTracks.getChildren().add(node);
                                 }
                             } catch (IOException e) {
                                 Platform.runLater(() -> {
@@ -189,7 +210,7 @@ public class ControllerManualClaims {
         mainVBox.getChildren().setAll(node);
     }
 
-    public void urlOnAction(ActionEvent actionEvent) throws SQLException, IOException {
+    public void urlOnAction() throws SQLException, IOException {
         loadURL();
     }
 }

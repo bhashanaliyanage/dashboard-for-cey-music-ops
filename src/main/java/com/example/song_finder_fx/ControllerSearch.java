@@ -5,10 +5,7 @@ import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
 import com.example.song_finder_fx.Organizer.SongSearch;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.PauseTransition;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -16,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -31,6 +29,7 @@ import javafx.util.Duration;
 
 import javax.sound.sampled.Clip;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -45,6 +44,9 @@ public class ControllerSearch {
     public HBox hboxSongSearch;
     public VBox vboxSongDetails;
     public HBox hbox2;
+
+    @FXML
+    private CheckBox cbUGC;
 
     @FXML
     private Label searchResultISRC;
@@ -102,6 +104,12 @@ public class ControllerSearch {
             pause.setOnFinished(event -> getText2(newValue));
             pause.playFromStart();
         });
+    }
+
+    @FXML
+    void getTextCB() {
+        String query = searchArea.getText();
+        getText2(query);
     }
 
     @FXML
@@ -275,16 +283,14 @@ public class ControllerSearch {
     }
 
     private void getText2(String text) {
-        // Getting search keywords
-        // String text = searchArea.getText();
-
         scrlpneSong.setVisible(true);
         scrlpneSong.setContent(vboxSong);
+        boolean excludeUGC = cbUGC.isSelected();
 
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                List<Songs> songList = search.searchSong(text, searchType);
+                List<Songs> songList = search.searchSong(text, searchType, excludeUGC);
                 // return searchOld.search(text);
 
                 try {
@@ -317,50 +323,22 @@ public class ControllerSearch {
                                 hbox2.setStyle("-fx-border-color: #6eb0e0");
                             }
 
+                            // First, set the initial opacity of the node to 0
+                            node.setOpacity(0);
+
+                            // Add the node to vboxSong
                             vboxSong.getChildren().add(node);
+
+                            // Create and play the fade-in animation
+                            FadeTransition fadeIn = new FadeTransition(Duration.millis(500), node);
+                            fadeIn.setFromValue(0.0);
+                            fadeIn.setToValue(1.0);
+                            fadeIn.play();
                         });
                     }
                 } catch (IOException e) {
                     Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error occurred when loading song", e.toString()));
                 }
-
-                /*Node[] nodes;
-                nodes = new Node[songList.size()];
-                // System.out.println("songList.size() = " + songList.size());
-                for (int i = 0; i < nodes.length; i++) {
-                    try {
-                        nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
-                        Label lblSongName = (Label) nodes[i].lookup("#songName");
-                        Label lblISRC = (Label) nodes[i].lookup("#searchResultISRC");
-                        Label lblArtist = (Label) nodes[i].lookup("#songSinger");
-                        Label lblComposer = (Label) nodes[i].lookup("#searchResultComposer");
-                        Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
-                        Label songType = (Label) nodes[i].lookup("#songType");
-                        HBox hbox2 = (HBox) nodes[i].lookup("#hbox2");
-
-                        lblSongName.setText(songList.get(i).getTrackTitle());
-                        lblISRC.setText(songList.get(i).getISRC().trim());
-                        lblArtist.setText(songList.get(i).getSinger().trim());
-                        lblComposer.setText(songList.get(i).getComposer().trim());
-                        lblLyricist.setText(songList.get(i).getLyricist().trim());
-
-                        if (songList.get(i).isOriginal()) {
-                            songType.setVisible(true);
-                        }
-
-                        if (songList.get(i).isInList()) {
-                            hbox2.setStyle("-fx-border-color: #6eb0e0");
-                        }
-
-                        int finalI = i;
-                        Platform.runLater(() -> vboxSong.getChildren().add(nodes[finalI]));
-                    } catch (IOException ex) {
-                        Platform.runLater(() -> {
-                            AlertBuilder.sendErrorAlert("Error", "Error occurred when loading song", ex.toString());
-                        });
-                    }
-                }*/
-                // return songList;
                 return null;
             }
 

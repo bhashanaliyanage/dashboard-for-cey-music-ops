@@ -2,6 +2,7 @@ package com.example.song_finder_fx.Organizer;
 
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.Songs;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,11 +17,14 @@ public class DatabaseHandler {
         // connection = DatabasePostgres.getConn();
     }
 
-    public List<Songs> searchSongsByTitle(String criteria) {
+    public List<Songs> searchSongsByTitle(String criteria, boolean excludeUGC) {
         List<Songs> searchResults = new ArrayList<>();
+
+        String sql = getSearchSQL_Query(excludeUGC);
+
         try {
             Connection conn = DatabasePostgres.getConn();
-            PreparedStatement statement = conn.prepareStatement("SELECT isrc, song_name, file_name, upc, composer, lyricist, singer, type, product_title FROM public.\"song_metadata_new\" WHERE song_name ILIKE ? ORDER BY type DESC LIMIT 15");
+            PreparedStatement statement = conn.prepareStatement(sql);
             statement.setString(1, criteria + "%");
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -44,7 +48,21 @@ public class DatabaseHandler {
         return searchResults;
     }
 
-    public List<Songs> searchSongsByISRC(String criteria) {
+    private static @NotNull String getSearchSQL_Query(boolean excludeUGC) {
+        String sql;
+
+        if (excludeUGC) {
+            sql = "SELECT isrc, song_name, file_name, upc, composer, lyricist, singer, type, product_title " +
+                    "FROM public.\"song_metadata_new\"" +
+                    " WHERE song_name ILIKE ? AND type = 'O' ORDER BY type DESC LIMIT 15";
+        } else {
+            sql = "SELECT isrc, song_name, file_name, upc, composer, lyricist, singer, type, product_title " +
+                    "FROM public.\"song_metadata_new\" WHERE song_name ILIKE ? ORDER BY type DESC LIMIT 15";
+        }
+        return sql;
+    }
+
+    public List<Songs> searchSongsByISRC(String criteria, boolean excludeUGC) {
         List<Songs> searchResults = new ArrayList<>();
         try {
             Connection conn = DatabasePostgres.getConn();
@@ -72,7 +90,7 @@ public class DatabaseHandler {
         return searchResults;
     }
 
-    public List<Songs> searchSongsByComposer(String criteria) {
+    public List<Songs> searchSongsByComposer(String criteria, boolean excludeUGC) {
         List<Songs> searchResults = new ArrayList<>();
         try {
             Connection conn = DatabasePostgres.getConn();
@@ -100,7 +118,7 @@ public class DatabaseHandler {
         return searchResults;
     }
 
-    public List<Songs> searchSongsBySinger(String criteria) {
+    public List<Songs> searchSongsBySinger(String criteria, boolean excludeUGC) {
         List<Songs> searchResults = new ArrayList<>();
         try {
             Connection conn = DatabasePostgres.getConn();
@@ -128,7 +146,7 @@ public class DatabaseHandler {
         return searchResults;
     }
 
-    public List<Songs> searchSongsByLyricist(String criteria) {
+    public List<Songs> searchSongsByLyricist(String criteria, boolean excludeUGC) {
         List<Songs> searchResults = new ArrayList<>();
         try {
             Connection conn = DatabasePostgres.getConn();
@@ -156,7 +174,7 @@ public class DatabaseHandler {
         return searchResults;
     }
 
-    public List<Songs> searchSongsByProductName(String criteria) {
+    public List<Songs> searchSongsByProductName(String criteria, boolean excludeUGC) {
         List<Songs> searchResults = new ArrayList<>();
         try {
             Connection conn = DatabasePostgres.getConn();

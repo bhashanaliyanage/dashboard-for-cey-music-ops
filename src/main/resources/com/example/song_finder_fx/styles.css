@@ -105,6 +105,26 @@
     -fx-border-radius: 7;
 }
 
+.button_inside_green {
+    -fx-background-color: '#69C08F';
+    -fx-text-fill: '#FFFFFF';
+    -fx-border-width: 1;
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+}
+
+.button_inside_green:hover {
+    -fx-background-color: '#4d8d69';
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+}
+
+.button_inside_green:pressed {
+    -fx-background-color: '#7de6ab';
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+}
+
 .button_brown_invoice {
     -fx-background-color: '#6D676E';
     -fx-text-fill: '#FFFFFF';

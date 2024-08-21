@@ -112,7 +112,7 @@ public class InitPreloader implements Initializable {
 
             try {
                 UIController.setAllScenes();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });

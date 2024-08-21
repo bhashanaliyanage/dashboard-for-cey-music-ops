@@ -88,7 +88,7 @@ public class DatabasePostgres {
             Statement statement = conn.createStatement();
             return statement.executeUpdate(query);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error Inserting row into report: " + e);
         }
         return 0;
     }
@@ -1376,20 +1376,45 @@ public class DatabasePostgres {
     }
 
     public static boolean checkIfArtistValidated(String composer) throws SQLException {
-        String query = "SELECT COUNT(artist_id) FROM public.artists WHERE artist_name = ? AND validated = true;";
+        int maxRetries = 3;
+        int retryCount = 0;
 
-        try (Connection con = getConn();
-             PreparedStatement ps = con.prepareStatement(query)) {
+        while (retryCount < maxRetries) {
+            try {
+                String query = "SELECT COUNT(artist_id) FROM public.artists WHERE artist_name = ? AND validated = true;";
 
-            ps.setString(1, composer);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                int count = rs.getInt(1);
-                return count > 0;
+                try (Connection con = getConn();
+                     PreparedStatement ps = con.prepareStatement(query)) {
+
+                    ps.setString(1, composer);
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) {
+                        int count = rs.getInt(1);
+                        return count > 0;
+                    }
+                } // The Connection, PreparedStatement will be closed here.
+
+                return false; // Default return value in case the artist is not found.
+            } catch (PSQLException e) {
+                if (e.getMessage().contains("An I/O error occurred") || e.getMessage().contains("This connection has been closed")) {
+                    retryCount++;
+                    if (retryCount >= maxRetries) {
+                        throw e;
+                    }
+                    System.out.println("Retrying database operation, attempt " + retryCount);
+                    // You might want to add a small delay here
+                    try {
+                        Thread.sleep(1000); // 1 second delay
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    throw e;
+                }
             }
-        } // The Connection, PreparedStatement will be closed here.
+        }
 
-        return false; // Default return value in case the artist is not found.
+        return false;
     }
 
     public static ArrayList<Songs> getMissingISRCs(int report_id) throws SQLException {
@@ -2358,6 +2383,27 @@ public class DatabasePostgres {
         return null;
     }
 
+    public static List<String> getIngestNames() throws SQLException {
+        String sql = "SELECT ingest_name FROM public.temp_ingest_metadata;";
+        List<String> ingestNames = new ArrayList<>();
+
+        try (Connection con = getConn()) {
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.isBeforeFirst()) {
+                        while (rs.next()) {
+                            String ingestName = rs.getString(1);
+                            ingestNames.add(ingestName);
+                        }
+                        return ingestNames;
+                    }
+                }
+            }
+        }
+
+        return ingestNames;
+    }
+
 
     public List<Payee> check(String name) {
 //        String name = "Victor Rathnayake";
@@ -3035,23 +3081,33 @@ public class DatabasePostgres {
                 """;
         String sqlNew = """
                 SELECT R.ASSET_ISRC,
-                R.AFTER_DEDUCTION_ROYALTY,
-                S.SONG_NAME, IP.PAYEE, IP.SHARE,
-                CASE WHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) ELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) END AS contributor,
-                (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
-                (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist, S.TYPE
-                FROM PUBLIC.summary_bd_02 AS R
-                JOIN (SELECT ASSET_ISRC, MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
-                FROM PUBLIC.summary_bd_02
-                WHERE ASSET_ISRC IN (SELECT ISRC
-                FROM PUBLIC.ISRC_PAYEES
-                WHERE PAYEE01 = ?
-                OR PAYEE = ?
-                OR PAYEE02 = ?)
-                GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
-                LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
-                LEFT JOIN PUBLIC.isrc_payees ip ON ip.isrc = R.asset_isrc
-                ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
+                                                            R.AFTER_DEDUCTION_ROYALTY,
+                                                            S.SONG_NAME, IP.PAYEE, IP.SHARE,
+                                                            CASE\s
+                                                                WHEN ip.payee = (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)\s
+                                                                THEN (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist)\s
+                                                                ELSE (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer)\s
+                                                            END AS contributor,
+                                                            (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.composer) AS composer,
+                                                            (SELECT ar.artist_name FROM public.artists ar WHERE ar.artist_id = s.lyricist) AS lyricist,\s
+                                                            S.TYPE,
+                                                            R.AFTER_DEDUCTION_ROYALTY * IP.SHARE / 100 AS calculated_royalty
+                                                        FROM PUBLIC.summary_bd_02 AS R
+                                                        JOIN (
+                                                            SELECT ASSET_ISRC, MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
+                                                            FROM PUBLIC.summary_bd_02
+                                                            WHERE ASSET_ISRC IN (
+                                                                SELECT ISRC
+                                                                FROM PUBLIC.ISRC_PAYEES
+                                                                WHERE PAYEE01 = ?
+                                                                OR PAYEE = ?
+                                                                OR PAYEE02 = ?
+                                                            )
+                                                            GROUP BY ASSET_ISRC
+                                                        ) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
+                                                        LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
+                                                        LEFT JOIN PUBLIC.isrc_payees ip ON ip.isrc = R.asset_isrc
+                                                        ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
                 """;
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement(sqlNew);
@@ -3062,7 +3118,7 @@ public class DatabasePostgres {
         while (rs.next()) {
             CoWriterShare cr = new CoWriterShare();
             cr.setIsrc(rs.getString(1));
-            cr.setRoyalty(rs.getDouble(2));
+            cr.setRoyalty(rs.getDouble(10));
             cr.setSongName(rs.getString(3));
             cr.setContributor(rs.getString(6));
             cr.setComposer(rs.getString(7));

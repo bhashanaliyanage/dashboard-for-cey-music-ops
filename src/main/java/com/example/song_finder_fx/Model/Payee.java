@@ -2,17 +2,16 @@ package com.example.song_finder_fx.Model;
 
 public class Payee {
 
-private String payee1;
-private String payee2;
-private String payee3;
+    private String payee1;
+    private String payee2;
+    private String payee3;
 
-private String share1;
-private String share2;
-private String share3;
-private String isrc;
-private double payee1amount;
-private double payee2Amount;
-private double payee3Amount;
+    private String share1;
+    private String share2;
+    private String share3;
+    private String isrc;
+    private double payee1amount;
+    private double payee2Amount;
 
     public String getPayee1() {
         return payee1;
@@ -70,27 +69,12 @@ private double payee3Amount;
         this.isrc = isrc;
     }
 
-    public double getPayee1amount() {
-        return payee1amount;
-    }
-
     public void setPayee1amount(double payee1amount) {
         this.payee1amount = payee1amount;
-    }
-
-    public double getPayee2Amount() {
-        return payee2Amount;
     }
 
     public void setPayee2Amount(double payee2Amount) {
         this.payee2Amount = payee2Amount;
     }
 
-    public double getPayee3Amount() {
-        return payee3Amount;
-    }
-
-    public void setPayee3Amount(double payee3Amount) {
-        this.payee3Amount = payee3Amount;
-    }
 }

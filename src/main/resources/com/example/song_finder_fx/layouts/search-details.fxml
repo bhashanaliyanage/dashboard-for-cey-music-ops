@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
@@ -26,19 +27,28 @@
       <VBox.margin>
          <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
       </VBox.margin>
-      <Label text="Search By">
+      <HBox>
          <VBox.margin>
-            <Insets left="30.0" top="20.0" />
+            <Insets left="30.0" right="30.0" top="20.0" />
          </VBox.margin>
-         <font>
-            <Font name="Segoe UI Semibold" size="19.0" />
-         </font>
-      </Label>
-      <Label fx:id="lblSearchType" layoutX="42.0" layoutY="41.0" text="Song Name">
-         <VBox.margin>
-            <Insets left="30.0" />
-         </VBox.margin>
-      </Label>
+         <children>
+            <VBox>
+               <children>
+                  <Label text="Search By">
+                     <font>
+                        <Font name="Segoe UI Semibold" size="19.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblSearchType" text="Song Name" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <CheckBox fx:id="cbUGC" mnemonicParsing="false" onAction="#getTextCB" selected="true" text="Exclude UGC Assets" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
       <HBox minHeight="30.0" spacing="32.0">
          <VBox.margin>
             <Insets left="30.0" right="30.0" top="20.0" />
@@ -77,15 +87,14 @@
             </cursor>
             <Image url="@../images/youtube.png" />
          </ImageView>
-         <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="607.0" layoutY="25.0"
-                    onMouseClicked="#onSearchOnGoogleBtnClicked" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+         <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="607.0" layoutY="25.0" onMouseClicked="#onSearchOnGoogleBtnClicked" opacity="0.8" pickOnBounds="true" preserveRatio="true">
             <cursor>
-               <Cursor fx:constant="HAND"/>
+               <Cursor fx:constant="HAND" />
             </cursor>
             <HBox.margin>
-               <Insets left="5.0"/>
+               <Insets left="5.0" />
             </HBox.margin>
-            <Image url="@../images/google.png"/>
+            <Image url="@../images/google.png" />
          </ImageView>
       </HBox>
       <ScrollPane fx:id="scrlpneSong" hbarPolicy="NEVER" prefWidth="544.0" styleClass="scroll-pane" stylesheets="@../styles.css" vbarPolicy="ALWAYS" visible="false" VBox.vgrow="ALWAYS">

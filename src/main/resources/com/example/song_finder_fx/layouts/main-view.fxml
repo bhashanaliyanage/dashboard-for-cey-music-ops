@@ -280,7 +280,7 @@
                         <padding>
                             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </padding>
-                        <Label text="Check Database Connection">
+                        <Label text="CeyMusic Database">
                             <font>
                                 <Font size="14.0" />
                             </font>
