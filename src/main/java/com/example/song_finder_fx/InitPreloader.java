@@ -59,15 +59,42 @@ public class InitPreloader implements Initializable {
         final String[] message = {""};
 
         Thread databaseCheck = new Thread(() -> {
-            message[0] = "Checking Connection";
+            final int MAX_ATTEMPTS = 3;
+            final int DELAY_SECONDS = 3;
 
-            Platform.runLater(() -> lblLoadingg.setText(message[0]));
+            for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+                if (attempt == 1) {
+                    message[0] = "Connecting to CeyMusic Database";
+                } else {
+                    message[0] = "Retrying Connection to CeyMusic Database (Attempt " + attempt + " of " + MAX_ATTEMPTS + ")";
+                }
 
-            con[0] = checkDatabaseConnection();
-            System.out.println("con = " + con[0]);
+                Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
-            if (Objects.equals(con[0], "Connection Error")) {
-                Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Database Offline", "Dashboard cannot connect to database"));
+                con[0] = checkDatabaseConnection();
+                System.out.println("con = " + con[0]);
+
+                if (!Objects.equals(con[0], "Connection Error")) {
+                    // Connection successful, exit the loop
+                    break;
+                }
+
+                if (attempt < MAX_ATTEMPTS) {
+                    // If it's not the last attempt, show countdown before retrying
+                    for (int i = DELAY_SECONDS; i > 0; i--) {
+                        final int secondsLeft = i;
+                        Platform.runLater(() -> lblLoadingg.setText("Retrying Connection to CeyMusic Database in " + secondsLeft + " second" + (secondsLeft != 1 ? "s" : "")));
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            System.out.println("Something went wrong when trying to sleep the thread: " + e);
+                            // e.printStackTrace();
+                        }
+                    }
+                } else {
+                    // If it's the last attempt and still failed, show error alert
+                    Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Database Offline", "Dashboard cannot connect to database after " + MAX_ATTEMPTS + " attempts"));
+                }
             }
         });
 
