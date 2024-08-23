@@ -28,6 +28,7 @@ public class CSVController {
     private final Path csvFile = tempDir.resolve("missing_isrcs.csv");
 
     public static void main(String[] args) {
+        // Sample method to generate a simple CSV File
         String filePath = "C:\\Users\\bhash\\Documents\\Test\\test.csv";
 
         // Sample data (replace with your actual data)
@@ -50,7 +51,7 @@ public class CSVController {
 
             System.out.println("Data written successfully to " + filePath);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Something went wrong while writing the data to the CSV file: " + e.getMessage());
         }
     }
 
@@ -82,7 +83,7 @@ public class CSVController {
         // report.setAssetReference(nextLine[18]);
         // report.setAssetOrProduct(nextLine[19]);
         // report.setProductQuantity(nextLine[20]);
-        // report.setAssetQuantity(nextLine[21]);
+        report.setAssetQuantity(nextLine[21]);
         // report.setOriginalGrossIncome(nextLine[22]);
         // report.setOriginalCurrency(nextLine[23]);
         // report.setExchangeRate(nextLine[24]);

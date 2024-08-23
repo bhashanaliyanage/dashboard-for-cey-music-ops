@@ -1481,21 +1481,21 @@ public class DatabasePostgres {
 
     public static void importReport(ReportMetadata report) throws SQLException, IOException, CsvValidationException {
         String insertMetadataSQL = "INSERT INTO report_metadata (report_name, report_month, report_year, created_at) VALUES (?, ?, ?, ?) RETURNING id";
-        String insertReportSQL = "INSERT INTO reports_new (report_id, asset_isrc, reported_royalty, territory, sale_start_date, dsp, product_label, upc) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertReportSQL = "INSERT INTO reports_new (report_id, asset_isrc, reported_royalty, territory, sale_start_date, dsp, product_label, upc, asset_quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         Connection con = getConn();
 
         // Insert metadata and get the generated report_id
         int reportId;
 
-        try (PreparedStatement pstmt = conn.prepareStatement(insertMetadataSQL, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setString(1, report.getName());
-            pstmt.setInt(2, report.getReportMonth());
-            pstmt.setInt(3, report.getReportYear());
-            pstmt.setObject(4, report.getCreatedAt());
-            pstmt.executeUpdate();
+        try (PreparedStatement stmt = con.prepareStatement(insertMetadataSQL, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, report.getName());
+            stmt.setInt(2, report.getReportMonth());
+            stmt.setInt(3, report.getReportYear());
+            stmt.setObject(4, report.getCreatedAt());
+            stmt.executeUpdate();
 
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     reportId = rs.getInt(1);
                 } else {
@@ -1506,23 +1506,25 @@ public class DatabasePostgres {
 
         // Insert report data
         try (CSVReader reader = new CSVReader(new FileReader(report.getCsvFile()));
-             PreparedStatement pstmt = conn.prepareStatement(insertReportSQL)) {
+             PreparedStatement stmt = con.prepareStatement(insertReportSQL)) {
 
             String[] nextLine;
             reader.readNext(); // Skip header
             while ((nextLine = reader.readNext()) != null) {
                 FUGAReport fugaReport = CSVController.getFUGAReport(nextLine);
-                pstmt.setInt(1, reportId);
-                pstmt.setString(2, fugaReport.getAssetISRC());
-                pstmt.setDouble(3, fugaReport.getReportedRoyalty());
-                pstmt.setString(4, fugaReport.getTerritory());
-                pstmt.setDate(5, fugaReport.getSaleStartDateNew());
-                pstmt.setString(6, fugaReport.getDsp());
-                pstmt.setString(7, fugaReport.getProductLabel());
-                pstmt.setString(8, String.valueOf(fugaReport.getProductUPC()));
-                pstmt.addBatch();
+                stmt.setInt(1, reportId);
+                stmt.setString(2, fugaReport.getAssetISRC());
+                stmt.setDouble(3, fugaReport.getReportedRoyalty());
+                stmt.setString(4, fugaReport.getTerritory());
+                stmt.setDate(5, fugaReport.getSaleStartDateNew());
+                stmt.setString(6, fugaReport.getDsp());
+                stmt.setString(7, fugaReport.getProductLabel());
+                stmt.setString(8, String.valueOf(fugaReport.getProductUPC()));
+                stmt.setInt(9, fugaReport.getAssetQuantity());
+                // fugaReport.getAssetQuantity();
+                stmt.addBatch();
             }
-            pstmt.executeBatch();
+            stmt.executeBatch();
         }
     }
 
@@ -1550,7 +1552,9 @@ public class DatabasePostgres {
 
             // System.out.println("Refreshing Tables...");
 
+            System.out.println("Refreshing Summary Breakdown 01 and 02");
             psProcedure.executeUpdate();
+            System.out.println("Refreshing Summary Breakdown 03");
             // After the stored procedure is executed, refresh the materialized view.
             psRefresh.executeUpdate();
         }
@@ -1722,7 +1726,7 @@ public class DatabasePostgres {
                 lblReportProgress.setVisible(true);
             });
 
-            String insertReportSQL = "INSERT INTO reports_new (report_id, asset_isrc, reported_royalty, territory, sale_start_date, dsp, product_label, upc) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String insertReportSQL = "INSERT INTO reports_new (report_id, asset_isrc, reported_royalty, territory, sale_start_date, dsp, product_label, upc, asset_quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (BufferedReader bReader = new BufferedReader(new FileReader(report.getCsvFile()));
                  CSVReader reader = new CSVReader(bReader);
                  PreparedStatement pstmt = con.prepareStatement(insertReportSQL)) {
@@ -1743,6 +1747,8 @@ public class DatabasePostgres {
                     pstmt.setString(6, fugaReport.getDsp());
                     pstmt.setString(7, fugaReport.getProductLabel());
                     pstmt.setString(8, String.valueOf(fugaReport.getProductUPC()));
+                    pstmt.setInt(9, fugaReport.getAssetQuantity());
+
                     pstmt.addBatch();
 
                     if (rowcount2 % 1000 == 0) {
