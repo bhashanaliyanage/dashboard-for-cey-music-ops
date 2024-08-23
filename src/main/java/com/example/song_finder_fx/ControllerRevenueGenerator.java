@@ -378,9 +378,7 @@ public class ControllerRevenueGenerator {
         RevenueReportController revenueReportController = new RevenueReportController(report);
 
         // Revenue report controller will have a method called calculate revenue (inputs report object and returns gross revenue, partner share, conversion rate, date, co-writer payment summary via report object)
-        report = revenueReportController.calculateRevenue();
-
-
+        report = revenueReportController.calculateRevenue(false);
 
         return report;
     }

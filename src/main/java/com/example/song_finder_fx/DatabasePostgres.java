@@ -357,7 +357,6 @@ public class DatabasePostgres {
 
             stmt.setInt(1, Integer.parseInt(songNo));
             stmt.executeUpdate();
-
         }
     }
 
@@ -991,63 +990,63 @@ public class DatabasePostgres {
 
     }
 
-    public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQLException {
-        int maxRetries = 3;
-        int retryCount = 0;
-        List<PayeeForReport> pReport = new ArrayList<>();
-        // Connection con = getConn();
-        String sql = """
-                SELECT ip.isrc,\s
-                SUM(CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_payee_share,
-                SUM(rv.after_deduction_royalty / 100 * CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_calculated_royalty
-                FROM isrc_payees ip JOIN public.summary_bd_02 rv ON ip.isrc = rv.asset_isrc
-                WHERE ip.payee = ? OR ip.payee01 = ? OR ip.payee02 = ? GROUP BY ip.isrc
-                """;
+public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQLException {
+    int maxRetries = 3;
+    int retryCount = 0;
+    List<PayeeForReport> pReport = new ArrayList<>();
+    // Connection con = getConn();
+    String sql = """
+            SELECT ip.isrc,\s
+            SUM(CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_payee_share,
+            SUM(rv.after_deduction_royalty / 100 * CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_calculated_royalty
+            FROM isrc_payees ip JOIN public.summary_bd_02 rv ON ip.isrc = rv.asset_isrc
+            WHERE ip.payee = ? OR ip.payee01 = ? OR ip.payee02 = ? GROUP BY ip.isrc
+            """;
 
-        while (retryCount < maxRetries) {
-            try (Connection con = getConn();
-                 PreparedStatement ps = con.prepareStatement(sql)) {
+    while (retryCount < maxRetries) {
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-                ps.setString(1, report.getArtist().getName());
-                ps.setString(2, report.getArtist().getName());
-                ps.setString(3, report.getArtist().getName());
-                ps.setString(4, report.getArtist().getName());
-                ps.setString(5, report.getArtist().getName());
-                ps.setString(6, report.getArtist().getName());
-                ps.setString(7, report.getArtist().getName());
-                //			System.out.println(ps);
-                ResultSet rs = ps.executeQuery();
+            ps.setString(1, report.getArtist().getName());
+            ps.setString(2, report.getArtist().getName());
+            ps.setString(3, report.getArtist().getName());
+            ps.setString(4, report.getArtist().getName());
+            ps.setString(5, report.getArtist().getName());
+            ps.setString(6, report.getArtist().getName());
+            ps.setString(7, report.getArtist().getName());
+            //			System.out.println(ps);
+            ResultSet rs = ps.executeQuery();
 
-                while (rs.next()) {
-                    PayeeForReport pr = new PayeeForReport();
-                    pr.setIsrc(rs.getString(1));
-                    pr.setShare(rs.getInt(2));
-                    pr.setValue(rs.getDouble(3));
-                    pReport.add(pr);
+            while (rs.next()) {
+                PayeeForReport pr = new PayeeForReport();
+                pr.setIsrc(rs.getString(1));
+                pr.setShare(rs.getInt(2));
+                pr.setValue(rs.getDouble(3));
+                pReport.add(pr);
+            }
+
+            return pReport;
+        } catch (PSQLException e) {
+            if (e.getMessage().contains("An I/O error occurred")) {
+                retryCount++;
+
+                if (retryCount >= maxRetries) {
+                    throw e;
                 }
 
-                return pReport;
-            } catch (PSQLException e) {
-                if (e.getMessage().contains("An I/O error occurred")) {
-                    retryCount++;
+                System.out.println("\nRetrying database operation, attempt " + retryCount);
 
-                    if (retryCount >= maxRetries) {
-                        throw e;
-                    }
-
-                    System.out.println("\nRetrying database operation, attempt " + retryCount);
-
-                    try {
-                        Thread.sleep(1000L * retryCount); // Exponential backoff
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                    }
+                try {
+                    Thread.sleep(1000L * retryCount); // Exponential backoff
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }
-
-        return null;
     }
+
+    return null;
+}
 
     public static ResultSet getCoWriterShares(String artistName) throws SQLException, ClassNotFoundException {
         Connection connection = DatabaseMySQL.getConn();
@@ -2430,6 +2429,165 @@ public class DatabasePostgres {
 
         return payeeDetails;
 
+    }
+
+    public static List<TerritoryBreakdown> getTerritoryBreakdown(String name) throws SQLException {
+        int maxRetries = 3;
+        int retryCount = 0;
+        List<TerritoryBreakdown> territoryBreakdownList = new ArrayList<>();
+
+        while (retryCount < maxRetries) {
+            try {
+                String sql = """
+                        SELECT\s
+                            RN.TERRITORY,
+                            SUM(RN.asset_quantity) AS asset_quantity,
+                            SUM(
+                                CASE
+                                    WHEN S.type = 'O' THEN\s
+                                        CASE
+                                            WHEN RN.TERRITORY = 'AU' THEN (RN.REPORTED_ROYALTY * 0.9 * 0.85 * 0.9) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                            ELSE (RN.REPORTED_ROYALTY * 0.85 * 0.9) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                        END
+                                    WHEN S.type = 'C' THEN\s
+                                        CASE
+                                            WHEN RN.TERRITORY = 'AU' THEN (RN.REPORTED_ROYALTY * 0.9 * 0.85 * 0.8) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                            ELSE (RN.REPORTED_ROYALTY * 0.85 * 0.8) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                        END
+                                    ELSE
+                                        CASE
+                                            WHEN RN.TERRITORY = 'AU' THEN (RN.REPORTED_ROYALTY * 0.9 * 0.85) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                            ELSE (RN.REPORTED_ROYALTY * 0.85) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                        END
+                                END
+                            ) AS REPORTED_ROYALTY_FOR_CEYMUSIC
+                        FROM PUBLIC.ISRC_PAYEES IP
+                        JOIN PUBLIC.REPORTS_NEW RN ON IP.ISRC = RN.ASSET_ISRC
+                        LEFT JOIN PUBLIC.SONGS S ON RN.ASSET_ISRC = S.ISRC
+                        WHERE (IP.PAYEE = ?
+                            OR IP.PAYEE01 = ?
+                            OR IP.PAYEE02 = ?
+                            OR IP.PAYEE03 = ?)
+                            AND RN.REPORT_ID = 29
+                        GROUP BY RN.TERRITORY
+                        ORDER BY REPORTED_ROYALTY_FOR_CEYMUSIC DESC;
+                        """;
+
+                try (Connection con = getConn();
+                     PreparedStatement ps = con.prepareStatement(sql)) {
+                    // TODO: Set Values
+                    for (int i = 1; i <= 20; i++) {
+                        ps.setString(i, name);
+                    }
+
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.isBeforeFirst()) {
+                        rs.next();
+                        // TODO: Get Values
+
+                    }
+                }
+                return territoryBreakdownList;
+            } catch (PSQLException e) {
+                if (e.getMessage().contains("An I/O error occurred") || e.getMessage().contains("This connection has been closed")) {
+                    retryCount++;
+                    if (retryCount >= maxRetries) {
+                        throw e;
+                    }
+                    System.out.println("Retrying database operation, attempt " + retryCount);
+                    // You might want to add a small delay here
+                    try {
+                        Thread.sleep(1000); // 1 second delay
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    throw e;
+                }
+            }
+        }
+
+        return territoryBreakdownList;
+    }
+
+    public static List<DSPBreakdown> getDSPBreakdown(String name) throws SQLException {
+        int maxRetries = 3;
+        int retryCount = 0;
+        List<DSPBreakdown> dspBreakdownList = new ArrayList<>();
+
+        while (retryCount < maxRetries) {
+            try {
+                // Your existing code here
+                String sql = "";
+
+                try (Connection con = getConn();
+                     PreparedStatement ps = con.prepareStatement(sql)) {
+                    // TODO: Set Values
+
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.isBeforeFirst()) {
+                        rs.next();
+                        // TODO: Get Values
+
+                    }
+                }
+                return dspBreakdownList;
+            } catch (PSQLException e) {
+                if (e.getMessage().contains("An I/O error occurred") || e.getMessage().contains("This connection has been closed")) {
+                    retryCount++;
+                    if (retryCount >= maxRetries) {
+                        throw e;
+                    }
+                    System.out.println("Retrying database operation, attempt " + retryCount);
+                    // You might want to add a small delay here
+                    try {
+                        Thread.sleep(1000); // 1 second delay
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    throw e;
+                }
+            }
+        }
+
+        return dspBreakdownList;
     }
 
 

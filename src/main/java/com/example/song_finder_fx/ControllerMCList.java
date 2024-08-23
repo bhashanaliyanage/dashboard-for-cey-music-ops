@@ -389,7 +389,7 @@ public class ControllerMCList {
                             });
                         } catch (SQLException e) {
                             Platform.runLater(() -> {
-                                AlertBuilder.sendErrorAlert("Error", "An Error Occurred While Archiving Claim", e.toString());
+                                AlertBuilder.sendErrorAlert("Error", "Something went wrong when archiving manual claim", e.toString());
                                 e.printStackTrace();
                             });
                         }

@@ -32,13 +32,13 @@ public class Test {
         // March 0.6285, 186.78
         // testArtistReportPDF(0.6285, 186.78, "Ajantha Ranasinghe", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_march_ajantha_ranasinghe.pdf");
         // testArtistReportsNew();
-        // testNewArtistReportPDF();
+        testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
         // DatabasePostgres.changePassword("gimhaar", "admin");
 
-        updateMayReport();
+        // updateMayReport();
     }
 
     private static void updateMayReport() throws IOException, SQLException, CsvValidationException {
@@ -106,7 +106,7 @@ public class Test {
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
-        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Ridma Weerawardena", 2024, 5);
+        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Ridma Weerawardena", 2024, 5, true);
 
         ReportPDFNew pdf = new ReportPDFNew();
         pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_may_ridma.pdf", report);
@@ -288,7 +288,7 @@ public class Test {
         int month = 4;
 
         // Creating artist model by passing artistID
-        ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month);
+        ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month, false);
 
         // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
         double grossRevenue = report.getGrossRevenueInAUD();
@@ -339,7 +339,7 @@ public class Test {
         }
     }
 
-    private static ArtistReport getArtistReportNew(int artistID, double eurToAudRate, double audToLkrRate, String artistName, int year, int month) throws SQLException {
+    private static ArtistReport getArtistReportNew(int artistID, double eurToAudRate, double audToLkrRate, String artistName, int year, int month, boolean includeTerritoryAndDSPBreakdown) throws SQLException {
         Artist artist = new Artist(artistID, artistName);
 
         // Creating revenue report model by passing artist object and conversion rate
@@ -349,7 +349,7 @@ public class Test {
         RevenueReportController revenueReportController = new RevenueReportController(report);
 
         // Revenue report controller will have a method called calculate revenue (inputs report object and returns gross revenue, partner share, conversion rate, date, co-writer payment summary via report object)
-        report = revenueReportController.calculateRevenue();
+        report = revenueReportController.calculateRevenue(includeTerritoryAndDSPBreakdown);
 
         return report;
     }
@@ -389,7 +389,7 @@ public class Test {
     private static void testArtistReportPDF(double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
         // DatabasePostgres.refreshSummaryTable(month, year);
 
-        ArtistReport report = getArtistReportNew(0, eurToAudRate, audToLkrRate, artistName, year, month);
+        ArtistReport report = getArtistReportNew(0, eurToAudRate, audToLkrRate, artistName, year, month, false);
 
         // System.out.println("report.getGrossRevenue() = " + report.getGrossRevenue());
 
@@ -406,7 +406,7 @@ public class Test {
         int year = 2024;
 
         // Creating artist model by passing artistID
-        ArtistReport report = getArtistReportNew(artistID, conversionRate, 0, artistName, month, year);
+        ArtistReport report = getArtistReportNew(artistID, conversionRate, 0, artistName, month, year, false);
 
         // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
         double grossRevenue = report.getGrossRevenueInLKR();
