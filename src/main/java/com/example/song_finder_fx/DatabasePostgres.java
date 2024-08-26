@@ -2431,7 +2431,7 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
 
     }
 
-    public static List<TerritoryBreakdown> getTerritoryBreakdown(String name) throws SQLException {
+    public static List<TerritoryBreakdown> getTerritoryBreakdown(ArtistReport report) throws SQLException {
         int maxRetries = 3;
         int retryCount = 0;
         List<TerritoryBreakdown> territoryBreakdownList = new ArrayList<>();
@@ -2504,23 +2504,31 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
                             OR IP.PAYEE01 = ?
                             OR IP.PAYEE02 = ?
                             OR IP.PAYEE03 = ?)
-                            AND RN.REPORT_ID = 29
+                            AND RN.REPORT_ID = ?
                         GROUP BY RN.TERRITORY
                         ORDER BY REPORTED_ROYALTY_FOR_CEYMUSIC DESC;
                         """;
 
-                try (Connection con = getConn();
-                     PreparedStatement ps = con.prepareStatement(sql)) {
-                    // TODO: Set Values
-                    for (int i = 1; i <= 20; i++) {
-                        ps.setString(i, name);
-                    }
+                int reportID = getFUGA_ReportID(report.getMonthInt(), report.getYear());
 
-                    ResultSet rs = ps.executeQuery();
-                    if (rs.isBeforeFirst()) {
-                        rs.next();
-                        // TODO: Get Values
+                if (reportID > 0) {
+                    try (Connection con = getConn();
+                         PreparedStatement ps = con.prepareStatement(sql)) {
+                        String artistName = report.getArtist().getName();
+                        for (int i = 1; i <= 28; i++) {
+                            ps.setString(i, artistName);
+                        }
+                        ps.setInt(29, reportID);
 
+                        ResultSet rs = ps.executeQuery();
+                        if (rs.isBeforeFirst()) {
+                            while (rs.next()) {
+                                String territory = rs.getString(1);
+                                int assetQuantity = rs.getInt(2);
+                                double reportedRoyaltyForCEYMusic = rs.getDouble(3);
+                                territoryBreakdownList.add(new TerritoryBreakdown(territory, assetQuantity, reportedRoyaltyForCEYMusic));
+                            }
+                        }
                     }
                 }
                 return territoryBreakdownList;
@@ -2546,7 +2554,7 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         return territoryBreakdownList;
     }
 
-    public static List<DSPBreakdown> getDSPBreakdown(String name) throws SQLException {
+    public static List<DSPBreakdown> getDSPBreakdown(ArtistReport report) throws SQLException {
         int maxRetries = 3;
         int retryCount = 0;
         List<DSPBreakdown> dspBreakdownList = new ArrayList<>();
@@ -2554,17 +2562,95 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         while (retryCount < maxRetries) {
             try {
                 // Your existing code here
-                String sql = "";
+                String sql = """
+                        SELECT\s
+                            RN.DSP,
+                        	SUM(RN.asset_quantity) AS asset_quantity,
+                            SUM(
+                                CASE
+                                    WHEN S.type = 'O' THEN\s
+                                        CASE
+                                            WHEN RN.TERRITORY = 'AU' THEN (RN.REPORTED_ROYALTY * 0.9 * 0.85 * 0.9) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                            ELSE (RN.REPORTED_ROYALTY * 0.85 * 0.9) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                        END
+                                    WHEN S.type = 'C' THEN\s
+                                        CASE
+                                            WHEN RN.TERRITORY = 'AU' THEN (RN.REPORTED_ROYALTY * 0.9 * 0.85 * 0.8) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                            ELSE (RN.REPORTED_ROYALTY * 0.85 * 0.8) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                        END
+                                    ELSE
+                                        CASE
+                                            WHEN RN.TERRITORY = 'AU' THEN (RN.REPORTED_ROYALTY * 0.9 * 0.85) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                            ELSE (RN.REPORTED_ROYALTY * 0.85) * COALESCE(
+                                                CASE
+                                                    WHEN IP.payee = ? THEN IP.share
+                                                    WHEN IP.payee01 = ? THEN IP.payee01share
+                                                    WHEN IP.payee02 = ? THEN IP.payee02share
+                                                    WHEN IP.payee03 = ? THEN IP.payee03share
+                                                END, 0) / 100
+                                        END
+                                END
+                            ) AS REPORTED_ROYALTY_FOR_CEYMUSIC
+                        FROM PUBLIC.ISRC_PAYEES IP
+                        JOIN PUBLIC.REPORTS_NEW RN ON IP.ISRC = RN.ASSET_ISRC
+                        LEFT JOIN PUBLIC.SONGS S ON RN.ASSET_ISRC = S.ISRC
+                        WHERE (IP.PAYEE = ?
+                            OR IP.PAYEE01 = ?
+                            OR IP.PAYEE02 = ?
+                            OR IP.PAYEE03 = ?)
+                            AND RN.REPORT_ID = ?
+                        GROUP BY RN.DSP
+                        ORDER BY REPORTED_ROYALTY_FOR_CEYMUSIC DESC;
+                        """;
+
+                int reportID = getFUGA_ReportID(report.getMonthInt(), report.getYear());
 
                 try (Connection con = getConn();
                      PreparedStatement ps = con.prepareStatement(sql)) {
-                    // TODO: Set Values
+                    String artistName = report.getArtist().getName();
+                    for (int i = 1; i <= 28; i++) {
+                        ps.setString(i, artistName);
+                    }
+                    ps.setInt(29, reportID);
 
                     ResultSet rs = ps.executeQuery();
                     if (rs.isBeforeFirst()) {
-                        rs.next();
-                        // TODO: Get Values
-
+                        while (rs.next()) {
+                            String dsp = rs.getString(1);
+                            int assetQuantity = rs.getInt(2);
+                            double reportedRoyaltyForCEYMusic = rs.getDouble(3);
+                            dspBreakdownList.add(new DSPBreakdown(dsp, assetQuantity, reportedRoyaltyForCEYMusic));
+                        }
                     }
                 }
                 return dspBreakdownList;
@@ -3295,6 +3381,23 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
                                                         LEFT JOIN PUBLIC.isrc_payees ip ON ip.isrc = R.asset_isrc
                                                         ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
                 """;
+        ResultSet rs = getAssetBreakdownResultSet(artist);
+        while (rs.next()) {
+            CoWriterShare cr = new CoWriterShare();
+            cr.setIsrc(rs.getString(1));
+            cr.setRoyalty(rs.getDouble(10));
+            cr.setSongName(rs.getString(3));
+            cr.setContributor(rs.getString(6));
+            cr.setComposer(rs.getString(7));
+            cr.setLyricist(rs.getString(8));
+            cr.setSongType(rs.getString(9));
+            cr.setShare(rs.getInt(5) + "%");
+            crLlist.add(cr);
+        }
+        return crLlist;
+    }
+
+    private static ResultSet getAssetBreakdownResultSet(String artist) throws SQLException {
         String sqlNew2 = """
                 SELECT R.ASSET_ISRC,
                 	R.AFTER_DEDUCTION_ROYALTY,
@@ -3314,11 +3417,11 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
                         THEN (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.LYRICIST)
                         ELSE (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER)
                     END AS CONTRIBUTOR,
-                                
+                               \s
                 	(SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER) AS COMPOSER,
-                                
+                               \s
                 	(SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.LYRICIST) AS LYRICIST,
-                	
+                \t
                 	 S.TYPE,
                 	R.AFTER_DEDUCTION_ROYALTY * IP.SHARE / 100 AS CALCULATED_ROYALTY
                 FROM PUBLIC.SUMMARY_BD_02 AS R
@@ -3335,7 +3438,7 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
                 LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
                 LEFT JOIN PUBLIC.ISRC_PAYEES IP ON IP.ISRC = R.ASSET_ISRC
                 ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
-                """;
+               \s""";
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement(sqlNew2);
         ps.setString(1, artist);
@@ -3345,20 +3448,7 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         ps.setString(5, artist);
         ps.setString(6, artist);
         ps.setString(7, artist);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            CoWriterShare cr = new CoWriterShare();
-            cr.setIsrc(rs.getString(1));
-            cr.setRoyalty(rs.getDouble(10));
-            cr.setSongName(rs.getString(3));
-            cr.setContributor(rs.getString(6));
-            cr.setComposer(rs.getString(7));
-            cr.setLyricist(rs.getString(8));
-            cr.setSongType(rs.getString(9));
-            cr.setShare(rs.getInt(5) + "%");
-            crLlist.add(cr);
-        }
-        return crLlist;
+        return ps.executeQuery();
     }
 
 }

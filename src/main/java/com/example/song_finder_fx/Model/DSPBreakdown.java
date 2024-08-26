@@ -1,4 +1,5 @@
 package com.example.song_finder_fx.Model;
 
-public class DSPBreakdown {
+public record DSPBreakdown (String dsp, int assetQuantity, double reportedRoyaltyForCEYMusic) {
+
 }

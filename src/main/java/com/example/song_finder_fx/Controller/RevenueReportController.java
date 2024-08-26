@@ -35,11 +35,11 @@ public record RevenueReportController(ArtistReport report) {
 
         if (includeTerritoryAndDSPBreakdown) {
             System.out.println("Getting Territory Breakdown");
-            List<TerritoryBreakdown> territoryBreakdownList = DatabasePostgres.getTerritoryBreakdown(report.getArtist().getName());
+            List<TerritoryBreakdown> territoryBreakdownList = DatabasePostgres.getTerritoryBreakdown(report);
             report.setTerritoryBreakdown(territoryBreakdownList);
 
             System.out.println("Getting DSP Breakdown");
-            List<DSPBreakdown> dspBreakdownList = DatabasePostgres.getDSPBreakdown(report.getArtist().getName());
+            List<DSPBreakdown> dspBreakdownList = DatabasePostgres.getDSPBreakdown(report);
             report.setDSPBreakdown(dspBreakdownList);
         }
 
