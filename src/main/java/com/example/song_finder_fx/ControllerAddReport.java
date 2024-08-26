@@ -353,6 +353,7 @@ void onLoadReport(ActionEvent event) {
             @Override
             protected Void call() {
                 try {
+                    Platform.runLater(() -> lblMissingPayees.setText("Loading..."));
                     int missingPayeeCount = DatabasePostgres.getMissingPayeeCount(id);
                     Platform.runLater(() -> lblMissingPayees.setText(String.valueOf(missingPayeeCount)));
                     Platform.runLater(() -> hboxMissingAssets.setDisable(false));
@@ -364,6 +365,7 @@ void onLoadReport(ActionEvent event) {
                 }
 
                 try {
+                    Platform.runLater(() -> lblMissingISRCs.setText("Loading..."));
                     int missingISRC_Count = DatabasePostgres.getMissingISRC_Count(id);
                     Platform.runLater(() -> lblMissingISRCs.setText(String.valueOf(missingISRC_Count)));
                     Platform.runLater(() -> hboxMissingAssets.setDisable(false));

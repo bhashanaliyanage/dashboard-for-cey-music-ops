@@ -1015,7 +1015,7 @@ public class DatabasePostgres {
                 ps.setString(5, report.getArtist().getName());
                 ps.setString(6, report.getArtist().getName());
                 ps.setString(7, report.getArtist().getName());
-    //			System.out.println(ps);
+                //			System.out.println(ps);
                 ResultSet rs = ps.executeQuery();
 
                 while (rs.next()) {
@@ -2404,9 +2404,55 @@ public class DatabasePostgres {
         return ingestNames;
     }
 
+    public static Map<String, Payee> fetchPayeeDetailsForISRCs(List<String> isrcs) throws SQLException {
+        Map<String, Payee> payeeDetails = new HashMap<>();
+        String placeholders = String.join(",", Collections.nCopies(isrcs.size(), "?"));
+        String sql = "SELECT isrc, payee, share, payee01, payee01share, payee02, payee02share " +
+                "FROM isrc_payees WHERE isrc IN (" + placeholders + ")";
+
+        System.out.println("Querying for ISRCs: " + String.join(", ", isrcs));
+
+        try (Connection conn = getConn();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < isrcs.size(); i++) {
+                pstmt.setString(i + 1, isrcs.get(i));
+            }
+
+            System.out.println("Executing SQL: " + pstmt.toString());
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Payee payee = new Payee();
+
+                    /*System.out.println("ISRC: " + rs.getString("isrc"));
+                    System.out.println("Payee 1: " + rs.getString("payee"));
+                    System.out.println("Share 1: " + rs.getInt("share"));
+                    System.out.println("Payee 2: " + rs.getString("payee01"));
+                    System.out.println("Share 2: " + rs.getInt("payee01share"));
+                    System.out.println("Payee 3: " + rs.getString("payee02"));
+                    System.out.println("Share 3: " + rs.getInt("payee02share"));*/
+
+                    payee.setIsrc(rs.getString("isrc"));
+                    payee.setPayee1(rs.getString("payee"));
+                    payee.setShare1(String.valueOf(rs.getInt("share")));
+                    payee.setPayee2(rs.getString("payee01"));
+                    payee.setShare2(String.valueOf(rs.getInt("payee01share")));
+                    payee.setPayee3(rs.getString("payee02"));
+                    payee.setShare3(String.valueOf(rs.getInt("payee02share")));
+
+                    payeeDetails.put(payee.getIsrc(), payee);
+                }
+            }
+        }
+
+        return payeeDetails;
+
+    }
+
 
     public List<Payee> check(String name) {
-//        String name = "Victor Rathnayake";
+        // String name = "Victor Rathnayake";
         Payee py;
         List<Payee> pyList = new ArrayList<>();
         try {
@@ -3109,11 +3155,56 @@ public class DatabasePostgres {
                                                         LEFT JOIN PUBLIC.isrc_payees ip ON ip.isrc = R.asset_isrc
                                                         ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
                 """;
+        String sqlNew2 = """
+                SELECT R.ASSET_ISRC,
+                	R.AFTER_DEDUCTION_ROYALTY,
+                	S.SONG_NAME,
+                	CASE
+                        WHEN ? = IP.PAYEE THEN IP.PAYEE
+                        WHEN ? = IP.PAYEE01 THEN IP.PAYEE01
+                        WHEN ? = IP.PAYEE02 THEN IP.PAYEE02
+                    END AS PAYEE,
+                	IP.SHARE,
+                	CASE
+                        WHEN (CASE
+                                  WHEN ? = IP.PAYEE THEN IP.PAYEE
+                                  WHEN ? = IP.PAYEE01 THEN IP.PAYEE01
+                                  WHEN ? = IP.PAYEE02 THEN IP.PAYEE02
+                              END) = (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER)\s
+                        THEN (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.LYRICIST)
+                        ELSE (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER)
+                    END AS CONTRIBUTOR,
+                                
+                	(SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER) AS COMPOSER,
+                                
+                	(SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.LYRICIST) AS LYRICIST,
+                	
+                	 S.TYPE,
+                	R.AFTER_DEDUCTION_ROYALTY * IP.SHARE / 100 AS CALCULATED_ROYALTY
+                FROM PUBLIC.SUMMARY_BD_02 AS R
+                JOIN
+                	(SELECT ASSET_ISRC,
+                			MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
+                		FROM PUBLIC.SUMMARY_BD_02
+                		WHERE ASSET_ISRC IN
+                				(SELECT ISRC
+                             FROM PUBLIC.ISRC_PAYEES
+                             WHERE ? IN (PAYEE, PAYEE01, PAYEE02))
+                		GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC
+                AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
+                LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
+                LEFT JOIN PUBLIC.ISRC_PAYEES IP ON IP.ISRC = R.ASSET_ISRC
+                ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
+                """;
         Connection con = getConn();
-        PreparedStatement ps = con.prepareStatement(sqlNew);
+        PreparedStatement ps = con.prepareStatement(sqlNew2);
         ps.setString(1, artist);
         ps.setString(2, artist);
         ps.setString(3, artist);
+        ps.setString(4, artist);
+        ps.setString(5, artist);
+        ps.setString(6, artist);
+        ps.setString(7, artist);
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             CoWriterShare cr = new CoWriterShare();

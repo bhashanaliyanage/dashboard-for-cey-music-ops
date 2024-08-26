@@ -7,7 +7,6 @@ import com.opencsv.CSVReaderBuilder;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,13 +17,9 @@ import java.util.List;
 
 public class IngestController {
 
-    public List<Ingest> getCreatedIngests() throws SQLException, IOException {
-        return DatabasePostgres.getAllIngests();
-    }
-
     public List<String> getMissingPayeeList() {
 
-        List<String> isrcList = new ArrayList<String>();
+        List<String> isrcList = new ArrayList<>();
         String sql = "SELECT asset_isrc FROM report WHERE asset_isrc NOT IN (SELECT isrc FROM isrc_payees)";
 
         try (Connection con = DatabasePostgres.getConn();
@@ -291,5 +286,54 @@ public class IngestController {
         } else {
             return ""; // or throw an exception, or return a default value
         }
+    }
+
+    public ValidationResult validateIngest(Ingest ingest) {
+        List<IngestCSVData> ingestCSVDataList = ingest.getIngestCSVDataList();
+        boolean isValid = true;
+        List<String> errorMessages = new ArrayList<>();
+
+        for (IngestCSVData ingestCSVData : ingestCSVDataList) {
+            // Validate ISRC
+            if (!validateISRC(ingestCSVData.getIsrc())) {
+                System.out.println("Invalid ISRC for track: " + ingestCSVData.getTrackTitle() + " | ISRC: " + ingestCSVData.getIsrc());
+                errorMessages.add("Invalid ISRC for track: " + ingestCSVData.getTrackTitle() + " | ISRC: " + ingestCSVData.getIsrc());
+                isValid = false;
+            }
+        }
+
+        return new ValidationResult(isValid, errorMessages);
+    }
+
+    public boolean validateISRC(String isrc) {
+        if (isrc == null || isrc.length() != 12) {
+            return false;
+        }
+
+        // Check country code (first two characters)
+        String countryCode = isrc.substring(0, 2);
+        if (!countryCode.matches("[A-Z]{2}")) {
+            return false;
+        }
+
+        // Check registrant code (next three characters)
+        String registrantCode = isrc.substring(2, 5);
+        if (!registrantCode.matches("[A-Z0-9]{3}")) {
+            return false;
+        }
+
+        // Check year (next two characters)
+        String year = isrc.substring(5, 7);
+        if (!year.matches("\\d{2}")) {
+            return false;
+        }
+
+        // Check designation code (last five characters)
+        String designationCode = isrc.substring(7);
+        if (!designationCode.matches("\\d{5}")) {
+            return false;
+        }
+
+        return true;
     }
 }

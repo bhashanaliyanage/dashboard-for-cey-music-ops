@@ -5,6 +5,7 @@ import com.example.song_finder_fx.Controller.IngestController;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Model.Ingest;
 import com.example.song_finder_fx.Model.IngestCSVData;
+import com.example.song_finder_fx.Model.ValidationResult;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -16,6 +17,7 @@ import javafx.scene.input.MouseEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 public class ControllerIngestView {
 
@@ -37,22 +39,37 @@ public class ControllerIngestView {
         IngestController ingestController = new IngestController();
 
         boolean status = AlertBuilder.getSendConfirmationAlert("CeyMusic Dashboard", "Please double check before approval", "Confirm Approval?");
-        System.out.println("status = " + status);
 
         if (status) {
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
                     try {
+                        // Validate ingest
                         Platform.runLater(() -> {
-                            btnApproveIngest.setText("Approving Ingest");
+                            btnApproveIngest.setText("Validating Ingest");
                             imgLoading.setVisible(true);
                         });
-                        ingestController.approveIngest(ingest);
-                        Platform.runLater(() -> {
-                            btnApproveIngest.setText("Approve Ingest");
-                            imgLoading.setVisible(false);
-                        });
+                        ValidationResult validatedIngest = ingestController.validateIngest(ingest);
+
+                        if (validatedIngest.isValid()) {
+                            // Inset data to the table
+                            Platform.runLater(() -> {
+                                btnApproveIngest.setText("Approving Ingest");
+                                imgLoading.setVisible(true);
+                            });
+                            ingestController.approveIngest(ingest);
+                            Platform.runLater(() -> {
+                                btnApproveIngest.setText("Approve Ingest");
+                                imgLoading.setVisible(false);
+                            });
+                        } else {
+                            Platform.runLater(() -> {
+                                btnApproveIngest.setText("Approve Ingest");
+                                imgLoading.setVisible(false);
+                                showValidationErrors(validatedIngest.errorMessages());
+                            });
+                        }
                     } catch (SQLException e) {
                         Platform.runLater(() -> {
                             btnApproveIngest.setText("Approve Ingest");
@@ -67,6 +84,30 @@ public class ControllerIngestView {
             Thread thread = new Thread(task);
             thread.start();
         }
+    }
+
+    private void showValidationErrors(List<String> errorMessages) {
+        StringBuilder messageBuilder = new StringBuilder();
+        int totalErrors = errorMessages.size();
+        int displayedErrors = Math.min(3, totalErrors);
+
+        for (int i = 0; i < displayedErrors; i++) {
+            messageBuilder.append(errorMessages.get(i)).append("\n");
+        }
+
+        if (totalErrors > 3) {
+            int remainingErrors = totalErrors - 3;
+            messageBuilder.append("\n... and ").append(remainingErrors).append(" more error");
+            if (remainingErrors > 1) {
+                messageBuilder.append("s");
+            }
+            messageBuilder.append(" like these.");
+        }
+
+        String errorMessage = messageBuilder.toString();
+        AlertBuilder.sendErrorAlert("Validation Error",
+                "The ingest could not be validated. Found " + totalErrors + " error(s):",
+                errorMessage);
     }
 
     @FXML

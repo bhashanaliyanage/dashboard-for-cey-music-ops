@@ -181,7 +181,7 @@ public class ControllerMCIdentifiers {
         });
     }
 
-    private void oldCode(MouseEvent event) throws SQLException, IOException, InterruptedException {
+    private void oldCode(MouseEvent event) throws SQLException, IOException {
         currentISRC = "";
         LocalDate date = LocalDate.now();
         String userName = System.getProperty("user.name");
@@ -206,7 +206,6 @@ public class ControllerMCIdentifiers {
         for (int claimID = 0; claimID < totalClaims; claimID++) {
             final String[] upc = {upcs.get(claimID).getText()};
             String catNo = claimCNumbers.get(claimID).getText();
-            // currentISRC = claimISRCs.get(claimID).getText();
 
             // Validating UPCs
             if (upc[0].isEmpty()) {
@@ -274,7 +273,6 @@ public class ControllerMCIdentifiers {
             // Updating UI with ingest ID
             lblIngestID.setText(String.valueOf(ingestID));
 
-
             // Executing rest of the tasks as a background task
             Task<Void> task = new Task<>() {
                 @Override
@@ -330,7 +328,6 @@ public class ControllerMCIdentifiers {
 
                         // Check if the video is already downloaded and use it
                         if (downloadedVideos.containsKey(youtubeID)) {
-                            // fileLocation[0] = downloadedVideos.get(youtubeID);
                             fileName = downloadedFileNames.get(fileLocation[0]);
                             Platform.runLater(() -> lblProcess.setText("Using existing audio for: " + albumTitle));
                         } else {
@@ -340,8 +337,6 @@ public class ControllerMCIdentifiers {
                             downloadedVideos.put(youtubeID, fileLocation[0]);
                             downloadedFileNames.put(fileLocation[0], fileName);
                         }
-
-                        // downloadAudio(claimID, fileName, fileLocation);
 
                         // Trimming audio if needed and copying it to the sub-folder created
                         trimAndCopyAudio(claimID, albumTitle, fileLocation, fileName, folder, lblProcess, originalFileName);
