@@ -289,9 +289,12 @@ public class DatabasePostgres {
         System.out.println("endDate = " + endDate);*/
 
         Connection conn = getConn();
-        PreparedStatement ps = conn.prepareStatement("SELECT claim_id, song_name, composer, lyricist, youtube_id, " +
-                "trim_start, trim_end, preview_image, artwork, date, claim_type FROM public.manual_claims " +
-                "WHERE ingest_status = false AND archive = true AND date BETWEEN ? AND ? ORDER BY claim_type ASC, claim_id DESC LIMIT 100;");
+        PreparedStatement ps = conn.prepareStatement("""
+                SELECT claim_id, song_name, composer, lyricist, youtube_id, trim_start, trim_end, date, claim_type
+                FROM public.manual_claims
+                WHERE ingest_status = false AND archive = true AND date BETWEEN ? AND ?
+                ORDER BY claim_type ASC, claim_id DESC LIMIT 100;
+                """);
         ps.setDate(1, Date.valueOf(startDate));
         ps.setDate(2, Date.valueOf(endDate));
         ResultSet resultSet = ps.executeQuery();
@@ -310,16 +313,16 @@ public class DatabasePostgres {
                 String youTubeLink = resultSet.getString(5);
                 String trimStart = resultSet.getString(6);
                 String trimEnd = resultSet.getString(7);
-                byte[] previewImageBytes = resultSet.getBytes(8);
-                byte[] artworkImageBytes = resultSet.getBytes(9);
-                Date date = resultSet.getDate(10);
-                int claimType = resultSet.getInt(11);
+                // byte[] previewImageBytes = resultSet.getBytes(8);
+                // byte[] artworkImageBytes = resultSet.getBytes(9);
+                Date date = resultSet.getDate(8);
+                int claimType = resultSet.getInt(9);
                 LocalDate localDate = sqlDateToLocalDate(date);
 
                 ManualClaimTrack manualClaimTrack = new ManualClaimTrack(id, songName, lyrics, composer, youTubeLink, localDate, claimType);
 
                 // Set the images to model
-                try {
+                /*try {
                     ByteArrayInputStream previewImageInputStream = new ByteArrayInputStream(previewImageBytes);
                     ByteArrayInputStream artworkImageInputStream = new ByteArrayInputStream(artworkImageBytes);
 
@@ -331,7 +334,7 @@ public class DatabasePostgres {
                     manualClaimTrack.setImage(artwork);
                 } catch (IOException e) {
                     Platform.runLater(e::printStackTrace);
-                }
+                }*/
 
                 if (trimStart != null && trimEnd != null) {
                     manualClaimTrack.addTrimTime(trimStart, trimEnd);

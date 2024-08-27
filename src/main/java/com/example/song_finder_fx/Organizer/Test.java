@@ -25,14 +25,14 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
-        // DatabasePostgres.refreshSummaryTable(5, 2024);
+        // DatabasePostgres.refreshSummaryTable(4, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
-        // testArtistReportPDF(0.6285, 186.78, "Ajantha Ranasinghe", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_march_ajantha_ranasinghe.pdf");
+        getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_mahesh_vithana_edit.pdf");
         // testArtistReportsNew();
-        testNewArtistReportPDF();
+        // testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
@@ -245,7 +245,7 @@ public class Test {
             // System.out.println(payee);
             if (names.contains(payee)) {
                 System.out.println("Available in the list: " + payee);
-                testArtistReportPDF(
+                getArtistReport(
                         eurToAudRate,
                         audToLkrRate,
                         payee,
@@ -386,7 +386,7 @@ public class Test {
         System.out.println(summary.getReportDayCount());
     }
 
-    private static void testArtistReportPDF(double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
+    private static void getArtistReport(double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
         // DatabasePostgres.refreshSummaryTable(month, year);
 
         ArtistReport report = getArtistReportNew(0, eurToAudRate, audToLkrRate, artistName, year, month, false);
