@@ -93,7 +93,7 @@ public class ReportPDFNew implements Colors {
         this.reportPath = path;
     }
 
-    private Table getStreamingBreakdownTable(ArtistReport report) throws MalformedURLException {
+    private Table getStreamingBreakdownTable(ArtistReport report) throws IOException {
         float[] columnWidth = {50f, 300f, 125f, 125f};
         Table table = new Table(columnWidth);
         table.setMarginLeft(20f);
@@ -123,7 +123,7 @@ public class ReportPDFNew implements Colors {
         // Header
         // Values
         table.addCell(new Cell(1, 2).setHeight(30f).setBorder(border).add(new Paragraph("").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Amount").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Amount (LKR)").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
         table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Streams").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
 
         // Cell cell = new Cell().setBackgroundColor(backgroundColor).setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/spotify.png")).setAutoScale(true));
@@ -138,7 +138,28 @@ public class ReportPDFNew implements Colors {
 
         table.addCell(cell);*/
 
-        // Values
+        List<DSPBreakdown> dspBreakdown = report.getDSPBreakdown();
+        double eurToAudRate = report.getEurToAudRate();
+        double audToLkrRate = report.getAudToLkrRate();
+
+        for (DSPBreakdown dsp : dspBreakdown) {
+            String dspName = dsp.dsp();
+            Image dspImage = getDSPImage(dsp.dsp()); // TODO: Implement getDSPImage
+            double reportedRoyalty = dsp.reportedRoyaltyForCEYMusic();
+            int assetQuantity = dsp.assetQuantity();
+
+            double processedRoyalty = reportedRoyalty / eurToAudRate * audToLkrRate;
+
+            // Values
+            table.addCell(new Cell().setHeight(30f).setBorder(border).add(dspImage));
+            table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph(dspName).setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+            table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph(String.format("%,9.2f", processedRoyalty)).setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+            table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph(String.valueOf(assetQuantity)).setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+
+            table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
+        }
+
+        /*// Values
         table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/spotify.png")).setAutoScale(true)));
         table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Spotify").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
         table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("00.00").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
@@ -156,9 +177,35 @@ public class ReportPDFNew implements Colors {
         table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/tiktok.png")).setAutoScale(true)));
         table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("YouTube").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
         table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("00.00").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("0").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("0").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));*/
 
         return table;
+    }
+
+    // src/main/resources/com/example/song_finder_fx/images/ytmusic.png
+
+    private Image getDSPImage(String dsp) throws IOException {
+        return switch (dsp) {
+            case "Spotify" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/spotify.png", true);
+            case "Apple Music", "iTunes Match" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/itunes.png", true);
+            case "Youtube Music" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/ytmusic.png", true);
+            case "Youtube Ad Supported" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/yt_square.png", true);
+            case "TikTok" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/tiktok.png", true);
+            case "Facebook Audio Library", "Facebook Fingerprinting" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/fb.png", true);
+
+            // TODO: Implement Rest of DSPs
+            case "Soundcloud" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_soundcloud.png", true);
+            case "Amazon Unlimited", "Amazon Prime", "Amazon ADS" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_amazon.png", true);
+            case "Snap" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_snapchat.png", true);
+            case "Hungama" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_hungama.png", true);
+            case "Tidal" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_tidal.png", true);
+
+            default ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/logo_small_200x.png", true);
+        };
     }
 
     private static void setBackgroundColor(Document document) {
@@ -332,7 +379,7 @@ public class ReportPDFNew implements Colors {
         File[] matchingFiles = folder.listFiles((dir, name) -> {
             String lowercaseName = name.toLowerCase();
             return lowercaseName.startsWith(baseFileName) &&
-                    (lowercaseName.endsWith(".png") || lowercaseName.endsWith(".jpg") || lowercaseName.endsWith(".jpeg"));
+                   (lowercaseName.endsWith(".png") || lowercaseName.endsWith(".jpg") || lowercaseName.endsWith(".jpeg"));
         });
 
         return (matchingFiles != null && matchingFiles.length > 0) ? matchingFiles[0] : null;
@@ -450,6 +497,17 @@ public class ReportPDFNew implements Colors {
         image.setHeight(30f);
 
         image.setAutoScale(autoscale);
+
+        return image;
+    }
+
+    static Image loadImageSmall2(String location, boolean autoscale) throws IOException {
+        Image image = new Image(ImageDataFactory.create(location));
+
+        // Set the new dimensions
+        image.setWidth(30f);
+
+        image.setAutoScaleHeight(autoscale);
 
         return image;
     }

@@ -189,4 +189,8 @@ public class ArtistReport {
     public void setDSPBreakdown(List<DSPBreakdown> dspBreakdownList) {
         this.dspBreakdown = dspBreakdownList;
     }
+
+    public List<DSPBreakdown> getDSPBreakdown() {
+        return this.dspBreakdown;
+    }
 }

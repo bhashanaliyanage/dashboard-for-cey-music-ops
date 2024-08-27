@@ -7,7 +7,6 @@ import com.example.song_finder_fx.Model.*;
 import com.example.song_finder_fx.Session.UserSession;
 import com.example.song_finder_fx.Session.UserSummary;
 import com.itextpdf.layout.Document;
-import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.*;
@@ -15,8 +14,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,84 +22,18 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
-        // DatabasePostgres.refreshSummaryTable(4, 2024);
+        // DatabasePostgres.refreshSummaryTable(5, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
-        getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_mahesh_vithana_edit.pdf");
+        // getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_mahesh_vithana_edit.pdf");
         // testArtistReportsNew();
-        // testNewArtistReportPDF();
+        testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
         // DatabasePostgres.changePassword("gimhaar", "admin");
-
-        // updateMayReport();
-    }
-
-    private static void updateMayReport() throws IOException, SQLException, CsvValidationException {
-        File csv = new File("D:\\CeyMusic\\CeyMusic Software Dev\\Tools\\Report Generator\\May2024StatementRun_IslandDreamRecords-standard-EUR\\May2024StatementRun_IslandDreamRecords-royalty_product_and_asset.csv");
-        if (csv.canRead()) {
-            ReportMetadata report = new ReportMetadata("may_2024", 5, 2024, csv);
-            report.setId(21);
-
-            String sql = "UPDATE public.reports_new SET asset_quantity = ? WHERE report_id = ? AND asset_isrc = ?;";
-
-            final int BATCH_SIZE = 1000;
-
-            try (BufferedReader bReader = new BufferedReader(new FileReader(report.getCsvFile()));
-                 CSVReader reader = new CSVReader(bReader);
-                 Connection con = DatabasePostgres.getConn()) {
-
-                con.setAutoCommit(false);  // Turn off auto-commit
-
-                try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-                    String[] nextLine;
-                    reader.readNext(); // Skip header
-
-                    int totalRows = 0;
-                    int processedRows = 0;
-                    int batchCount = 0;
-
-                    System.out.println("Starting update process...");
-
-                    while ((nextLine = reader.readNext()) != null) {
-                        FUGAReport fugaReport = CSVController.getFUGAReport(nextLine);
-                        pstmt.setInt(1, fugaReport.getAssetQuantity());
-                        pstmt.setInt(2, report.getId());
-                        pstmt.setString(3, fugaReport.getAssetISRC());
-                        pstmt.addBatch();
-
-                        batchCount++;
-                        processedRows++;
-                        totalRows++;
-
-                        if (batchCount >= BATCH_SIZE) {
-                            pstmt.executeBatch();
-                            con.commit();
-                            System.out.printf("Processed %d rows\n", processedRows);
-                            batchCount = 0;
-                        }
-                    }
-
-                    // Execute any remaining records in the final batch
-                    if (batchCount > 0) {
-                        pstmt.executeBatch();
-                        con.commit();
-                    }
-
-                    System.out.println("Update process completed. Total rows processed: " + totalRows);
-                } catch (SQLException e) {
-                    con.rollback();
-                    throw e;
-                } finally {
-                    con.setAutoCommit(true);  // Reset to default behavior
-                }
-            }
-        } else {
-            System.out.println("Cannot read file: " + csv.getAbsolutePath());
-        }
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
