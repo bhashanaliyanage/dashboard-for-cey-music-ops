@@ -94,14 +94,6 @@ public class ArtistReport {
         }
     }
 
-    public ArrayList<String> getCoWriters() {
-        return coWriters;
-    }
-
-    public ArrayList<String> getCoWriterShare() {
-        return coWriterShare;
-    }
-
     public Artist getArtist() {
         return artist;
     }
@@ -151,9 +143,6 @@ public class ArtistReport {
         System.out.println("Artist Name: " + artist.getName());
     }
 
-    public void setPayee(String payee) {
-    }
-
     public void setCoWriterPaymentSummary(List<CoWriterSummary> coWriterSummaryList) {
         this.coWriterPaymentSummary = coWriterSummaryList;
     }
@@ -192,5 +181,9 @@ public class ArtistReport {
 
     public List<DSPBreakdown> getDSPBreakdown() {
         return this.dspBreakdown;
+    }
+
+    public List<TerritoryBreakdown> getTerritoryBreakdown() {
+        return this.territoryBreakdown;
     }
 }

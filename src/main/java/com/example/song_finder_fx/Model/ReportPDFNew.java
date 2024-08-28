@@ -2,6 +2,7 @@ package com.example.song_finder_fx.Model;
 
 import com.example.song_finder_fx.Constants.Colors;
 import com.example.song_finder_fx.Constants.SearchType;
+import com.example.song_finder_fx.Controller.ItemSwitcher;
 import com.example.song_finder_fx.Controller.PDFDocument;
 import com.example.song_finder_fx.Main;
 import com.example.song_finder_fx.Organizer.SongSearch;
@@ -39,7 +40,6 @@ public class ReportPDFNew implements Colors {
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
     private static PdfFont FONT_POPPINS_MEDIUM = null;
-    private static final Border DARK_BLUE_BORDER = new SolidBorder(INVOICE_DARK_BLUE, 0.5f);
     private String reportPath;
     private static final int PAGE01 = 1;
     private static final int PAGE02 = 2;
@@ -76,6 +76,8 @@ public class ReportPDFNew implements Colors {
         songBreakdown.setWidth(540f);
         Table streamingBreakdown = getStreamingBreakdownTable(report);
         streamingBreakdown.setWidth(540f);
+        Table territoryBreakdown = getTerritoryBreakdownTable(report);
+        territoryBreakdown.setWidth(540f);
 
         document.add(tableHeader); // Letter Head
         document.add(reportMonthAndYear); // Report Month and Year
@@ -87,6 +89,12 @@ public class ReportPDFNew implements Colors {
 
         document.add(reportHeadingSmall);
         document.add(streamingBreakdown);
+
+        // Page 03 /////////////////////////////////////////////////////////////////////////////////////////////////////
+        document.add(new AreaBreak());
+
+        document.add(reportHeadingSmall);
+        document.add(territoryBreakdown);
 
         document.close();
 
@@ -128,23 +136,13 @@ public class ReportPDFNew implements Colors {
 
         // Cell cell = new Cell().setBackgroundColor(backgroundColor).setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/spotify.png")).setAutoScale(true));
 
-        /*Cell cell = new Cell()
-                .setBackgroundColor(backgroundColor)
-                .setHeight(30f)
-                .setBorder(border)
-                .add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/spotify.png")).setAutoScale(true));
-
-        cell.setNextRenderer(new RoundedBorderCellRenderer(cell));
-
-        table.addCell(cell);*/
-
         List<DSPBreakdown> dspBreakdown = report.getDSPBreakdown();
         double eurToAudRate = report.getEurToAudRate();
         double audToLkrRate = report.getAudToLkrRate();
 
         for (DSPBreakdown dsp : dspBreakdown) {
             String dspName = dsp.dsp();
-            Image dspImage = getDSPImage(dsp.dsp()); // TODO: Implement getDSPImage
+            Image dspImage = getDSPImage(dsp.dsp());
             double reportedRoyalty = dsp.reportedRoyaltyForCEYMusic();
             int assetQuantity = dsp.assetQuantity();
 
@@ -159,30 +157,115 @@ public class ReportPDFNew implements Colors {
             table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
         }
 
-        /*// Values
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/spotify.png")).setAutoScale(true)));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Spotify").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("00.00").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("0").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        return table;
+    }
 
+    private Table getTerritoryBreakdownTable(ArtistReport report) throws IOException {
+        float[] columnWidth = {50f, 300f, 125f, 125f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+        table.setMarginTop(10f);
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        float fontSizeSubTitle = 10f;
+        PdfFont titleFont = FONT_POPPINS_SEMIBOLD;
+        PdfFont subtitleFont = FONT_POPPINS_MEDIUM;
+        VerticalAlignment verticalAlignment = VerticalAlignment.MIDDLE;
+        Border border = Border.NO_BORDER;
+
+        // Heading
         table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
-
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/itunes.png")).setAutoScale(true)));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Apple Music").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("00.00").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("0").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
-
         table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
+        table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
+        table.addCell(new Cell(1, 4)
+                .setBorder(border)
+                .add(new Paragraph("Territory Breakdown")
+                        .setFont(titleFont)
+                        .setTextAlignment(TextAlignment.LEFT)
+                        .setFontColor(INVOICE_BLUE)
+                        .setFontSize(15f)
+                )
+        );
 
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/tiktok.png")).setAutoScale(true)));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("YouTube").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("00.00").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
-        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("0").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));*/
+        // Header
+        // Values
+        table.addCell(new Cell(1, 2).setHeight(30f).setBorder(border).add(new Paragraph("").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Amount (LKR)").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+        table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Streams").setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+
+        // Cell cell = new Cell().setBackgroundColor(backgroundColor).setHeight(30f).setBorder(border).add(new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/spotify.png")).setAutoScale(true));
+
+        List<TerritoryBreakdown> territoryBreakdowns = report.getTerritoryBreakdown();
+        double eurToAudRate = report.getEurToAudRate();
+        double audToLkrRate = report.getAudToLkrRate();
+
+        int rowCount = 0;
+        double othersTotalRoyalty = 0;
+        int othersTotalAssetQuantity = 0;
+
+        for (TerritoryBreakdown territoryBreakdown : territoryBreakdowns) {
+            if (rowCount < 12) {
+                String territory = territoryBreakdown.territory();
+                System.out.println("territory = " + territory);
+                Image territoryImage = getTerritoryImage(territoryBreakdown.territory());
+                double reportedRoyalty = territoryBreakdown.reportedRoyaltyForCEYMusic();
+                int assetQuantity = territoryBreakdown.assetQuantity();
+
+                double processedRoyalty = reportedRoyalty / eurToAudRate * audToLkrRate;
+
+                // Values
+                table.addCell(new Cell().setHeight(30f).setBorder(border).add(territoryImage));
+                table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph(ItemSwitcher.setTerritoryName(territory)).setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+                table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph(String.format("%,9.2f", processedRoyalty)).setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+                table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph(String.valueOf(assetQuantity)).setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+
+                table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
+
+                rowCount++;
+            } else {
+                double reportedRoyalty = territoryBreakdown.reportedRoyaltyForCEYMusic();
+                double processedRoyalty = reportedRoyalty / eurToAudRate * audToLkrRate;
+                othersTotalRoyalty += processedRoyalty;
+                othersTotalAssetQuantity += territoryBreakdown.assetQuantity();
+            }
+        }
+
+        // Add "Others" row if there are more than 12 territories
+        if (rowCount >= 12 && othersTotalRoyalty > 0) {
+            table.addCell(new Cell().setHeight(30f).setBorder(border).add(getTerritoryImage("Others")));
+            table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph("Others").setFont(subtitleFont).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+            table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph(String.format("%,9.2f", othersTotalRoyalty)).setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+            table.addCell(new Cell().setHeight(30f).setBorder(border).add(new Paragraph(String.valueOf(othersTotalAssetQuantity)).setFont(subtitleFont).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle)).setVerticalAlignment(verticalAlignment));
+
+            table.addCell(new Cell(1, 4).setBorder(border).add(new Paragraph("")));
+        }
 
         return table;
     }
 
-    // src/main/resources/com/example/song_finder_fx/images/ytmusic.png
+private Image getTerritoryImage(String territory) throws IOException {
+    return switch (territory) {
+        case "LK" ->
+                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_sri_lanka.png", true);
+        case "AU" ->
+                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_australia.png", true);
+        case "US" ->
+                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_states.png", true);
+        case "GB" ->
+                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_kingdom.png", true);
+        case "CA" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_canada.png", true);
+        case "JP" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_japan.png", true);
+        case "AE" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_uae.png", true);
+        case "IT" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_italy.png", true);
+        case "NZ" ->
+                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_new_zealand.png", true);
+        case "TH" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_thailand.png", true);
+        case "DE" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_germany.png", true);
+        case "KR" ->
+                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_korea.png", true);
+        default -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_default.png", true);
+    };
+}
 
     private Image getDSPImage(String dsp) throws IOException {
         return switch (dsp) {
@@ -194,17 +277,19 @@ public class ReportPDFNew implements Colors {
             case "Youtube Ad Supported" ->
                     loadImageSmall("src/main/resources/com/example/song_finder_fx/images/yt_square.png", true);
             case "TikTok" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/tiktok.png", true);
-            case "Facebook Audio Library", "Facebook Fingerprinting" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/fb.png", true);
-
-            // TODO: Implement Rest of DSPs
-            case "Soundcloud" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_soundcloud.png", true);
-            case "Amazon Unlimited", "Amazon Prime", "Amazon ADS" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_amazon.png", true);
-            case "Snap" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_snapchat.png", true);
-            case "Hungama" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_hungama.png", true);
+            case "Facebook Audio Library", "Facebook Fingerprinting" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/fb.png", true);
+            case "Soundcloud" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_soundcloud.png", true);
+            case "Amazon Unlimited", "Amazon Prime", "Amazon ADS" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_amazon.png", true);
+            case "Snap" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_snapchat.png", true);
+            case "Hungama" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_hungama.png", true);
             case "Tidal" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_tidal.png", true);
 
-            default ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/logo_small_200x.png", true);
+            default -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/logo_small_200x.png", true);
         };
     }
 
@@ -226,7 +311,6 @@ public class ReportPDFNew implements Colors {
         table.setMarginRight(20f);
         table.setMarginTop(10f);
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
-        float fontSizeSubTitle = 15f;
         PdfFont subtitleFont = FONT_POPPINS_MEDIUM;
         TextAlignment textAlignment = TextAlignment.CENTER;
         Border border = Border.NO_BORDER;
@@ -379,7 +463,7 @@ public class ReportPDFNew implements Colors {
         File[] matchingFiles = folder.listFiles((dir, name) -> {
             String lowercaseName = name.toLowerCase();
             return lowercaseName.startsWith(baseFileName) &&
-                   (lowercaseName.endsWith(".png") || lowercaseName.endsWith(".jpg") || lowercaseName.endsWith(".jpeg"));
+                    (lowercaseName.endsWith(".png") || lowercaseName.endsWith(".jpg") || lowercaseName.endsWith(".jpeg"));
         });
 
         return (matchingFiles != null && matchingFiles.length > 0) ? matchingFiles[0] : null;
