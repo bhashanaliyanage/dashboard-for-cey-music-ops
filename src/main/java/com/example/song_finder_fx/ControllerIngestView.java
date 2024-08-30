@@ -40,33 +40,33 @@ public class ControllerIngestView {
         if (status) {
             Task<Void> task = new Task<>() {
                 @Override
-                protected Void call() {
-                    try {
-                        // Validate ingest
+                protected Void call() throws SQLException {
+                    // Validate ingest
+                    Platform.runLater(() -> {
+                        btnApproveIngest.setText("Validating Ingest");
+                        imgLoading.setVisible(true);
+                    });
+                    ValidationResult validatedIngest = ingestController.validateIngest(ingest);
+
+                    if (validatedIngest.isValid()) {
+                        // Inset data to the table
                         Platform.runLater(() -> {
-                            btnApproveIngest.setText("Validating Ingest");
+                            btnApproveIngest.setText("Approving Ingest");
                             imgLoading.setVisible(true);
                         });
-                        ValidationResult validatedIngest = ingestController.validateIngest(ingest);
-
-                        if (validatedIngest.isValid()) {
-                            // Inset data to the table
-                            Platform.runLater(() -> {
-                                btnApproveIngest.setText("Approving Ingest");
-                                imgLoading.setVisible(true);
-                            });
-                            ingestController.approveIngest(ingest);
-                            Platform.runLater(() -> {
-                                btnApproveIngest.setText("Approve Ingest");
-                                imgLoading.setVisible(false);
-                            });
-                        } else {
-                            Platform.runLater(() -> {
-                                btnApproveIngest.setText("Approve Ingest");
-                                imgLoading.setVisible(false);
-                                showValidationErrors(validatedIngest.errorMessages());
-                            });
-                        }
+                        ingestController.approveIngest(ingest);
+                        Platform.runLater(() -> {
+                            btnApproveIngest.setText("Approve Ingest");
+                            imgLoading.setVisible(false);
+                        });
+                    } else {
+                        Platform.runLater(() -> {
+                            btnApproveIngest.setText("Approve Ingest");
+                            imgLoading.setVisible(false);
+                            showValidationErrors(validatedIngest.errorMessages());
+                        });
+                    }
+                    /*try {
                     } catch (SQLException e) {
                         Platform.runLater(() -> {
                             btnApproveIngest.setText("Approve Ingest");
@@ -74,10 +74,17 @@ public class ControllerIngestView {
                             AlertBuilder.sendErrorAlert("Error", "Approving Ingest", e.toString());
                             e.printStackTrace();
                         });
-                    }
+                    }*/
                     return null;
                 }
             };
+
+            task.setOnFailed(e -> Platform.runLater(() -> {
+                btnApproveIngest.setText("Approve Ingest");
+                imgLoading.setVisible(false);
+                AlertBuilder.sendErrorAlert("Error", "Approving Ingest", e.toString());
+            }));
+
             Thread thread = new Thread(task);
             thread.start();
         }

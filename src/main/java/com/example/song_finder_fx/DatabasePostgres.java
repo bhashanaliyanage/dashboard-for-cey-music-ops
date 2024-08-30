@@ -1143,7 +1143,6 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         try (Connection con = getConn();
              PreparedStatement ps = con.prepareStatement("INSERT INTO public.temp_artists(name) VALUES (?);")) {
 
-
             ps.setString(1, artist);
             ps.executeUpdate();
         }

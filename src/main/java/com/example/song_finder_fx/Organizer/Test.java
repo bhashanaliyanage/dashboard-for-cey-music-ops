@@ -29,7 +29,7 @@ public class Test {
         // March 0.6285, 186.78
         // getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_mahesh_vithana_edit.pdf");
         // testArtistReportsNew();
-        testNewArtistReportPDF();
+        // testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
@@ -90,8 +90,8 @@ public class Test {
     private static void testBulkReporting() throws SQLException, IOException {
         int month = 5;
         int year = 2024;
-        double eurToAudRate = 0.6305;
-        double audToLkrRate = 184.65;
+        double eurToAudRate = 0.63333;
+        double audToLkrRate = 186.90;
 
         ArrayList<String> names = new ArrayList<>(Arrays.asList(
                 "Ajantha Ranasinghe",

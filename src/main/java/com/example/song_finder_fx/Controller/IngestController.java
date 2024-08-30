@@ -255,8 +255,38 @@ public class IngestController {
                 DatabasePostgres.addProduct(product);
                 // System.out.println("Adding Product: " + product.getAlbumTitle());
             }
-
         }
+
+        for (IngestCSVData row : csvRows) {
+            Songs song = new Songs();
+
+            song.setISRC(row.getIsrc());
+            song.setTrackTitle(row.getTrackTitle());
+            song.setFileName(row.getOriginalFileName());
+            song.setUPC(row.getUpc());
+            song.setComposer(row.getComposer());
+            song.setLyricist(row.getLyricist());
+            song.setFeaturingArtist(row.getFeaturingArtist());
+            song.setType(getType(row.getIsrc()));
+
+            DatabasePostgres.addSong(song);
+        }
+
+        DatabasePostgres.approveIngest(ingest.getIngestID());
+    }
+
+    private String getType(String isrc) {
+        if (isrc == null || isrc.length() < 5) {
+            return "U";
+        }
+
+        char fifthChar = isrc.charAt(4);
+
+        return switch (fifthChar) {
+            case 'W' -> "O";
+            case 'U' -> "C";
+            default -> "U";
+        };
     }
 
     public ValidationResult validateIngest(Ingest ingest) {
