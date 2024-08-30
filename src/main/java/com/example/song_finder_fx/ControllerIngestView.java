@@ -10,7 +10,9 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -18,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 public class ControllerIngestView {
 
@@ -26,12 +29,6 @@ public class ControllerIngestView {
 
     @FXML
     public ImageView imgLoading;
-
-    @FXML
-    private TableView<IngestCSVData> tableIngest;
-
-    @FXML
-    private Label lblIngestName;
 
     @FXML
     void onApproveIngest() {
@@ -132,4 +129,18 @@ public class ControllerIngestView {
 
     }
 
+    @FXML
+    public void onHome(MouseEvent mouseEvent) {
+        try {
+            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests-chooser.fxml")));
+            UIController.mainVBoxStatic.getChildren().setAll(node);
+
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            UIController.sideVBoxStatic.getChildren().clear();
+            UIController.sideVBoxStatic.getChildren().add(sidepanelNewContent);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString());
+        }
+    }
 }

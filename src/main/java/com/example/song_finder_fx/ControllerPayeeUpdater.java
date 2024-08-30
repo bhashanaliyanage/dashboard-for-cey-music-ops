@@ -8,10 +8,13 @@ import com.example.song_finder_fx.Model.PayeeUpdaterUI;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -19,7 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 public class ControllerPayeeUpdater {
 
@@ -173,7 +176,7 @@ public class ControllerPayeeUpdater {
 
     @FXML
     void onGoBack() {
-
+        UIController.mainVBoxStatic.getChildren().setAll(ControllerIngest.unApprovedIngestsUI);
     }
 
     @FXML
@@ -242,6 +245,21 @@ public class ControllerPayeeUpdater {
         for (PayeeUpdaterUI uiElement : payeeUpdaterUIS) {
             CheckBox checkBox = uiElement.getCbEntry();
             checkBox.setSelected(value);
+        }
+    }
+
+    @FXML
+    public void onHome(MouseEvent mouseEvent) {
+        try {
+            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests-chooser.fxml")));
+            UIController.mainVBoxStatic.getChildren().setAll(node);
+
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            UIController.sideVBoxStatic.getChildren().clear();
+            UIController.sideVBoxStatic.getChildren().add(sidepanelNewContent);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString());
         }
     }
 }

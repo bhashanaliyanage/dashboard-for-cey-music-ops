@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.Cursor?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox prefHeight="1000.0" prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerIngestView">
+<VBox prefHeight="1000.0" prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerIngestView">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" right="30.0" top="30.0" />
         </VBox.margin>
         <HBox minWidth="370.0" spacing="10.0">
-            <Label text="Ingests" textFill="#656565">
+            <Label onMouseClicked="#onHome" text="Ingests" textFill="#656565">
                 <font>
-                    <Font name="Segoe UI Semibold" size="28.0"/>
+                    <Font name="Segoe UI Semibold" size="28.0" />
                 </font>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
             </Label>
             <Label onMouseClicked="#onGoBack" text="&gt; Ingests to Approve" textFill="#656565">
                 <font>
-                    <Font name="Segoe UI Semibold" size="28.0"/>
+                    <Font name="Segoe UI Semibold" size="28.0" />
                 </font>
                 <cursor>
-                    <Cursor fx:constant="HAND"/>
+                    <Cursor fx:constant="HAND" />
                 </cursor>
             </Label>
         </HBox>
@@ -62,15 +60,14 @@
             <Button disable="true" mnemonicParsing="false" onAction="#onSaveEdits" prefHeight="30.0" prefWidth="165.0" styleClass="button_inside_brown" text="Save Edits" />
         </HBox>
     </HBox>
-    <VBox maxWidth="688.0" minHeight="-Infinity" prefWidth="688.0" spacing="5.0" styleClass="textarea-bg"
-          stylesheets="@../../styles.css" VBox.vgrow="ALWAYS">
+    <VBox maxWidth="688.0" minHeight="-Infinity" prefWidth="688.0" spacing="5.0" styleClass="textarea-bg" stylesheets="@../../styles.css" VBox.vgrow="ALWAYS">
         <VBox.margin>
-            <Insets bottom="10.0" left="30.0" top="10.0"/>
+            <Insets bottom="10.0" left="30.0" top="10.0" />
         </VBox.margin>
         <TableView fx:id="tableIngest" prefWidth="200.0" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn prefWidth="75.0" text="C1"/>
-                <TableColumn prefWidth="75.0" text="C2"/>
+                <TableColumn prefWidth="75.0" text="C1" />
+                <TableColumn prefWidth="75.0" text="C2" />
             </columns>
         </TableView>
     </VBox>
