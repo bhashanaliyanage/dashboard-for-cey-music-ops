@@ -16,7 +16,6 @@ import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.border.Border;
-import com.itextpdf.layout.border.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
@@ -54,6 +53,8 @@ public class ReportPDFNew implements Colors {
         // Images
         Image reportHeading = getArtistHeading(report.getArtist().getName(), PAGE01);
         Image reportHeadingSmall = getArtistHeading(report.getArtist().getName(), PAGE02);
+        Image reportFooter = new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/reports/revenue_report_footer.png"));
+        reportFooter.setAutoScale(true);
 
         // Fonts
         FONT_RUBIK_SEMIBOLD = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf");
@@ -78,6 +79,9 @@ public class ReportPDFNew implements Colors {
         streamingBreakdown.setWidth(540f);
         Table territoryBreakdown = getTerritoryBreakdownTable(report);
         territoryBreakdown.setWidth(540f);
+        Table reportFooterTable = getFooterTable(reportFooter);
+        reportFooterTable.setFixedPosition(0, 0, 600);
+
 
         document.add(tableHeader); // Letter Head
         document.add(reportMonthAndYear); // Report Month and Year
@@ -95,10 +99,20 @@ public class ReportPDFNew implements Colors {
 
         document.add(reportHeadingSmall);
         document.add(territoryBreakdown);
+        document.add(reportFooterTable);
 
         document.close();
 
         this.reportPath = path;
+    }
+
+    private Table getFooterTable(Image reportFooter) {
+        float[] columnWidth = {1000f};
+        Table table = new Table(columnWidth);
+
+        table.addCell(new Cell().add(reportFooter).setBorder(Border.NO_BORDER).setMargin(0f));
+
+        return table;
     }
 
     private Table getStreamingBreakdownTable(ArtistReport report) throws IOException {
@@ -562,8 +576,8 @@ private Image getTerritoryImage(String territory) throws IOException {
     }
 
     static Image getArtistHeading(String artistName, int pageNumber) throws MalformedURLException {
-        Image invoiceHeading = new Image(ImageDataFactory.create(getArtistHeadingImage(artistName, pageNumber)));
-        invoiceHeading.setAutoScale(true);
+Image invoiceHeading = new Image(ImageDataFactory.create(getArtistHeadingImage(artistName, pageNumber)));
+invoiceHeading.setAutoScale(true);
         return invoiceHeading;
     }
 

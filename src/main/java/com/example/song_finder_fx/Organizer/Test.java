@@ -22,7 +22,7 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
-        // DatabasePostgres.refreshSummaryTable(5, 2024);
+        DatabasePostgres.refreshSummaryTable(6, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
         // April 0.6305, 184.65
