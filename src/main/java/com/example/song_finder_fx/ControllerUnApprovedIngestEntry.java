@@ -57,10 +57,6 @@ public class ControllerUnApprovedIngestEntry {
                 Node node = SceneController.loadLayout("layouts/ingests/ingest-view.fxml");
                 UIController.mainVBoxStatic.getChildren().setAll(node);
 
-                /*for (IngestCSVData data : dataList) {
-
-                }*/
-
                 Label lblIngestName = (Label) node.lookup("#lblIngestName");
                 lblIngestName.setText("> " + ingest.getName());
 

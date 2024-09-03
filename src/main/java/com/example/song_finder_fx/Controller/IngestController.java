@@ -4,6 +4,8 @@ import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.*;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import javafx.application.Platform;
+import javafx.scene.control.Button;
 
 import java.io.File;
 import java.io.FileReader;
@@ -233,8 +235,9 @@ public class IngestController {
         return "";
     }
 
-    public void approveIngest(Ingest ingest) throws SQLException {
+    public void approveIngest(Ingest ingest, Button btnApproveIngest) throws SQLException {
         List<IngestCSVData> csvRows = ingest.getIngestCSVDataList();
+        int totalSongs = csvRows.size();  // Total number of songs to process
 
         // Create Products
         List<String> productNames = new ArrayList<>();
@@ -257,6 +260,8 @@ public class IngestController {
             }
         }
 
+        int songsProcessed = 0;  // Counter for songs processed
+
         for (IngestCSVData row : csvRows) {
             Songs song = new Songs();
 
@@ -270,6 +275,16 @@ public class IngestController {
             song.setType(getType(row.getIsrc()));
 
             DatabasePostgres.addSong(song);
+
+            songsProcessed++;  // Increment the processed count
+
+            // Calculate progress percentage
+            int progressPercentage = (int) ((songsProcessed / (double) totalSongs) * 100);
+
+            // Update button text if not null
+            if (btnApproveIngest != null) {
+                Platform.runLater(() -> btnApproveIngest.setText("Processing... " + progressPercentage + "%"));
+            }
         }
 
         DatabasePostgres.approveIngest(ingest.getIngestID());

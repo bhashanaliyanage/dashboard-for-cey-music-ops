@@ -54,7 +54,7 @@ public class ControllerIngestView {
                             btnApproveIngest.setText("Approving Ingest");
                             imgLoading.setVisible(true);
                         });
-                        ingestController.approveIngest(ingest);
+                        ingestController.approveIngest(ingest, btnApproveIngest);
                         Platform.runLater(() -> {
                             btnApproveIngest.setText("Approve Ingest");
                             imgLoading.setVisible(false);
@@ -66,15 +66,6 @@ public class ControllerIngestView {
                             showValidationErrors(validatedIngest.errorMessages());
                         });
                     }
-                    /*try {
-                    } catch (SQLException e) {
-                        Platform.runLater(() -> {
-                            btnApproveIngest.setText("Approve Ingest");
-                            imgLoading.setVisible(false);
-                            AlertBuilder.sendErrorAlert("Error", "Approving Ingest", e.toString());
-                            e.printStackTrace();
-                        });
-                    }*/
                     return null;
                 }
             };
