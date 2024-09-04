@@ -125,6 +125,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Label lblPlayerSongName;
     public Label lblPlayerSongArtst;
     public Label lblSongListSub;
+    public static Label lblSongListSubStatic;
     public Label srchRsSongName;
     public Label srchRsISRC;
     public Label songProductName;
@@ -222,9 +223,32 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         btnSettingsStatic = btnSettings;
         btnSongListStatic = btnSongList;
         lblDatabaseStatusStatic = lblDatabaseStatus;
+        lblSongListSubStatic = lblSongListSub;
 
         // Loading user
         loadUser();
+
+        loadUserSongList();
+    }
+
+    private void loadUserSongList() {
+        Thread thread = new Thread(() -> {
+            try {
+                List<Songs> songList = DatabasePostgres.getUserSongList(Main.userSession.getUserName());
+                Main.songListNew = songList;
+
+                if (songList.size() > 1) {
+                    String text = songList.getFirst().getISRC() + " + " + (songList.size() - 1) + " other songs added";
+                    Platform.runLater(() -> UIController.lblSongListSubStatic.setText(text));
+                } else {
+                    Platform.runLater(() -> UIController.lblSongListSubStatic.setText(songList.getFirst().getISRC()));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> e.printStackTrace());
+            }
+
+        });
+        thread.start();
     }
 
     public static void disableUser() throws SQLException {

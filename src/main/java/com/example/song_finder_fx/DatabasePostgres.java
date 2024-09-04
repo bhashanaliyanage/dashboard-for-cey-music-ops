@@ -159,6 +159,34 @@ public class DatabasePostgres {
         return count;
     }
 
+    public static List<ManualClaimTrack> checkPreviousClaimsNew(String id) throws SQLException {
+        List<ManualClaimTrack> tracks = new ArrayList<>();
+
+        try (Connection con = getConn()) {
+            String query = String.format("SELECT CLAIM_ID, SONG_NAME, TRIM_START, TRIM_END, DATE FROM public.manual_claims WHERE youtube_id = '%s';", id);
+
+            try (Statement statement = con.createStatement()) {
+                try (ResultSet rs = statement.executeQuery(query)) {
+                    while (rs.next()) {
+                        int claimId = rs.getInt(1);
+                        String songName = rs.getString(2);
+                        String trimStart = rs.getString(3);
+                        String trimEnd = rs.getString(4);
+                        Date date = rs.getDate(5);
+                        LocalDate localDate = sqlDateToLocalDate(date);
+
+                        ManualClaimTrack track = new ManualClaimTrack(claimId, songName, null, null, id, localDate, 0);
+                        track.setTrimStart(trimStart);
+                        track.setTrimEnd(trimEnd);
+
+                        tracks.add(track);
+                    }
+                    return tracks;
+                }
+            }
+        }
+    }
+
     public static String getManualClaimCount() throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
@@ -2678,6 +2706,40 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         return dspBreakdownList;
     }
 
+    public static void addToUserSongList(String isrc, String userName) throws SQLException {
+        String sql = "INSERT INTO public.user_songlist(isrc, username) VALUES (?, ?);";
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, isrc);
+            ps.setString(2, userName);
+            ps.executeUpdate();
+        }
+    }
+
+    public static void deleteFromUserSongListList(String isrc, String userName) throws SQLException {
+        String sql = "DELETE FROM public.user_songlist WHERE isrc = ? AND username = ?;";
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, isrc);
+            ps.setString(2, userName);
+            ps.executeUpdate();
+        }
+    }
+
+    public static List<Songs> getUserSongList(String userName) throws SQLException, ClassNotFoundException {
+        String sql = "SELECT isrc FROM public.user_songlist WHERE username = ?;";
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, userName);
+            ResultSet rs = ps.executeQuery();
+            List<Songs> songList = new ArrayList<>();
+            while (rs.next()) {
+                String isrc = rs.getString(1);
+                songList.add(searchSongDetails(isrc));
+            }
+            return songList;
+        }
+    }
 
     public List<Payee> check(String name) {
         // String name = "Victor Rathnayake";

@@ -57,6 +57,14 @@ public class Main extends Application {
 
     public static void addSongToList(Songs song) {
         songListNew.add(song);
+        Thread thread = new Thread(() -> {
+            try {
+                DatabasePostgres.addToUserSongList(song.getISRC(), userSession.getUserName());
+            } catch (SQLException e) {
+                Platform.runLater(() -> e.printStackTrace());
+            }
+        });
+        thread.start();
     }
 
     public static List<Songs> getSongListNew() {
@@ -88,6 +96,17 @@ public class Main extends Application {
         if (status) {
             System.out.println("ISRC: " + isrc + " Removed from Song List");
         }
+
+        Thread thread = new Thread(() -> {
+            try {
+                DatabasePostgres.deleteFromUserSongListList(isrc, userSession.getUserName());
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
+        thread.start();
+
         return status;
     }
 
