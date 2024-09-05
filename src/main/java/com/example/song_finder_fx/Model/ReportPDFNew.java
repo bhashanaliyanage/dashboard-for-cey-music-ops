@@ -20,8 +20,6 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
-import com.itextpdf.layout.renderer.CellRenderer;
-import com.itextpdf.layout.renderer.DrawContext;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -29,8 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 import static com.google.common.io.Files.getFileExtension;
 
@@ -51,6 +49,7 @@ public class ReportPDFNew implements Colors {
         setBackgroundColor(document);
 
         // Images
+        System.out.println("Getting Report Header Images...");
         Image reportHeading = getArtistHeading(report.getArtist().getName(), PAGE01);
         Image reportHeadingSmall = getArtistHeading(report.getArtist().getName(), PAGE02);
         Image reportFooter = new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/reports/revenue_report_footer.png"));
@@ -257,29 +256,36 @@ public class ReportPDFNew implements Colors {
         return table;
     }
 
-private Image getTerritoryImage(String territory) throws IOException {
-    return switch (territory) {
-        case "LK" ->
-                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_sri_lanka.png", true);
-        case "AU" ->
-                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_australia.png", true);
-        case "US" ->
-                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_states.png", true);
-        case "GB" ->
-                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_kingdom.png", true);
-        case "CA" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_canada.png", true);
-        case "JP" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_japan.png", true);
-        case "AE" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_uae.png", true);
-        case "IT" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_italy.png", true);
-        case "NZ" ->
-                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_new_zealand.png", true);
-        case "TH" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_thailand.png", true);
-        case "DE" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_germany.png", true);
-        case "KR" ->
-                loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_korea.png", true);
-        default -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_default.png", true);
-    };
-}
+    private Image getTerritoryImage(String territory) throws IOException {
+        return switch (territory) {
+            case "LK" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_sri_lanka.png", true);
+            case "AU" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_australia.png", true);
+            case "US" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_states.png", true);
+            case "GB" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_kingdom.png", true);
+            case "CA" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_canada.png", true);
+            case "JP" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_japan.png", true);
+            case "AE" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_uae.png", true);
+            case "IT" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_italy.png", true);
+            case "NZ" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_new_zealand.png", true);
+            case "TH" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_thailand.png", true);
+            case "DE" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_germany.png", true);
+            case "KR" ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_korea.png", true);
+            default ->
+                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_default.png", true);
+        };
+    }
 
     private Image getDSPImage(String dsp) throws IOException {
         return switch (dsp) {
@@ -357,7 +363,17 @@ private Image getTerritoryImage(String territory) throws IOException {
         List<CoWriterShare> assetBreakdown = report.getAssetBreakdown();
         double audToLKR_Rate = report.getAudToLkrRate();
 
+        // Create a Map to group songs by name
+        Map<String, List<CoWriterShare>> groupedAssets = new HashMap<>();
+
+        // Group assets by song name
+        System.out.println("Grouping assets by song name...");
         for (CoWriterShare asset : assetBreakdown) {
+            groupedAssets.computeIfAbsent(asset.getSongName(), k -> new ArrayList<>()).add(asset);
+        }
+
+        // Old Code
+        /*for (CoWriterShare asset : assetBreakdown) {
 
             String songName = asset.getSongName();
             String splits = asset.getShare();
@@ -368,7 +384,44 @@ private Image getTerritoryImage(String territory) throws IOException {
 
             addSongSummaryRow(table, songImage, songName, splits, tracks, artistShareAUD, artistShareLKR);
 
+        }*/
+
+        // Process grouped assets
+        for (Map.Entry<String, List<CoWriterShare>> entry : groupedAssets.entrySet()) {
+            String songName = entry.getKey();
+            List<CoWriterShare> assets = entry.getValue();
+
+            // Calculate combined values
+            int trackCount = assets.size();
+            double totalRoyaltyAUD = assets.stream().mapToDouble(CoWriterShare::getRoyalty).sum();
+            double totalRoyaltyLKR = totalRoyaltyAUD * audToLKR_Rate;
+
+            // Get splits (assuming all entries for the same song have the same split)
+            String splits = assets.getFirst().getShare();
+
+            // Format values
+            String tracks = String.valueOf(trackCount);
+            String artistShareAUD = String.format("%,9.2f", totalRoyaltyAUD);
+            String artistShareLKR = String.format("%,9.2f", totalRoyaltyLKR);
+
+            // Get song image for "SR" type asset if available
+            Image songImage = null;
+            for (CoWriterShare asset : assets) {
+                if ("SR".equals(asset.getSongType())) {
+                    songImage = getSongImage(asset.getIsrc());
+                    break;
+                }
+            }
+
+            // If no "SR" type asset found, use a default image or leave it null
+            if (songImage == null) {
+                songImage = loadImageSmall("src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork_90.jpg", true);
+            }
+
+            // Add row to the table
+            addSongSummaryRow(table, songImage, songName, splits, tracks, artistShareAUD, artistShareLKR);
         }
+
 
         return table;
     }
@@ -394,7 +447,14 @@ private Image getTerritoryImage(String territory) throws IOException {
         File searchDir = new File(searchLocation);
 
         // Find the UPC folder
-        File upcFolder = findUPCFolder(searchDir, upc);
+        File upcFolder = null;
+
+        try {
+            upcFolder = findUPCFolder(searchDir, upc);
+        } catch (Exception e) {
+            System.out.println("Cannot find UPC Folder: " + e.getMessage());
+        }
+
         if (upcFolder == null) {
             return null;
         }
@@ -576,8 +636,8 @@ private Image getTerritoryImage(String territory) throws IOException {
     }
 
     static Image getArtistHeading(String artistName, int pageNumber) throws MalformedURLException {
-Image invoiceHeading = new Image(ImageDataFactory.create(getArtistHeadingImage(artistName, pageNumber)));
-invoiceHeading.setAutoScale(true);
+        Image invoiceHeading = new Image(ImageDataFactory.create(getArtistHeadingImage(artistName, pageNumber)));
+        invoiceHeading.setAutoScale(true);
         return invoiceHeading;
     }
 
@@ -599,42 +659,65 @@ invoiceHeading.setAutoScale(true);
         return image;
     }
 
-    static Image loadImageSmall2(String location, boolean autoscale) throws IOException {
-        Image image = new Image(ImageDataFactory.create(location));
-
-        // Set the new dimensions
-        image.setWidth(30f);
-
-        image.setAutoScaleHeight(autoscale);
-
-        return image;
-    }
-
     private static String getArtistHeadingImage(String artistName, int pageNumber) {
-        if (Objects.equals(artistName, "Ridma Weerawardena")) {
-            if (pageNumber == 1)
-                return "src/main/resources/com/example/song_finder_fx/images/reports/artists/ridmaw.png";
-            else if (pageNumber == 2)
-                return "src/main/resources/com/example/song_finder_fx/images/reports/artists/ridmaw_head_small.png";
-            else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
-        } else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
+        switch (artistName) {
+            case "Ridma Weerawardena" -> {
+                if (pageNumber == 1)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/ridmaw.png";
+                else if (pageNumber == 2)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/ridmaw_head_small.png";
+                else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
+            }
+            case "Methun SK" -> {
+                if (pageNumber == 1)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/methunsk.png";
+                else if (pageNumber == 2)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/methunsk_head_small.png";
+                else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
+            }
+            case "Abhisheka Wimalaweera" -> {
+                if (pageNumber == 1)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/abhishekaw.png";
+                else if (pageNumber == 2)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/abhishekaw_head_small.png";
+                else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
+            }
+            case "Aruna Lian" -> {
+                if (pageNumber == 1)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/arunal.png";
+                else if (pageNumber == 2)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/arunal_head_small.png";
+                else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
+            }
+            case "Sangeeth Wijesuriya" -> {
+                if (pageNumber == 1)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/sangeethw.png";
+                else if (pageNumber == 2)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/sangeethw_head_small.png";
+                else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
+            }
+            case "Senanga Dissanayake" -> {
+                if (pageNumber == 1)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/senangad.png";
+                else if (pageNumber == 2)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/senangad_head_small.png";
+                else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
+            }
+            case "WAYO" -> {
+                if (pageNumber == 1)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/wayo.png";
+                else if (pageNumber == 2)
+                    return "src/main/resources/com/example/song_finder_fx/images/reports/artists/wayo_head_small.png";
+                else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
+            }
+            case null, default -> {
+                return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
+            }
+        }
     }
 
     public String getReportPath() {
         return this.reportPath;
     }
 
-    private static class RoundedBorderCellRenderer extends CellRenderer {
-        public RoundedBorderCellRenderer(Cell modelElement) {
-            super(modelElement);
-        }
-
-        @Override
-        public void draw(DrawContext drawContext) {
-            drawContext.getCanvas().roundRectangle(getOccupiedAreaBBox().getX() + 1.5f, getOccupiedAreaBBox().getY() + 1.5f,
-                    getOccupiedAreaBBox().getWidth() - 3, getOccupiedAreaBBox().getHeight() - 3, 10);
-            drawContext.getCanvas().stroke();
-            super.draw(drawContext);
-        }
-    }
 }

@@ -10,10 +10,6 @@ import com.itextpdf.layout.Document;
 import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.*;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,14 +18,14 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
-        DatabasePostgres.refreshSummaryTable(7, 2024);
+        // DatabasePostgres.refreshSummaryTable(7, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
         // getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_mahesh_vithana_edit.pdf");
         // testArtistReportsNew();
-        // testNewArtistReportPDF();
+        testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
@@ -37,54 +33,11 @@ public class Test {
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
-        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Ridma Weerawardena", 2024, 5, true);
+        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Aruna Lian", 2024, 7, true);
 
         ReportPDFNew pdf = new ReportPDFNew();
-        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_may_ridma.pdf", report);
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_july_aruna_lian.pdf", report);
         System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
-    }
-
-    private static void testAssignPayee() throws SQLException {
-        Ingest ingest = DatabasePostgres.getIngest(12);
-        assert ingest != null;
-        List<IngestCSVData> data = ingest.getIngestCSVDataList();
-        IngestCSVDataController controller = new IngestCSVDataController(data.getFirst());
-
-        System.out.println("Assigning Payees...");
-
-        IngestCSVData data2 = controller.assignPayees();
-
-        System.out.println("\nEdit Data on: " + data2.getTrackTitle());
-        System.out.println("Composer: " + data2.getComposer());
-        System.out.println("Lyricist: " + data2.getLyricist());
-        System.out.println("Payee 01: " + data2.getPayee().getPayee1());
-        System.out.println("Share: " + data2.getPayee().getShare1());
-        System.out.println("Payee 02: " + data2.getPayee().getPayee2());
-        System.out.println("Share: " + data2.getPayee().getShare2());
-        System.out.println("Payee 03: " + data2.getPayee().getPayee3());
-    }
-
-    public static String testApiCall() {
-        String s = "";
-        String url = "http://192.168.1.32:8080/artist";
-        String urlpart = "/allart";
-        url = url + urlpart;
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest req = HttpRequest.newBuilder().uri(URI.create(url)).build();
-
-        try {
-            HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response);
-            System.out.println("here");
-            s = response.body();
-
-            System.out.println("here1");
-            // return response.body();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return s;
     }
 
     private static void testBulkReporting() throws SQLException, IOException {
