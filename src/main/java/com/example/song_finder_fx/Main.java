@@ -32,7 +32,7 @@ public class Main extends Application {
     static List<Songs> songListNew = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion("v23.20.2");
+    public static ProductVersion versionInfo = new ProductVersion("v23.20.1");
     public static TrayIcon trayIcon;
 
     public static void main(String[] args) {
@@ -61,7 +61,7 @@ public class Main extends Application {
             try {
                 DatabasePostgres.addToUserSongList(song.getISRC(), userSession.getUserName());
             } catch (SQLException e) {
-                Platform.runLater(() -> e.printStackTrace());
+                Platform.runLater(e::printStackTrace);
             }
         });
         thread.start();
@@ -102,7 +102,7 @@ public class Main extends Application {
                 DatabasePostgres.deleteFromUserSongListList(isrc, userSession.getUserName());
             } catch (SQLException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.out.println("Unable to delete song from user song list in database: " + e);
             }
         });
         thread.start();
