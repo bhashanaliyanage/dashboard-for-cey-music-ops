@@ -1,5 +1,6 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -10,10 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
@@ -99,15 +97,10 @@ public class ControllerManualClaims {
             threadLoadVideo.start();
 
             // If this ID is in the manual claims database, show an alert.
-            int previousClaims = DatabasePostgres.checkPreviousClaims(ID2);
-            if (previousClaims > 0) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Previous Added Claims Found");
-                alert.setHeaderText("Previous Added Claims Found");
-                alert.setContentText(previousClaims + " Previous claims found for this video");
+            // int previousClaims = DatabasePostgres.checkPreviousClaims(ID2);
 
-                alert.showAndWait();
-            }
+            Thread showPreviousClaims = getThreadPreviousClaims(ID2);
+            showPreviousClaims.start();
 
             comboClaimType.requestFocus();
 
@@ -119,6 +112,68 @@ public class ControllerManualClaims {
         } else {
             System.out.println("URL Empty");
         }
+    }
+
+    private Thread getThreadPreviousClaims(String id2) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                try {
+                    List<ManualClaimTrack> previousClaims = DatabasePostgres.checkPreviousClaimsNew(id2);
+
+                    if (!previousClaims.isEmpty()) {
+                        Platform.runLater(() -> AlertBuilder.sendInfoAlert("Previous Added Claims Found", "Previous Added Claims Found", "Previous claims found for this video"));
+
+                        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/sidepanel-previous-claims.fxml")));
+
+                        Label lblClaimCount = (Label) node.lookup("#lblClaimCount");
+                        Label lblYouTubeID = (Label) node.lookup("#lblYouTubeID");
+                        // Scene scene = node.getScene();
+                        // VBox vBoxClaims = (VBox) node.lookup("#vBoxClaims");
+                        ScrollPane scrollPaneClaims = (ScrollPane) node.lookup("#scrollPaneClaims");
+                        VBox vbox = new VBox();
+                        vbox.setSpacing(5);
+                        Platform.runLater(() -> scrollPaneClaims.setContent(vbox));
+
+
+                        Platform.runLater(() -> {
+                            lblClaimCount.setText(previousClaims.size() + "");
+                            lblYouTubeID.setText(id2);
+                            UIController.sideVBoxStatic.getChildren().setAll(node);
+                        });
+
+                        for (ManualClaimTrack manualClaimTrack : previousClaims) {
+                            String claimID = String.valueOf(manualClaimTrack.getId());
+                            String claimName = manualClaimTrack.getTrackName();
+                            String trimStart = manualClaimTrack.getTrimStart();
+                            String trimEnd = manualClaimTrack.getTrimEnd();
+                            String date = manualClaimTrack.getDate().toString();
+
+                            Node node2 = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/sidepanel-previous-claim-entry.fxml")));
+                            Label lblClaimID = (Label) node2.lookup("#lblClaimID");
+                            Label lblClaimName = (Label) node2.lookup("#lblClaimName");
+                            Label lblTrimStart = (Label) node2.lookup("#lblTrimStart");
+                            Label lblTrimEnd = (Label) node2.lookup("#lblTrimEnd");
+                            Label lblDate = (Label) node2.lookup("#lblDate");
+
+                            Platform.runLater(() -> {
+                                lblClaimID.setText(claimID);
+                                lblClaimName.setText(claimName);
+                                lblTrimStart.setText(trimStart);
+                                lblTrimEnd.setText(trimEnd);
+                                lblDate.setText(date);
+                                vbox.getChildren().add(node2);
+                            });
+                        }
+                    }
+                } catch (Exception e) {
+                    Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Loading URL", e.toString()));
+                }
+                return null;
+            }
+        };
+
+        return new Thread(task);
     }
 
     private @NotNull Thread getThreadLoadVideo(String ID2) {
@@ -142,8 +197,7 @@ public class ControllerManualClaims {
             }
         };
 
-        Thread threadLoadVideo = new Thread(taskLoadVideo);
-        return threadLoadVideo;
+        return new Thread(taskLoadVideo);
     }
 
     public void onAddManualClaim() {
@@ -162,12 +216,9 @@ public class ControllerManualClaims {
                                     NotificationBuilder.displayTrayError("Error!", "Error Adding Manual Claim");
                                 } else {
                                     NotificationBuilder.displayTrayInfo("Manual Claim Added", "Your Claim for " + songName + " is successfully added");
-                                    // Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
                                     Node node = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/manual_claims/manual-claims.fxml")));
                                     UIController.mainNodes[6] = node;
                                     UIController.mainVBoxStatic.getChildren().setAll(node);
-                                    // vboxTracks.getChildren().clear();
-                                    // vboxTracks.getChildren().add(node);
                                 }
                             } catch (IOException e) {
                                 Platform.runLater(() -> {
@@ -191,7 +242,9 @@ public class ControllerManualClaims {
 
                 Platform.runLater(() -> {
                     btnAddClaim.setText("Add Manual Claim");
+                    UIController.blankSidePanel();
                 });
+
 
                 return null;
             }

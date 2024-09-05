@@ -17,8 +17,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 
@@ -69,7 +67,7 @@ public class ControllerSPFilterArchive {
             dpEnd.setStyle("-fx-border-color: '#E9EBEE';");
 
             // Filter Claims
-            final List<ManualClaimTrack>[] archivedManualClaims = new List[1];
+            @SuppressWarnings("unchecked") final List<ManualClaimTrack>[] archivedManualClaims = new List[1];
 
             Task<Void> taskGetClaims = new Task<>() {
                 @Override
@@ -120,7 +118,7 @@ public class ControllerSPFilterArchive {
                 if (!archivedManualClaims[0].isEmpty()) {
                     for (ManualClaimTrack track : archivedManualClaims[0]) {
                         int claimID = track.getId();
-                        Image previewImage = track.getPreviewImage();
+                        // Image previewImage = track.getPreviewImage();
                         String title = track.getTrackName();
                         String composer = track.getComposer();
                         String lyricist = track.getLyricist();
@@ -139,7 +137,7 @@ public class ControllerSPFilterArchive {
                             Label lblClaimType = (Label) node.lookup("#lblClaimType");
                             CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
                             HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
-                            ImageView image = (ImageView) node.lookup("#image");
+                            // ImageView image = (ImageView) node.lookup("#image");
 
                             // Setting values
                             lblSongNo.setText(String.valueOf(claimID));
@@ -148,25 +146,24 @@ public class ControllerSPFilterArchive {
                             lblLyricist.setText(lyricist);
                             lblDate.setText(TextFormatter.getDaysAgo(date));
                             lblClaimType.setText(claimType);
-                            try {
+                            /*try {
                                 image.setImage(previewImage);
                             } catch (Exception e) {
-                                AlertBuilder.sendErrorAlert("Error",
-                                        "Error Loading Preview Image",
-                                        "Claim ID: " + claimID +
-                                                "\nClaim Name: " + title +
-                                                "\nDate: " + date +
-                                                "\nType: " + claimType);
-                            }
+                                errorCount++;
+                                errorSummary.append(String.format("""
+                                        Error loading preview image for:
+                                        Claim ID: %d
+                                        Claim Name: %s
+                                        Date: %s
+                                        Type: %s
+
+                                        """, claimID, title, date, claimType));
+                            }*/
 
                             // Adding entry items for later access
                             ArchivedMCUI ui = new ArchivedMCUI(lblSongNo, lblClaimType, checkBox, hboxEntry);
                             ui.setClaim(track);
                             archivedMCUIS.add(ui);
-                            /*labelsSongNo.add(lblSongNo);
-                            labelsClaimType.add(lblClaimType);
-                            checkBoxes.add(checkBox);
-                            hBoxes.add(hboxEntry);*/
 
                             Platform.runLater(() -> ControllerMCArchiveList.vbClaimsListStatic.getChildren().add(node));
                         } catch (IOException e) {
@@ -179,52 +176,17 @@ public class ControllerSPFilterArchive {
                         try {
                             resetSidePanel();
                         } catch (IOException e) {
-                            e.toString();
+                            System.out.println("Error resetting side panel: " + e);
                         }
                     });
                 }
             });
-
-            // Thread threadShowClaims = new Thread(taskSHowClaims);
-            // threadShowClaims.start();
-
         }
-
     }
 
     private void resetSidePanel() throws IOException {
         Node node2 = SceneController.loadLayout("layouts/sidepanel-blank.fxml");
         UIController.sideVBoxStatic.getChildren().setAll(node2);
-    }
-
-    private static List<ManualClaimTrack> filterManualClaims(LocalDate startDate, LocalDate endDate) {
-        final List<ManualClaimTrack>[] archivedManualClaims = new List[1];
-
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                try {
-                    archivedManualClaims[0] = DatabasePostgres.getArchivedManualClaims(startDate, endDate);
-
-                    System.out.println("\nTotal: " + archivedManualClaims[0].size());
-                    System.out.println("\n");
-
-                    /*for (ManualClaimTrack track : archivedManualClaims[0]) {
-                        System.out.println("Name: " + track.getTrackName());
-                        // Platform.runLater(() -> System.out.println("Name: " + track.getTrackName()));
-                    }*/
-                } catch (SQLException e) {
-                    Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Filtering Manual Claims", e.toString()));
-                }
-
-                return null;
-            }
-        };
-
-        Thread thread = new Thread(task);
-        thread.start();
-
-        return archivedManualClaims[0];
     }
 
     private static void checkDatesGraterThan(LocalDate startDate, LocalDate endDate) {

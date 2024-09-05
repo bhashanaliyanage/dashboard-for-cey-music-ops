@@ -7,14 +7,12 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
@@ -68,19 +66,7 @@ public class ControllerSearchSong {
     Songs songDetails;
 
     @FXML
-    void contextM(ActionEvent event) {
-        System.out.println("ControllerSearch.contextM");
-        String isrc = searchResultISRC.getText();
-        try {
-            songDetails = DatabasePostgres.searchSongDetails(isrc);
-            System.out.println("Fetched song details!");
-        } catch (SQLException | ClassNotFoundException e) {
-            AlertBuilder.sendErrorAlert("Error!", "Error Occurred While Fetching Song", e.toString());
-        }
-    }
-
-    @FXML
-    void copyComposer(ActionEvent event) {
+    void copyComposer() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
 
@@ -104,7 +90,7 @@ public class ControllerSearchSong {
     }
 
     @FXML
-    void copyFeaturing(ActionEvent event) {
+    void copyFeaturing() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
 
@@ -126,7 +112,7 @@ public class ControllerSearchSong {
     }
 
     @FXML
-    void copyISRC(ActionEvent event) {
+    void copyISRC() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
 
@@ -148,7 +134,7 @@ public class ControllerSearchSong {
     }
 
     @FXML
-    void copyLyricist(ActionEvent event) {
+    void copyLyricist() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
 
@@ -170,7 +156,7 @@ public class ControllerSearchSong {
     }
 
     @FXML
-    void copyProductName(ActionEvent event) {
+    void copyProductName() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
 
@@ -192,7 +178,7 @@ public class ControllerSearchSong {
     }
 
     @FXML
-    void copySinger(ActionEvent event) {
+    void copySinger() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
 
@@ -214,7 +200,7 @@ public class ControllerSearchSong {
     }
 
     @FXML
-    void copySongName(ActionEvent event) {
+    void copySongName() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
 
@@ -236,7 +222,7 @@ public class ControllerSearchSong {
     }
 
     @FXML
-    void copyUPC(ActionEvent event) {
+    void copyUPC() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
 
@@ -259,21 +245,16 @@ public class ControllerSearchSong {
 
     @FXML
     void onAddToListButtonClickedInSearchSong(MouseEvent event) {
-        // Getting scene
-        Node node = (Node) event.getSource();
-        Scene scene = node.getScene();
-
-        // Getting label from scene
-        Label songListButtonSubtitle = (Label) scene.lookup("#lblSongListSub");
-
         // Adding songs to list
         String isrc = searchResultISRC.getText();
         Songs song = null;
+
         try {
             song = DatabasePostgres.searchSongDetails(isrc);
         } catch (SQLException | ClassNotFoundException e) {
             AlertBuilder.sendErrorAlert("Error!", "Error Occurred While Fetching Song", e.toString());
         }
+
         Main.addSongToList(song);
 
         List<Songs> songList = Main.getSongListNew();
@@ -281,10 +262,10 @@ public class ControllerSearchSong {
 
         if (songListLength > 1) {
             String text = songList.getFirst().getISRC() + " + " + (songListLength - 1) + " other songs added";
-            songListButtonSubtitle.setText(text);
+            UIController.lblSongListSubStatic.setText(text);
             System.out.println(text);
         } else {
-            songListButtonSubtitle.setText(songList.getFirst().getISRC());
+            UIController.lblSongListSubStatic.setText(songList.getFirst().getISRC());
             System.out.println(songList.getFirst());
         }
 
@@ -342,7 +323,7 @@ public class ControllerSearchSong {
     }
 
     @FXML
-    void onSearchedSongClick(MouseEvent event) {
+    void onSearchedSongClick() {
 
         Duration duration = Duration.seconds(0.100);
 

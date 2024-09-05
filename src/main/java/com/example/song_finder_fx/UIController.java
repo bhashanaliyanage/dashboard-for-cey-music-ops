@@ -78,12 +78,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public ImageView btnPercentageChange;
     public ImageView ProgressView;
     public ImageView imgMediaPico;
-    public ImageView imgDeleteSong;
-    public ImageView imgPlaySong;
     //</editor-fold>
-
-    //<editor-fold desc="HBox">
-    public HBox hboxInvoiceSong;
 
     public HBox btnSeachSongs;
 
@@ -125,6 +120,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Label lblPlayerSongName;
     public Label lblPlayerSongArtst;
     public Label lblSongListSub;
+    public static Label lblSongListSubStatic;
     public Label srchRsSongName;
     public Label srchRsISRC;
     public Label songProductName;
@@ -222,9 +218,62 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         btnSettingsStatic = btnSettings;
         btnSongListStatic = btnSongList;
         lblDatabaseStatusStatic = lblDatabaseStatus;
+        lblSongListSubStatic = lblSongListSub;
 
         // Loading user
         loadUser();
+
+        loadUserSongList();
+
+        updateApplication();
+    }
+
+    private void updateApplication() {
+        Thread thread = new Thread(() -> {
+            try {
+                if (Main.versionInfo.updateAvailable()) {
+                    File updateFile = Main.versionInfo.getUpdate(null, lblUserEmailAndUpdate, null);
+
+                    if (updateFile != null) {
+                        Platform.runLater(() -> {
+                            boolean confirmation = AlertBuilder.getSendConfirmationAlert("Update Available", "An update is available and downloaded automatically.", "Would you like to install it now?");
+                            if (confirmation) {
+                                try {
+                                    Desktop.getDesktop().open(updateFile);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                Platform.exit();
+                                System.exit(0);
+                            }
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        thread.start();
+    }
+
+    private void loadUserSongList() {
+        Thread thread = new Thread(() -> {
+            try {
+                List<Songs> songList = DatabasePostgres.getUserSongList(Main.userSession.getUserName());
+                Main.songListNew = songList;
+
+                if (songList.size() > 1) {
+                    String text = songList.getFirst().getISRC() + " + " + (songList.size() - 1) + " other songs added";
+                    Platform.runLater(() -> UIController.lblSongListSubStatic.setText(text));
+                } else {
+                    Platform.runLater(() -> UIController.lblSongListSubStatic.setText(songList.getFirst().getISRC()));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> e.printStackTrace());
+            }
+
+        });
+        thread.start();
     }
 
     public static void disableUser() throws SQLException {
@@ -304,20 +353,20 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         }
     }
 
-public static void setAllScenes() throws IOException {
-    // About
-    mainNodes[1] = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/about.fxml")));
-    // Search
-    mainNodes[2] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/search-details.fxml")));
-    // Search and collect songs
-    mainNodes[3] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/collect-songs.fxml")));
-    // NavBar
-    mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar.fxml")));
-    // NavBar Collapsed
-    mainNodes[5] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar-small.fxml")));
-    // Add Manual Claims
-    mainNodes[6] = null;
-}
+    public static void setAllScenes() throws IOException {
+        // About
+        mainNodes[1] = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/about.fxml")));
+        // Search
+        mainNodes[2] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/search-details.fxml")));
+        // Search and collect songs
+        mainNodes[3] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/collect-songs.fxml")));
+        // NavBar
+        mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar.fxml")));
+        // NavBar Collapsed
+        mainNodes[5] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar-small.fxml")));
+        // Add Manual Claims
+        mainNodes[6] = null;
+    }
 
     public void backButtonImplementationForSearchSong(MouseEvent event) {
         Node node = (Node) event.getSource();

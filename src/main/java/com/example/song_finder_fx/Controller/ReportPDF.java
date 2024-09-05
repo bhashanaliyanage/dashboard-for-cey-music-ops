@@ -4,6 +4,7 @@ import com.example.song_finder_fx.Model.ArtistReport;
 import com.example.song_finder_fx.Model.CoWriterShare;
 import com.example.song_finder_fx.Model.CoWriterSummary;
 import com.example.song_finder_fx.Model.Songs;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.layout.Document;
@@ -17,6 +18,7 @@ import javafx.stage.Window;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,6 @@ import static com.itextpdf.kernel.pdf.PdfName.Colors;
 public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
     private static final Border BLUE_BORDER = new SolidBorder(INVOICE_BLUE, 0.5f);
     // private static final Border BLUE_BORDER_WO_SIDES = new SolidBorder()
-    private static final Border BLACK_BORDER = new SolidBorder(INVOICE_BLACK, 0.5f);
     private static final Border DARK_BLUE_BORDER = new SolidBorder(INVOICE_DARK_BLUE, 0.5f);
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
@@ -117,7 +118,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         table.addCell(new Cell().add(new Paragraph("AMOUNT").setFont(FONT_RUBIK_SEMIBOLD).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.CENTER))
                 .setPaddingLeft(10f).setFontSize(10f).setBorder(BLUE_BORDER).setBackgroundColor(INVOICE_BLUE));
 
-        for (int i = 0; i <= (songCount -1); i++) {
+        for (int i = 0; i <= (songCount - 1); i++) {
             Songs song = topPerformingSongs.get(i);
 
             String trackTitle = song.getTrackTitle();
@@ -221,7 +222,6 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         table.setMarginLeft(20f);
         table.setMarginRight(20f);
         table.setMarginTop(10f);
-        DecimalFormat df = new DecimalFormat("0.00");
 
         // Row 01
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("Gross Revenue Produced").setFont(FONT_RUBIK_SEMIBOLD))
@@ -384,73 +384,100 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         return table;
     }
 
-private Table getAssetBreakdownTable(ArtistReport report) {
-    // Table
-    float[] columnWidth = {200f, 50f, 50f, 100f, 200f};
-    Table table = new Table(columnWidth);
-    table.setMarginLeft(20f);
-    table.setMarginRight(20f);
+    private Table getAssetBreakdownTable(ArtistReport report) throws MalformedURLException {
+        // Table
+        float[] columnWidth = {200f, 50f, 50f, 100f, 190f, 10f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+        float fontSizeSubTitle = 8f;
 
-    // Table 02 Row 01
-    table.addCell(new Cell(1, 5).add(new Paragraph("")).setBorder(Border.NO_BORDER));
-    table.addCell(new Cell(1, 5).add(new Paragraph("ASSET BREAKDOWN").setFont(FONT_RUBIK_SEMIBOLD))
-            .setVerticalAlignment(VerticalAlignment.BOTTOM).setTextAlignment(TextAlignment.CENTER)
-            .setFontSize(10f).setBorder(Border.NO_BORDER));
-    table.addCell(new Cell(1, 5).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        // Table 02 Row 01
+        table.addCell(new Cell(1, 6).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell(1, 6).add(new Paragraph("ASSET BREAKDOWN").setFont(FONT_RUBIK_SEMIBOLD))
+                .setVerticalAlignment(VerticalAlignment.BOTTOM).setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(10f).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell(1, 6).add(new Paragraph("")).setBorder(Border.NO_BORDER));
 
-    table.addCell(new Cell().setHeight(20f).add(new Paragraph("Title").setFont(FONT_RUBIK_SEMIBOLD))
-            .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
-            setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
-    table.addCell(new Cell().setHeight(20f).add(new Paragraph("").setFont(FONT_RUBIK_SEMIBOLD))
-            .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
-            setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
-    table.addCell(new Cell().setHeight(20f).add(new Paragraph("").setFont(FONT_RUBIK_SEMIBOLD))
-            .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
-            setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
-    table.addCell(new Cell().setHeight(20f).add(new Paragraph("Artist Share").setFont(FONT_RUBIK_SEMIBOLD))
-            .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
-            setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
-    table.addCell(new Cell().setHeight(20f).add(new Paragraph("Co-Writer").setFont(FONT_RUBIK_SEMIBOLD))
-            .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
-            setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Title").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Artist Share").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
+        table.addCell(new Cell(1, 2).setHeight(20f).add(new Paragraph("Co-Writer").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
 
-    List<CoWriterShare> coWriterShares = report.getAssetBreakdown();
-    double eurToAudRate = report.getEurToAudRate();
-    double audToLkrRate = report.getAudToLkrRate();
+        List<CoWriterShare> coWriterShares = report.getAssetBreakdown();
+        double eurToAudRate = report.getEurToAudRate();
+        double audToLkrRate = report.getAudToLkrRate();
 
-    for (CoWriterShare share : coWriterShares) {
-        String songName = share.getSongName();
-        String songType = share.getSongType();
-        String percentage = share.getShare();
-        double artistShare = share.getRoyalty();
-        String coWriter = share.getContributor();
+        for (CoWriterShare share : coWriterShares) {
+            String songName = share.getSongName();
+            String songType = share.getSongType();
+            String percentage = share.getShare();
+            double artistShare = share.getRoyalty();
+            String coWriter = share.getContributor();
 
-        table.addCell(new Cell().add(new Paragraph(songName).setFont(FONT_POPPINS).setPaddingLeft(5f))
-                .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().add(new Paragraph(songType).setFont(FONT_POPPINS))
-                .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().add(new Paragraph(percentage).setFont(FONT_POPPINS))
-                .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
-        table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare / eurToAudRate * audToLkrRate) + "/-").setFont(FONT_POPPINS))
-                .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(10f).setBorder(BLUE_BORDER));
-        /*table.addCell(new Cell().add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f))
-                .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f).setBorder(BLUE_BORDER));*/
+            table.addCell(new Cell().add(new Paragraph(songName).setFont(FONT_POPPINS).setPaddingLeft(5f))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle).setBorder(BLUE_BORDER));
+            table.addCell(new Cell().add(new Paragraph(songType).setFont(FONT_POPPINS))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle).setBorder(BLUE_BORDER));
+            table.addCell(new Cell().add(new Paragraph(percentage).setFont(FONT_POPPINS))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle).setBorder(BLUE_BORDER));
+            table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare / eurToAudRate * audToLkrRate) + "/-").setFont(FONT_POPPINS))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle).setBorder(BLUE_BORDER));
 
-        // Modification
-        // Modified part for the last column
-        Cell coWriterCell = new Cell().setBorder(BLUE_BORDER);
-        if (percentage.equals("50%")) {
-            coWriterCell.add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f))
-                    .add(new Paragraph("PAID").setFont(FONT_POPPINS).setPaddingLeft(5f).setFontColor(INVOICE_GREEN));
-        } else {
-            coWriterCell.add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f));
+            Image paidImage = loadImage("src/main/resources/com/example/song_finder_fx/images/reports/report_paid_dark_g.png");
+            // paidImage.setWidth(5f);
+            paidImage.setHeight(10f);
+
+            // Modification
+            // Modified part for the last column
+            Cell coWriterCell;
+            Cell paidImageCell;
+
+            if (!percentage.equals("100%")) {
+                coWriterCell = new Cell().setBorderRight(Border.NO_BORDER).setBorderBottom(BLUE_BORDER);
+                coWriterCell.setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(8f);
+
+                paidImageCell = new Cell().setBorderRight(BLUE_BORDER).setBorderLeft(Border.NO_BORDER).setBorderBottom(BLUE_BORDER).setPaddingRight(5f).setVerticalAlignment(VerticalAlignment.MIDDLE);
+                /*coWriterCell.add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f))
+                        .add(new Paragraph("PAID").setFont(FONT_POPPINS).setPaddingLeft(5f).setFontColor(INVOICE_GREEN));*/
+
+                coWriterCell.add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f));
+                paidImageCell.add(paidImage);
+
+                table.addCell(coWriterCell);
+                table.addCell(paidImageCell);
+                /*coWriterCell.add(new Cell().add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f)));
+                coWriterCell.add(new Cell().add(paidImage));*/
+            } else {
+                coWriterCell = new Cell(1, 2).setBorder(BLUE_BORDER);
+                coWriterCell.setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(8f);
+
+                coWriterCell.add(new Paragraph(coWriter).setFont(FONT_POPPINS).setPaddingLeft(5f));
+
+                table.addCell(coWriterCell);
+            }
+
+            // System.out.println(songName + " | " + songType + " | " + percentage + " | " + artistShare + " | " + coWriter);
         }
-        coWriterCell.setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(10f);
-        table.addCell(coWriterCell);
 
-        // System.out.println(songName + " | " + songType + " | " + percentage + " | " + artistShare + " | " + coWriter);
+
+        return table;
     }
 
-    return table;
-}
+    private Image loadImage(String location) throws MalformedURLException {
+        Image image = new Image(ImageDataFactory.create(location));
+        image.setAutoScale(false);
+        return image;
+    }
 }

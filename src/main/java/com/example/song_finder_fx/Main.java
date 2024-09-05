@@ -32,7 +32,7 @@ public class Main extends Application {
     static List<Songs> songListNew = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    public static ProductVersion versionInfo = new ProductVersion("v23.19.1");
+    public static ProductVersion versionInfo = new ProductVersion("v23.20.3");
     public static TrayIcon trayIcon;
 
     public static void main(String[] args) {
@@ -57,6 +57,14 @@ public class Main extends Application {
 
     public static void addSongToList(Songs song) {
         songListNew.add(song);
+        Thread thread = new Thread(() -> {
+            try {
+                DatabasePostgres.addToUserSongList(song.getISRC(), userSession.getUserName());
+            } catch (SQLException e) {
+                Platform.runLater(e::printStackTrace);
+            }
+        });
+        thread.start();
     }
 
     public static List<Songs> getSongListNew() {
@@ -88,6 +96,17 @@ public class Main extends Application {
         if (status) {
             System.out.println("ISRC: " + isrc + " Removed from Song List");
         }
+
+        Thread thread = new Thread(() -> {
+            try {
+                DatabasePostgres.deleteFromUserSongListList(isrc, userSession.getUserName());
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                System.out.println("Unable to delete song from user song list in database: " + e);
+            }
+        });
+        thread.start();
+
         return status;
     }
 
@@ -198,7 +217,7 @@ public class Main extends Application {
         return chooser.showDialog(ownerWindow);
     }
 
-    public static void copyAudio(String isrc, File directory, File destination) throws SQLException, ClassNotFoundException {
+    public static void copyAudio(String isrc, File directory, File destination) throws SQLException {
 //        DatabaseMySQL.searchAndCopySongs(isrc, directory, destination);
         DatabasePostgres.searchAndCopySongs(isrc, directory, destination);     //Postgress
 

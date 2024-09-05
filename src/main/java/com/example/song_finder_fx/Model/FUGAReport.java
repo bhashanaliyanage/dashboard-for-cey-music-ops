@@ -122,7 +122,7 @@ public class FUGAReport {
     }
 
     public int getAssetQuantity() {
-        return assetQuantity;
+        return this.assetQuantity;
     }
 
     public double getOriginalGrossIncome() {

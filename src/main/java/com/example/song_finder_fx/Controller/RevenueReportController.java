@@ -1,10 +1,7 @@
 package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.DatabasePostgres;
-import com.example.song_finder_fx.Model.ArtistReport;
-import com.example.song_finder_fx.Model.CoWriterSummary;
-import com.example.song_finder_fx.Model.RevenueReport;
-import com.example.song_finder_fx.Model.Songs;
+import com.example.song_finder_fx.Model.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,7 +9,7 @@ import java.util.List;
 
 public record RevenueReportController(ArtistReport report) {
 
-    public ArtistReport calculateRevenue() throws SQLException {
+    public ArtistReport calculateRevenue(boolean includeTerritoryAndDSPBreakdown) throws SQLException {
         // Refreshing Tables
         // DatabasePostgres.refreshSummaryTable(report.getMonthInt(), report.getYear());
 
@@ -35,6 +32,16 @@ public record RevenueReportController(ArtistReport report) {
         System.out.println("Summarizing co-writer payments");
         List<CoWriterSummary> coWriterSummaryList = DatabasePostgres.getCoWriterPaymentSummary(report.getArtist().getName());
         report.setCoWriterPaymentSummary(coWriterSummaryList);
+
+        if (includeTerritoryAndDSPBreakdown) {
+            System.out.println("Getting Territory Breakdown");
+            List<TerritoryBreakdown> territoryBreakdownList = DatabasePostgres.getTerritoryBreakdown(report);
+            report.setTerritoryBreakdown(territoryBreakdownList);
+
+            System.out.println("Getting DSP Breakdown");
+            List<DSPBreakdown> dspBreakdownList = DatabasePostgres.getDSPBreakdown(report);
+            report.setDSPBreakdown(dspBreakdownList);
+        }
 
         return report;
     }

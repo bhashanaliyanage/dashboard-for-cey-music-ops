@@ -17,6 +17,8 @@ public class ArtistReport {
 
     private List<CoWriterShare> coWritterList;
     private List<CoWriterSummary> coWriterPaymentSummary;
+    private List<TerritoryBreakdown> territoryBreakdown;
+    private List<DSPBreakdown> dspBreakdown;
 
     public ArtistReport(Artist artist, double eurToAudRate, double audToLkrRate, int year, int month) {
         System.out.println("Creating Artist Report for " + artist.getName());
@@ -92,14 +94,6 @@ public class ArtistReport {
         }
     }
 
-    public ArrayList<String> getCoWriters() {
-        return coWriters;
-    }
-
-    public ArrayList<String> getCoWriterShare() {
-        return coWriterShare;
-    }
-
     public Artist getArtist() {
         return artist;
     }
@@ -149,9 +143,6 @@ public class ArtistReport {
         System.out.println("Artist Name: " + artist.getName());
     }
 
-    public void setPayee(String payee) {
-    }
-
     public void setCoWriterPaymentSummary(List<CoWriterSummary> coWriterSummaryList) {
         this.coWriterPaymentSummary = coWriterSummaryList;
     }
@@ -178,5 +169,21 @@ public class ArtistReport {
 
     public double getPartnerShareInAUD() {
         return partnerShare / eurToAudRate;
+    }
+
+    public void setTerritoryBreakdown(List<TerritoryBreakdown> territoryBreakdownList) {
+        this.territoryBreakdown = territoryBreakdownList;
+    }
+
+    public void setDSPBreakdown(List<DSPBreakdown> dspBreakdownList) {
+        this.dspBreakdown = dspBreakdownList;
+    }
+
+    public List<DSPBreakdown> getDSPBreakdown() {
+        return this.dspBreakdown;
+    }
+
+    public List<TerritoryBreakdown> getTerritoryBreakdown() {
+        return this.territoryBreakdown;
     }
 }

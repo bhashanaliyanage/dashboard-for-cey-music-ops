@@ -1,15 +1,17 @@
 package com.example.song_finder_fx;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Model.Ingest;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class ControllerUnapprovedIngests {
@@ -45,9 +47,7 @@ public class ControllerUnapprovedIngests {
                     lblDate.setText(String.valueOf(ingest.getImportedDate()));
                     lblImportedBy.setText(ingest.getImportedUser());
 
-                    Platform.runLater(() -> {
-                        vbIngestList.getChildren().add(node);
-                    });
+                    Platform.runLater(() -> vbIngestList.getChildren().add(node));
                 }
 
                 return null;
@@ -59,8 +59,18 @@ public class ControllerUnapprovedIngests {
     }
 
     @FXML
-    void onGoBack(MouseEvent event) {
+    void onGoBack() {
+        try {
+            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests-chooser.fxml")));
+            UIController.mainVBoxStatic.getChildren().setAll(node);
 
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            UIController.sideVBoxStatic.getChildren().clear();
+            UIController.sideVBoxStatic.getChildren().add(sidepanelNewContent);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString());
+        }
     }
 
 }

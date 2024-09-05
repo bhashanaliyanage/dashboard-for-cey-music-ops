@@ -33,7 +33,7 @@ public class UserSettingsManager {
                     System.err.println("Failed to create properties file: " + configFile.getAbsolutePath());
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Unable to create properties file: " + e);
             }
         }
     }
@@ -44,7 +44,7 @@ public class UserSettingsManager {
             File configFile = getUserConfigFile();
             properties.load(new FileInputStream(configFile));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Unable to load user settings: " + e);
         }
         return properties;
     }
@@ -54,7 +54,7 @@ public class UserSettingsManager {
             File configFile = getUserConfigFile();
             properties.store(new FileOutputStream(configFile), "User Settings");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Unable to save user settings: " + e);
         }
     }
 
@@ -67,19 +67,8 @@ public class UserSettingsManager {
         return new File(appFolder, CONFIG_FILE);
     }
 
-    public static void main(String[] args) {
-        Properties userSettings = loadUserSettings();
-        // Read or modify settings as needed
-        userSettings.setProperty("adb", "W:\\audio");
-        saveUserSettings(userSettings);
-        System.out.println(userSettings.getProperty("adb"));
-    }
-
     public String getADB() {
         Properties userSettings = loadUserSettings();
-        // Read or modify settings as needed
-        // userSettings.setProperty("adb", "W:\\audio");
-        // saveUserSettings(userSettings);
         String adb = userSettings.getProperty("adb");
         if (adb == null) {
             return "";

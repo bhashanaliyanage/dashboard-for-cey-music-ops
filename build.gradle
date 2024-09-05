@@ -56,13 +56,13 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.41.2.2'
 
     // MySQL Connection
-    implementation 'mysql:mysql-connector-java:8.0.28'
+    // implementation 'mysql:mysql-connector-java:8.0.28'
 
     // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
     implementation 'org.controlsfx:controlsfx:11.1.2'
 
     // https://mvnrepository.com/artifact/org.openjfx/javafx-media
-    implementation 'org.openjfx:javafx-media:21'
+    implementation 'org.openjfx:javafx-media:21.0.2'
 
     // https://mvnrepository.com/artifact/com.itextpdf/itext7-core
     implementation 'com.itextpdf:itext7-core:7.0.4'

@@ -19,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.io.File;
 import java.io.FileReader;
@@ -68,6 +69,13 @@ public class ControllerIngest {
                 Platform.runLater(() -> hboxApproveIngests.setDisable(true));
                 getUnApprovedIngests();
                 Platform.runLater(() -> hboxApproveIngests.setDisable(false));
+
+                try {
+                    List<String> ingestNames = DatabasePostgres.getIngestNames();
+                    Platform.runLater(() -> TextFields.bindAutoCompletion(txtName, ingestNames));
+                } catch (SQLException ignored) {
+
+                }
                 return null;
             }
         };
