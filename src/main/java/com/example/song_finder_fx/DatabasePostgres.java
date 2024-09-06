@@ -3456,6 +3456,8 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
             cr.setLyricist(rs.getString(8));
             cr.setSongType(rs.getString(9));
             cr.setShare(rs.getInt(5) + "%");
+            cr.setUPC(rs.getString(11));
+            cr.setProductTitle(rs.getString(12));
             crLlist.add(cr);
         }
         return crLlist;
@@ -3487,7 +3489,9 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
                 	(SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.LYRICIST) AS LYRICIST,
                 \t
                 	 S.TYPE,
-                	R.AFTER_DEDUCTION_ROYALTY * IP.SHARE / 100 AS CALCULATED_ROYALTY
+                	R.AFTER_DEDUCTION_ROYALTY * IP.SHARE / 100 AS CALCULATED_ROYALTY,
+                	S.UPC,
+                	P.PRODUCT_TITLE
                 FROM PUBLIC.SUMMARY_BD_02 AS R
                 JOIN
                 	(SELECT ASSET_ISRC,
@@ -3501,6 +3505,7 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
                 AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
                 LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
                 LEFT JOIN PUBLIC.ISRC_PAYEES IP ON IP.ISRC = R.ASSET_ISRC
+                LEFT JOIN PUBLIC.PRODUCTS P ON P.UPC = S.UPC
                 ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
                \s""";
         Connection con = getConn();

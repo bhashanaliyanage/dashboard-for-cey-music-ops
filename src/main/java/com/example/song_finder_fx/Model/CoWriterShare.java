@@ -14,6 +14,16 @@ public class CoWriterShare {
     private String contributor;
     private String composer;
     private String lyricist;
+    private String upc;
+    private String productTitle;
+
+    public String getProductTitle() {
+        return this.productTitle;
+    }
+
+    public String getUpc() {
+        return this.upc;
+    }
 
     public double getRoyalty() {
         return royalty;
@@ -72,10 +82,6 @@ public class CoWriterShare {
         this.songType = songType;
     }
 
-    public String getArtistName() {
-        return artistName;
-    }
-
     public void setArtistName(String artistName) {
         this.artistName = artistName;
     }
@@ -98,5 +104,13 @@ public class CoWriterShare {
 
     public void setLyricist(String lyricist) {
         this.lyricist = lyricist;
+    }
+
+    public void setUPC(String string) {
+        this.upc = string;
+    }
+
+    public void setProductTitle(String string) {
+        this.productTitle = string;
     }
 }

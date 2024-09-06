@@ -1,11 +1,9 @@
 package com.example.song_finder_fx.Model;
 
 import com.example.song_finder_fx.Constants.Colors;
-import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.ItemSwitcher;
 import com.example.song_finder_fx.Controller.PDFDocument;
 import com.example.song_finder_fx.Main;
-import com.example.song_finder_fx.Organizer.SongSearch;
 import com.itextpdf.io.font.FontProgramFactory;
 import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -72,8 +70,10 @@ public class ReportPDFNew implements Colors {
         Table tableHeader = getHeaderTable(reportHeading);
         Table reportSummary = getReportSummaryTable(report);
         reportSummary.setFixedPosition(35, 570, 540);
-        Table songBreakdown = getSongBreakdownTable(report);
-        songBreakdown.setWidth(540f);
+        Table srBreakdown = getSRBreakdownTable(report);
+        srBreakdown.setWidth(540f);
+        Table pubBreakdown = getPubBreakdownTable(report);
+        pubBreakdown.setWidth(540f);
         Table streamingBreakdown = getStreamingBreakdownTable(report);
         streamingBreakdown.setWidth(540f);
         Table territoryBreakdown = getTerritoryBreakdownTable(report);
@@ -85,7 +85,12 @@ public class ReportPDFNew implements Colors {
         document.add(tableHeader); // Letter Head
         document.add(reportMonthAndYear); // Report Month and Year
         document.add(reportSummary);
-        document.add(songBreakdown);
+        document.add(srBreakdown);
+
+        // Page 01 /////////////////////////////////////////////////////////////////////////////////////////////////////
+        document.add(new AreaBreak());
+        document.add(reportHeadingSmall);
+        document.add(pubBreakdown);
 
         // Page 02 /////////////////////////////////////////////////////////////////////////////////////////////////////
         document.add(new AreaBreak());
@@ -103,6 +108,115 @@ public class ReportPDFNew implements Colors {
         document.close();
 
         this.reportPath = path;
+    }
+
+    private Table getPubBreakdownTable(ArtistReport report) {
+        // Table
+        float[] columnWidth = {50f, 200f, 50f, 50f, 125f, 125f};
+        Table table = new Table(columnWidth);
+        table.setMarginLeft(20f);
+        table.setMarginRight(20f);
+        table.setMarginTop(10f);
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        PdfFont subtitleFont = FONT_POPPINS_MEDIUM;
+        TextAlignment textAlignment = TextAlignment.CENTER;
+        Border border = Border.NO_BORDER;
+
+        // Heading
+        table.addCell(new Cell(1, 6).setBorder(border).add(new Paragraph("")));
+        table.addCell(new Cell(1, 6).setBorder(border).add(new Paragraph("")));
+        table.addCell(new Cell(1, 6).setBorder(border).add(new Paragraph("")));
+        table.addCell(new Cell(1, 6)
+                .setBorder(border)
+                .add(new Paragraph("Publishing Breakdown")
+                        .setFont(FONT_POPPINS_SEMIBOLD)
+                        .setTextAlignment(TextAlignment.LEFT)
+                        .setFontColor(INVOICE_BLUE)
+                        .setFontSize(15f)
+                )
+        );
+
+        // Row 01
+        table.addCell(new Cell().add(new Paragraph("")
+                .setFont(subtitleFont)).setBorder(border));
+        table.addCell(new Cell().add(new Paragraph("")
+                .setFont(subtitleFont)).setBorder(border));
+        table.addCell(new Cell().add(new Paragraph("Splits")
+                        .setFont(subtitleFont)
+                        .setTextAlignment(textAlignment))
+                .setFontSize(10f).setBorder(border));
+        // table.addCell(new Cell().setHeight(20f).add(image).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
+        table.addCell(new Cell().add(new Paragraph("Tracks")
+                        .setFont(subtitleFont)
+                        .setTextAlignment(textAlignment))
+                .setFontSize(10f).setBorder(border));
+        table.addCell(new Cell().add(new Paragraph("Artist Share (AUD)")
+                        .setFont(subtitleFont)
+                        .setTextAlignment(textAlignment))
+                .setFontSize(10f).setBorder(border));
+        // table.addCell(new Cell().setHeight(20f).add(image).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
+        table.addCell(new Cell().add(new Paragraph("Artist Share (LKR)")
+                        .setFont(subtitleFont)
+                        .setTextAlignment(textAlignment))
+                .setFontSize(10f).setBorder(border));
+
+
+        List<CoWriterShare> assetBreakdown = report.getPUBAssetBreakdown();
+        double eurToAUD_Rate = report.getEurToAudRate();
+        double audToLKR_Rate = report.getAudToLkrRate();
+
+        // Create a Map to group songs by name
+        Map<String, List<CoWriterShare>> groupedAssets = new HashMap<>();
+
+        // Group assets by UPC
+        System.out.println("Grouping assets by song name...");
+        for (CoWriterShare asset : assetBreakdown) {
+            groupedAssets.computeIfAbsent(asset.getSongName(), k -> new ArrayList<>()).add(asset);
+        }
+
+        // Create a list of grouped entries for sorting
+        List<Map.Entry<String, List<CoWriterShare>>> sortedEntries = new ArrayList<>(groupedAssets.entrySet());
+
+        // Sort the entries based on total royalty in descending order
+        sortedEntries.sort((e1, e2) -> {
+            double totalRoyalty1 = e1.getValue().stream().mapToDouble(CoWriterShare::getRoyalty).sum();
+            double totalRoyalty2 = e2.getValue().stream().mapToDouble(CoWriterShare::getRoyalty).sum();
+            return Double.compare(totalRoyalty2, totalRoyalty1); // Descending order
+        });
+
+        // Process grouped assets
+        for (Map.Entry<String, List<CoWriterShare>> entry : sortedEntries) {
+            String upc = entry.getKey();
+            List<CoWriterShare> assets = entry.getValue();
+            String productTitle = upc;
+            if (assets.getFirst().getProductTitle() != null) {
+                productTitle = assets.getFirst().getProductTitle();
+                System.out.println("Changed product title to: " + productTitle);
+            }
+
+            // Calculate combined values
+            int trackCount = assets.size();
+            double totalRoyaltyEUR = assets.stream().mapToDouble(CoWriterShare::getRoyalty).sum();
+            double totalRoyaltyAUD = totalRoyaltyEUR / eurToAUD_Rate;
+            double totalRoyaltyLKR = totalRoyaltyAUD * audToLKR_Rate;
+
+            // Get splits (assuming all entries for the same song have the same split)
+            String splits = assets.getFirst().getShare();
+
+            // Format values
+            String tracks = String.valueOf(trackCount);
+            String artistShareAUD = String.format("%,9.2f", totalRoyaltyAUD);
+            String artistShareLKR = String.format("%,9.2f", totalRoyaltyLKR);
+
+            // Get song image for "SR" type asset if available
+            // Image songImage = loadImageSmall("src/main/resources/com/example/song_finder_fx/images/logo_small_50x.png", true);;
+
+            // Add row to the table
+            addSongSummaryRowPUB(table, null, productTitle, splits, tracks, artistShareAUD, artistShareLKR);
+        }
+
+
+        return table;
     }
 
     private Table getFooterTable(Image reportFooter) {
@@ -323,7 +437,7 @@ public class ReportPDFNew implements Colors {
         document.add(tableColored);
     }
 
-    private Table getSongBreakdownTable(ArtistReport report) throws IOException, SQLException, ClassNotFoundException {
+    private Table getSRBreakdownTable(ArtistReport report) throws IOException, SQLException, ClassNotFoundException {
         // Table
         float[] columnWidth = {50f, 200f, 50f, 50f, 125f, 125f};
         Table table = new Table(columnWidth);
@@ -360,40 +474,43 @@ public class ReportPDFNew implements Colors {
                 .setFontSize(10f).setBorder(border));
 
 
-        List<CoWriterShare> assetBreakdown = report.getAssetBreakdown();
+        List<CoWriterShare> assetBreakdown = report.getSRAssetBreakdown();
+        double eurToAUD_Rate = report.getEurToAudRate();
         double audToLKR_Rate = report.getAudToLkrRate();
 
         // Create a Map to group songs by name
         Map<String, List<CoWriterShare>> groupedAssets = new HashMap<>();
 
-        // Group assets by song name
+        // Group assets by UPC
         System.out.println("Grouping assets by song name...");
         for (CoWriterShare asset : assetBreakdown) {
-            groupedAssets.computeIfAbsent(asset.getSongName(), k -> new ArrayList<>()).add(asset);
+            groupedAssets.computeIfAbsent(asset.getUpc(), k -> new ArrayList<>()).add(asset);
         }
 
-        // Old Code
-        /*for (CoWriterShare asset : assetBreakdown) {
+        // Create a list of grouped entries for sorting
+        List<Map.Entry<String, List<CoWriterShare>>> sortedEntries = new ArrayList<>(groupedAssets.entrySet());
 
-            String songName = asset.getSongName();
-            String splits = asset.getShare();
-            String tracks = "1";
-            String artistShareAUD = String.format("%,9.2f", asset.getRoyalty());
-            String artistShareLKR = String.format("%,9.2f", asset.getRoyalty() * audToLKR_Rate);
-            Image songImage = getSongImage(asset.getIsrc());
-
-            addSongSummaryRow(table, songImage, songName, splits, tracks, artistShareAUD, artistShareLKR);
-
-        }*/
+        // Sort the entries based on total royalty in descending order
+        sortedEntries.sort((e1, e2) -> {
+            double totalRoyalty1 = e1.getValue().stream().mapToDouble(CoWriterShare::getRoyalty).sum();
+            double totalRoyalty2 = e2.getValue().stream().mapToDouble(CoWriterShare::getRoyalty).sum();
+            return Double.compare(totalRoyalty2, totalRoyalty1); // Descending order
+        });
 
         // Process grouped assets
-        for (Map.Entry<String, List<CoWriterShare>> entry : groupedAssets.entrySet()) {
-            String songName = entry.getKey();
+        for (Map.Entry<String, List<CoWriterShare>> entry : sortedEntries) {
+            String upc = entry.getKey();
             List<CoWriterShare> assets = entry.getValue();
+            String productTitle = upc;
+            if (assets.getFirst().getProductTitle() != null) {
+                productTitle = assets.getFirst().getProductTitle();
+                System.out.println("Changed product title to: " + productTitle);
+            }
 
             // Calculate combined values
             int trackCount = assets.size();
-            double totalRoyaltyAUD = assets.stream().mapToDouble(CoWriterShare::getRoyalty).sum();
+            double totalRoyaltyEUR = assets.stream().mapToDouble(CoWriterShare::getRoyalty).sum();
+            double totalRoyaltyAUD = totalRoyaltyEUR / eurToAUD_Rate;
             double totalRoyaltyLKR = totalRoyaltyAUD * audToLKR_Rate;
 
             // Get splits (assuming all entries for the same song have the same split)
@@ -405,34 +522,23 @@ public class ReportPDFNew implements Colors {
             String artistShareLKR = String.format("%,9.2f", totalRoyaltyLKR);
 
             // Get song image for "SR" type asset if available
-            Image songImage = null;
-            for (CoWriterShare asset : assets) {
-                if ("SR".equals(asset.getSongType())) {
-                    songImage = getSongImage(asset.getIsrc());
-                    break;
-                }
-            }
-
-            // If no "SR" type asset found, use a default image or leave it null
-            if (songImage == null) {
-                songImage = loadImageSmall("src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork_90.jpg", true);
-            }
+            Image songImage = getSongImage(assets.getFirst().getIsrc(), upc);
 
             // Add row to the table
-            addSongSummaryRow(table, songImage, songName, splits, tracks, artistShareAUD, artistShareLKR);
+            addSongSummaryRow(table, songImage, productTitle, splits, tracks, artistShareAUD, artistShareLKR);
         }
 
 
         return table;
     }
 
-    private Image getSongImage(String isrc) throws IOException, SQLException, ClassNotFoundException {
+    private Image getSongImage(String isrc, String upc) throws IOException, SQLException, ClassNotFoundException {
         // TODO: Fetch Image for ISRC
         // Senanga, Abhisheka, Sangeeth Wijesuriya, WAYO, Ridma
-        SongSearch search = new SongSearch();
-        List<Songs> songList = search.searchSong(isrc, SearchType.ISRC, true);
-        String upc = songList.getFirst().getUPC();
-        System.out.println("upc = " + upc);
+        // SongSearch search = new SongSearch();
+        // List<Songs> songList = search.searchSong(isrc, SearchType.ISRC, true);
+        // String upc = songList.getFirst().getUPC();
+        System.out.println("UPC: " + upc + " | ISRC: " + isrc);
         String searchLocation = Main.getAudioDatabaseLocation();
         String imagePath = findUPCImage(searchLocation, upc);
 
@@ -470,11 +576,22 @@ public class ReportPDFNew implements Colors {
     }
 
     private static File findUPCFolder(File searchDir, String upc) {
-        /*File[] folders = searchDir.listFiles((dir, name) -> name.equalsIgnoreCase(upc) && new File(dir, name).isDirectory());
-
+        // Previous method which only checks if the folder name starts with the UPC
+        /*File[] folders = searchDir.listFiles((dir, name) -> name.toLowerCase().startsWith(upc.toLowerCase()) && new File(dir, name).isDirectory());
         return (folders != null && folders.length > 0) ? folders[0] : null;*/
 
-        File[] folders = searchDir.listFiles((dir, name) -> name.toLowerCase().startsWith(upc.toLowerCase()) && new File(dir, name).isDirectory());
+        // Modification to the method to check if any part of the folder name matches the UPC
+        File[] folders = searchDir.listFiles((dir, name) -> {
+            // Split the name by common separators
+            String[] parts = name.split("[-_\\s]+");
+            // Check if any part matches the UPC
+            for (String part : parts) {
+                if (part.trim().equalsIgnoreCase(upc)) {
+                    return new File(dir, name).isDirectory();
+                }
+            }
+            return false;
+        });
 
         return (folders != null && folders.length > 0) ? folders[0] : null;
     }
@@ -559,7 +676,30 @@ public class ReportPDFNew implements Colors {
 
         // Songs
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(songImage).setBorder(border));
-        table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(songName).setFont(FONT_POPPINS_MEDIUM)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
+        table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(Objects.requireNonNullElse(songName, "null")).setFont(FONT_POPPINS_MEDIUM)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
+        table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(splits).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
+        table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(tracks).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
+        table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(artistShareAUD).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
+        table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(artistShareLKR).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
+    }
+
+    private static void addSongSummaryRowPUB(Table table, Image songImage, String songName, String splits, String tracks, String artistShareAUD, String artistShareLKR) {
+        VerticalAlignment verticalAlignment = VerticalAlignment.MIDDLE;
+        Color backgroundColor = new DeviceRgb(226, 229, 233);
+        PdfFont subtitleFont = FONT_POPPINS;
+        TextAlignment textAlignment = TextAlignment.CENTER;
+        Border border = Border.NO_BORDER;
+
+        table.addCell(new Cell().setHeight(1f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(1f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(1f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(1f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(1f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(1f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+
+        // Songs
+        // table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(songImage).setBorder(border));
+        table.addCell(new Cell(1, 2).setPaddingLeft(15f).setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(Objects.requireNonNullElse(songName, "null")).setFont(FONT_POPPINS_MEDIUM)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(splits).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(tracks).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(artistShareAUD).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
