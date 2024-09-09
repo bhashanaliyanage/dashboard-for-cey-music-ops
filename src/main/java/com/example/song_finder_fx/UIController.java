@@ -136,7 +136,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Label songUPCCopied;
     public Label songAlbumNameCopied;
     public Label songName;
-    public Label lblSearchType;
     public Label searchResultISRC;
     public Label songFeaturing;
     public Label songFeaturingCopied;
@@ -241,7 +240,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                                 try {
                                     Desktop.getDesktop().open(updateFile);
                                 } catch (IOException e) {
-                                    e.printStackTrace();
+                                    Platform.runLater(() -> System.out.println("Unable to open update file: " + e.getMessage()));
                                 }
                                 Platform.exit();
                                 System.exit(0);
@@ -1310,8 +1309,12 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     }
 
     public void onRevenueAnalysisBtnClick() throws IOException {
-        ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
-        revenueGenerator.loadRevenueGenerator();
+        // ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
+        // revenueGenerator.loadRevenueGenerator();
+        Node node = SceneController.loadLayout("layouts/reports/revenue-reports.fxml");
+
+        mainVBox.getChildren().setAll(node);
+        System.out.println("UIController.onRevenueAnalysisBtnClick");
 
         changeSelectorTo(rctRevenue);
     }
