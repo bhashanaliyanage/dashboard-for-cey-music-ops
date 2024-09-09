@@ -33,10 +33,10 @@ public class Test {
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
-        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Abhisheka Wimalaweera", 2024, 7, true);
+        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Aruna Lian", 2024, 7, true);
 
         ReportPDFNew pdf = new ReportPDFNew();
-        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_july_abhisheka.pdf", report);
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_july_aruna_lian.pdf", report);
         System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
     }
 
@@ -138,17 +138,6 @@ public class Test {
                         path + "\\" + year + "_" + ItemSwitcher.setMonth(month).toLowerCase() + "_" + payee.toLowerCase().replace(" ", "_") + ".pdf");
             } else {
                 System.out.println("Not Available in the list: " + payee);
-            }
-        }
-    }
-
-    private static void testRemoveAllReports() throws SQLException {
-        List<ReportMetadata> reports = DatabasePostgres.getAllReports();
-
-        for (ReportMetadata report : reports) {
-            boolean status = report.remove();
-            if (status) {
-                System.out.println("Report of the month of " + report.getReportMonth() + " is deleted.");
             }
         }
     }

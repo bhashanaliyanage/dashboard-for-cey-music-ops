@@ -101,7 +101,6 @@ public class Main extends Application {
             try {
                 DatabasePostgres.deleteFromUserSongListList(isrc, userSession.getUserName());
             } catch (SQLException e) {
-                // TODO Auto-generated catch block
                 System.out.println("Unable to delete song from user song list in database: " + e);
             }
         });

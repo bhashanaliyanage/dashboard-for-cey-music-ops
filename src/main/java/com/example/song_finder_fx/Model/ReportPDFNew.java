@@ -72,8 +72,13 @@ public class ReportPDFNew implements Colors {
         reportSummary.setFixedPosition(35, 570, 540);
         Table srBreakdown = getSRBreakdownTable(report);
         srBreakdown.setWidth(540f);
-        Table pubBreakdown = getPubBreakdownTable(report);
-        pubBreakdown.setWidth(540f);
+
+        Table pubBreakdown = null;
+        if (!report.getPUBAssetBreakdown().isEmpty()) {
+            pubBreakdown = getPubBreakdownTable(report);
+            pubBreakdown.setWidth(540f);
+        }
+
         Table streamingBreakdown = getStreamingBreakdownTable(report);
         streamingBreakdown.setWidth(540f);
         Table territoryBreakdown = getTerritoryBreakdownTable(report);
@@ -88,9 +93,11 @@ public class ReportPDFNew implements Colors {
         document.add(srBreakdown);
 
         // Page 01 /////////////////////////////////////////////////////////////////////////////////////////////////////
-        document.add(new AreaBreak());
-        document.add(reportHeadingSmall);
-        document.add(pubBreakdown);
+        if (pubBreakdown != null) {
+            document.add(new AreaBreak());
+            document.add(reportHeadingSmall);
+            document.add(pubBreakdown);
+        }
 
         // Page 02 /////////////////////////////////////////////////////////////////////////////////////////////////////
         document.add(new AreaBreak());
@@ -209,10 +216,10 @@ public class ReportPDFNew implements Colors {
             String artistShareLKR = String.format("%,9.2f", totalRoyaltyLKR);
 
             // Get song image for "SR" type asset if available
-            // Image songImage = loadImageSmall("src/main/resources/com/example/song_finder_fx/images/logo_small_50x.png", true);;
+            // Image songImage = loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/logo_small_50x.png", true);;
 
             // Add row to the table
-            addSongSummaryRowPUB(table, null, productTitle, splits, tracks, artistShareAUD, artistShareLKR);
+            addSongSummaryRowPUB(table, productTitle, splits, tracks, artistShareAUD, artistShareLKR);
         }
 
 
@@ -370,60 +377,84 @@ public class ReportPDFNew implements Colors {
         return table;
     }
 
-    private Image getTerritoryImage(String territory) throws IOException {
-        return switch (territory) {
-            case "LK" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_sri_lanka.png", true);
-            case "AU" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_australia.png", true);
-            case "US" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_states.png", true);
-            case "GB" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_kingdom.png", true);
-            case "CA" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_canada.png", true);
-            case "JP" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_japan.png", true);
-            case "AE" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_uae.png", true);
-            case "IT" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_italy.png", true);
-            case "NZ" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_new_zealand.png", true);
-            case "TH" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_thailand.png", true);
-            case "DE" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_germany.png", true);
-            case "KR" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_korea.png", true);
-            default ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_default.png", true);
-        };
-    }
+private Image getTerritoryImage(String territory) throws IOException {
+    return switch (territory) {
+        case "LK" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_sri_lanka.png");
+        case "AU" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_australia.png");
+        case "US" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_states.png");
+        case "GB" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_kingdom.png");
+        case "CA" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_canada.png");
+        case "JP" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_japan.png");
+        case "AE" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_uae.png");
+        case "IT" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_italy.png");
+        case "NZ" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_new_zealand.png");
+        case "TH" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_thailand.png");
+        case "DE" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_germany.png");
+        case "KR" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_korea.png");
+        case "ID" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_indonesia.png");
+        case "MY" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_malaysia.png");
+        case "PH" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_philippines.png");
+        case "FR" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_france.png");
+        case "BR" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_brazil.png");
+        case "KW" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_kuwait.png");
+        case "RO" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_romania.png");
+        case "SG" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_singapore.png");
+        case "SA" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_saudi_arabia.png");
+        case "IN" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_india.png");
+        case "SE" ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_sweden.png");
+        default ->
+                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_default.png");
+    };
+}
 
     private Image getDSPImage(String dsp) throws IOException {
         return switch (dsp) {
-            case "Spotify" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/spotify.png", true);
-            case "Apple Music", "iTunes Match" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/itunes.png", true);
+            case "Spotify" -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/spotify.png");
+            case "Apple Music", "iTunes Match", "iTunes" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/itunes.png");
             case "Youtube Music" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/ytmusic.png", true);
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/ytmusic.png");
             case "Youtube Ad Supported" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/yt_square.png", true);
-            case "TikTok" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/tiktok.png", true);
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/yt_square.png");
+            case "TikTok" -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/tiktok.png");
             case "Facebook Audio Library", "Facebook Fingerprinting" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/fb.png", true);
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/fb.png");
             case "Soundcloud" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_soundcloud.png", true);
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_soundcloud.png");
             case "Amazon Unlimited", "Amazon Prime", "Amazon ADS" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_amazon.png", true);
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_amazon.png");
             case "Snap" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_snapchat.png", true);
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_snapchat.png");
             case "Hungama" ->
-                    loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_hungama.png", true);
-            case "Tidal" -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/dsp_tidal.png", true);
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_hungama.png");
+            case "Tidal" -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_tidal.png");
+            case "Deezer" -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_deezer.png");
+            case "LINE Music" -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_line_music.png");
 
-            default -> loadImageSmall("src/main/resources/com/example/song_finder_fx/images/logo_small_200x.png", true);
+            default -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/logo_small_200x.png");
         };
     }
 
@@ -544,7 +575,7 @@ public class ReportPDFNew implements Colors {
 
         System.out.println("Image Search Location: " + searchLocation);
 
-        return loadImageSmall(Objects.requireNonNullElse(imagePath, "src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork_90.jpg"), true);
+        return loadAutoScaledImage(Objects.requireNonNullElse(imagePath, "src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork_90.jpg"));
         // String location = "src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork_90.jpg";
     }
 
@@ -683,7 +714,7 @@ public class ReportPDFNew implements Colors {
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(artistShareLKR).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
     }
 
-    private static void addSongSummaryRowPUB(Table table, Image songImage, String songName, String splits, String tracks, String artistShareAUD, String artistShareLKR) {
+    private static void addSongSummaryRowPUB(Table table, String songName, String splits, String tracks, String artistShareAUD, String artistShareLKR) {
         VerticalAlignment verticalAlignment = VerticalAlignment.MIDDLE;
         Color backgroundColor = new DeviceRgb(226, 229, 233);
         PdfFont subtitleFont = FONT_POPPINS;
@@ -717,7 +748,7 @@ public class ReportPDFNew implements Colors {
         float fontSizeSubTitle = 15f;
         PdfFont subtitleFont = FONT_POPPINS_MEDIUM;
 
-        Image image = loadImage("src/main/resources/com/example/song_finder_fx/images/reports/icon_grow.png", false);
+        Image image = loadGrowIcon();
         image.setWidth(10);
 
         // Row 01
@@ -781,20 +812,20 @@ public class ReportPDFNew implements Colors {
         return invoiceHeading;
     }
 
-    static Image loadImage(String location, boolean autoscale) throws MalformedURLException {
-        Image image = new Image(ImageDataFactory.create(location));
-        image.setAutoScale(autoscale);
+    static Image loadGrowIcon() throws MalformedURLException {
+        Image image = new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/reports/icon_grow.png"));
+        image.setAutoScale(false);
         return image;
     }
 
-    static Image loadImageSmall(String location, boolean autoscale) throws IOException {
+    static Image loadAutoScaledImage(String location) throws IOException {
         Image image = new Image(ImageDataFactory.create(location));
 
         // Set the new dimensions
         image.setWidth(30f);
         image.setHeight(30f);
 
-        image.setAutoScale(autoscale);
+        image.setAutoScale(true);
 
         return image;
     }
