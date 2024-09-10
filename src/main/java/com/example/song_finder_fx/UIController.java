@@ -70,8 +70,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Button btnCopyTo;
     public Button btnAudioDatabase;
     public HBox btnIngests;
-    @FXML
-    private HBox btnArtistReports;
     //</editor-fold>
 
     //<editor-fold desc="ImageView">
@@ -248,8 +246,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                         });
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException e) {
+                Platform.runLater(e::printStackTrace);
             }
         });
         thread.start();
@@ -1347,7 +1345,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     public void onArtistReportsBtnClick() {
-
         try {
             ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
             revenueGenerator.loadArtistReports();

@@ -38,14 +38,14 @@ public class ImageProcessor {
         return resizedImage;
     }
 
-    public static BufferedImage cropImage(BufferedImage image) {
-        // Calculate the square dimensions (1:1 ratio)
-        int size = Math.min(image.getWidth(), image.getHeight());
+public static BufferedImage cropImage(BufferedImage image) {
+    // Calculate the square dimensions (1:1 ratio)
+    int size = Math.min(image.getWidth(), image.getHeight());
 
-        // Crop the center square
-        int x = (image.getWidth() - size) / 2;
-        int y = (image.getHeight() - size) / 2;
-        return image.getSubimage(x, y, size, size);
-    }
+    // Crop the center square
+    int x = (image.getWidth() - size) / 2;
+    int y = (image.getHeight() - size) / 2;
+    return image.getSubimage(x, y, size, size);
+}
 
 }
