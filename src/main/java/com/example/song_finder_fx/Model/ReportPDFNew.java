@@ -459,7 +459,7 @@ public class ReportPDFNew implements Colors {
             if (pageNumber == 1)
                 return "src/main/resources/com/example/song_finder_fx/images/reports/artists/ridmaw.png";
             else if (pageNumber == 2)
-                return "src/main/resources/com/example/song_finder_fx/images/reports/artists/ridmaw_head_small.png";
+                return "src/main/resources/com/example/song_finder_fx/images/reports/artistsll./ridmaw_head_smapng";
             else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
         } else return "src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png";
     }
