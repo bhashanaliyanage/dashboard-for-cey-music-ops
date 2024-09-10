@@ -164,21 +164,21 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     File destination;
     public Rectangle rctManualClaims;
     public Rectangle rctSearchSongs;
-    public Rectangle rctCollectSongs;
+    // public Rectangle rctCollectSongs;
     public Rectangle rctRevenue;
-    public Rectangle rctArtistReports;
+    // public Rectangle rctArtistReports;
 
     public static Label lblUserEmailAndUpdateStatic;
 
     public static HBox btnRevenueAnalysisStatic;
 
-    public static HBox btnArtistReportsStatic;
+    // public static HBox btnArtistReportsStatic;
 
     public static HBox btnIngestsStatic;
 
     public static HBox btnSeachSongsStatic;
 
-    public static HBox btnCollectSongsStatic;
+    // public static HBox btnCollectSongsStatic;
 
     public static HBox btnManualClaimsStatic;
 
@@ -209,10 +209,10 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         lblUserStatic = lblUser;
         lblUserEmailAndUpdateStatic = lblUserEmailAndUpdate;
         btnRevenueAnalysisStatic = btnRevenueAnalysis;
-        btnArtistReportsStatic = btnArtistReports;
+        // btnArtistReportsStatic = btnArtistReports;
         btnIngestsStatic = btnIngests;
         btnSeachSongsStatic = btnSeachSongs;
-        btnCollectSongsStatic = btnCollectSongs;
+        // btnCollectSongsStatic = btnCollectSongs;
         btnManualClaimsStatic = btnManualClaims;
         btnSettingsStatic = btnSettings;
         btnSongListStatic = btnSongList;
@@ -295,7 +295,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             if (privilegeLevel == 3) {
                 try {
                     btnRevenueAnalysisStatic.setDisable(true);
-                    btnArtistReportsStatic.setDisable(true);
+                    // btnArtistReportsStatic.setDisable(true);
                     btnIngestsStatic.setDisable(true);
 
                     btnSeachSongsStatic.setDisable(false);
@@ -322,11 +322,11 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 mainVBoxStatic.setDisable(false);
             } else if (privilegeLevel == 1) {
                 btnRevenueAnalysisStatic.setDisable(false);
-                btnArtistReportsStatic.setDisable(false);
+                // btnArtistReportsStatic.setDisable(false);
                 btnIngestsStatic.setDisable(false);
 
                 btnSeachSongsStatic.setDisable(false);
-                btnCollectSongsStatic.setDisable(false);
+                // btnCollectSongsStatic.setDisable(false);
                 btnManualClaimsStatic.setDisable(false);
                 btnSettingsStatic.setDisable(false);
                 btnSongListStatic.setDisable(false);
@@ -336,7 +336,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         } else {
             try {
                 btnRevenueAnalysisStatic.setDisable(true);
-                btnArtistReportsStatic.setDisable(true);
+                // btnArtistReportsStatic.setDisable(true);
                 btnIngestsStatic.setDisable(true);
 
                 btnSeachSongsStatic.setDisable(true);
@@ -681,9 +681,9 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     private void changeSelectorTo(Rectangle selector) {
         rctSearchSongs.setVisible(false);
-        rctCollectSongs.setVisible(false);
+        // rctCollectSongs.setVisible(false);
         rctRevenue.setVisible(false);
-        rctArtistReports.setVisible(false);
+        // rctArtistReports.setVisible(false);
         rctIngests.setVisible(false);
         rctManualClaims.setVisible(false);
 
@@ -1093,7 +1093,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
 
-            changeSelectorTo(rctCollectSongs);
+            // changeSelectorTo(rctCollectSongs);
 
             String directoryString = Main.getAudioDatabaseLocation();
             Node node = (Node) event.getSource();
@@ -1357,7 +1357,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
 
-            changeSelectorTo(rctArtistReports);
+            // changeSelectorTo(rctArtistReports);
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
         }

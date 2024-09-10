@@ -58,11 +58,19 @@ public class ControllerMCList {
 
     public static List<Label> labelsLyricist = new ArrayList<>();
 
-    public static List<ManualClaimTrack> manualClaims = new ArrayList<>();
+    // public static List<ManualClaimTrack> manualClaims = new ArrayList<>();
 
     public static List<ManualClaimTrack> finalManualClaims = new ArrayList<>();
 
     public static Map<Integer, ManualClaimTrack> claimMap = new HashMap<>();
+
+    private final int pageSize = 50;
+
+    private int currentPage = 0;
+
+    public static List<ManualClaimTrack> allManualClaims;
+
+    private final List<Node> allClaimEntries = new ArrayList<>();
 
     @FXML
     public void initialize() throws SQLException, IOException {
@@ -75,13 +83,14 @@ public class ControllerMCList {
         ivArtworks.clear();
 
         lblClaimCount.setText("Loading...");
-        String databaseStatusText = UIController.lblDatabaseStatusStatic.getText();
+        // String databaseStatusText = UIController.lblDatabaseStatusStatic.getText();
 
         Task<Void> taskGetManualClaims = getTaskLoadManualClaims();
 
         taskGetManualClaims.setOnSucceeded(event -> {
-            Thread threadValidation = new Thread(() -> {
+            /*Thread threadValidation = new Thread(() -> {
                 try {
+                    validateArtists();
                     Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText("Validating Artists"));
                     for (Label label : labelsComposer) {
                         String composer = label.getText();
@@ -99,7 +108,7 @@ public class ControllerMCList {
                             Platform.runLater(() -> label.setStyle("-fx-text-fill: red"));
                         }
                     }
-                    Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText(databaseStatusText));
+                    // Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText(databaseStatusText));
                 } catch (SQLException e) {
                     Platform.runLater(e::printStackTrace);
                 }
@@ -121,7 +130,8 @@ public class ControllerMCList {
             });
 
             threadValidation.start();
-            threadArtworks.start();
+            threadArtworks.start();*/
+            runValidationAndArtworkThreads();
         });
 
         Thread threadGetManualClaims = new Thread(taskGetManualClaims);
@@ -129,16 +139,60 @@ public class ControllerMCList {
 
     }
 
-    private @NotNull Task<Void> getTaskLoadManualClaims() {
-        List<Node> claimEntries = new ArrayList<>();
+    private void validateArtists() throws SQLException {
+        int startIndex = currentPage * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
 
+        for (int i = startIndex; i < endIndex; i++) {
+            final int index = i;
+            String composer = labelsComposer.get(i).getText();
+            boolean status = DatabasePostgres.checkIfArtistValidated(composer);
+            if (!status) {
+                Platform.runLater(() -> labelsComposer.get(index).setStyle("-fx-text-fill: red"));
+            }
+
+            String lyricist = labelsLyricist.get(i).getText();
+            status = DatabasePostgres.checkIfArtistValidated(lyricist);
+            if (!status) {
+                Platform.runLater(() -> labelsLyricist.get(index).setStyle("-fx-text-fill: red"));
+            }
+        }
+    }
+
+    private @NotNull Task<Void> getTaskLoadManualClaims() {
         return new Task<>() {
             @Override
             protected Void call() throws SQLException {
-                Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText("Loading Manual Claims"));
-                manualClaims = DatabasePostgres.getManualClaims();
+                // Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText("Loading Manual Claims"));
+                allManualClaims = DatabasePostgres.getManualClaims();
+                // manualClaims = DatabasePostgres.getManualClaims();
 
-                int count = 0;
+                // Pagination Modification
+                for (int i = 0; i < allManualClaims.size(); i++) {
+                    ManualClaimTrack claim = allManualClaims.get(i);
+                    claimMap.put(claim.getId(), claim);
+
+                    Node node;
+                    try {
+                        node = createClaimEntryNode(claim, i + 1);
+                        allClaimEntries.add(node);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                Platform.runLater(() -> {
+                    try {
+                        lblClaimCount.setText(DatabasePostgres.getManualClaimCount());
+                        displayCurrentPage();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                return null;
+
+                // Old Code
+                /*int count = 0;
                 for (ManualClaimTrack claim : manualClaims) {
                     count++;
                     claimMap.put(claim.getId(), claim);
@@ -189,20 +243,126 @@ public class ControllerMCList {
                         throw new RuntimeException(e);
                     }
                 });
+
                 return null;
+                */
             }
         };
+    }
+
+    private void runValidationAndArtworkThreads() {
+        Thread threadValidation = new Thread(() -> {
+            try {
+                // Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText("Validating Artists"));
+                validateArtists();
+                // Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText(databaseStatusText));
+            } catch (SQLException e) {
+                Platform.runLater(e::printStackTrace);
+            }
+        });
+
+        Thread threadArtworks = new Thread(this::fetchArtworks);
+
+        threadValidation.start();
+        threadArtworks.start();
+    }
+
+    private void fetchArtworks() {
+        int startIndex = currentPage * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
+
+        for (int i = startIndex; i < endIndex; i++) {
+            final int index = i;
+            ImageView imageView = ivArtworks.get(i);
+            MCTrackController controller = new MCTrackController(allManualClaims.get(i));
+            try {
+                Platform.runLater(() -> System.out.println("Fetching Artworks for: " + allManualClaims.get(index).getTrackName()));
+                ManualClaimTrack updatedClaim = controller.fetchArtwork();
+                allManualClaims.set(index, updatedClaim);
+                Platform.runLater(() -> {
+                    try {
+                        imageView.setImage(setImage(updatedClaim, index));
+                    } catch (IOException | URISyntaxException e) {
+                        Platform.runLater(e::printStackTrace);
+                    }
+                });
+            } catch (SQLException e) {
+                Platform.runLater(e::printStackTrace);
+            }
+        }
+    }
+
+    private void displayCurrentPage() {
+        int startIndex = currentPage * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allClaimEntries.size());
+
+        vbClaimsList.getChildren().clear();
+        for (int i = startIndex; i < endIndex; i++) {
+            vbClaimsList.getChildren().add(allClaimEntries.get(i));
+        }
+
+        lblClaimCount.setText(String.valueOf(allManualClaims.size()));
+        // Update pagination controls (e.g., enable/disable next/previous buttons)
+        updatePaginationControls();
+
+        // Run validation and artwork threads for the current page
+        runValidationAndArtworkThreads();
+    }
+
+    private void updatePaginationControls() {
+        // TODO: Implement this method to update your pagination controls
+        // For example, enable/disable next/previous buttons based on currentPage
+    }
+
+    public void nextPage() {
+        if ((currentPage + 1) * pageSize < allClaimEntries.size()) {
+            currentPage++;
+            displayCurrentPage();
+        }
+    }
+
+    public void previousPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            displayCurrentPage();
+        }
+    }
+
+    private Node createClaimEntryNode(ManualClaimTrack claim, int count) throws IOException {
+        Node node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/manual_claims/manual-claims-list-entry.fxml")));
+
+        Label lblSongNo = (Label) node.lookup("#lblSongNo");
+        labelsSongNo.add(lblSongNo);
+        Label lblSongName = (Label) node.lookup("#lblSongName");
+        labelsSongName.add(lblSongName);
+        Label lblComposer = (Label) node.lookup("#lblComposer");
+        labelsComposer.add(lblComposer);
+        Label lblLyricist = (Label) node.lookup("#lblLyricist");
+        labelsLyricist.add(lblLyricist);
+        Label lblDate = (Label) node.lookup("#lblDate");
+        Label lblClaimType = (Label) node.lookup("#lblClaimType");
+        CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
+        checkBoxes.add(checkBox);
+        HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
+        hBoxes.add(hboxEntry);
+        ImageView image = (ImageView) node.lookup("#image");
+        ivArtworks.add(image);
+
+        lblSongNo.setText(String.valueOf(claim.getId()));
+        lblSongName.setText(claim.getTrackName());
+        lblComposer.setText(claim.getComposer());
+        lblLyricist.setText(claim.getLyricist());
+        lblDate.setText(TextFormatter.getDaysAgo(claim.getDate()));
+        lblDate.setStyle(setColor(claim.getDate()));
+        lblClaimType.setText(claim.getClaimTypeString());
+
+        return node;
     }
 
     private Image setImage(ManualClaimTrack claim, int listIndex) throws IOException, URISyntaxException {
         if (claim.getPreviewImage() != null) {
             return claim.getPreviewImage();
         } else {
-            // File uploadArtwork = new File("src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork.jpg");
-            // return SwingFXUtils.toFXImage(ImageIO.read(uploadArtwork), null);
-
-            // Fetching Thumbnail
-            // Platform.runLater(() -> btnAddClaim.setText("Fetching Artwork For: " + songName));
             String youtubeID = claim.getYoutubeID();
             String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
             BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
@@ -213,10 +373,9 @@ public class ControllerMCList {
             image = ImageProcessor.resizeImage(1400, 1400, image);
             claim.setImage(image);
 
-            manualClaims.set(listIndex, claim);
+            allManualClaims.set(listIndex, claim);
 
             return SwingFXUtils.toFXImage(image, null);
-
         }
     }
 
@@ -249,39 +408,55 @@ public class ControllerMCList {
         mainVBox.getChildren().setAll(node);
     }
 
-    @FXML
-    void onCheck(ActionEvent event) throws IOException {
-        finalManualClaims.clear();
-        for (int i = 0; i < checkBoxes.size(); i++) {
-            if (checkBoxes.get(i).isSelected()) {
-                // ID, Name, Composer, Lyricist
-                int id = manualClaims.get(i).getId();
-                ManualClaimTrack claim = claimMap.get(id);
-                System.out.println("claim.getBufferedImage() = " + manualClaims.get(i).getBufferedImage());
-                finalManualClaims.add(claim);
-                // finalSongNames.add(labelsSongName.get(i).getText());
-            }
+@FXML
+void onCheck(ActionEvent event) throws IOException {
+    finalManualClaims.clear();
+    for (int i = 0; i < checkBoxes.size(); i++) {
+        if (checkBoxes.get(i).isSelected()) {
+            // ID, Name, Composer, Lyricist
+            int id = allManualClaims.get(i).getId();
+            ManualClaimTrack claim = claimMap.get(id);
+            System.out.println("claim.getBufferedImage() = " + allManualClaims.get(i).getBufferedImage());
+            finalManualClaims.add(claim);
+            // finalSongNames.add(labelsSongName.get(i).getText());
         }
-
-        Node node = SceneController.loadLayout("layouts/manual_claims/manual-claims-identifiers.fxml");
-        Scene scene = SceneController.getSceneFromEvent(event);
-        VBox main = SceneController.getMainVBox(scene);
-        main.getChildren().clear();
-        main.getChildren().add(node);
     }
+
+    Node node = SceneController.loadLayout("layouts/manual_claims/manual-claims-identifiers.fxml");
+    Scene scene = SceneController.getSceneFromEvent(event);
+    VBox main = SceneController.getMainVBox(scene);
+    main.getChildren().clear();
+    main.getChildren().add(node);
+}
 
     @FXML
     void onSelectNone() {
-        for (CheckBox checkBox : checkBoxes) {
-            checkBox.setSelected(false);
+        int count = 0;
+
+        int startIndex = currentPage * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
+
+        for (int i = startIndex; i < endIndex; i++) {
+            checkBoxes.get(i).setSelected(false);
+            count++;
         }
+
+        System.out.println(count + " items deselected");
     }
 
     @FXML
     void onSelectAll() {
-        for (CheckBox checkBox : checkBoxes) {
-            checkBox.setSelected(true);
+        int count = 0;
+
+        int startIndex = currentPage * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
+
+        for (int i = startIndex; i < endIndex; i++) {
+            checkBoxes.get(i).setSelected(true);
+            count++;
         }
+
+        System.out.println(count + " items selected");
     }
 
     public void onExportSelected(ActionEvent actionEvent) {
@@ -289,7 +464,7 @@ public class ControllerMCList {
 
         for (int i = 0; i < checkBoxes.size(); i++) {
             if (checkBoxes.get(i).isSelected()) {
-                selectedClaims.add(manualClaims.get(i));
+                selectedClaims.add(allManualClaims.get(i));
             }
         }
 
@@ -407,5 +582,13 @@ public class ControllerMCList {
 
         Thread thread = new Thread(task);
         thread.start();
+    }
+
+    public void onBackPage(ActionEvent actionEvent) {
+        previousPage();
+    }
+
+    public void onNextPage(ActionEvent actionEvent) {
+        nextPage();
     }
 }

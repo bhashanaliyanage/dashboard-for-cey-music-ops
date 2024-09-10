@@ -77,13 +77,28 @@
          <Button mnemonicParsing="false" onAction="#onCheck" prefWidth="130.0" styleClass="button_inside_brown" text="Create Ingest" />
       </HBox>
    </VBox>
+   <VBox layoutX="40.0" layoutY="219.0" maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg"
+         stylesheets="@../../styles.css">
+      <VBox.margin>
+         <Insets left="30.0" top="5.0"/>
+      </VBox.margin>
+      <HBox spacing="10.0">
+         <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+         </VBox.margin>
+         <Button mnemonicParsing="false" onAction="#onBackPage" prefWidth="130.0" styleClass="button_inside"
+                 text="Back"/>
+         <Button mnemonicParsing="false" onAction="#onNextPage" prefWidth="130.0" styleClass="button_inside"
+                 text="Next"/>
+      </HBox>
+   </VBox>
    <ScrollPane hbarPolicy="NEVER" minWidth="692.0" VBox.vgrow="ALWAYS">
       <VBox.margin>
-         <Insets bottom="10.0" left="28.0" right="30.0" top="1.0"/>
+         <Insets bottom="10.0" left="28.0" right="30.0" top="1.0" />
       </VBox.margin>
       <VBox fx:id="vbClaimsList" maxWidth="688.0" minWidth="688.0" spacing="10.0" styleClass="textarea-bg">
          <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
       </VBox>
    </ScrollPane>

@@ -72,31 +72,6 @@
                     </Label>
                 </VBox>
             </HBox>
-            <HBox fx:id="btnCollectSongs" disable="true" layoutX="35.0" layoutY="170.0" maxWidth="278.0" onMouseClicked="#onCollectSongsButtonClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
-                <VBox.margin>
-                    <Insets left="25.0" />
-                </VBox.margin>
-                <Rectangle fx:id="rctCollectSongs" arcHeight="5.0" arcWidth="5.0" fill="#79b7e3" height="19.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" visible="false" width="5.0" />
-                <ImageView fitHeight="19.0" fitWidth="19.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-                    <HBox.margin>
-                        <Insets left="10.0" />
-                    </HBox.margin>
-                    <Image url="@../images/icon%20_document%20download_.png" />
-                </ImageView>
-                <VBox stylesheets="@../styles.css">
-                    <padding>
-                        <Insets left="10.0" right="10.0" />
-                    </padding>
-                    <Label fx:id="lblSearchNCollect" prefHeight="40.0" text="Search and Collect Songs">
-                        <font>
-                            <Font name="Segoe UI Light" size="14.0" />
-                        </font>
-                        <VBox.margin>
-                            <Insets left="4.0" />
-                        </VBox.margin>
-                    </Label>
-                </VBox>
-            </HBox>
             <HBox fx:id="btnManualClaims" disable="true" layoutX="35.0" layoutY="233.0" maxWidth="278.0" onMouseClicked="#onManualClaimsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
                 <VBox.margin>
                     <Insets left="25.0" />
@@ -143,31 +118,6 @@
                         </font>
                         <VBox.margin>
                             <Insets left="4.0" />
-                        </VBox.margin>
-                    </Label>
-                </VBox>
-            </HBox>
-            <HBox fx:id="btnArtistReports" disable="true" layoutX="35.0" layoutY="215.0" maxWidth="278.0" onMouseClicked="#onArtistReportsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
-                <VBox.margin>
-                    <Insets left="25.0" />
-                </VBox.margin>
-                <Rectangle fx:id="rctArtistReports" arcHeight="5.0" arcWidth="5.0" fill="#79b7e3" height="19.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" visible="false" width="5.0" />
-                <ImageView fitHeight="19.0" fitWidth="19.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-                    <HBox.margin>
-                        <Insets left="10.0" />
-                    </HBox.margin>
-                    <Image url="@../images/icon_report_.png" />
-                </ImageView>
-                <VBox stylesheets="@../styles.css">
-                    <padding>
-                        <Insets left="10.0" right="10.0" />
-                    </padding>
-                    <Label fx:id="lblArtistReports" prefHeight="40.0" text="Artist Reports">
-                        <font>
-                            <Font name="Segoe UI Light" size="14.0" />
-                        </font>
-                        <VBox.margin>
-                            <Insets left="5.0" />
                         </VBox.margin>
                     </Label>
                 </VBox>
