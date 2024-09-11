@@ -9,12 +9,7 @@ import com.example.song_finder_fx.Session.UserSummary;
 import com.itextpdf.layout.Document;
 import com.opencsv.exceptions.CsvValidationException;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.*;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,15 +17,15 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Test {
-    public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
-        // DatabasePostgres.refreshSummaryTable(3, 2024);
+    public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
+        // DatabasePostgres.refreshSummaryTable(7, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
-        // testArtistReportPDF(0.6285, 186.78, "Ajantha Ranasinghe", 2024, 3, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_march_ajantha_ranasinghe.pdf");
-        testArtistReportsNew();
-        // testNewArtistReportPDF();
+        // getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_mahesh_vithana_edit.pdf");
+        // testArtistReportsNew();
+        testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
@@ -38,61 +33,18 @@ public class Test {
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
-        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Ridma Weerawardena", 2024, 4);
+        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Aruna Lian", 2024, 7, true);
 
         ReportPDFNew pdf = new ReportPDFNew();
-        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_april_ridma.pdf", report);
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_july_aruna_lian.pdf", report);
         System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
     }
 
-    private static void testAssignPayee() throws SQLException {
-        Ingest ingest = DatabasePostgres.getIngest(12);
-        assert ingest != null;
-        List<IngestCSVData> data = ingest.getIngestCSVDataList();
-        IngestCSVDataController controller = new IngestCSVDataController(data.getFirst());
-
-        System.out.println("Assigning Payees...");
-
-        IngestCSVData data2 = controller.assignPayees();
-
-        System.out.println("\nEdit Data on: " + data2.getTrackTitle());
-        System.out.println("Composer: " + data2.getComposer());
-        System.out.println("Lyricist: " + data2.getLyricist());
-        System.out.println("Payee 01: " + data2.getPayee().getPayee1());
-        System.out.println("Share: " + data2.getPayee().getShare1());
-        System.out.println("Payee 02: " + data2.getPayee().getPayee2());
-        System.out.println("Share: " + data2.getPayee().getShare2());
-        System.out.println("Payee 03: " + data2.getPayee().getPayee3());
-    }
-
-    public static String testApiCall() {
-        String s = "";
-        String url = "http://192.168.1.32:8080/artist";
-        String urlpart = "/allart";
-        url = url + urlpart;
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest req = HttpRequest.newBuilder().uri(URI.create(url)).build();
-
-        try {
-            HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response);
-            System.out.println("here");
-            s = response.body();
-
-            System.out.println("here1");
-            // return response.body();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return s;
-    }
-
     private static void testBulkReporting() throws SQLException, IOException {
-        int month = 4;
+        int month = 5;
         int year = 2024;
-        double eurToAudRate = 0.6305;
-        double audToLkrRate = 184.65;
+        double eurToAudRate = 0.63333;
+        double audToLkrRate = 186.90;
 
         ArrayList<String> names = new ArrayList<>(Arrays.asList(
                 "Ajantha Ranasinghe",
@@ -177,7 +129,7 @@ public class Test {
             // System.out.println(payee);
             if (names.contains(payee)) {
                 System.out.println("Available in the list: " + payee);
-                testArtistReportPDF(
+                getArtistReport(
                         eurToAudRate,
                         audToLkrRate,
                         payee,
@@ -186,17 +138,6 @@ public class Test {
                         path + "\\" + year + "_" + ItemSwitcher.setMonth(month).toLowerCase() + "_" + payee.toLowerCase().replace(" ", "_") + ".pdf");
             } else {
                 System.out.println("Not Available in the list: " + payee);
-            }
-        }
-    }
-
-    private static void testRemoveAllReports() throws SQLException {
-        List<ReportMetadata> reports = DatabasePostgres.getAllReports();
-
-        for (ReportMetadata report : reports) {
-            boolean status = report.remove();
-            if (status) {
-                System.out.println("Report of the month of " + report.getReportMonth() + " is deleted.");
             }
         }
     }
@@ -220,7 +161,7 @@ public class Test {
         int month = 4;
 
         // Creating artist model by passing artistID
-        ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month);
+        ArtistReport report = getArtistReportNew(artistID, eurToAudRate, audToLkrRate, artistName, year, month, false);
 
         // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
         double grossRevenue = report.getGrossRevenueInAUD();
@@ -271,7 +212,7 @@ public class Test {
         }
     }
 
-    private static ArtistReport getArtistReportNew(int artistID, double eurToAudRate, double audToLkrRate, String artistName, int year, int month) throws SQLException {
+    private static ArtistReport getArtistReportNew(int artistID, double eurToAudRate, double audToLkrRate, String artistName, int year, int month, boolean includeTerritoryAndDSPBreakdown) throws SQLException {
         Artist artist = new Artist(artistID, artistName);
 
         // Creating revenue report model by passing artist object and conversion rate
@@ -281,7 +222,7 @@ public class Test {
         RevenueReportController revenueReportController = new RevenueReportController(report);
 
         // Revenue report controller will have a method called calculate revenue (inputs report object and returns gross revenue, partner share, conversion rate, date, co-writer payment summary via report object)
-        report = revenueReportController.calculateRevenue();
+        report = revenueReportController.calculateRevenue(includeTerritoryAndDSPBreakdown);
 
         return report;
     }
@@ -318,10 +259,10 @@ public class Test {
         System.out.println(summary.getReportDayCount());
     }
 
-    private static void testArtistReportPDF(double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
+    private static void getArtistReport(double eurToAudRate, double audToLkrRate, String artistName, int year, int month, String path) throws SQLException, IOException {
         // DatabasePostgres.refreshSummaryTable(month, year);
 
-        ArtistReport report = getArtistReportNew(0, eurToAudRate, audToLkrRate, artistName, year, month);
+        ArtistReport report = getArtistReportNew(0, eurToAudRate, audToLkrRate, artistName, year, month, false);
 
         // System.out.println("report.getGrossRevenue() = " + report.getGrossRevenue());
 
@@ -338,7 +279,7 @@ public class Test {
         int year = 2024;
 
         // Creating artist model by passing artistID
-        ArtistReport report = getArtistReportNew(artistID, conversionRate, 0, artistName, month, year);
+        ArtistReport report = getArtistReportNew(artistID, conversionRate, 0, artistName, month, year, false);
 
         // Then get gross revenue, partner share, conversion rate, date, top performing songs, and co-writer payment summary from the report model
         double grossRevenue = report.getGrossRevenueInLKR();

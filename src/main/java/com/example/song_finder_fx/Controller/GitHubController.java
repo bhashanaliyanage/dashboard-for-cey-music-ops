@@ -27,132 +27,134 @@ public class GitHubController {
         this.repo = repo;
     }
 
-public File downloadUpdate(String assetName, String savePath, Button button, Label label, Task<File> task) {
-    String apiUrl = String.format("https://api.github.com/repos/%s/%s/releases/latest", owner, repo);
-    File downloadedFile = null;
+    public File downloadUpdate(String assetName, String savePath, Button button, Label label, Task<File> task) {
+        String apiUrl = String.format("https://api.github.com/repos/%s/%s/releases/latest", owner, repo);
+        File downloadedFile = null;
 
-    // Store the original email text
-    final String originalEmail = label.getText();
-    final boolean[] updatedBefore = {false};
+        // Store the original email text
+        final String originalEmail = label.getText();
+        final boolean[] updatedBefore = {false};
 
-    try {
-        URL url = new URL(apiUrl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
+        try {
+            URL url = new URL(apiUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
 
-        String downloadUrl = getDownloadUrl(assetName, conn);
+            String downloadUrl = getDownloadUrl(assetName, conn);
 
-        // Download the file
-        url = new URL(downloadUrl);
-        conn = (HttpURLConnection) url.openConnection();
-        int contentLength = conn.getContentLength();
+            // Download the file
+            url = new URL(downloadUrl);
+            conn = (HttpURLConnection) url.openConnection();
+            int contentLength = conn.getContentLength();
 
-        downloadedFile = new File(savePath);
-        try (InputStream in = conn.getInputStream();
-             FileOutputStream out = new FileOutputStream(downloadedFile)) {
+            downloadedFile = new File(savePath);
+            try (InputStream in = conn.getInputStream();
+                 FileOutputStream out = new FileOutputStream(downloadedFile)) {
 
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            long totalBytesRead = 0;
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                long totalBytesRead = 0;
 
-            // Create fade-out transition
-            FadeTransition fadeOut = new FadeTransition(Duration.millis(500), label);
-            fadeOut.setFromValue(1.0);
-            fadeOut.setToValue(0.0);
+                // Create fade-out transition
+                FadeTransition fadeOut = new FadeTransition(Duration.millis(500), label);
+                fadeOut.setFromValue(1.0);
+                fadeOut.setToValue(0.0);
 
-            // Create fade-in transition
-            FadeTransition fadeIn = new FadeTransition(Duration.millis(500), label);
-            fadeIn.setFromValue(0.0);
-            fadeIn.setToValue(1.0);
+                // Create fade-in transition
+                FadeTransition fadeIn = new FadeTransition(Duration.millis(500), label);
+                fadeIn.setFromValue(0.0);
+                fadeIn.setToValue(1.0);
 
             /*fadeIn.setOnFinished(e -> {
 
             });*/
 
-            // Play fade-out, then change text and fade-in
-            fadeOut.setOnFinished(e -> {
-                label.setText("Downloading Update: 0%");
-                updatedBefore[0] = true;
-                fadeIn.play();
-            });
+                // Play fade-out, then change text and fade-in
+                fadeOut.setOnFinished(e -> {
+                    label.setText("Downloading Update: 0%");
+                    updatedBefore[0] = true;
+                    fadeIn.play();
+                });
 
-            Platform.runLater(fadeOut::play);
+                Platform.runLater(fadeOut::play);
 
 
-            while ((bytesRead = in.read(buffer)) != -1) {
-                if (task.isCancelled()) {
-                    // Clean up and exit if cancelled
-                    out.close();
-                    in.close();
-                    if (downloadedFile.exists()) {
-                        downloadedFile.delete();
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    if (task != null && task.isCancelled()) {
+                        // Clean up and exit if cancelled
+                        out.close();
+                        in.close();
+                        if (downloadedFile.exists()) {
+                            downloadedFile.delete();
+                        }
+
+                        Platform.runLater(() -> {
+                            FadeTransition fadeOutCancel = new FadeTransition(Duration.millis(500), label);
+                            fadeOutCancel.setFromValue(1.0);
+                            fadeOutCancel.setToValue(0.0);
+                            fadeOutCancel.setOnFinished(e -> {
+                                label.setText(originalEmail);
+                                FadeTransition fadeInCancel = new FadeTransition(Duration.millis(500), label);
+                                fadeInCancel.setFromValue(0.0);
+                                fadeInCancel.setToValue(1.0);
+                                fadeInCancel.play();
+                            });
+                            fadeOutCancel.play();
+                        });
+
+                        return null;
                     }
 
-                    Platform.runLater(() -> {
-                        FadeTransition fadeOutCancel = new FadeTransition(Duration.millis(500), label);
-                        fadeOutCancel.setFromValue(1.0);
-                        fadeOutCancel.setToValue(0.0);
-                        fadeOutCancel.setOnFinished(e -> {
-                            label.setText(originalEmail);
-                            FadeTransition fadeInCancel = new FadeTransition(Duration.millis(500), label);
-                            fadeInCancel.setFromValue(0.0);
-                            fadeInCancel.setToValue(1.0);
-                            fadeInCancel.play();
+                    out.write(buffer, 0, bytesRead);
+                    totalBytesRead += bytesRead;
+                    double progress = (double) totalBytesRead / contentLength;
+
+                    int percentCompleted = (int) (progress * 100);
+
+                    if (updatedBefore[0]) {
+                        Platform.runLater(() -> {
+                            if (button != null) {
+                                button.setText(percentCompleted + "%");
+                            }
+                            label.setText("Downloading Update: " + percentCompleted + "%");
                         });
-                        fadeOutCancel.play();
-                    });
+                    }
+                    // task.updateProgress(progress, 1.0);
 
-                    return null;
+                    System.out.print("\rDownload progress: " + percentCompleted + "%");
                 }
 
-                out.write(buffer, 0, bytesRead);
-                totalBytesRead += bytesRead;
-                double progress = (double) totalBytesRead / contentLength;
+                System.out.println("\nFile downloaded successfully.");
 
-                int percentCompleted = (int) (progress * 100);
-
-                if (updatedBefore[0]) {
-                    Platform.runLater(() -> {
-                        button.setText(percentCompleted + "%");
-                        label.setText("Downloading Update: " + percentCompleted + "%");
+                // Fade out the download text and fade in the original email
+                Platform.runLater(() -> {
+                    FadeTransition fadeOutFinal = new FadeTransition(Duration.millis(500), label);
+                    fadeOutFinal.setFromValue(1.0);
+                    fadeOutFinal.setToValue(0.0);
+                    fadeOutFinal.setOnFinished(e -> {
+                        label.setText(Main.userSession.getEmail());
+                        label.setStyle("");
+                        FadeTransition fadeInFinal = new FadeTransition(Duration.millis(500), label);
+                        fadeInFinal.setFromValue(0.0);
+                        fadeInFinal.setToValue(1.0);
+                        fadeInFinal.play();
                     });
-                }
-                // task.updateProgress(progress, 1.0);
+                    fadeOutFinal.play();
+                });
 
-                System.out.print("\rDownload progress: " + percentCompleted + "%");
+                return downloadedFile;
             }
 
-            System.out.println("\nFile downloaded successfully.");
-
-            // Fade out the download text and fade in the original email
-            Platform.runLater(() -> {
-                FadeTransition fadeOutFinal = new FadeTransition(Duration.millis(500), label);
-                fadeOutFinal.setFromValue(1.0);
-                fadeOutFinal.setToValue(0.0);
-                fadeOutFinal.setOnFinished(e -> {
-                    label.setText(Main.userSession.getEmail());
-                    label.setStyle("");
-                    FadeTransition fadeInFinal = new FadeTransition(Duration.millis(500), label);
-                    fadeInFinal.setFromValue(0.0);
-                    fadeInFinal.setToValue(1.0);
-                    fadeInFinal.play();
-                });
-                fadeOutFinal.play();
-            });
-
-            return downloadedFile;
+        } catch (Exception e) {
+            if (downloadedFile != null && downloadedFile.exists()) {
+                downloadedFile.delete();
+            }
+            System.out.println("Unable to download update: " + e);
         }
 
-    } catch (Exception e) {
-        if (downloadedFile != null && downloadedFile.exists()) {
-            downloadedFile.delete();
-        }
-        e.printStackTrace();
+        return downloadedFile;
     }
-
-    return downloadedFile;
-}
 
     private static @NotNull String getDownloadUrl(String assetName, HttpURLConnection conn) throws IOException {
         if (conn.getResponseCode() != 200) {
@@ -216,7 +218,7 @@ public File downloadUpdate(String assetName, String savePath, Button button, Lab
             return new ReleaseInfo(version, releaseNotes);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Unable to get latest version: " + e);
             return null;
         }
     }

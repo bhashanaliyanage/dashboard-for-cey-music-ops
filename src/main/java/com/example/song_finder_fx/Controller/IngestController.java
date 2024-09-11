@@ -4,6 +4,8 @@ import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.*;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import javafx.application.Platform;
+import javafx.scene.control.Button;
 
 import java.io.File;
 import java.io.FileReader;
@@ -233,59 +235,73 @@ public class IngestController {
         return "";
     }
 
-    public void approveIngest(Ingest ingest) throws SQLException {
+    public void approveIngest(Ingest ingest, Button btnApproveIngest) throws SQLException {
         List<IngestCSVData> csvRows = ingest.getIngestCSVDataList();
+        int totalSongs = csvRows.size();  // Total number of songs to process
 
         // Create Products
         List<String> productNames = new ArrayList<>();
-        // List<Product> products = new ArrayList<>();
-        // List<Songs> songs = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
 
         for (IngestCSVData row : csvRows) {
-            // Process Products
             String currentProductName = row.getAlbumTitle();
+
             if (!productNames.contains(currentProductName)) {
                 Product product = new Product(row.getUpc(),
                         row.getAlbumTitle(),
                         row.getCatalogNumber(),
                         row.releaseDate());
 
-                // products.add(product);
+                products.add(product);
                 productNames.add(currentProductName);
 
                 DatabasePostgres.addProduct(product);
                 // System.out.println("Adding Product: " + product.getAlbumTitle());
             }
+        }
 
-            // Process Assets
+        int songsProcessed = 0;  // Counter for songs processed
+
+        for (IngestCSVData row : csvRows) {
             Songs song = new Songs();
+
             song.setISRC(row.getIsrc());
             song.setTrackTitle(row.getTrackTitle());
             song.setFileName(row.getOriginalFileName());
             song.setUPC(row.getUpc());
-            // Composer, Lyricist, Featuring, Singer, Type
             song.setComposer(row.getComposer());
             song.setLyricist(row.getLyricist());
             song.setFeaturingArtist(row.getFeaturingArtist());
-            // song.setSinger();
             song.setType(getType(row.getIsrc()));
 
-            // songs.add(song);
-
             DatabasePostgres.addSong(song);
+
+            songsProcessed++;  // Increment the processed count
+
+            // Calculate progress percentage
+            int progressPercentage = (int) ((songsProcessed / (double) totalSongs) * 100);
+
+            // Update button text if not null
+            if (btnApproveIngest != null) {
+                Platform.runLater(() -> btnApproveIngest.setText("Processing... " + progressPercentage + "%"));
+            }
         }
 
-        // TODO: Make the ingest go to approved state
+        DatabasePostgres.approveIngest(ingest.getIngestID());
     }
 
     private String getType(String isrc) {
-        if (isrc.startsWith("LKA0W")) {
-            return "O";
-        } else if (isrc.startsWith("LKA0U")) {
-            return "C";
-        } else {
-            return ""; // or throw an exception, or return a default value
+        if (isrc == null || isrc.length() < 5) {
+            return "U";
         }
+
+        char fifthChar = isrc.charAt(4);
+
+        return switch (fifthChar) {
+            case 'W' -> "O";
+            case 'U' -> "C";
+            default -> "U";
+        };
     }
 
     public ValidationResult validateIngest(Ingest ingest) {

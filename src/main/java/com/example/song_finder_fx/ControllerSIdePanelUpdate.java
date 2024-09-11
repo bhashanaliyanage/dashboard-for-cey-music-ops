@@ -48,45 +48,10 @@ public class ControllerSIdePanelUpdate {
 
     @FXML
     public void onUpdateBtnClick(ActionEvent event) {
-        // Current Code
-        /*Scene scene = SceneController.getSceneFromEvent(event);
-    Button btnUpdate = (Button) scene.lookup("#btnUpdate");
-    Task<Void> task = new Task<>() {
-        @Override
-        protected Void call() throws Exception {
-            Platform.runLater(() -> {
-                btnUpdate.setText("Downloading");
-                btnUpdate.setOnAction(actionEvent -> {});
-            });
-            File updateFile = Main.versionInfo.getUpdate(btnUpdate); // Your code is inside this method
-            Platform.runLater(() -> {
-                try {
-                    if (updateFile != null) {
-                        Platform.runLater(() -> btnUpdate.setText("Installing..."));
-                        Desktop.getDesktop().open(updateFile);
-                    } else {
-                        Platform.runLater(() -> {
-                            btnUpdate.setText("Error!");
-                            btnUpdate.setStyle("-fx-border-color: red;");
-                        });
-                    }
-                } catch (IOException e) {
-                    AlertBuilder.sendErrorAlert("Error", "Error Opening Update Package", "Path: " + updateFile.getAbsolutePath() + "\n\n" + e);
-                }
-            });
-            return null;
-        }
-    };
-
-    Thread thread = new Thread(task);
-    thread.start();*/
-
-        // Claude.ai modification
-        Scene scene = SceneController.getSceneFromEvent(event);
-        Button btnUpdate = (Button) scene.lookup("#btnUpdate");
+        // Scene scene = SceneController.getSceneFromEvent(event);
+        // Button btnUpdate = (Button) scene.lookup("#btnUpdate");
         Label lblUpdate = UIController.lblUserEmailAndUpdateStatic;
         btnUpdate.setText("Preparing");
-        // ProgressBar progressBar = (ProgressBar) scene.lookup("#progressBar"); // Assume you've added this to your FXML
 
         if (task != null && task.isRunning()) {
             // If task is already running, clicking the button will prompt for cancellation
@@ -141,27 +106,27 @@ public class ControllerSIdePanelUpdate {
         new Thread(task).start();
     }
 
-private void showCancellationAlert(Button btnUpdate) {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.setTitle("Cancel Download");
-    alert.setHeaderText("Do you want to cancel the download?");
-    alert.setContentText("The download progress will be lost.");
+    private void showCancellationAlert(Button btnUpdate) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Cancel Download");
+        alert.setHeaderText("Do you want to cancel the download?");
+        alert.setContentText("The download progress will be lost.");
 
-    Optional<ButtonType> result = alert.showAndWait();
-    if (result.isPresent() && result.get() == ButtonType.OK) {
-        task.cancel();
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            task.cancel();
 
-        // Set a timer to keep "Cancelling..." text for a short period
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.ZERO, e -> btnUpdate.setText("Cancelling...")),
-                new KeyFrame(Duration.seconds(2), e -> {
-                    if (!task.isRunning()) {
-                        btnUpdate.setText("Update");
-                    }
-                })
-        );
+            // Set a timer to keep "Cancelling..." text for a short period
+            Timeline timeline = new Timeline(
+                    new KeyFrame(Duration.ZERO, e -> btnUpdate.setText("Cancelling...")),
+                    new KeyFrame(Duration.seconds(2), e -> {
+                        if (!task.isRunning()) {
+                            btnUpdate.setText("Update");
+                        }
+                    })
+            );
 
-        timeline.play();
+            timeline.play();
+        }
     }
-}
 }

@@ -8,10 +8,13 @@ import com.example.song_finder_fx.Model.PayeeUpdaterUI;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -19,7 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 public class ControllerPayeeUpdater {
 
@@ -34,81 +37,12 @@ public class ControllerPayeeUpdater {
 
     public static List<PayeeUpdaterUI> payeeUpdaterUIS = new ArrayList<>();
 
+    private boolean hideAssignedPayees = false;
+
     @FXML
     void initialize() {
+        onRefresh();
         System.out.println("ControllerPayeeUpdater.initialize");
-        Ingest ingest = ControllerUnApprovedIngestEntry.ingest;
-        List<IngestCSVData> csvData = ingest.getIngestCSVDataList();
-
-        // Fetch all ISRCs from csvData
-        List<String> isrcs = csvData.stream()
-                .map(IngestCSVData::getIsrc)
-                .toList();
-
-        final int[] count = {0};
-
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws SQLException {
-                Map<String, Payee> payeeDetails = DatabasePostgres.fetchPayeeDetailsForISRCs(isrcs);
-
-                Platform.runLater(() -> System.out.println("Looping through CSV rows"));
-
-                payeeUpdaterUIS.clear();
-
-                for (IngestCSVData data : csvData) {
-                    try {
-                        Node node = SceneController.loadLayout("layouts/ingests/payee-updater-view-entry.fxml");
-
-                        CheckBox checkBox = (CheckBox) node.lookup("#cbEntry");
-                        Label lblContributor01 = (Label) node.lookup("#lblContributor01");
-                        Label lblContributor02 = (Label) node.lookup("#lblContributor02");
-                        Label lblISRC = (Label) node.lookup("#lblISRC");
-                        Label lblPayee01 = (Label) node.lookup("#lblPayee01");
-                        Label lblPayee02 = (Label) node.lookup("#lblPayee02");
-                        Label lblTrackName = (Label) node.lookup("#lblTrackName");
-                        Label lblNumber = (Label) node.lookup("#lblNumber");
-
-                        Platform.runLater(() -> {
-                            count[0]++;
-                            lblISRC.setText(data.getIsrc());
-                            lblTrackName.setText(data.getTrackTitle());
-                            lblContributor01.setText(data.getComposer());
-                            lblContributor02.setText(data.getLyricist());
-                            lblNumber.setText(String.valueOf(count[0]));
-
-                            // Set payee details if available
-                            Payee payee = payeeDetails.get(data.getIsrc());
-                            if (payee != null) {
-                                lblPayee01.setText(payee.getPayee1() + " (" + payee.getShare1() + "%)");
-                                lblPayee01.setStyle("-fx-text-fill: '#72a276'");
-                                lblPayee02.setText(payee.getPayee2() + " (" + payee.getShare2() + "%)");
-                                lblPayee02.setStyle("-fx-text-fill: '#72a276'");
-                            }
-
-                            vboxTracks.getChildren().add(node);
-                        });
-
-                        payeeUpdaterUIS.add(new PayeeUpdaterUI(checkBox, lblContributor01, lblContributor02, lblISRC, lblPayee01, lblPayee02, lblTrackName, data));
-                    } catch (IOException e) {
-                        Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", "Something went wrong when initializing UI: " + e));
-                        break;
-                    }
-                }
-
-                return null;
-            }
-        };
-
-        task.setOnFailed(e -> Platform.runLater(() -> {
-            task.getException().printStackTrace();
-            btnAssignPayees.setText("Assign Payees");
-            btnAssignPayees.setDisable(false);
-            AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", "Something went wrong when initializing UI: " + task.getException());
-        }));
-
-        Thread thread = new Thread(task);
-        thread.start();
     }
 
     @FXML
@@ -173,7 +107,7 @@ public class ControllerPayeeUpdater {
 
     @FXML
     void onGoBack() {
-
+        UIController.mainVBoxStatic.getChildren().setAll(ControllerIngest.unApprovedIngestsUI);
     }
 
     @FXML
@@ -233,6 +167,7 @@ public class ControllerPayeeUpdater {
     }
 
 
+
     @FXML
     void onSelectNone() {
         checkBoxesSetSelected(false);
@@ -243,5 +178,106 @@ public class ControllerPayeeUpdater {
             CheckBox checkBox = uiElement.getCbEntry();
             checkBox.setSelected(value);
         }
+    }
+
+    @FXML
+    public void onHome(MouseEvent mouseEvent) {
+        try {
+            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests-chooser.fxml")));
+            UIController.mainVBoxStatic.getChildren().setAll(node);
+
+            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
+            Parent sidepanelNewContent = sidepanelLoader.load();
+            UIController.sideVBoxStatic.getChildren().clear();
+            UIController.sideVBoxStatic.getChildren().add(sidepanelNewContent);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", e.toString());
+        }
+    }
+
+    public void onHideAssigned(MouseEvent mouseEvent) {
+        hideAssignedPayees = !hideAssignedPayees;
+        onRefresh();
+    }
+
+    private void onRefresh() {
+        Ingest ingest = ControllerUnApprovedIngestEntry.ingest;
+        List<IngestCSVData> csvData = ingest.getIngestCSVDataList();
+
+        // Fetch all ISRCs from csvData
+        List<String> isrcs = csvData.stream()
+                .map(IngestCSVData::getIsrc)
+                .toList();
+
+        final int[] count = {0};
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws SQLException {
+                Map<String, Payee> payeeDetails = DatabasePostgres.fetchPayeeDetailsForISRCs(isrcs);
+
+                Platform.runLater(() -> System.out.println("Looping through CSV rows"));
+
+                payeeUpdaterUIS.clear();
+                Platform.runLater(() -> vboxTracks.getChildren().clear());
+
+                for (IngestCSVData data : csvData) {
+                    try {
+                        if (hideAssignedPayees && payeeDetails.get(data.getIsrc()) != null) {
+                            continue;
+                        } else {
+                            Node node = SceneController.loadLayout("layouts/ingests/payee-updater-view-entry.fxml");
+
+                            CheckBox checkBox = (CheckBox) node.lookup("#cbEntry");
+                            Label lblContributor01 = (Label) node.lookup("#lblContributor01");
+                            Label lblContributor02 = (Label) node.lookup("#lblContributor02");
+                            Label lblISRC = (Label) node.lookup("#lblISRC");
+                            Label lblPayee01 = (Label) node.lookup("#lblPayee01");
+                            Label lblPayee02 = (Label) node.lookup("#lblPayee02");
+                            Label lblTrackName = (Label) node.lookup("#lblTrackName");
+                            Label lblNumber = (Label) node.lookup("#lblNumber");
+
+                            Platform.runLater(() -> {
+                                count[0]++;
+                                lblISRC.setText(data.getIsrc());
+                                lblTrackName.setText(data.getTrackTitle());
+                                lblContributor01.setText(data.getComposer());
+                                lblContributor02.setText(data.getLyricist());
+                                lblNumber.setText(String.valueOf(count[0]));
+
+                                // Set payee details if available
+                                Payee payee = payeeDetails.get(data.getIsrc());
+                                if (payee != null) {
+                                    lblPayee01.setText(payee.getPayee1() + " (" + payee.getShare1() + "%)");
+                                    lblPayee01.setStyle("-fx-text-fill: '#72a276'");
+                                    lblPayee02.setText(payee.getPayee2() + " (" + payee.getShare2() + "%)");
+                                    lblPayee02.setStyle("-fx-text-fill: '#72a276'");
+                                }
+
+                                vboxTracks.getChildren().add(node);
+                            });
+
+                            payeeUpdaterUIS.add(new PayeeUpdaterUI(checkBox, lblContributor01, lblContributor02, lblISRC, lblPayee01, lblPayee02, lblTrackName, data));
+
+                        }
+                    } catch (IOException e) {
+                        Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", "Something went wrong when initializing UI: " + e));
+                        break;
+                    }
+                }
+
+                return null;
+            }
+        };
+
+        task.setOnFailed(e -> Platform.runLater(() -> {
+            task.getException().printStackTrace();
+            btnAssignPayees.setText("Assign Payees");
+            btnAssignPayees.setDisable(false);
+            AlertBuilder.sendErrorAlert("Error", "Error Initializing UI", "Something went wrong when initializing UI: " + task.getException());
+        }));
+
+        Thread thread = new Thread(task);
+        thread.start();
     }
 }

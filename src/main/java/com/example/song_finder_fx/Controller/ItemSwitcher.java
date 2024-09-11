@@ -15,6 +15,35 @@ public class ItemSwitcher {
         };
     }
 
+public static String setTerritoryName(String territory) {
+    return switch (territory) {
+        case "LK" -> "Sri Lanka";
+        case "AU" -> "Australia";
+        case "US" -> "United States";
+        case "GB" -> "United Kingdom";
+        case "CA" -> "Canada";
+        case "JP" -> "Japan";
+        case "AE" -> "United Arab Emirates";
+        case "IT" -> "Italy";
+        case "NZ" -> "New Zealand";
+        case "TH" -> "Thailand";
+        case "DE" -> "Germany";
+        case "KR" -> "Korea";
+        case "ID" -> "Indonesia";
+        case "MY" -> "Malaysia";
+        case "PH" -> "Philippines";
+        case "FR" -> "France";
+        case "BR" -> "Brazil";
+        case "KW" -> "Kuwait";
+        case "RO" -> "Romania";
+        case "SG" -> "Singapore";
+        case "SA" -> "Saudi Arabia";
+        case "IN" -> "India";
+        case "SE" -> "Sweden";
+        default -> territory; // Return the original code if not found
+    };
+}
+
     public String setCountry(String countryCode) {
         return switch (countryCode) {
             case "AU" -> "Australia";

@@ -70,20 +70,13 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Button btnCopyTo;
     public Button btnAudioDatabase;
     public HBox btnIngests;
-    @FXML
-    private HBox btnArtistReports;
     //</editor-fold>
 
     //<editor-fold desc="ImageView">
     public ImageView btnPercentageChange;
     public ImageView ProgressView;
     public ImageView imgMediaPico;
-    public ImageView imgDeleteSong;
-    public ImageView imgPlaySong;
     //</editor-fold>
-
-    //<editor-fold desc="HBox">
-    public HBox hboxInvoiceSong;
 
     public HBox btnSeachSongs;
 
@@ -125,6 +118,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Label lblPlayerSongName;
     public Label lblPlayerSongArtst;
     public Label lblSongListSub;
+    public static Label lblSongListSubStatic;
     public Label srchRsSongName;
     public Label srchRsISRC;
     public Label songProductName;
@@ -140,7 +134,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Label songUPCCopied;
     public Label songAlbumNameCopied;
     public Label songName;
-    public Label lblSearchType;
     public Label searchResultISRC;
     public Label songFeaturing;
     public Label songFeaturingCopied;
@@ -169,21 +162,21 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     File destination;
     public Rectangle rctManualClaims;
     public Rectangle rctSearchSongs;
-    public Rectangle rctCollectSongs;
+    // public Rectangle rctCollectSongs;
     public Rectangle rctRevenue;
-    public Rectangle rctArtistReports;
+    // public Rectangle rctArtistReports;
 
     public static Label lblUserEmailAndUpdateStatic;
 
     public static HBox btnRevenueAnalysisStatic;
 
-    public static HBox btnArtistReportsStatic;
+    // public static HBox btnArtistReportsStatic;
 
     public static HBox btnIngestsStatic;
 
     public static HBox btnSeachSongsStatic;
 
-    public static HBox btnCollectSongsStatic;
+    // public static HBox btnCollectSongsStatic;
 
     public static HBox btnManualClaimsStatic;
 
@@ -214,17 +207,70 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         lblUserStatic = lblUser;
         lblUserEmailAndUpdateStatic = lblUserEmailAndUpdate;
         btnRevenueAnalysisStatic = btnRevenueAnalysis;
-        btnArtistReportsStatic = btnArtistReports;
+        // btnArtistReportsStatic = btnArtistReports;
         btnIngestsStatic = btnIngests;
         btnSeachSongsStatic = btnSeachSongs;
-        btnCollectSongsStatic = btnCollectSongs;
+        // btnCollectSongsStatic = btnCollectSongs;
         btnManualClaimsStatic = btnManualClaims;
         btnSettingsStatic = btnSettings;
         btnSongListStatic = btnSongList;
         lblDatabaseStatusStatic = lblDatabaseStatus;
+        lblSongListSubStatic = lblSongListSub;
 
         // Loading user
         loadUser();
+
+        loadUserSongList();
+
+        updateApplication();
+    }
+
+    private void updateApplication() {
+        Thread thread = new Thread(() -> {
+            try {
+                if (Main.versionInfo.updateAvailable()) {
+                    File updateFile = Main.versionInfo.getUpdate(null, lblUserEmailAndUpdate, null);
+
+                    if (updateFile != null) {
+                        Platform.runLater(() -> {
+                            boolean confirmation = AlertBuilder.getSendConfirmationAlert("Update Available", "An update is available and downloaded automatically.", "Would you like to install it now?");
+                            if (confirmation) {
+                                try {
+                                    Desktop.getDesktop().open(updateFile);
+                                } catch (IOException e) {
+                                    Platform.runLater(() -> System.out.println("Unable to open update file: " + e.getMessage()));
+                                }
+                                Platform.exit();
+                                System.exit(0);
+                            }
+                        });
+                    }
+                }
+            } catch (IOException e) {
+                Platform.runLater(e::printStackTrace);
+            }
+        });
+        thread.start();
+    }
+
+    private void loadUserSongList() {
+        Thread thread = new Thread(() -> {
+            try {
+                List<Songs> songList = DatabasePostgres.getUserSongList(Main.userSession.getUserName());
+                Main.songListNew = songList;
+
+                if (songList.size() > 1) {
+                    String text = songList.getFirst().getISRC() + " + " + (songList.size() - 1) + " other songs added";
+                    Platform.runLater(() -> UIController.lblSongListSubStatic.setText(text));
+                } else {
+                    Platform.runLater(() -> UIController.lblSongListSubStatic.setText(songList.getFirst().getISRC()));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> e.printStackTrace());
+            }
+
+        });
+        thread.start();
     }
 
     public static void disableUser() throws SQLException {
@@ -247,7 +293,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             if (privilegeLevel == 3) {
                 try {
                     btnRevenueAnalysisStatic.setDisable(true);
-                    btnArtistReportsStatic.setDisable(true);
+                    // btnArtistReportsStatic.setDisable(true);
                     btnIngestsStatic.setDisable(true);
 
                     btnSeachSongsStatic.setDisable(false);
@@ -274,11 +320,11 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 mainVBoxStatic.setDisable(false);
             } else if (privilegeLevel == 1) {
                 btnRevenueAnalysisStatic.setDisable(false);
-                btnArtistReportsStatic.setDisable(false);
+                // btnArtistReportsStatic.setDisable(false);
                 btnIngestsStatic.setDisable(false);
 
                 btnSeachSongsStatic.setDisable(false);
-                btnCollectSongsStatic.setDisable(false);
+                // btnCollectSongsStatic.setDisable(false);
                 btnManualClaimsStatic.setDisable(false);
                 btnSettingsStatic.setDisable(false);
                 btnSongListStatic.setDisable(false);
@@ -288,7 +334,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         } else {
             try {
                 btnRevenueAnalysisStatic.setDisable(true);
-                btnArtistReportsStatic.setDisable(true);
+                // btnArtistReportsStatic.setDisable(true);
                 btnIngestsStatic.setDisable(true);
 
                 btnSeachSongsStatic.setDisable(true);
@@ -304,20 +350,20 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         }
     }
 
-public static void setAllScenes() throws IOException {
-    // About
-    mainNodes[1] = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/about.fxml")));
-    // Search
-    mainNodes[2] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/search-details.fxml")));
-    // Search and collect songs
-    mainNodes[3] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/collect-songs.fxml")));
-    // NavBar
-    mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar.fxml")));
-    // NavBar Collapsed
-    mainNodes[5] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar-small.fxml")));
-    // Add Manual Claims
-    mainNodes[6] = null;
-}
+    public static void setAllScenes() throws IOException {
+        // About
+        mainNodes[1] = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/about.fxml")));
+        // Search
+        mainNodes[2] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/search-details.fxml")));
+        // Search and collect songs
+        mainNodes[3] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/collect-songs.fxml")));
+        // NavBar
+        mainNodes[4] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar.fxml")));
+        // NavBar Collapsed
+        mainNodes[5] = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/navigationbar-small.fxml")));
+        // Add Manual Claims
+        mainNodes[6] = null;
+    }
 
     public void backButtonImplementationForSearchSong(MouseEvent event) {
         Node node = (Node) event.getSource();
@@ -633,9 +679,9 @@ public static void setAllScenes() throws IOException {
 
     private void changeSelectorTo(Rectangle selector) {
         rctSearchSongs.setVisible(false);
-        rctCollectSongs.setVisible(false);
+        // rctCollectSongs.setVisible(false);
         rctRevenue.setVisible(false);
-        rctArtistReports.setVisible(false);
+        // rctArtistReports.setVisible(false);
         rctIngests.setVisible(false);
         rctManualClaims.setVisible(false);
 
@@ -1045,7 +1091,7 @@ public static void setAllScenes() throws IOException {
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
 
-            changeSelectorTo(rctCollectSongs);
+            // changeSelectorTo(rctCollectSongs);
 
             String directoryString = Main.getAudioDatabaseLocation();
             Node node = (Node) event.getSource();
@@ -1261,8 +1307,12 @@ public static void setAllScenes() throws IOException {
     }
 
     public void onRevenueAnalysisBtnClick() throws IOException {
-        ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
-        revenueGenerator.loadRevenueGenerator();
+        // ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
+        // revenueGenerator.loadRevenueGenerator();
+        Node node = SceneController.loadLayout("layouts/reports/revenue-reports.fxml");
+
+        mainVBox.getChildren().setAll(node);
+        System.out.println("UIController.onRevenueAnalysisBtnClick");
 
         changeSelectorTo(rctRevenue);
     }
@@ -1295,7 +1345,6 @@ public static void setAllScenes() throws IOException {
     //</editor-fold>
 
     public void onArtistReportsBtnClick() {
-
         try {
             ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
             revenueGenerator.loadArtistReports();
@@ -1305,7 +1354,7 @@ public static void setAllScenes() throws IOException {
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
 
-            changeSelectorTo(rctArtistReports);
+            // changeSelectorTo(rctArtistReports);
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
         }

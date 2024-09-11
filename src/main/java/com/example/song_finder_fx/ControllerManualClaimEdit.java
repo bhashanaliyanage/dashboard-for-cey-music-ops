@@ -13,7 +13,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -24,7 +23,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Objects;
 
 public class ControllerManualClaimEdit {
@@ -90,9 +88,9 @@ public class ControllerManualClaimEdit {
                 ControllerMCList.labelsComposer.get(i).setText(composer);
                 ControllerMCList.labelsLyricist.get(i).setText(lyricist);
 
-                ControllerMCList.manualClaims.get(i).setTrackName(trackName);
-                ControllerMCList.manualClaims.get(i).setComposer(composer);
-                ControllerMCList.manualClaims.get(i).setLyricist(lyricist);
+                ControllerMCList.allManualClaims.get(i).setTrackName(trackName);
+                ControllerMCList.allManualClaims.get(i).setComposer(composer);
+                ControllerMCList.allManualClaims.get(i).setLyricist(lyricist);
 
                 // Checking trim times
                 if (!trimStart.isEmpty() && !trimEnd.isEmpty()) {
@@ -100,8 +98,8 @@ public class ControllerManualClaimEdit {
                     boolean status = TextFormatter.validateTrimTimes(trimStart, trimEnd);
                     if (status) {
                         // Adding trim times to model
-                        ControllerMCList.manualClaims.get(i).setTrimStart(trimStart);
-                        ControllerMCList.manualClaims.get(i).setTrimEnd(trimEnd);
+                        ControllerMCList.allManualClaims.get(i).setTrimStart(trimStart);
+                        ControllerMCList.allManualClaims.get(i).setTrimEnd(trimEnd);
                         DatabasePostgres.editManualClaim(songID, trackName, composer, lyricist, trimStart, trimEnd);
                     } else {
                         claimValidation = false;
@@ -133,7 +131,7 @@ public class ControllerManualClaimEdit {
     }*/
 
     @FXML
-    public void onChangeImageClicked(MouseEvent event) throws IOException, SQLException, AWTException {
+    public void onChangeImageClicked(MouseEvent event) throws IOException, SQLException {
         Scene scene = SceneController.getSceneFromEvent(event);
         File file = Main.browseForImage(scene.getWindow());
         if (file != null) {
@@ -185,7 +183,7 @@ public class ControllerManualClaimEdit {
                 Desktop.getDesktop().browse(uri);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            AlertBuilder.sendErrorAlert("Error", "Something went wrong when opening link", "Link: " + link + "\nException: " + e.getMessage());
         }
     }
 

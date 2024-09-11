@@ -9,14 +9,14 @@ public class ArtistReport {
     private int monthInt = 0;
     private Artist artist = null;
     private double eurToAudRate = 0;
-    private final ArrayList<String> coWriters = new ArrayList<>();
-    private final ArrayList<String> coWriterShare = new ArrayList<>();
     private Double grossRevenue;
     private Double partnerShare;
     private ArrayList<Songs> topPerformingSongs;
 
     private List<CoWriterShare> coWritterList;
     private List<CoWriterSummary> coWriterPaymentSummary;
+    private List<TerritoryBreakdown> territoryBreakdown;
+    private List<DSPBreakdown> dspBreakdown;
 
     public ArtistReport(Artist artist, double eurToAudRate, double audToLkrRate, int year, int month) {
         System.out.println("Creating Artist Report for " + artist.getName());
@@ -92,14 +92,6 @@ public class ArtistReport {
         }
     }
 
-    public ArrayList<String> getCoWriters() {
-        return coWriters;
-    }
-
-    public ArrayList<String> getCoWriterShare() {
-        return coWriterShare;
-    }
-
     public Artist getArtist() {
         return artist;
     }
@@ -149,9 +141,6 @@ public class ArtistReport {
         System.out.println("Artist Name: " + artist.getName());
     }
 
-    public void setPayee(String payee) {
-    }
-
     public void setCoWriterPaymentSummary(List<CoWriterSummary> coWriterSummaryList) {
         this.coWriterPaymentSummary = coWriterSummaryList;
     }
@@ -178,5 +167,45 @@ public class ArtistReport {
 
     public double getPartnerShareInAUD() {
         return partnerShare / eurToAudRate;
+    }
+
+    public void setTerritoryBreakdown(List<TerritoryBreakdown> territoryBreakdownList) {
+        this.territoryBreakdown = territoryBreakdownList;
+    }
+
+    public void setDSPBreakdown(List<DSPBreakdown> dspBreakdownList) {
+        this.dspBreakdown = dspBreakdownList;
+    }
+
+    public List<DSPBreakdown> getDSPBreakdown() {
+        return this.dspBreakdown;
+    }
+
+    public List<TerritoryBreakdown> getTerritoryBreakdown() {
+        return this.territoryBreakdown;
+    }
+
+    public List<CoWriterShare> getSRAssetBreakdown() {
+        List<CoWriterShare> srCoWriterShare = new ArrayList<>();
+
+        for (CoWriterShare coWriterShare : coWritterList) {
+           if (coWriterShare.getSongType().equals("SR")) {
+               srCoWriterShare.add(coWriterShare);
+           }
+        }
+
+        return srCoWriterShare;
+    }
+
+    public List<CoWriterShare> getPUBAssetBreakdown() {
+        List<CoWriterShare> pubCoWriterShare = new ArrayList<>();
+
+        for (CoWriterShare coWriterShare : coWritterList) {
+            if (!coWriterShare.getSongType().equals("SR") || coWriterShare.getSongType().isEmpty()) {
+                pubCoWriterShare.add(coWriterShare);
+            }
+        }
+
+        return pubCoWriterShare;
     }
 }
