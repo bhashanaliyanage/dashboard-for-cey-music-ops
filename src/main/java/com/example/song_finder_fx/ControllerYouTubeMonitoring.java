@@ -17,22 +17,25 @@ public class ControllerYouTubeMonitoring {
         // Sample Pseudo Code
         /*
         list<YouTubeChannel> youTubeChannelList = Database.getYouTubeChannelList();
-        list<YouTubeVideo> youTubeVideoList = new ArrayList<>();
 
         for (YouTubeChannel channel : youTubeChannelList) {
             int channelType = channel.getType();
 
             if (channelType == 1) {
                 String playlistID = channel.getPlaylistID();
-                youTubeVideoList.append(fetchFromPlaylist(playlistID));
+                channel.appendVideo(fetchFromPlaylist(playlistID));
             } else if (channelType == 2) {
                 String channelID = channel.getChannelID();
-                youTubeVideoList.append(fetchFromChannelID(channelID));
+                channel.appendVideo(fetchFromChannelID(channelID));
             }
         }
 
-        for (YouTubeVideo video : youTubeVideoList) {
-            //  Show in UI
+        for (YouTubeChannel channel : youTubeChannelList) {
+            list<YouTubeVideo> youTubeVideoList = channel.getVideoList();
+
+            for (YouTubeVideo video : youTubeVideoList) {
+                //  Show in UI
+            }
         }
         */
     }
