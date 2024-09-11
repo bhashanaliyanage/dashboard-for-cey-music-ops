@@ -3615,6 +3615,26 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         return s;
     }
 
-
+//Youtube Service
+public List<YoutubeData> getUrlList() {
+    Connection con = getConn();
+    String sql = "SELECT url,name  from youtube where type = '2'";
+//    List<String> stList = new ArrayList<String>();
+        List  <YoutubeData> stList = new ArrayList<YoutubeData>();
+    try {
+        PreparedStatement ps  =  con.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        while(rs.next()) {
+            YoutubeData yt =  new YoutubeData();
+//            System.out.println(ps);
+          yt.setUrl(rs.getString(1));
+           yt.setName(  rs.getString(2));
+            stList.add(yt);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return stList;
+}
 
 }
