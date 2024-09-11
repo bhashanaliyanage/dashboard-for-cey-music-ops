@@ -93,7 +93,7 @@ public class ControllerManualClaimEdit {
                 ControllerMCList.allManualClaims.get(i).setLyricist(lyricist);
 
                 // Checking trim times
-                if (!trimStart.isEmpty() && !trimEnd.isEmpty()) {
+                if (trimStart != null && trimEnd != null && !trimStart.isEmpty() && !trimEnd.isEmpty()) {
                     // Validating trim times
                     boolean status = TextFormatter.validateTrimTimes(trimStart, trimEnd);
                     if (status) {
