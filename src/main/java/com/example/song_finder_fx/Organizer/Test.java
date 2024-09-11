@@ -33,10 +33,10 @@ public class Test {
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
-        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Aruna Lian", 2024, 7, true);
+        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Methun SK", 2024, 7, true);
 
         ReportPDFNew pdf = new ReportPDFNew();
-        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_july_aruna_lian.pdf", report);
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_july_methun.pdf", report);
         System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
     }
 
@@ -139,15 +139,6 @@ public class Test {
             } else {
                 System.out.println("Not Available in the list: " + payee);
             }
-        }
-    }
-
-    private static void testAddNewFugaReport() {
-        ReportMetadata report = new ReportMetadata("Test March", 1, 2024, new File("D:\\CeyMusic\\CeyMusic Software Dev\\Tools\\Report Generator\\March2024StatementRun_IslandDreamRecords-standard\\March2024StatementRun_IslandDreamRecords-royalty_product_and_asset.csv"));
-        try {
-            DatabasePostgres.importReport(report);
-        } catch (SQLException | IOException | CsvValidationException e) {
-            throw new RuntimeException(e);
         }
     }
 

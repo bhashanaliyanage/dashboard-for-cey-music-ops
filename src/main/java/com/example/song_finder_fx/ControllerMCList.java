@@ -100,34 +100,6 @@ public class ControllerMCList {
 
     }
 
-    private void validateArtists() {
-        try {
-            int startIndex = currentPage * pageSize;
-            int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
-
-            for (int i = startIndex; i < endIndex; i++) {
-                if (Thread.currentThread().isInterrupted()) {
-                    return; // Exit the method if the thread has been interrupted
-                }
-
-                final int index = i;
-                String composer = labelsComposer.get(i).getText();
-                boolean status = DatabasePostgres.checkIfArtistValidated(composer);
-                if (!status) {
-                    Platform.runLater(() -> labelsComposer.get(index).setStyle("-fx-text-fill: red"));
-                }
-
-                String lyricist = labelsLyricist.get(i).getText();
-                status = DatabasePostgres.checkIfArtistValidated(lyricist);
-                if (!status) {
-                    Platform.runLater(() -> labelsLyricist.get(index).setStyle("-fx-text-fill: red"));
-                }
-            }
-        } catch (SQLException e) {
-            Platform.runLater(e::printStackTrace);
-        }
-    }
-
     private @NotNull Task<Void> getTaskLoadManualClaims() {
         return new Task<>() {
             @Override
@@ -137,8 +109,7 @@ public class ControllerMCList {
                 // manualClaims = DatabasePostgres.getManualClaims();
 
                 // Pagination Modification
-                for (int i = 0; i < allManualClaims.size(); i++) {
-                    ManualClaimTrack claim = allManualClaims.get(i);
+                for (ManualClaimTrack claim : allManualClaims) {
                     claimMap.put(claim.getId(), claim);
 
                     Node node;
@@ -166,11 +137,65 @@ public class ControllerMCList {
     private void runValidationAndArtworkThreads() {
         stopExistingThreads();
 
-        threadValidation = new Thread(this::validateArtists);
-        threadArtworks = new Thread(this::fetchArtworks);
+        threadValidation = new Thread(() -> {
+            try {
+                int startIndex = currentPage * pageSize;
+                int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
 
-        threadValidation.start();
+                for (int i = startIndex; i < endIndex; i++) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        return; // Exit the method if the thread has been interrupted
+                    }
+
+                    final int index = i;
+                    String composer = labelsComposer.get(i).getText();
+                    boolean status = DatabasePostgres.checkIfArtistValidated(composer);
+                    if (!status) {
+                        Platform.runLater(() -> labelsComposer.get(index).setStyle("-fx-text-fill: red"));
+                    }
+
+                    String lyricist = labelsLyricist.get(i).getText();
+                    status = DatabasePostgres.checkIfArtistValidated(lyricist);
+                    if (!status) {
+                        Platform.runLater(() -> labelsLyricist.get(index).setStyle("-fx-text-fill: red"));
+                    }
+                }
+            } catch (SQLException e) {
+                Platform.runLater(e::printStackTrace);
+            }
+        });
+
+        threadArtworks = new Thread(() -> {
+            int startIndex = currentPage * pageSize;
+            int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
+
+            for (int i = startIndex; i < endIndex; i++) {
+                if (Thread.currentThread().isInterrupted()) {
+                    return; // Exit the method if the thread has been interrupted
+                }
+
+                final int index = i;
+                ImageView imageView = ivArtworks.get(i);
+                MCTrackController controller = new MCTrackController(allManualClaims.get(i));
+                try {
+                    Platform.runLater(() -> System.out.println("Fetching Artworks for: " + allManualClaims.get(index).getTrackName()));
+                    ManualClaimTrack updatedClaim = controller.fetchArtwork();
+                    allManualClaims.set(index, updatedClaim);
+                    Platform.runLater(() -> {
+                        try {
+                            imageView.setImage(setImage(updatedClaim, index));
+                        } catch (IOException | URISyntaxException e) {
+                            Platform.runLater(e::printStackTrace);
+                        }
+                    });
+                } catch (SQLException e) {
+                    Platform.runLater(e::printStackTrace);
+                }
+            }
+        });
+
         threadArtworks.start();
+        threadValidation.start();
     }
 
     private void stopExistingThreads() {
@@ -189,35 +214,6 @@ public class ControllerMCList {
                 threadArtworks.join(1000); // Wait for up to 1 second for the thread to finish
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-            }
-        }
-    }
-
-    private void fetchArtworks() {
-        int startIndex = currentPage * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
-
-        for (int i = startIndex; i < endIndex; i++) {
-            if (Thread.currentThread().isInterrupted()) {
-                return; // Exit the method if the thread has been interrupted
-            }
-
-            final int index = i;
-            ImageView imageView = ivArtworks.get(i);
-            MCTrackController controller = new MCTrackController(allManualClaims.get(i));
-            try {
-                Platform.runLater(() -> System.out.println("Fetching Artworks for: " + allManualClaims.get(index).getTrackName()));
-                ManualClaimTrack updatedClaim = controller.fetchArtwork();
-                allManualClaims.set(index, updatedClaim);
-                Platform.runLater(() -> {
-                    try {
-                        imageView.setImage(setImage(updatedClaim, index));
-                    } catch (IOException | URISyntaxException e) {
-                        Platform.runLater(e::printStackTrace);
-                    }
-                });
-            } catch (SQLException e) {
-                Platform.runLater(e::printStackTrace);
             }
         }
     }

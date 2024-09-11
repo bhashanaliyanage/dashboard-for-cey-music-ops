@@ -35,6 +35,8 @@ public class ReportPDFNew implements Colors {
     private static PdfFont FONT_RUBIK_SEMIBOLD = null;
     private static PdfFont FONT_POPPINS = null;
     private static PdfFont FONT_POPPINS_MEDIUM = null;
+    private static int srRowCount = 0;
+    private static int pubRowCount = 0;
     private String reportPath;
     private static final int PAGE01 = 1;
     private static final int PAGE02 = 2;
@@ -73,6 +75,8 @@ public class ReportPDFNew implements Colors {
         Table srBreakdown = getSRBreakdownTable(report);
         srBreakdown.setWidth(540f);
 
+        // srBreakdown.getNumberOfRows();
+
         Table pubBreakdown = null;
         if (!report.getPUBAssetBreakdown().isEmpty()) {
             pubBreakdown = getPubBreakdownTable(report);
@@ -93,10 +97,19 @@ public class ReportPDFNew implements Colors {
         document.add(srBreakdown);
 
         // Page 01 /////////////////////////////////////////////////////////////////////////////////////////////////////
+        int srRows = srRowCount;
+        int pubRows = pubRowCount;
+        int remainingRowsOnFirstPage = 10 - srRows;
         if (pubBreakdown != null) {
-            document.add(new AreaBreak());
-            document.add(reportHeadingSmall);
-            document.add(pubBreakdown);
+            if (srRows <= 10 && (pubRows <= remainingRowsOnFirstPage)) {
+                // Add pubBreakdown on the same page
+                document.add(pubBreakdown);
+            } else {
+                // Add a new page and the small header before adding pubBreakdown
+                document.add(new AreaBreak());
+                document.add(reportHeadingSmall);
+                document.add(pubBreakdown);
+            }
         }
 
         // Page 02 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -377,58 +390,58 @@ public class ReportPDFNew implements Colors {
         return table;
     }
 
-private Image getTerritoryImage(String territory) throws IOException {
-    return switch (territory) {
-        case "LK" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_sri_lanka.png");
-        case "AU" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_australia.png");
-        case "US" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_states.png");
-        case "GB" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_kingdom.png");
-        case "CA" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_canada.png");
-        case "JP" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_japan.png");
-        case "AE" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_uae.png");
-        case "IT" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_italy.png");
-        case "NZ" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_new_zealand.png");
-        case "TH" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_thailand.png");
-        case "DE" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_germany.png");
-        case "KR" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_korea.png");
-        case "ID" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_indonesia.png");
-        case "MY" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_malaysia.png");
-        case "PH" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_philippines.png");
-        case "FR" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_france.png");
-        case "BR" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_brazil.png");
-        case "KW" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_kuwait.png");
-        case "RO" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_romania.png");
-        case "SG" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_singapore.png");
-        case "SA" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_saudi_arabia.png");
-        case "IN" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_india.png");
-        case "SE" ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_sweden.png");
-        default ->
-                loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_default.png");
-    };
-}
+    private Image getTerritoryImage(String territory) throws IOException {
+        return switch (territory) {
+            case "LK" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_sri_lanka.png");
+            case "AU" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_australia.png");
+            case "US" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_states.png");
+            case "GB" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_united_kingdom.png");
+            case "CA" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_canada.png");
+            case "JP" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_japan.png");
+            case "AE" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_uae.png");
+            case "IT" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_italy.png");
+            case "NZ" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_new_zealand.png");
+            case "TH" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_thailand.png");
+            case "DE" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_germany.png");
+            case "KR" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_korea.png");
+            case "ID" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_indonesia.png");
+            case "MY" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_malaysia.png");
+            case "PH" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_philippines.png");
+            case "FR" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_france.png");
+            case "BR" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_brazil.png");
+            case "KW" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_kuwait.png");
+            case "RO" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_romania.png");
+            case "SG" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_singapore.png");
+            case "SA" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_saudi_arabia.png");
+            case "IN" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_india.png");
+            case "SE" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_sweden.png");
+            default ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/reports/territory_flags/flag_default.png");
+        };
+    }
 
     private Image getDSPImage(String dsp) throws IOException {
         return switch (dsp) {
@@ -446,13 +459,13 @@ private Image getTerritoryImage(String territory) throws IOException {
                     loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_soundcloud.png");
             case "Amazon Unlimited", "Amazon Prime", "Amazon ADS" ->
                     loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_amazon.png");
-            case "Snap" ->
-                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_snapchat.png");
+            case "Snap" -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_snapchat.png");
             case "Hungama" ->
                     loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_hungama.png");
             case "Tidal" -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_tidal.png");
             case "Deezer" -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_deezer.png");
-            case "LINE Music" -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_line_music.png");
+            case "LINE Music" ->
+                    loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/dsp_line_music.png");
 
             default -> loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/logo_small_200x.png");
         };
@@ -712,6 +725,8 @@ private Image getTerritoryImage(String territory) throws IOException {
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(tracks).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(artistShareAUD).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(artistShareLKR).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
+
+        srRowCount++;
     }
 
     private static void addSongSummaryRowPUB(Table table, String songName, String splits, String tracks, String artistShareAUD, String artistShareLKR) {
@@ -735,6 +750,8 @@ private Image getTerritoryImage(String territory) throws IOException {
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(tracks).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(artistShareAUD).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
         table.addCell(new Cell().setHeight(30f).setBackgroundColor(backgroundColor).add(new Paragraph(artistShareLKR).setFont(subtitleFont).setTextAlignment(textAlignment)).setVerticalAlignment(verticalAlignment).setFontSize(10f).setBorder(border));
+
+        pubRowCount++;
     }
 
     private Table getReportSummaryTable(ArtistReport report) throws MalformedURLException {

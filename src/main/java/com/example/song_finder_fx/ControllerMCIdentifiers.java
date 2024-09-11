@@ -203,9 +203,12 @@ public class ControllerMCIdentifiers {
         });
 
         // Front End Validation
+        System.out.println("Validating UPCs and Catalog Numbers");
         for (int claimID = 0; claimID < totalClaims; claimID++) {
             final String[] upc = {upcs.get(claimID).getText()};
             String catNo = claimCNumbers.get(claimID).getText();
+
+            System.out.println("Checking Claim: " + (claimID + 1));
 
             // Validating UPCs
             if (upc[0].isEmpty()) {
@@ -219,8 +222,6 @@ public class ControllerMCIdentifiers {
                     System.out.println("New UPC entered: " + newUPC);
                 });
             }
-
-            System.out.println("claimID = " + (claimID + 1));
 
             // Validating Catalog Numbers
             if (catNo.isEmpty()) {
@@ -304,7 +305,7 @@ public class ControllerMCIdentifiers {
                             Platform.runLater(() -> lblProcess.setText("Getting Artwork for: " + albumTitle));
                             try {
                                 String outputPath = folder.getAbsolutePath() + "\\" + upc[0] + ".jpg";
-                                Platform.runLater(() -> System.out.println("outputPath = " + outputPath));
+                                // Platform.runLater(() -> System.out.println("outputPath = " + outputPath));
                                 ImageIO.write(artwork, "jpg", new File(outputPath));
                             } catch (IOException e) {
                                 Platform.runLater(() -> progressBar.setStyle("-fx-background-color: red;"));
@@ -479,7 +480,7 @@ public class ControllerMCIdentifiers {
         String releaseDate = getDate();
         String year = getYear(releaseDate);
         String isrc = getISRC(i, currentISRC);
-        Platform.runLater(() -> System.out.println("isrc = " + isrc));
+        Platform.runLater(() -> System.out.println("Generating row for ISRC: " + isrc));
         String writers = String.format("%s | %s", composer, lyricist);
 
         List<String> row = new ArrayList<>();

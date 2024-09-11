@@ -19,8 +19,8 @@ public class YoutubeDownload {
     public static void downloadAudioOnly(String url, String file) throws IOException, InterruptedException {
             String nodeScriptPath = "libs/jdown.js";
 
-            System.out.println("url = " + url);
-            System.out.println("file = " + file);
+            System.out.println("Downloading audio from: " + url);
+            System.out.println("Saving downloaded audio as: " + file);
 
             ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
             Process process = processBuilder.start();
