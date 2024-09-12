@@ -4,6 +4,7 @@ import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.CSVController;
 import com.example.song_finder_fx.Controller.ItemSwitcher;
 import com.example.song_finder_fx.Model.*;
+import com.example.song_finder_fx.Session.CallWeb;
 import com.example.song_finder_fx.Session.Hasher;
 import com.example.song_finder_fx.Session.User;
 import com.opencsv.CSVReader;
@@ -42,6 +43,7 @@ public class DatabasePostgres {
     private static Connection conn;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
+//    DatabasePostgres db =  new DatabasePostgres();
     public static Connection getConn() {
         // LocalHost
         String ip = "jdbc:postgresql://192.168.1.200:5432/";
@@ -2146,23 +2148,47 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
     }
 
     public static void addSong(Songs song) throws SQLException {
-        String sql = "INSERT INTO public.songs(isrc, song_name, file_name, upc, composer, lyricist, featuring, type) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
-                "ON CONFLICT (isrc) DO NOTHING;";
+        String selectSql = "SELECT * FROM public.songs WHERE isrc = ?";
+        String insertSql = "INSERT INTO public.songs(isrc, song_name, file_name, upc, composer, lyricist, featuring, type) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String updateSql = "UPDATE public.songs SET song_name = ?, file_name = ?, upc = ?, composer = ?, lyricist = ?, featuring = ?, type = ? " +
+                "WHERE isrc = ?";
 
         try (Connection con = getConn();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, song.getISRC());
-            ps.setString(2, song.getTrackTitle());
-            ps.setString(3, song.getFileName());
-            ps.setString(4, song.getUPC());
-            ps.setInt(5, setArtistID(song.getComposer()));
-            ps.setInt(6, setArtistID(song.getLyricist()));
-            ps.setInt(7, setArtistID(song.getFeaturing()));
-            System.out.println("Song Type: " + song.getTypeConverted());
-            ps.setString(8, song.getType());
+             PreparedStatement selectPs = con.prepareStatement(selectSql);
+             PreparedStatement insertPs = con.prepareStatement(insertSql);
+             PreparedStatement updatePs = con.prepareStatement(updateSql)) {
 
-            ps.executeUpdate();
+            selectPs.setString(1, song.getISRC());
+            ResultSet rs = selectPs.executeQuery();
+
+            if (rs.next()) {
+                // ISRC exists, update the record
+                updatePs.setString(1, song.getTrackTitle());
+                updatePs.setString(2, song.getFileName());
+                updatePs.setString(3, song.getUPC());
+                updatePs.setInt(4, setArtistID(song.getComposer()));
+                updatePs.setInt(5, setArtistID(song.getLyricist()));
+                updatePs.setInt(6, setArtistID(song.getFeaturing()));
+                updatePs.setString(7, song.getType());
+                updatePs.setString(8, song.getISRC());
+
+                updatePs.executeUpdate();
+                System.out.println("Song updated: " + song.getISRC());
+            } else {
+                // ISRC doesn't exist, insert new record
+                insertPs.setString(1, song.getISRC());
+                insertPs.setString(2, song.getTrackTitle());
+                insertPs.setString(3, song.getFileName());
+                insertPs.setString(4, song.getUPC());
+                insertPs.setInt(5, setArtistID(song.getComposer()));
+                insertPs.setInt(6, setArtistID(song.getLyricist()));
+                insertPs.setInt(7, setArtistID(song.getFeaturing()));
+                insertPs.setString(8, song.getType());
+
+                insertPs.executeUpdate();
+                System.out.println("Song inserted: " + song.getISRC());
+            }
         }
     }
 
@@ -3034,11 +3060,7 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         return songs;
     }
 
-    public static void main(String[] args) {
-        Songs list = new Songs();
-        list = (Songs) topPerformingSongs();
-        System.out.println(list);
-    }
+
 
     public static List<Songs> topPerformingSongs() {
         String sql = "select  asset_isrc, reported_royalty_for_ceymusic " +
@@ -3519,5 +3541,100 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         ps.setString(7, artist);
         return ps.executeQuery();
     }
+
+    public List<Payee> getPayeeList(){
+        List<Payee> payeeLists = new ArrayList<>();
+        Connection con = getConn();
+        String sql = "SELECT isrc,payee,share , payee01, payee01share, payee02, payee02share,payee03,payee03share from isrc_payees ";
+        try {
+        PreparedStatement ps =  con.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        while(rs.next()){
+            Payee py =  new Payee();
+           py.setIsrc(rs.getString(1));
+           py.setPayee1(rs.getString(2));
+           int pay1 = rs.getInt(3);
+           py.setShare1(Integer.toString(pay1));
+           py.setPayee2(rs.getString(4));
+           int pay2 = rs.getInt(5);
+           py.setShare2(Integer.toBinaryString(pay2));
+           py.setPayee3(rs.getString(6));
+           int pay3 = rs.getInt(7);
+           py.setShare3(Integer.toString(pay3));
+
+        }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return payeeLists;
+    }
+
+    public Payee getPayeeByIsrc(String isrc) {
+        String sql = "SELECT payee,share,payee01,payee01share,payee02,payee02share  from isrc_payees where isrc =  ? ";
+        Connection con = getConn();
+        Payee py = null;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, isrc);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                py = new Payee();
+                py.setIsrc(rs.getString(1));
+                py.setPayee1(rs.getString(2));
+                py.setShare1(rs.getString(3));
+                py.setPayee2(rs.getString(4));
+                py.setShare2(rs.getString(5));
+                py.setPayee3(rs.getString(6));
+                py.setShare3(rs.getString(7));
+
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return py;
+    }
+
+
+
+    public static void main(String[] args) {
+//
+        String s = DatabasePostgres.testMeth();
+    }
+
+    public static String testMeth() {
+        String s= "artist/allart";
+        String url = CallWeb.BASE_URL+s;
+//        System.out.println(url+"  url");
+        try {
+            s = CallWeb.callWebApp(url);
+//            System.out.println( "calling url" +url);
+            System.out.println(s);
+        } catch (Exception e) {
+        }
+
+        return s;
+    }
+
+//Youtube Service
+public List<YoutubeData> getUrlList() {
+    Connection con = getConn();
+    String sql = "SELECT url,name  from youtube where type = '2'";
+//    List<String> stList = new ArrayList<String>();
+        List  <YoutubeData> stList = new ArrayList<YoutubeData>();
+    try {
+        PreparedStatement ps  =  con.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        while(rs.next()) {
+            YoutubeData yt =  new YoutubeData();
+//            System.out.println(ps);
+          yt.setUrl(rs.getString(1));
+           yt.setName(  rs.getString(2));
+            stList.add(yt);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return stList;
+}
 
 }
