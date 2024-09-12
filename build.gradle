@@ -31,6 +31,20 @@ application {
     mainClass = 'com.example.song_finder_fx.Main'
 }
 
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+
+test {
+    systemProperty 'file.encoding', 'UTF-8'
+}
+
+
+
 shadowJar {
     manifest {
         attributes 'Main-Class': 'com.example.Main'
