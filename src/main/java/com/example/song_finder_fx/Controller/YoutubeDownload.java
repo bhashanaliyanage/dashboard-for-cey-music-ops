@@ -31,35 +31,35 @@ public class YoutubeDownload {
     }
 
     public static void downloadAudioOnly(String url, String file) throws IOException, InterruptedException {
-            String nodeScriptPath = "libs/jdown.js";
+        String nodeScriptPath = "libs/jdown.js";
 
-            System.out.println("Downloading audio from: " + url);
-            System.out.println("Saving downloaded audio as: " + file);
+        System.out.println("Downloading audio from: " + url);
+        System.out.println("Saving downloaded audio as: " + file);
 
-            ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
-            Process process = processBuilder.start();
+        ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
+        Process process = processBuilder.start();
 
-            // Read and print output
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String finalLine = line;
-                Platform.runLater(() -> System.out.println(finalLine));
-            }
+        // Read and print output
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String finalLine = line;
+            Platform.runLater(() -> System.out.println(finalLine));
+        }
 
-            int exitCode = process.waitFor();
+        int exitCode = process.waitFor();
 
-            if (exitCode == 0) {
-                System.out.println("Audio download script executed successfully.");
-            } else {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("An error occurred");
-                    alert.setContentText("Error Downloading Audio");
-                    Platform.runLater(alert::showAndWait);
-                });
-            }
+        if (exitCode == 0) {
+            System.out.println("Audio download script executed successfully.");
+        } else {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("An error occurred");
+                alert.setContentText("Error Downloading Audio");
+                Platform.runLater(alert::showAndWait);
+            });
+        }
     }
 
     public static void trimAudio(String filePath, String outputPath, String startTime, String EndTime) throws IOException, InterruptedException {
@@ -145,7 +145,7 @@ public class YoutubeDownload {
     //GET TV CHANNEL PROGRAM LIST
 
 
- public static void main(String[] args) {
+    public static void main(String[] args) {
 
 
 //     List<List<Map<String, String>>> result = new ArrayList<>();
@@ -159,29 +159,25 @@ public class YoutubeDownload {
 //         getviData1(urlList);
 //
 //     }
- }
+    }
+
     public static List<List<Map<String, String>>> getTypeTvProgramLlist() {
         List<List<Map<String, String>>> result = new ArrayList<>();
-        List<YoutubeData> list = new ArrayList<>();
-        List<String> urlList = new ArrayList<>();
+        List<YoutubeData> list;
+        List<String> urlList;
         list = getUrlList();
-        List<String> lst = new ArrayList<>();
         for (YoutubeData yd : list) {
             urlList = Collections.singletonList(yd.getUrl());
-//         System.out.println(result);
-          result =   getviData1(urlList);
-
+            result = getviData1(urlList);
         }
         return result;
     }
 
- //GET YOUTUBE CHANNEL NOTIFICATION
-
-
-    public static List<YoutubeData> getUrlList(){
+    // GET YOUTUBE CHANNEL NOTIFICATION
+    public static List<YoutubeData> getUrlList() {
         DatabasePostgres db = new DatabasePostgres();
         List<YoutubeData> list = new ArrayList<>();
-        list =  db.getUrlList();
+        list = db.getUrlList();
 
         return list;
 
@@ -224,11 +220,11 @@ public class YoutubeDownload {
             int count = 0;
             VideoDetails vd = new VideoDetails();
 
-            System.out.println("Title: " + video.getTitle());
+            /*System.out.println("Title: " + video.getTitle());
             System.out.println("URL: " + video.getUrl());
             System.out.println("Thumbnail: " + video.getThumbnail());
             System.out.println("video" + video.getReleaseDate());
-            System.out.println(name);
+            System.out.println(name);*/
             video.setChannalName(name);
 //            System.out.println();
             vList.add(video);
