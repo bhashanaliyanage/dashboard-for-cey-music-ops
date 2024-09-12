@@ -720,6 +720,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         // rctArtistReports.setVisible(false);
         rctIngests.setVisible(false);
         rctManualClaims.setVisible(false);
+        rctYTM.setVisible(false);
 
         selector.setVisible(true);
     }

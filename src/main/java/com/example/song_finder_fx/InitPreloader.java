@@ -127,9 +127,10 @@ public class InitPreloader implements Initializable {
 
             // updateLocation = versionDetailsNew.getLocation();
             // versionDetailsNew.getDetails()
-            Platform.runLater(() -> System.out.println("releaseInfo.version = " + releaseInfo.version));
-            Main.versionInfo.setServerVersion(releaseInfo.version, releaseInfo.releaseNotes);
-
+            if (releaseInfo != null) {
+                Platform.runLater(() -> System.out.println("releaseInfo.version = " + releaseInfo.version));
+                Main.versionInfo.setServerVersion(releaseInfo.version, releaseInfo.releaseNotes);
+            }
         });
 
         Thread loadScenes = new Thread(() -> {
