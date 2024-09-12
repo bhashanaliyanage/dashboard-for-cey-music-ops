@@ -49,17 +49,17 @@ import java.util.stream.Stream;
 
 public class UIController implements com.example.song_finder_fx.Constants.UINode {
 
-    @FXML
-    public VBox sideVBox;
-
-    public static VBox sideVBoxStatic;
-
     private final Search search = new Search();
 
+    static File directory;
 
-    //<editor-fold desc="Variables">
+    public BorderPane borderpane;
+
+    File destination;
+
     //<editor-fold desc="TextArea">
     public TextArea textArea;
+
     //</editor-fold>
 
     //<editor-fold desc="Button">
@@ -77,6 +77,12 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public ImageView ProgressView;
     public ImageView imgMediaPico;
     //</editor-fold>
+
+    //<editor-fold desc="HBoxes">
+    public static HBox btnYouTubeMonitoringStatic;
+
+    @FXML
+    public HBox btnYouTubeMonitoring;
 
     public HBox btnSeachSongs;
 
@@ -97,6 +103,11 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     //<editor-fold desc="VBox">
+    public static VBox sideVBoxStatic;
+
+    @FXML
+    public VBox sideVBox;
+
     public VBox textAreaVbox;
 
     @FXML
@@ -156,15 +167,21 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     //<editor-fold desc="Rectangle">
-    static File directory;
-    public BorderPane borderpane;
+    @FXML
+    public Rectangle rctYTM;
+
     public Rectangle rctIngests;
-    File destination;
+
     public Rectangle rctManualClaims;
+
     public Rectangle rctSearchSongs;
+
     // public Rectangle rctCollectSongs;
+
     public Rectangle rctRevenue;
+
     // public Rectangle rctArtistReports;
+    //</editor-fold>
 
     public static Label lblUserEmailAndUpdateStatic;
 
@@ -184,19 +201,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     public static HBox btnSongListStatic;
 
-    public static void blankSidePanel() {
-        try {
-            Node node2 = SceneController.loadLayout("layouts/sidepanel-blank.fxml");
-            sideVBoxStatic.getChildren().setAll(node2);
-        } catch (IOException e) {
-            System.out.println("Unable to load side panel");
-        }
-    }
-
-    //</editor-fold>
-    //</editor-fold>
-
-    @FXML
     public void initialize() throws SQLException {
         System.out.println("Initializing UI...");
 
@@ -216,6 +220,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         btnSongListStatic = btnSongList;
         lblDatabaseStatusStatic = lblDatabaseStatus;
         lblSongListSubStatic = lblSongListSub;
+        btnYouTubeMonitoringStatic = btnYouTubeMonitoring;
 
         // Loading user
         loadUser();
@@ -224,6 +229,36 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
         updateApplication();
     }
+
+    @FXML
+    public void onYTMBtnClick() {
+        try {
+            Node node = SceneController.loadLayout("layouts/youtube_monitoring/youtube_monitoring.fxml");
+
+            // Load YouTube Monitoring View
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(node);
+
+            // Set SidePanel
+            blankSidePanel();
+
+            // Change Selector
+            changeSelectorTo(rctYTM);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Something went wrong while trying to load the YouTube Monitoring View.", e.toString());
+        }
+    }
+
+    public static void blankSidePanel() {
+        try {
+            Node node2 = SceneController.loadLayout("layouts/sidepanel-blank.fxml");
+            sideVBoxStatic.getChildren().setAll(node2);
+        } catch (IOException e) {
+            System.out.println("Unable to load side panel");
+        }
+    }
+
+    @FXML
 
     private void updateApplication() {
         Thread thread = new Thread(() -> {
@@ -328,6 +363,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 btnManualClaimsStatic.setDisable(false);
                 btnSettingsStatic.setDisable(false);
                 btnSongListStatic.setDisable(false);
+                btnYouTubeMonitoringStatic.setDisable(false);
 
                 mainVBoxStatic.setDisable(false);
             }

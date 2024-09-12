@@ -287,7 +287,7 @@ public class InitPreloader implements Initializable {
                 leftVBox.setMinWidth(293);
                 hboxAbout.setVisible(true);
                 lblSearch.setVisible(true);
-                lblSearchNCollect.setVisible(true);
+                // lblSearchNCollect.setVisible(true);
                 lblRevenueAnalysis.setVisible(true);
                 lblArtistReports.setVisible(true);
                 lblSettings.setVisible(true);

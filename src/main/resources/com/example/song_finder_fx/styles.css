@@ -114,13 +114,14 @@
 }
 
 .button_inside_green:hover {
-    -fx-background-color: '#4d8d69';
+    -fx-background-color: '#71D09A';
     -fx-background-radius: 7;
     -fx-border-radius: 7;
 }
 
 .button_inside_green:pressed {
-    -fx-background-color: '#7de6ab';
+    -fx-background-color: '#69C08F';
+    -fx-text-fill: '#FFFFFF';
     -fx-background-radius: 7;
     -fx-border-radius: 7;
 }
