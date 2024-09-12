@@ -116,20 +116,6 @@ public class ControllerManualClaimEdit {
         }
     }
 
-    /*@FXML
-    void onChangeImageClicked(MouseEvent event) throws IOException {
-        Scene scene = SceneController.getSceneFromEvent(event);
-        File file = Main.browseForImage(scene.getWindow());
-        if (file != null) {
-            // Covert user input to a Java BufferedImage
-            BufferedImage bufferedImage = ImageIO.read(file);
-            // Resize user input to preview size
-            BufferedImage previewImage = ImageProcessor.resizeImage(210, 210, bufferedImage);
-            // Convert BufferedImage to JavaFX image and set it into user interface
-            imgPreview.setImage(SwingFXUtils.toFXImage(previewImage, null));
-        }
-    }*/
-
     @FXML
     public void onChangeImageClicked(MouseEvent event) throws IOException, SQLException {
         Scene scene = SceneController.getSceneFromEvent(event);

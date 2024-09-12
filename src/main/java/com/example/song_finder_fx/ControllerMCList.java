@@ -32,6 +32,10 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class ControllerMCList {
 
@@ -77,7 +81,14 @@ public class ControllerMCList {
     private final List<Node> allClaimEntries = new ArrayList<>();
 
     private volatile Thread threadValidation;
+
     private volatile Thread threadArtworks;
+
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    private ScheduledFuture<?> debounceFuture;
+
+    private static final long DEBOUNCE_DELAY = 300; // milliseconds
 
     @FXML
     public void initialize() throws SQLException, IOException {
@@ -93,7 +104,7 @@ public class ControllerMCList {
 
         Task<Void> taskGetManualClaims = getTaskLoadManualClaims();
 
-        taskGetManualClaims.setOnSucceeded(event -> runValidationAndArtworkThreads());
+        taskGetManualClaims.setOnSucceeded(event -> debouncedRunValidationAndArtworkThreads());
 
         Thread threadGetManualClaims = new Thread(taskGetManualClaims);
         threadGetManualClaims.start();
@@ -132,6 +143,14 @@ public class ControllerMCList {
                 return null;
             }
         };
+    }
+
+    private void debouncedRunValidationAndArtworkThreads() {
+        if (debounceFuture != null) {
+            debounceFuture.cancel(false);
+        }
+
+        debounceFuture = scheduler.schedule(this::runValidationAndArtworkThreads, DEBOUNCE_DELAY, TimeUnit.MILLISECONDS);
     }
 
     private void runValidationAndArtworkThreads() {
@@ -245,7 +264,7 @@ public class ControllerMCList {
         updatePaginationControls();
 
         // Run validation and artwork threads for the current page
-        runValidationAndArtworkThreads();
+        debouncedRunValidationAndArtworkThreads();
     }
 
     private void updatePaginationControls() {
