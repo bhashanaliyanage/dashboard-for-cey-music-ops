@@ -143,19 +143,37 @@ public class YoutubeDownload {
 
     //Get urlList from database  Type 2 Urls
     //GET TV CHANNEL PROGRAM LIST
- public static void main(String[] args) {
-     List<List<Map<String, String>>> result = new ArrayList<>();
-     List<YoutubeData> list = new ArrayList<>();
-     List<String> urlList = new ArrayList<>();
-        list = getUrlList();
-     List<String> lst = new ArrayList<>();
-     for (YoutubeData yd : list) {
-         urlList = Collections.singletonList(yd.getUrl());
-//         System.out.println(result);
-         getviData1(urlList);
 
-     }
+
+ public static void main(String[] args) {
+
+
+//     List<List<Map<String, String>>> result = new ArrayList<>();
+//     List<YoutubeData> list = new ArrayList<>();
+//     List<String> urlList = new ArrayList<>();
+//        list = getUrlList();
+//     List<String> lst = new ArrayList<>();
+//     for (YoutubeData yd : list) {
+//         urlList = Collections.singletonList(yd.getUrl());
+////         System.out.println(result);
+//         getviData1(urlList);
+//
+//     }
  }
+    public static List<List<Map<String, String>>> getTypeTvProgramLlist() {
+        List<List<Map<String, String>>> result = new ArrayList<>();
+        List<YoutubeData> list = new ArrayList<>();
+        List<String> urlList = new ArrayList<>();
+        list = getUrlList();
+        List<String> lst = new ArrayList<>();
+        for (YoutubeData yd : list) {
+            urlList = Collections.singletonList(yd.getUrl());
+//         System.out.println(result);
+          result =   getviData1(urlList);
+
+        }
+        return result;
+    }
 
  //GET YOUTUBE CHANNEL NOTIFICATION
 
