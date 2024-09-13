@@ -157,10 +157,15 @@ public class YoutubeDownload {
     List<String> urlList = new ArrayList<>();
     for (YoutubeData yd : youList) {
         urlList = Collections.singletonList(yd.getUrl());
-        li = getvd(urlList);
-        System.out.println(li);
+        List<List<Map<String, String>>> vdData = getvd(urlList); // Get data from getvd method
+
+        li.addAll(vdData);
+
+//        li = getvd(urlList);
+//        System.out.println(li);
     }
 
+        System.out.println(li+" this is the retuned list");
     }
 
     public List<List<Map<String, String>>> getProgramListByChannel() {
