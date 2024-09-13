@@ -161,6 +161,20 @@ public class YoutubeDownload {
     }
 
  }
+
+ public List<List<Map<String, String>>> getProgramListByChannel(){
+     List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
+     List<YoutubeData> youList =  new ArrayList<>();
+     youList = youList();
+     List<String> urlList = new ArrayList<>();
+     for (YoutubeData yd : youList) {
+         urlList = Collections.singletonList(yd.getUrl());
+         li = getvd(urlList);
+         System.out.println(li);
+     }
+
+     return li;
+ }
  public static  List<YoutubeData> youList(){
      DatabasePostgres db = new DatabasePostgres();
      List<YoutubeData> list = new ArrayList<>();
