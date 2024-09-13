@@ -24,13 +24,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class YoutubeDownload {
 
-    public static void downloadAudio(String url, String fileLocation, String fileName) throws IOException, InterruptedException {
+    public static boolean downloadAudio(String url, String fileLocation, String fileName) throws IOException, InterruptedException {
         String file = fileLocation + "\\" + fileName;
-        downloadAudioOnly(url, file);
-
-    }
-
-    public static void downloadAudioOnly(String url, String file) throws IOException, InterruptedException {
         String nodeScriptPath = "libs/jdown.js";
 
         System.out.println("Downloading audio from: " + url);
@@ -49,8 +44,44 @@ public class YoutubeDownload {
 
         int exitCode = process.waitFor();
 
+        boolean status;
+
         if (exitCode == 0) {
             System.out.println("Audio download script executed successfully.");
+            status = true;
+        } else {
+            System.out.println("Audio download script execution failed.");
+            status = false;
+        }
+
+        return status;
+    }
+
+    // Made this inline cuz no need of two methods. Might delete later.
+    public static boolean downloadAudioOnly(String url, String file) throws IOException, InterruptedException {
+        String nodeScriptPath = "libs/jdown.js";
+
+        System.out.println("Downloading audio from: " + url);
+        System.out.println("Saving downloaded audio as: " + file);
+
+        ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
+        Process process = processBuilder.start();
+
+        // Read and print output
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String finalLine = line;
+            Platform.runLater(() -> System.out.println(finalLine));
+        }
+
+        int exitCode = process.waitFor();
+
+        boolean status;
+
+        if (exitCode == 0) {
+            System.out.println("Audio download script executed successfully.");
+            status = true;
         } else {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -59,7 +90,10 @@ public class YoutubeDownload {
                 alert.setContentText("Error Downloading Audio");
                 Platform.runLater(alert::showAndWait);
             });
+            status = false;
         }
+
+        return status;
     }
 
     public static void trimAudio(String filePath, String outputPath, String startTime, String EndTime) throws IOException, InterruptedException {
@@ -176,7 +210,7 @@ public class YoutubeDownload {
     // GET YOUTUBE CHANNEL NOTIFICATION
     public static List<YoutubeData> getUrlList() {
         DatabasePostgres db = new DatabasePostgres();
-        List<YoutubeData> list = new ArrayList<>();
+        List<YoutubeData> list;
         list = db.getUrlList();
 
         return list;
@@ -208,13 +242,12 @@ public class YoutubeDownload {
     }
 
     public static List<VideoDetails> getYou(String name) {
-//		 String playlistUrl = "https://www.youtube.com/playlist?list=PLxlWBAWnGBcdKoHbqfALcO0mHvfMpzNF4";
-        String playlistUrl = name;
-//		 String playlistUrl = "https://www.youtube.com/@LakaiSikai/videos";
+        //	String playlistUrl = "https://www.youtube.com/playlist?list=PLxlWBAWnGBcdKoHbqfALcO0mHvfMpzNF4";
+        //	String playlistUrl = "https://www.youtube.com/@LakaiSikai/videos";
 
         List<VideoDetails> vList = new ArrayList<VideoDetails>();
 
-        List<VideoDetails> playlistVideos = getPlaylistVideos(playlistUrl);
+        List<VideoDetails> playlistVideos = getPlaylistVideos(name);
 
         for (VideoDetails video : playlistVideos) {
             int count = 0;

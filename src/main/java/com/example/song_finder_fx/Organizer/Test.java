@@ -11,21 +11,20 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
-        // DatabasePostgres.refreshSummaryTable(7, 2024);
+        DatabasePostgres.refreshSummaryTable(6, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
-        testBulkReporting();
+        // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
         // getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_mahesh_vithana_edit.pdf");
         // testArtistReportsNew();
-        testNewArtistReportPDF();
+        // testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
@@ -216,29 +215,6 @@ public class Test {
         report = revenueReportController.calculateRevenue(includeTerritoryAndDSPBreakdown);
 
         return report;
-    }
-
-    private static void testStoreIngests() throws SQLException {
-        File file = new File("C:\\Users\\bhash\\Downloads\\Catalog Ingestion CSV Downloads\\PRK-CEY-001-004.csv");
-        IngestController ingestController = new IngestController();
-        String status = ingestController.insertIngest("test", LocalDate.now(), file);
-        System.out.println("\nImport Status: " + status);
-    }
-
-    private static void testArchivedManualClaims() throws SQLException {
-        List<ManualClaimTrack> archivedManualClaims;
-
-        LocalDate startDate = LocalDate.of(2024, 5, 1);
-        LocalDate endDate = LocalDate.of(2024, 5, 30);
-
-        archivedManualClaims = DatabasePostgres.getArchivedManualClaims(startDate, endDate);
-
-        System.out.println("\nTotal: " + archivedManualClaims.size());
-        System.out.println("\n");
-
-        for (ManualClaimTrack track : archivedManualClaims) {
-            System.out.println("Name: " + track.getTrackName());
-        }
     }
 
     private static void testDashboard() throws SQLException {

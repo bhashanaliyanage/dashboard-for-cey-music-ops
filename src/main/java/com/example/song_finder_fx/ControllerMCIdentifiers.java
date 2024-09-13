@@ -188,6 +188,7 @@ public class ControllerMCIdentifiers {
         final String[] ingestFileName = {"ingest.csv"};
         Map<String, String> downloadedVideos = new HashMap<>();
         Map<String, String> downloadedFileNames = new HashMap<>();
+        List<String> errorLog = new ArrayList<>();
 
         // Getting total claims for the loop
         int totalClaims = ControllerMCList.finalManualClaims.size();
@@ -208,7 +209,7 @@ public class ControllerMCIdentifiers {
             final String[] upc = {upcs.get(claimID).getText()};
             String catNo = claimCNumbers.get(claimID).getText();
 
-            System.out.println("Checking Claim: " + (claimID + 1));
+            System.out.println("Checking Claim: " + (claimID + 1) + " of " + totalClaims);
 
             // Validating UPCs
             if (upc[0].isEmpty()) {
@@ -333,10 +334,15 @@ public class ControllerMCIdentifiers {
                             Platform.runLater(() -> lblProcess.setText("Using existing audio for: " + albumTitle));
                         } else {
                             Platform.runLater(() -> lblProcess.setText("Downloading audio for: " + albumTitle));
-                            downloadAudio(claimID, fileName, fileLocation);
-                            // Store the downloaded file location
-                            downloadedVideos.put(youtubeID, fileLocation[0]);
-                            downloadedFileNames.put(fileLocation[0], fileName);
+                            boolean status = downloadAudio(claimID, fileName, fileLocation);
+                            if (!status) {
+                                String errorMessage = "Failed to download audio for: " + albumTitle + " (YouTube ID: " + youtubeID + ")";
+                                errorLog.add(errorMessage);
+                            } else {
+                                // Store the downloaded file location
+                                downloadedVideos.put(youtubeID, fileLocation[0]);
+                                downloadedFileNames.put(fileLocation[0], fileName);
+                            }
                         }
 
                         // Trimming audio if needed and copying it to the sub-folder created
@@ -366,6 +372,18 @@ public class ControllerMCIdentifiers {
                     }
 
                     csvWriter.close();
+
+                    if (!errorLog.isEmpty()) {
+                        Platform.runLater(() -> {
+                            String errorSummary = String.join("\n", errorLog);
+                            AlertBuilder.sendErrorAlert(
+                                    "Ingest Process Errors",
+                                    "Some errors occurred during the ingest process",
+                                    "The following errors were encountered:\n\n" + errorSummary
+                            );
+                        });
+                    }
+
                     return null;
                 }
             };
@@ -426,21 +444,23 @@ public class ControllerMCIdentifiers {
         }
     }
 
-    private static void downloadAudio(int claimID, String fileName, String[] fileLocation) {
+    private static boolean downloadAudio(int claimID, String fileName, String[] fileLocation) {
         String url = "";
         String fileLocation1 = "";
+
+        boolean status;
 
         try {
             url = ControllerMCList.finalManualClaims.get(claimID).getYouTubeURL();
             Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audio");
             fileLocation1 = tempDir.toString();
-            YoutubeDownload.downloadAudio(url, fileLocation1, fileName);
+            status = YoutubeDownload.downloadAudio(url, fileLocation1, fileName);
             fileLocation[0] = fileLocation1;
         } catch (IOException | InterruptedException e) {
-            String finalUrl = url;
-            String finalFileLocation = fileLocation1;
-            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Error Downloading Audio", String.format("YouTube URL: %s\nTemporary File Path: %s\nException: %s", finalUrl, finalFileLocation, e)));
+            status = false;
         }
+
+        return status;
     }
 
     @NotNull

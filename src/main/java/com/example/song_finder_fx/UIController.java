@@ -301,7 +301,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                     Platform.runLater(() -> UIController.lblSongListSubStatic.setText(songList.getFirst().getISRC()));
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> e.printStackTrace());
+                Platform.runLater(e::printStackTrace);
             }
 
         });
@@ -378,6 +378,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 btnManualClaimsStatic.setDisable(true);
                 btnSettingsStatic.setDisable(true);
                 btnSongListStatic.setDisable(true);
+                btnYouTubeMonitoringStatic.setDisable(true);
 
                 mainVBoxStatic.setDisable(true);
             } catch (Exception e) {
