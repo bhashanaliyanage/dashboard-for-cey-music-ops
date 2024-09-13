@@ -3660,7 +3660,7 @@ public List<YoutubeData> getUrlList() {
 
     public boolean insertYoutubechannelType1(YoutubeData you){
     Connection con = getConn();
-    String sql  = "INSERT INTO public.youtube(type, name, url)VALUES (?, ?, ?);";
+    String sql  = "INSERT INTO public.youtube(type, name, url)VALUES (?, ?, ?) ";
     boolean bl = false;
     try {
     PreparedStatement ps  =  con.prepareStatement(sql);

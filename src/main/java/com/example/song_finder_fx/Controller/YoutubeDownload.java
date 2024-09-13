@@ -150,16 +150,16 @@ public class YoutubeDownload {
     //Get urlList from database  Type 1 Urls
     //GET YOUTUBE CHANNEL LIST
     public static void main(String[] args) {
-//     List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
-//
-//    List<YoutubeData> youList =  new ArrayList<>();
-//    youList = youList();
-//    List<String> urlList = new ArrayList<>();
-//    for (YoutubeData yd : youList) {
-//        urlList = Collections.singletonList(yd.getUrl());
-//        li = getvd(urlList);
-//        System.out.println(li);
-//    }
+     List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
+
+    List<YoutubeData> youList =  new ArrayList<>();
+    youList = youList();
+    List<String> urlList = new ArrayList<>();
+    for (YoutubeData yd : youList) {
+        urlList = Collections.singletonList(yd.getUrl());
+        li = getvd(urlList);
+        System.out.println(li);
+    }
 
     }
 
