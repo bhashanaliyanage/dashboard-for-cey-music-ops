@@ -150,22 +150,22 @@ public class YoutubeDownload {
     //Get urlList from database  Type 1 Urls
     //GET YOUTUBE CHANNEL LIST
     public static void main(String[] args) {
-     List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
-
-    List<YoutubeData> youList =  new ArrayList<>();
-    youList = youList();
-    List<String> urlList = new ArrayList<>();
-    for (YoutubeData yd : youList) {
-        urlList = Collections.singletonList(yd.getUrl());
-        List<List<Map<String, String>>> vdData = getvd(urlList);
-
-        li.addAll(vdData);
+//     List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
+//
+//    List<YoutubeData> youList =  new ArrayList<>();
+//    youList = youList();
+//    List<String> urlList = new ArrayList<>();
+//    for (YoutubeData yd : youList) {
+//        urlList = Collections.singletonList(yd.getUrl());
+//        List<List<Map<String, String>>> vdData = getvd(urlList);
+//
+//        li.addAll(vdData);
 
 //        li = getvd(urlList);
 //        System.out.println(li);
-    }
-
-        System.out.println(li+" this is the retuned list");
+        List<List<Map<String, String>>> result = new ArrayList<>();
+                result = getTypeTvProgramLlist();
+        System.out.println( result);
     }
 
     public List<List<Map<String, String>>> getProgramListByChannel() {
@@ -398,7 +398,9 @@ public class YoutubeDownload {
         for (YoutubeData yd : list) {
             urlList = Collections.singletonList(yd.getUrl());
 //         System.out.println(result);
-            result = getviData1(urlList);
+         List<List<Map<String, String>>> result1 = getviData1(urlList);
+
+            result.addAll(result1);
 
         }
         return result;
