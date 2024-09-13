@@ -3,6 +3,16 @@ package com.example.song_finder_fx.Model;
 public class YoutubeData {
     private String url;
     private String name;
+    private int type;
+
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 
     public String getUrl() {
         return url;

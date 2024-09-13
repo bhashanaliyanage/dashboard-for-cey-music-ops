@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -36,35 +37,35 @@ public class YoutubeDownload {
     }
 
     public static void downloadAudioOnly(String url, String file) throws IOException, InterruptedException {
-            String nodeScriptPath = "libs/jdown.js";
+        String nodeScriptPath = "libs/jdown.js";
 
-            System.out.println("url = " + url);
-            System.out.println("file = " + file);
+        System.out.println("url = " + url);
+        System.out.println("file = " + file);
 
-            ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
-            Process process = processBuilder.start();
+        ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
+        Process process = processBuilder.start();
 
-            // Read and print output
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String finalLine = line;
-                Platform.runLater(() -> System.out.println(finalLine));
-            }
+        // Read and print output
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String finalLine = line;
+            Platform.runLater(() -> System.out.println(finalLine));
+        }
 
-            int exitCode = process.waitFor();
+        int exitCode = process.waitFor();
 
-            if (exitCode == 0) {
-                System.out.println("Audio download script executed successfully.");
-            } else {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("An error occurred");
-                    alert.setContentText("Error Downloading Audio");
-                    Platform.runLater(alert::showAndWait);
-                });
-            }
+        if (exitCode == 0) {
+            System.out.println("Audio download script executed successfully.");
+        } else {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("An error occurred");
+                alert.setContentText("Error Downloading Audio");
+                Platform.runLater(alert::showAndWait);
+            });
+        }
     }
 
     public static void trimAudio(String filePath, String outputPath, String startTime, String EndTime) throws IOException, InterruptedException {
@@ -148,65 +149,66 @@ public class YoutubeDownload {
 
     //Get urlList from database  Type 1 Urls
     //GET YOUTUBE CHANNEL LIST
- public static void main(String[] args) {
-     List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
+    public static void main(String[] args) {
+//     List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
+//
+//    List<YoutubeData> youList =  new ArrayList<>();
+//    youList = youList();
+//    List<String> urlList = new ArrayList<>();
+//    for (YoutubeData yd : youList) {
+//        urlList = Collections.singletonList(yd.getUrl());
+//        li = getvd(urlList);
+//        System.out.println(li);
+//    }
 
-    List<YoutubeData> youList =  new ArrayList<>();
-    youList = youList();
-    List<String> urlList = new ArrayList<>();
-    for (YoutubeData yd : youList) {
-        urlList = Collections.singletonList(yd.getUrl());
-        li = getvd(urlList);
-        System.out.println(li);
     }
 
- }
+    public List<List<Map<String, String>>> getProgramListByChannel() {
+        List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
+        List<YoutubeData> youList = new ArrayList<>();
+        youList = youList();
+        List<String> urlList = new ArrayList<>();
+        for (YoutubeData yd : youList) {
+            urlList = Collections.singletonList(yd.getUrl());
+            li = getvd(urlList);
 
- public List<List<Map<String, String>>> getProgramListByChannel(){
-     List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
-     List<YoutubeData> youList =  new ArrayList<>();
-     youList = youList();
-     List<String> urlList = new ArrayList<>();
-     for (YoutubeData yd : youList) {
-         urlList = Collections.singletonList(yd.getUrl());
-         li = getvd(urlList);
-         System.out.println(li);
-     }
+        }
 
-     return li;
- }
- public static  List<YoutubeData> youList(){
-     DatabasePostgres db = new DatabasePostgres();
-     List<YoutubeData> list = new ArrayList<>();
-     list =  db.getUrlList1();
+        return li;
+    }
 
-     return list;
- }
+    public static List<YoutubeData> youList() {
+        DatabasePostgres db = new DatabasePostgres();
+        List<YoutubeData> list = new ArrayList<>();
+        list = db.getUrlList1();
 
- //GET youtube VIDEO LIST  | GET TYPE 2 LIST | ONLY CHANNLE NAME LIST
- public static List<List<Map<String, String>>> getvd(List<String> list) {
-     List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
-     List<VideoDetails> vdlist = new ArrayList<VideoDetails>();
+        return list;
+    }
 
-     for (String s : list) {
-         List<VideoDetails> vd = new ArrayList<VideoDetails>();
-         System.out.println(s);
-         vd = dataList(s);
-         List<Map<String, String>> maplist = new ArrayList<>();
+    //GET youtube VIDEO LIST  | GET TYPE 2 LIST | ONLY CHANNLE NAME LIST
+    public static List<List<Map<String, String>>> getvd(List<String> list) {
+        List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
+        List<VideoDetails> vdlist = new ArrayList<VideoDetails>();
 
-         for (VideoDetails v : vd) {
+        for (String s : list) {
+            List<VideoDetails> vd = new ArrayList<VideoDetails>();
+            System.out.println(s);
+            vd = dataList(s);
+            List<Map<String, String>> maplist = new ArrayList<>();
 
-             Map<String, String> map = new HashMap<>();
-             map.put("Title", v.getTitle());
-             map.put("Url", v.getUrl());
-             map.put("Thumbnail", v.getThumbnail());
-             map.put("releaseDate", v.getReleaseDate());
-             maplist.add(map);
-         }
-         li.add(maplist);
-     }
-     return li;
- }
+            for (VideoDetails v : vd) {
+
+                Map<String, String> map = new HashMap<>();
+                map.put("Title", v.getTitle());
+                map.put("Url", v.getUrl());
+                map.put("Thumbnail", v.getThumbnail());
+                map.put("releaseDate", v.getReleaseDate());
+                maplist.add(map);
+            }
+            li.add(maplist);
+        }
+        return li;
+    }
 
     public static List<VideoDetails> dataList(String list) {
         YouDownload you = new YouDownload();
@@ -234,7 +236,7 @@ public class YoutubeDownload {
         return vList;
     }
 
-    public static List<VideoDetails> getRes( YouDownload you) {
+    public static List<VideoDetails> getRes(YouDownload you) {
         StringBuilder result = new StringBuilder();
         List<String> result1 = new ArrayList<>();
         List<VideoDetails> vd = new ArrayList<VideoDetails>();
@@ -263,9 +265,9 @@ public class YoutubeDownload {
 
 //                    String dataOrMonth = extractSinhalaSubstring(publishedTimeText);
                     System.out.println(publishedTimeText);
-                    String dataOrMonth = publishedTimeText.substring(0,9);
+                    String dataOrMonth = publishedTimeText.substring(0, 9);
                     byte[] bytes1 = dataOrMonth.getBytes(StandardCharsets.UTF_8);
-                    System.out.println(dataOrMonth+"data or month");
+                    System.out.println(dataOrMonth + "data or month");
 //                    String dataOrMonth = new String(publishedTimeText.substring(0, 2).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
 //                    System.out.println("Extracted: " + dataOrMonth);
 //                  //test area
@@ -276,7 +278,6 @@ public class YoutubeDownload {
 //                    }
 
 
-
 //                    byte[] bytes = publishedTimeText.getBytes(StandardCharsets.UTF_8);
 //                    byte[] bytes = {-61, -96, -62, -74, -62, -81, -61, -96, -62, -73, -30, -128, -103, -61, -96, -62, -74, -62, -79, 32, 51,};
                     byte[] bytes = {-61, -96, -62, -74, -62, -81, -61, -96, -62, -73, -30, -128, -103, -61, -96, -62, -74, -62, -79,};
@@ -285,16 +286,14 @@ public class YoutubeDownload {
                     System.out.println("Reconstructed: " + reconstructed);
 
 
-
-
                     String datenumber = "";
                     Pattern pattern = Pattern.compile("\\d+");
                     Matcher matcher = pattern.matcher(publishedTimeText);
-                    System.out.println(dataOrMonth+"date or month");
+                    System.out.println(dataOrMonth + "date or month");
 
                     // Check if a number is found and extract it
                     if (matcher.find()) {
-                         datenumber = matcher.group();  // Extract the first number found
+                        datenumber = matcher.group();  // Extract the first number found
                         System.out.println(datenumber + " - Extracted number");
                     } else {
                         System.out.println("No number found in the text.");
@@ -303,7 +302,7 @@ public class YoutubeDownload {
                     VideoDetails vd1 = new VideoDetails();
 
 //                    if (dataOrMonth.equals("දින") || dataOrMonth.equals("පැය")) {
-                        if (Arrays.equals(bytes, bytes1)) {
+                    if (Arrays.equals(bytes, bytes1)) {
                         System.out.println("This will return");
 
                         Date uploadDate = calculateUploadDate(publishedTimeText);
@@ -393,18 +392,18 @@ public class YoutubeDownload {
         for (YoutubeData yd : list) {
             urlList = Collections.singletonList(yd.getUrl());
 //         System.out.println(result);
-          result =   getviData1(urlList);
+            result = getviData1(urlList);
 
         }
         return result;
     }
 
- //GET YOUTUBE CHANNEL url list from database
+    //GET YOUTUBE CHANNEL url list from database
 
-    public static List<YoutubeData> getUrlList(){
+    public static List<YoutubeData> getUrlList() {
         DatabasePostgres db = new DatabasePostgres();
         List<YoutubeData> list = new ArrayList<>();
-        list =  db.getUrlList();
+        list = db.getUrlList();
 
         return list;
 
@@ -554,5 +553,24 @@ public class YoutubeDownload {
             return "no date found";
         }
     }
+
+    //Insert youtube channel to list | Type 1 and Type 2
+    public boolean addChannelToDatabase(YoutubeData channel) {
+        DatabasePostgres db = new DatabasePostgres();
+        boolean bl = false;
+       bl= db.insertYoutubechannelType1(channel);
+
+        return bl;
+    }
+
+    //Update Youtube channle List
+    public boolean updateYoutubechannelType1(YoutubeData you) {
+        DatabasePostgres db = new DatabasePostgres();
+        boolean bl = false;
+        bl = db.updateYoutubeChannel(you);
+        return bl;
+    }
+
+
 
 }
