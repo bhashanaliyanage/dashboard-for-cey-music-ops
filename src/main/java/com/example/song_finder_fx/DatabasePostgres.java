@@ -3676,13 +3676,13 @@ public List<YoutubeData> getUrlList() {
 
     public boolean updateYoutubeChannel(YoutubeData you) {
         Connection con = getConn();
-        String sql  = "UPDATE public.youtube SET type = ?, name = ? WHERE url = ?;";
+        String sql  = "UPDATE public.youtube SET type = ?, url = ? WHERE name = ? ";
         boolean bl = false;
         try {
             PreparedStatement ps  =  con.prepareStatement(sql);
             ps.setInt(1,you.getType());
-            ps.setString(2,you.getName());
-            ps.setString(3,you.getUrl());
+            ps.setString(2,you.getUrl());
+            ps.setString(3,you.getName());
             bl  = ps.executeUpdate() > 0 ? true: false;
         } catch (Exception e) {
             e.printStackTrace();
