@@ -1,5 +1,6 @@
 package com.example.song_finder_fx.Session;
 
+import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.OAuthAuthenticator;
 import com.example.song_finder_fx.Controller.OAuthGoogleAuthenticator;
 import com.example.song_finder_fx.DatabasePostgres;
@@ -40,13 +41,17 @@ public class UserSession {
     }
 
     // Private method to set privileges based on user role
-    public void setPrivilegesAndEmail(String username) throws SQLException {
-        this.user = DatabasePostgres.getUserData(username);
+    public void setPrivilegesAndEmail(String username) {
+        try {
+            this.user = DatabasePostgres.getUserData(username);
 
-        if (this.user == null) {
-            logout();
-        } else {
-            this.username = username;
+            if (this.user == null) {
+                logout();
+            } else {
+                this.username = username;
+            }
+        } catch (SQLException e) {
+            AlertBuilder.sendErrorAlert("Error", "Something went wrong when setting up the user", "Username: " + username + "\nException: " + e);
         }
     }
 

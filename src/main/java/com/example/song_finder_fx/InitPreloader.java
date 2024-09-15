@@ -5,10 +5,12 @@ import com.example.song_finder_fx.Controller.GitHubController;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Model.ReleaseInfo;
 import com.example.song_finder_fx.Model.Revenue;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -17,6 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -46,6 +49,10 @@ public class InitPreloader implements Initializable {
     public static boolean starting;
 
     public static Revenue revenue = new Revenue();
+
+    private static final double COLLAPSE_THRESHOLD = 1235;
+
+    private static final PauseTransition resizeTimer = new PauseTransition(Duration.millis(50));
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -115,18 +122,12 @@ public class InitPreloader implements Initializable {
 
             Platform.runLater(() -> lblLoadingg.setText(message[0]));
 
-            // ResultSet versionDetails = DatabaseMySQL.checkUpdates();
             String owner = "bhashanaliyanage";
             String repo = "dashboard-for-cey-music-ops";
             GitHubController controller = new GitHubController(owner, repo);
 
             // Check Update
             ReleaseInfo releaseInfo = controller.getLatestVersion();
-            // boolean updateAvailable = Main.versionInfo.updateAvailable();
-            // Updates versionDetailsNew = DatabasePostgres.checkUpdatesNew();        //Connection for Postgress
-
-            // updateLocation = versionDetailsNew.getLocation();
-            // versionDetailsNew.getDetails()
             if (releaseInfo != null) {
                 Platform.runLater(() -> System.out.println("releaseInfo.version = " + releaseInfo.version));
                 Main.versionInfo.setServerVersion(releaseInfo.version, releaseInfo.releaseNotes);
@@ -209,7 +210,7 @@ public class InitPreloader implements Initializable {
                 // Platform.runLater(() -> setupSystemTray(mainWindowStage));
 
             } catch (IOException e) {
-                e.printStackTrace();
+                Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Cannot load application", e.toString()));
             }
         }));
 
@@ -217,8 +218,10 @@ public class InitPreloader implements Initializable {
         databaseCheck.join();
         audioDatabaseCheck.start();
         audioDatabaseCheck.join();
+
         updatesCheck.start();
         updatesCheck.join();
+
         loadScenes.start();
         loadScenes.join();
         mainWindow.start();
@@ -240,10 +243,13 @@ public class InitPreloader implements Initializable {
         VBox leftVBox = (VBox) scene.lookup("#leftVBox");
         HBox hboxAbout = (HBox) scene.lookup("#hboxAbout");
         Label lblSearch = (Label) scene.lookup("#lblSearch");
-        Label lblSearchNCollect = (Label) scene.lookup("#lblSearchNCollect");
+        // Label lblSearchNCollect = (Label) scene.lookup("#lblSearchNCollect");
         Label lblRevenueAnalysis = (Label) scene.lookup("#lblRevenueAnalysis");
-        Label lblArtistReports = (Label) scene.lookup("#lblArtistReports");
+        // Label lblArtistReports = (Label) scene.lookup("#lblArtistReports");
         Label lblSettings = (Label) scene.lookup("#lblSettings");
+        Label lblMC = (Label) scene.lookup("#lblMC");
+        Label lblIngest = (Label) scene.lookup("#lblIngest");
+        Label lblYT = (Label) scene.lookup("#lblYT");
         VBox vboxSongList = (VBox) scene.lookup("#vboxSongList");
         VBox btnDatabaseCheck = (VBox) scene.lookup("#btnDatabaseCheck");
         VBox btnDatabaseCheck2 = (VBox) scene.lookup("#btnDatabaseCheck2");
@@ -263,47 +269,75 @@ public class InitPreloader implements Initializable {
             updateNotify.setStyle("-fx-text-fill: '#FEA82F'");
         }
 
-        setupResizeListener(mainWindowStage, leftVBox, hboxAbout, lblSearch, lblSearchNCollect, lblRevenueAnalysis, lblArtistReports, lblSettings, vboxSongList, btnDatabaseCheck, btnDatabaseCheck2);
+        setupResizeListener(mainWindowStage, leftVBox, hboxAbout, lblSearch, lblRevenueAnalysis, lblSettings, vboxSongList, btnDatabaseCheck, btnDatabaseCheck2, lblIngest, lblYT, lblMC);
     }
 
-    private static void setupResizeListener(Stage mainWindowStage, VBox leftVBox, HBox hboxAbout, Label lblSearch, Label lblSearchNCollect, Label lblRevenueAnalysis, Label lblArtistReports, Label lblSettings, VBox vboxSongList, VBox btnDatabaseCheck, VBox btnDatabaseCheck2) {
+    private static void setupResizeListener(Stage mainWindowStage, VBox leftVBox, HBox hboxAbout, Label lblSearch, Label lblRevenueAnalysis, Label lblSettings, VBox vboxSongList, VBox btnDatabaseCheck, VBox btnDatabaseCheck2, Label lblIngest, Label lblYT, Label lblMC) {
         mainWindowStage.widthProperty().addListener((obs, oldVal, newVal) -> {
-            if ((oldVal.intValue() > newVal.intValue()) && (newVal.intValue() <= 1235)) {
-                leftVBox.setPrefWidth(100);
-                leftVBox.setMinWidth(100);
+            /*if ((oldVal.intValue() > newVal.intValue()) && (newVal.intValue() <= COLLAPSE_THRESHOLD)) {
+                leftVBox.setPrefWidth(COLLAPSED_WIDTH);
+                leftVBox.setMinWidth(COLLAPSED_WIDTH);
                 hboxAbout.setVisible(false);
                 lblSearch.setVisible(false);
-                lblSearchNCollect.setVisible(false);
+                // lblSearchNCollect.setVisible(false);
                 lblRevenueAnalysis.setVisible(false);
-                lblArtistReports.setVisible(false);
+                // lblArtistReports.setVisible(false);
                 lblSettings.setVisible(false);
+                lblMC.setVisible(false);
+                lblIngest.setVisible(false);
+                lblYT.setVisible(false);
                 vboxSongList.setVisible(false);
                 btnDatabaseCheck.setVisible(false);
                 btnDatabaseCheck2.setVisible(false);
                 // borderPane.setLeft(UIController.mainNodes[5]);
             }
 
-            if ((oldVal.intValue() < newVal.intValue()) && (newVal.intValue() >= 1235)) {
-                leftVBox.setPrefWidth(293);
-                leftVBox.setMinWidth(293);
+            if ((oldVal.intValue() < newVal.intValue()) && (newVal.intValue() >= COLLAPSE_THRESHOLD)) {
+                leftVBox.setPrefWidth(EXPANDED_WIDTH);
+                leftVBox.setMinWidth(EXPANDED_WIDTH);
                 hboxAbout.setVisible(true);
                 lblSearch.setVisible(true);
                 // lblSearchNCollect.setVisible(true);
                 lblRevenueAnalysis.setVisible(true);
-                lblArtistReports.setVisible(true);
+                // lblArtistReports.setVisible(true);
                 lblSettings.setVisible(true);
+                lblMC.setVisible(true);
+                lblIngest.setVisible(true);
+                lblYT.setVisible(true);
                 vboxSongList.setVisible(true);
                 btnDatabaseCheck.setVisible(true);
                 btnDatabaseCheck2.setVisible(true);
                 // borderPane.setLeft(UIController.mainNodes[4]);
-            }
+            }*/
+            resizeTimer.setOnFinished(event -> updateLayout(newVal.doubleValue(), leftVBox, hboxAbout,
+                    lblSearch, lblRevenueAnalysis, lblSettings,
+                    vboxSongList, btnDatabaseCheck, btnDatabaseCheck2,
+                    lblIngest, lblYT, lblMC));
+            resizeTimer.playFromStart();
         });
     }
 
+    private static void updateLayout(double width, VBox leftVBox, HBox hboxAbout, Label lblSearch,
+                                     Label lblRevenueAnalysis, Label lblSettings, VBox vboxSongList,
+                                     VBox btnDatabaseCheck, VBox btnDatabaseCheck2, Label lblIngest,
+                                     Label lblYT, Label lblMC) {
+        boolean isExpanded = width >= COLLAPSE_THRESHOLD;
+
+        leftVBox.getStyleClass().remove(isExpanded ? "collapsed" : "expanded");
+        leftVBox.getStyleClass().add(isExpanded ? "expanded" : "collapsed");
+
+        setElementsVisibility(isExpanded, hboxAbout, lblSearch, lblRevenueAnalysis, lblSettings,
+                vboxSongList, btnDatabaseCheck, btnDatabaseCheck2, lblIngest, lblYT, lblMC);
+    }
+
+    private static void setElementsVisibility(boolean visible, Node... nodes) {
+        for (Node node : nodes) {
+            node.setVisible(visible);
+        }
+    }
+
     private void closeWindowEvent(WindowEvent windowEvent) {
-        Platform.runLater(() -> {
-            NotificationBuilder.displayTrayInfo("CeyMusic Dashboard", "CeyMusic Dashboard is minimized to system tray");
-        });
+        Platform.runLater(() -> NotificationBuilder.displayTrayInfo("CeyMusic Dashboard", "CeyMusic Dashboard is minimized to system tray"));
     }
 
     private String checkDatabaseConnection() {

@@ -1,3 +1,15 @@
+.expanded {
+    -fx-pref-width: 293;
+    -fx-min-width: 293;
+    -fx-transition: all 0.3s ease-out;
+}
+
+.collapsed {
+    -fx-pref-width: 100;
+    -fx-min-width: 100;
+    -fx-transition: all 0.3s ease-in;
+}
+
 .white-background{
     -fx-background-color: '#f3f3f3';
 }
