@@ -4,7 +4,6 @@ import com.example.song_finder_fx.Controller.*;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -34,7 +33,7 @@ public class ControllerYouTubeMonitoring {
     }
 
     @FXML
-    void onAddNewReport(ActionEvent event) {
+    void onAddNewReport() {
 
     }
 
@@ -46,6 +45,9 @@ public class ControllerYouTubeMonitoring {
     private void listChannels() {
         try {
             List<List<Map<String, String>>> list = YoutubeDownload.getTypeTvProgramLlist();
+            list.addAll(YoutubeDownload.getProgramListByChannel());
+            // List<List<Map<String, String>>> result = YoutubeDownload.getTypeTvProgramLlist();
+            // result.addAll(YoutubeDownload.getProgramListByChannel());
 
             int totalUploads = 0;
             Set<String> uniqueChannels = new HashSet<>();
@@ -65,11 +67,11 @@ public class ControllerYouTubeMonitoring {
                     String releaseDate = map.get("releaseDate");
 
                     System.out.println("title = " + title);
-                    String cleanedTitle = cleanAndFormatTitle(title);
                     BufferedImage thumbnailImage = ImageProcessor.getDownloadedImage(thumbnail);
                     Image convertedImage = SwingFXUtils.toFXImage(thumbnailImage, null);
 
                     Node node = SceneController.loadLayout("layouts/youtube_monitoring/youtube_monitoring_entry.fxml");
+                    // ImageView imgTitle = (ImageView) node.lookup("#imgTitle");
                     ImageView imgThumb = (ImageView) node.lookup("#imgThumb");
                     Label lblVideoTitle = (Label) node.lookup("#lblVideoTitle");
                     Label lblCName = (Label) node.lookup("#lblCName");
@@ -77,7 +79,8 @@ public class ControllerYouTubeMonitoring {
                     Label lblViewCount = (Label) node.lookup("#lblViewCount");
 
                     Platform.runLater(() -> {
-                        lblVideoTitle.setText(cleanedTitle);
+                        lblVideoTitle.setText(title);
+                        // imgTitle.setImage(Test.createImageFromText(title, "Iskoola Potha"));
                         lblCName.setText("Channel: Siyatha"); // TODO: Add Channel Name
                         lblDate.setText(releaseDate);
                         lblViewCount.setText("Views: N/A");
@@ -116,18 +119,4 @@ public class ControllerYouTubeMonitoring {
         return cleanedTitle;
     }
 
-    private String removeUnsupportedCharacters(String input) {
-        // Use StringBuilder for efficient string manipulation
-        StringBuilder cleaned = new StringBuilder();
-
-        for (int i = 0; i < input.length(); i++) {
-            char ch = input.charAt(i);
-            // Check if the character is within the Basic Multilingual Plane (BMP)
-            if (Character.isDefined(ch) && !Character.isISOControl(ch)) {
-                cleaned.append(ch); // Append supported characters
-            }
-        }
-
-        return cleaned.toString();
-    }
 }

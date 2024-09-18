@@ -8,7 +8,11 @@ import com.example.song_finder_fx.Session.UserSession;
 import com.example.song_finder_fx.Session.UserSummary;
 import com.itextpdf.layout.Document;
 import com.opencsv.exceptions.CsvValidationException;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,7 +21,7 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
-        DatabasePostgres.refreshSummaryTable(6, 2024);
+        // DatabasePostgres.refreshSummaryTable(6, 2024);
         // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
         // April 0.6305, 184.65
@@ -29,6 +33,73 @@ public class Test {
         // testDashboard();
         // UserSession us = new UserSession();
         // DatabasePostgres.changePassword("gimhaar", "admin");
+
+        // createImageFromText("මම Siyatha", "C:\\Users\\bhash\\Documents\\Test\\test.png", "Iskoola Pota");
+
+        /*String garbledText = "à·ƒà·'à¶ºà¶­ à¶­à¶»à·";
+        String unicodeText = attemptConversion(garbledText);
+        System.out.println(unicodeText);*/
+    }
+
+    public static Image createImageFromText(String text, String preferredFontName) {
+        int width = 350;
+        int height = 20;
+
+        // Create a buffered image
+        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        // Create a graphics object
+        Graphics2D g2d = bufferedImage.createGraphics();
+
+        // Set the background color
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, width, height);
+
+        // Find a suitable font
+        Font font = findSuitableFont(preferredFontName, text);
+        g2d.setFont(font.deriveFont(14f));  // Set font size to 24
+
+        // Set the text color
+        g2d.setColor(Color.BLACK);
+
+        // Enable anti-aliasing for smoother text
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // Draw the text
+        FontMetrics metrics = g2d.getFontMetrics();
+        int textWidth = metrics.stringWidth(text);
+        int textHeight = metrics.getHeight();
+        g2d.drawString(text, 0, height / 2 + textHeight / 4);
+
+        // Dispose the graphics object
+        g2d.dispose();
+
+        return SwingFXUtils.toFXImage(bufferedImage, null);
+    }
+
+    private static Font findSuitableFont(String preferredFontName, String text) {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        Font[] fonts = ge.getAllFonts();
+
+        // First, try the preferred font
+        for (Font font : fonts) {
+            if (font.getName().equals(preferredFontName) && font.canDisplayUpTo(text) == -1) {
+                System.out.println("Using preferred font: " + font.getName());
+                return font;
+            }
+        }
+
+        // If preferred font doesn't work, find any font that can display the text
+        for (Font font : fonts) {
+            if (font.canDisplayUpTo(text) == -1) {
+                System.out.println("Using font: " + font.getName());
+                return font;
+            }
+        }
+
+        // If no suitable font found, return a default font
+        System.out.println("No suitable font found. Using default.");
+        return new Font(Font.SANS_SERIF, Font.PLAIN, 12);
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {

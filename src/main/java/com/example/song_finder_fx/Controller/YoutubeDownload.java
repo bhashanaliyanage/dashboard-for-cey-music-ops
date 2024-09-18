@@ -13,7 +13,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -185,33 +184,58 @@ public class YoutubeDownload {
     //GET TV CHANNEL PROGRAM LIST
 
 
- public static void main(String[] args) {
+    public static void main(String[] args) {
+        //     List<List<Map<String, String>>> result = new ArrayList<>();
+        //     List<YoutubeData> list = new ArrayList<>();
+        //     List<String> urlList = new ArrayList<>();
+        //        list = getUrlList();
+        //     List<String> lst = new ArrayList<>();
+        //     for (YoutubeData yd : list) {
+        //         urlList = Collections.singletonList(yd.getUrl());
+        ////         System.out.println(result);
+        //         getviData1(urlList);
+        //
+        //        li.addAll(vdData);
+
+        //        li = getvd(urlList);
+        //        System.out.println(li);
 
 
-//     List<List<Map<String, String>>> result = new ArrayList<>();
-//     List<YoutubeData> list = new ArrayList<>();
-//     List<String> urlList = new ArrayList<>();
-//        list = getUrlList();
-//     List<String> lst = new ArrayList<>();
-//     for (YoutubeData yd : list) {
-//         urlList = Collections.singletonList(yd.getUrl());
-////         System.out.println(result);
-//         getviData1(urlList);
-//
-//        li.addAll(vdData);
+        List<List<Map<String, String>>> result = getTypeTvProgramLlist();
+        result.addAll(getProgramListByChannel());
+        // List<List<Map<String, String>>> result = getProgramListByChannel();
+        int totalUploads = 0;
+        Set<String> uniqueChannels = new HashSet<>();
 
-//        li = getvd(urlList);
-//        System.out.println(li);
-        List<List<Map<String, String>>> result = new ArrayList<>();
-                result = getTypeTvProgramLlist();
-        System.out.println( result);
+        for (List<Map<String, String>> list1 : result) {
+            for (Map<String, String> map : list1) {
+                // Fetching Details
+                String channelName = map.get("channelName");
+                uniqueChannels.add(channelName);
+                totalUploads++;
+
+                String title = map.get("Title");
+                String url = map.get("Url");
+                String thumbnail = map.get("Thumbnail");
+                String releaseDate = map.get("releaseDate");
+
+                System.out.println("Title: " + title);
+                System.out.println("URL: " + url);
+                // System.out.println("Thumbnail: " + thumbnail);
+                System.out.println("Release Date: " + releaseDate);
+                System.out.println();
+            }
+        }
+
+        System.out.println(totalUploads + " Uploads from " + uniqueChannels.size() + " YouTube Channels are Available");
     }
 
-    public List<List<Map<String, String>>> getProgramListByChannel() {
-        List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
-        List<YoutubeData> youList = new ArrayList<>();
+    public static List<List<Map<String, String>>> getProgramListByChannel() {
+        // Type 01: Single Channel
+        List<List<Map<String, String>>> li = new ArrayList<>();
+        List<YoutubeData> youList;
         youList = youList();
-        List<String> urlList = new ArrayList<>();
+        List<String> urlList;
         for (YoutubeData yd : youList) {
             urlList = Collections.singletonList(yd.getUrl());
             List<List<Map<String, String>>> vdData = getvd(urlList);
@@ -224,7 +248,7 @@ public class YoutubeDownload {
 
     public static List<YoutubeData> youList() {
         DatabasePostgres db = new DatabasePostgres();
-        List<YoutubeData> list = new ArrayList<>();
+        List<YoutubeData> list;
         list = db.getUrlList1();
 
         return list;
@@ -232,17 +256,15 @@ public class YoutubeDownload {
 
     //GET youtube VIDEO LIST  | GET TYPE 2 LIST | ONLY CHANNLE NAME LIST
     public static List<List<Map<String, String>>> getvd(List<String> list) {
-        List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
-        List<VideoDetails> vdlist = new ArrayList<VideoDetails>();
+        List<List<Map<String, String>>> li = new ArrayList<>();
 
         for (String s : list) {
-            List<VideoDetails> vd = new ArrayList<VideoDetails>();
+            List<VideoDetails> vd = new ArrayList<>();
             System.out.println(s);
             vd = dataList(s);
             List<Map<String, String>> maplist = new ArrayList<>();
 
             for (VideoDetails v : vd) {
-
                 Map<String, String> map = new HashMap<>();
                 map.put("Title", v.getTitle());
                 map.put("Url", v.getUrl());
@@ -427,7 +449,7 @@ public class YoutubeDownload {
     }
 
 
-    //GET YOUTUBE TV PROGRAM LIST| GET TYPE 2 LIST
+    // GET YOUTUBE TV PROGRAM LIST| GET TYPE 2 LIST
     public static List<List<Map<String, String>>> getTypeTvProgramLlist() {
         List<List<Map<String, String>>> result = new ArrayList<>();
         List<YoutubeData> list = new ArrayList<>();
@@ -437,7 +459,7 @@ public class YoutubeDownload {
         for (YoutubeData yd : list) {
             urlList = Collections.singletonList(yd.getUrl());
 //         System.out.println(result);
-         List<List<Map<String, String>>> result1 = getviData1(urlList);
+            List<List<Map<String, String>>> result1 = getviData1(urlList);
 
             result.addAll(result1);
 
@@ -465,6 +487,7 @@ public class YoutubeDownload {
 
             for (VideoDetails vd : vdList) {
                 Map<String, String> map = new HashMap<>();
+                String title = vd.getTitle();
                 map.put("Title", vd.getTitle());
                 map.put("Url", vd.getUrl());
                 map.put("Thumbnail", vd.getThumbnail());
@@ -497,6 +520,7 @@ public class YoutubeDownload {
             System.out.println("Thumbnail: " + video.getThumbnail());
             System.out.println("video" + video.getReleaseDate());
             System.out.println(name);*/
+            String title = video.getTitle();
             video.setChannalName(name);
 //            System.out.println();
             vList.add(video);
@@ -527,6 +551,8 @@ public class YoutubeDownload {
 
                     String title = videoRenderer.path("title").path("runs").get(0).path("text")
                             .asText("Title not found");
+                    title = new String(videoRenderer.path("title").path("runs").get(0).path("text")
+                            .asText("Title not found").getBytes(), StandardCharsets.UTF_8);
                     String videoId = videoRenderer.path("videoId").asText("Video ID not found");
                     String thumbnailUrl = videoRenderer.path("thumbnail").path("thumbnails").get(0).path("url")
                             .asText("Thumbnail not found");
@@ -604,7 +630,7 @@ public class YoutubeDownload {
     public boolean addChannelToDatabase(YoutubeData channel) {
         DatabasePostgres db = new DatabasePostgres();
         boolean bl = false;
-       bl= db.insertYoutubechannelType1(channel);
+        bl = db.insertYoutubechannelType1(channel);
 
         return bl;
     }
@@ -616,7 +642,4 @@ public class YoutubeDownload {
         bl = db.updateYoutubeChannel(you);
         return bl;
     }
-
-
-
 }
