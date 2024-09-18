@@ -3636,5 +3636,60 @@ public List<YoutubeData> getUrlList() {
     }
     return stList;
 }
+    public List<YoutubeData> getUrlList1() {
+        Connection con = getConn();
+        String sql = "SELECT url,name  from youtube where type = '1'";
+//    List<String> stList = new ArrayList<String>();
+        List  <YoutubeData> stList = new ArrayList<YoutubeData>();
+        try {
+            PreparedStatement ps  =  con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            System.out.println(ps);
+            while(rs.next()) {
+                YoutubeData yt =  new YoutubeData();
+//            System.out.println(ps);
+                yt.setUrl(rs.getString(1));
+                yt.setName(  rs.getString(2));
+                stList.add(yt);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stList;
+    }
+
+    public boolean insertYoutubechannelType1(YoutubeData you){
+    Connection con = getConn();
+    String sql  = "INSERT INTO public.youtube(type, name, url)VALUES (?, ?, ?) ";
+    boolean bl = false;
+    try {
+    PreparedStatement ps  =  con.prepareStatement(sql);
+    ps.setString(1,you.getUrl());
+    ps.setString(2,you.getName());
+    ps.setInt(3,you.getType());
+   bl  = ps.executeUpdate() > 0 ? true: false;
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+        return bl;
+    }
+
+    public boolean updateYoutubeChannel(YoutubeData you) {
+        Connection con = getConn();
+        String sql  = "UPDATE public.youtube SET type = ?, url = ? WHERE name = ? ";
+        boolean bl = false;
+        try {
+            PreparedStatement ps  =  con.prepareStatement(sql);
+            ps.setInt(1,you.getType());
+            ps.setString(2,you.getUrl());
+            ps.setString(3,you.getName());
+            bl  = ps.executeUpdate() > 0 ? true: false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bl;
+    }
+
+
 
 }

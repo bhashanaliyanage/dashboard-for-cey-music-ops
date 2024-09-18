@@ -2,6 +2,7 @@ package com.example.song_finder_fx.Controller;
 
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.VideoDetails;
+import com.example.song_finder_fx.Model.YouDownload;
 import com.example.song_finder_fx.Model.YoutubeData;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -10,10 +11,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import java.text.SimpleDateFormat;
 
 import java.net.URL;
 
@@ -179,7 +185,7 @@ public class YoutubeDownload {
     //GET TV CHANNEL PROGRAM LIST
 
 
-    public static void main(String[] args) {
+ public static void main(String[] args) {
 
 
 //     List<List<Map<String, String>>> result = new ArrayList<>();
@@ -192,25 +198,258 @@ public class YoutubeDownload {
 ////         System.out.println(result);
 //         getviData1(urlList);
 //
-//     }
+//        li.addAll(vdData);
+
+//        li = getvd(urlList);
+//        System.out.println(li);
+        List<List<Map<String, String>>> result = new ArrayList<>();
+                result = getTypeTvProgramLlist();
+        System.out.println( result);
     }
 
+    public List<List<Map<String, String>>> getProgramListByChannel() {
+        List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
+        List<YoutubeData> youList = new ArrayList<>();
+        youList = youList();
+        List<String> urlList = new ArrayList<>();
+        for (YoutubeData yd : youList) {
+            urlList = Collections.singletonList(yd.getUrl());
+            List<List<Map<String, String>>> vdData = getvd(urlList);
+
+            li.addAll(vdData);
+        }
+
+        return li;
+    }
+
+    public static List<YoutubeData> youList() {
+        DatabasePostgres db = new DatabasePostgres();
+        List<YoutubeData> list = new ArrayList<>();
+        list = db.getUrlList1();
+
+        return list;
+    }
+
+    //GET youtube VIDEO LIST  | GET TYPE 2 LIST | ONLY CHANNLE NAME LIST
+    public static List<List<Map<String, String>>> getvd(List<String> list) {
+        List<List<Map<String, String>>> li = new ArrayList<List<Map<String, String>>>();
+        List<VideoDetails> vdlist = new ArrayList<VideoDetails>();
+
+        for (String s : list) {
+            List<VideoDetails> vd = new ArrayList<VideoDetails>();
+            System.out.println(s);
+            vd = dataList(s);
+            List<Map<String, String>> maplist = new ArrayList<>();
+
+            for (VideoDetails v : vd) {
+
+                Map<String, String> map = new HashMap<>();
+                map.put("Title", v.getTitle());
+                map.put("Url", v.getUrl());
+                map.put("Thumbnail", v.getThumbnail());
+                map.put("releaseDate", v.getReleaseDate());
+                maplist.add(map);
+            }
+            li.add(maplist);
+        }
+        return li;
+    }
+
+    public static List<VideoDetails> dataList(String list) {
+        YouDownload you = new YouDownload();
+        Map<String, List<Map<String, String>>> channelMap = new HashMap<>();
+        List<VideoDetails> vList = new ArrayList<VideoDetails>();
+
+        you.setUrl(list);
+        List<VideoDetails> ss = new ArrayList<VideoDetails>();
+
+        ss = getRes(you);
+        System.out.println(ss + " this is ss");
+
+        for (VideoDetails video : ss) {
+            int count = 0;
+            VideoDetails vd = new VideoDetails();
+
+            System.out.println("Title: " + video.getTitle());
+            System.out.println("URL: " + video.getUrl());
+            System.out.println("Thumbnail: " + video.getThumbnail());
+            System.out.println("video" + video.getReleaseDate());
+            System.out.println();
+            vList.add(video);
+        }
+
+        return vList;
+    }
+
+    public static List<VideoDetails> getRes(YouDownload you) {
+        StringBuilder result = new StringBuilder();
+        List<String> result1 = new ArrayList<>();
+        List<VideoDetails> vd = new ArrayList<VideoDetails>();
+        try {
+            String urlString = you.getUrl();
+            String jsonResponse = getResponseFromUrl(urlString);
+            String cleanedJson = extractJsonData(jsonResponse);
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(cleanedJson);
+
+            JsonNode contents = rootNode.path("contents").path("twoColumnBrowseResultsRenderer").path("tabs").get(1)
+                    .path("tabRenderer").path("content").path("richGridRenderer").path("contents");
+
+            if (contents.isArray() && contents.size() > 0) {
+                for (JsonNode videoNode : contents) {
+                    JsonNode videoRenderer = videoNode.path("richItemRenderer").path("content").path("videoRenderer");
+
+                    String publishedTimeText = videoRenderer.path("publishedTimeText").path("simpleText")
+                            .asText("Field not found");
+
+                    String url = videoRenderer.path("navigationEndpoint").path("commandMetadata")
+                            .path("webCommandMetadata").path("url").asText("URL not found");
+
+                    String YoutubeChannel = you.getUrl().substring(25);
+
+//                    String dataOrMonth = extractSinhalaSubstring(publishedTimeText);
+                    System.out.println(publishedTimeText);
+                    String dataOrMonth = publishedTimeText.substring(0, 9);
+                    byte[] bytes1 = dataOrMonth.getBytes(StandardCharsets.UTF_8);
+                    System.out.println(dataOrMonth + "data or month");
+//                    String dataOrMonth = new String(publishedTimeText.substring(0, 2).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+//                    System.out.println("Extracted: " + dataOrMonth);
+//                  //test area
+//                    System.out.println("Full string: " + publishedTimeText);
+//                    System.out.println("Length: " + publishedTimeText.length());
+//                    for (int i = 0; i < publishedTimeText.length(); i++) {
+//                        System.out.println("Character at " + i + ": " + publishedTimeText.charAt(i) + " (Unicode: " + (int)publishedTimeText.charAt(i) + ")");
+//                    }
+
+
+//                    byte[] bytes = publishedTimeText.getBytes(StandardCharsets.UTF_8);
+//                    byte[] bytes = {-61, -96, -62, -74, -62, -81, -61, -96, -62, -73, -30, -128, -103, -61, -96, -62, -74, -62, -79, 32, 51,};
+                    byte[] bytes = {-61, -96, -62, -74, -62, -81, -61, -96, -62, -73, -30, -128, -103, -61, -96, -62, -74, -62, -79,};
+                    System.out.println("Bytes: " + java.util.Arrays.toString(bytes));
+                    String reconstructed = new String(bytes, StandardCharsets.UTF_8);
+                    System.out.println("Reconstructed: " + reconstructed);
+
+
+                    String datenumber = "";
+                    Pattern pattern = Pattern.compile("\\d+");
+                    Matcher matcher = pattern.matcher(publishedTimeText);
+                    System.out.println(dataOrMonth + "date or month");
+
+                    // Check if a number is found and extract it
+                    if (matcher.find()) {
+                        datenumber = matcher.group();  // Extract the first number found
+                        System.out.println(datenumber + " - Extracted number");
+                    } else {
+                        System.out.println("No number found in the text.");
+                    }
+
+                    VideoDetails vd1 = new VideoDetails();
+
+//                    if (dataOrMonth.equals("දින") || dataOrMonth.equals("පැය")) {
+                    if (Arrays.equals(bytes, bytes1)) {
+                        System.out.println("This will return");
+
+                        Date uploadDate = calculateUploadDate(publishedTimeText);
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        String formattedUploadDate = (uploadDate != null) ? sdf.format(uploadDate)
+                                : "Unable to calculate";
+
+                        result.append("publishedTimeText: ").append(publishedTimeText).append(", ");
+                        result.append("URL: https://www.youtube.com").append(url).append(", ");
+                        result.append("YouTube Channel: ").append(YoutubeChannel).append(", ");
+//						result.append("Calculated Upload Date: ").append(formattedUploadDate).append(" ");
+                        result.append("Calculated Upload Date1: ").append(dateCalulator(datenumber)).append(" ");
+                        vd1.setUrl("https://www.youtube.com" + url);
+//						vd1.setReleaseDate(formattedUploadDate);
+                        vd1.setTitle(YoutubeChannel);
+                        vd1.setReleaseDate(dateCalulator(datenumber));
+//						vd1.set
+//						result1.add(result.toString());
+                        vd.add(vd1);
+                    } else {
+                        System.out.println("This will return another");
+                    }
+
+                    System.out.println(dataOrMonth);
+
+                }
+            } else {
+                result.append("No videos found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.append("Error: ").append(e.getMessage());
+        }
+        return vd;
+    }
+
+    private static String extractSinhalaSubstring(String dt) {
+        if (dt.length() >= 2) {
+            return dt.substring(1, 5);
+        } else {
+            return dt;
+        }
+    }
+
+    public static String dateCalulator(String dt) {
+        int i = Integer.parseInt(dt);
+        LocalDate lcdate = LocalDate.now().minusDays(i);
+        return lcdate.toString();
+    }
+
+
+    private static Date calculateUploadDate(String publishedTimeText) {
+        Calendar cal = Calendar.getInstance();
+        try {
+            if (publishedTimeText.contains("hour") || publishedTimeText.contains("minute")) {
+                return cal.getTime(); // Today
+            } else if (publishedTimeText.contains("day")) {
+                int days = Integer.parseInt(publishedTimeText.split(" ")[0]);
+                cal.add(Calendar.DAY_OF_YEAR, -days);
+            } else if (publishedTimeText.contains("week")) {
+                int weeks = Integer.parseInt(publishedTimeText.split(" ")[0]);
+                cal.add(Calendar.WEEK_OF_YEAR, -weeks);
+            } else if (publishedTimeText.contains("month")) {
+                int months = Integer.parseInt(publishedTimeText.split(" ")[0]);
+                cal.add(Calendar.MONTH, -months);
+            } else if (publishedTimeText.contains("year")) {
+                int years = Integer.parseInt(publishedTimeText.split(" ")[0]);
+                cal.add(Calendar.YEAR, -years);
+            } else {
+                return null; // Unable to parse
+            }
+            return cal.getTime();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    //GET YOUTUBE TV PROGRAM LIST| GET TYPE 2 LIST
     public static List<List<Map<String, String>>> getTypeTvProgramLlist() {
         List<List<Map<String, String>>> result = new ArrayList<>();
-        List<YoutubeData> list;
-        List<String> urlList;
+        List<YoutubeData> list = new ArrayList<>();
+        List<String> urlList = new ArrayList<>();
         list = getUrlList();
+        List<String> lst = new ArrayList<>();
         for (YoutubeData yd : list) {
             urlList = Collections.singletonList(yd.getUrl());
-            result = getviData1(urlList);
+//         System.out.println(result);
+         List<List<Map<String, String>>> result1 = getviData1(urlList);
+
+            result.addAll(result1);
+
         }
         return result;
     }
 
-    // GET YOUTUBE CHANNEL NOTIFICATION
+    //GET YOUTUBE CHANNEL url list from database
+
     public static List<YoutubeData> getUrlList() {
         DatabasePostgres db = new DatabasePostgres();
-        List<YoutubeData> list;
+        List<YoutubeData> list = new ArrayList<>();
         list = db.getUrlList();
 
         return list;
@@ -360,5 +599,24 @@ public class YoutubeDownload {
             return "no date found";
         }
     }
+
+    //Insert youtube channel to list | Type 1 and Type 2
+    public boolean addChannelToDatabase(YoutubeData channel) {
+        DatabasePostgres db = new DatabasePostgres();
+        boolean bl = false;
+       bl= db.insertYoutubechannelType1(channel);
+
+        return bl;
+    }
+
+    //Update Youtube channle List
+    public boolean updateYoutubechannelType1(YoutubeData you) {
+        DatabasePostgres db = new DatabasePostgres();
+        boolean bl = false;
+        bl = db.updateYoutubeChannel(you);
+        return bl;
+    }
+
+
 
 }
