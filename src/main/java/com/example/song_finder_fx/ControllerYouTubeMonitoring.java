@@ -46,8 +46,6 @@ public class ControllerYouTubeMonitoring {
         try {
             List<List<Map<String, String>>> list = YoutubeDownload.getTypeTvProgramLlist();
             list.addAll(YoutubeDownload.getProgramListByChannel());
-            // List<List<Map<String, String>>> result = YoutubeDownload.getTypeTvProgramLlist();
-            // result.addAll(YoutubeDownload.getProgramListByChannel());
 
             int totalUploads = 0;
             Set<String> uniqueChannels = new HashSet<>();

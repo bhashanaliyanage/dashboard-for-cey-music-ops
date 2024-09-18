@@ -51,7 +51,6 @@ public class ControllerMCList {
     @FXML
     private Label lblPaginationInfo;
 
-
     public static List<CheckBox> checkBoxes = new ArrayList<>();
 
     public static List<HBox> hBoxes = new ArrayList<>();
@@ -65,8 +64,6 @@ public class ControllerMCList {
     public static List<Label> labelsComposer = new ArrayList<>();
 
     public static List<Label> labelsLyricist = new ArrayList<>();
-
-    // public static List<ManualClaimTrack> manualClaims = new ArrayList<>();
 
     public static List<ManualClaimTrack> finalManualClaims = new ArrayList<>();
 
@@ -123,6 +120,7 @@ public class ControllerMCList {
                 for (ManualClaimTrack claim : allManualClaims) {
                     claimMap.put(claim.getId(), claim);
 
+                    // Creating and adding claim entry to a list of all claim entries
                     Node node;
                     try {
                         node = createClaimEntryNode(claim);
@@ -317,29 +315,29 @@ public class ControllerMCList {
         return node;
     }
 
-private Image setImage(ManualClaimTrack claim, int listIndex) throws IOException, URISyntaxException {
-    if (claim.getPreviewImage() != null) {
-        return claim.getPreviewImage();
-    } else {
-        String youtubeID = claim.getYoutubeID();
-        String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
-        BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
-        image = ImageProcessor.cropImage(image);
+    private Image setImage(ManualClaimTrack claim, int listIndex) throws IOException, URISyntaxException {
+        if (claim.getPreviewImage() != null) {
+            return claim.getPreviewImage();
+        } else {
+            String youtubeID = claim.getYoutubeID();
+            String thumbnailURL = "https://i.ytimg.com/vi/" + youtubeID + "/maxresdefault.jpg";
+            BufferedImage image = ImageProcessor.getDownloadedImage(thumbnailURL);
+            image = ImageProcessor.cropImage(image);
 
-        // Setting Thumbnail and Preview Images to the model
-        // Resize the image for preview (adjust dimensions as needed)
-        int previewWidth = 200; // Adjust this value to your desired preview width
-        int previewHeight = 200; // Adjust this value to your desired preview height
-        BufferedImage previewImage = ImageProcessor.resizeImage(previewWidth, previewHeight, image);
-        claim.setPreviewImage(previewImage);
-        image = ImageProcessor.resizeImage(1400, 1400, image);
-        claim.setImage(image);
+            // Setting Thumbnail and Preview Images to the model
+            // Resize the image for preview (adjust dimensions as needed)
+            int previewWidth = 200; // Adjust this value to your desired preview width
+            int previewHeight = 200; // Adjust this value to your desired preview height
+            BufferedImage previewImage = ImageProcessor.resizeImage(previewWidth, previewHeight, image);
+            claim.setPreviewImage(previewImage);
+            image = ImageProcessor.resizeImage(1400, 1400, image);
+            claim.setImage(image);
 
-        allManualClaims.set(listIndex, claim);
+            allManualClaims.set(listIndex, claim);
 
-        return SwingFXUtils.toFXImage(image, null);
+            return SwingFXUtils.toFXImage(image, null);
+        }
     }
-}
 
     private String setColor(LocalDate localDate) {
         // Get the current system date

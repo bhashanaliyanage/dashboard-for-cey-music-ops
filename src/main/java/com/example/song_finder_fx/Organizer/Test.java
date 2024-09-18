@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
@@ -36,9 +37,25 @@ public class Test {
 
         // createImageFromText("මම Siyatha", "C:\\Users\\bhash\\Documents\\Test\\test.png", "Iskoola Pota");
 
-        /*String garbledText = "à·ƒà·'à¶ºà¶­ à¶­à¶»à·";
-        String unicodeText = attemptConversion(garbledText);
-        System.out.println(unicodeText);*/
+        List<List<Map<String, String>>> list = YoutubeDownload.getProgramListByChannel();
+
+        for (List<Map<String, String>> list1 : list) {
+            for (Map<String, String> map : list1) {
+                // Fetching Details
+                String channelName = map.get("channelName");
+                String title = map.get("Title");
+                String url = map.get("Url");
+                String thumbnail = map.get("Thumbnail");
+                String releaseDate = map.get("releaseDate");
+
+                System.out.println("Channel Name: " + channelName);
+                System.out.println("Title: " + title);
+                System.out.println("URL: " + url);
+                // System.out.println("Thumbnail: " + thumbnail);
+                System.out.println("Release Date: " + releaseDate);
+                System.out.println();
+            }
+        }
     }
 
     public static Image createImageFromText(String text, String preferredFontName) {

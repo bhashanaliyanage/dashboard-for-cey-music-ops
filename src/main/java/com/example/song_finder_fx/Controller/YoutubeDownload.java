@@ -260,7 +260,7 @@ public class YoutubeDownload {
 
         for (String s : list) {
             List<VideoDetails> vd = new ArrayList<>();
-            System.out.println(s);
+            System.out.println("Link: " + s);
             vd = dataList(s);
             List<Map<String, String>> maplist = new ArrayList<>();
 
@@ -278,29 +278,22 @@ public class YoutubeDownload {
     }
 
     public static List<VideoDetails> dataList(String list) {
+        // Simplified Method
         YouDownload you = new YouDownload();
-        Map<String, List<Map<String, String>>> channelMap = new HashMap<>();
-        List<VideoDetails> vList = new ArrayList<VideoDetails>();
 
         you.setUrl(list);
-        List<VideoDetails> ss = new ArrayList<VideoDetails>();
+        List<VideoDetails> ss;
 
         ss = getRes(you);
-        System.out.println(ss + " this is ss");
+        // System.out.println(ss + " this is ss");
 
-        for (VideoDetails video : ss) {
-            int count = 0;
-            VideoDetails vd = new VideoDetails();
+        // System.out.println("Title: " + video.getTitle());
+        // System.out.println("URL: " + video.getUrl());
+        // System.out.println("Thumbnail: " + video.getThumbnail());
+        // System.out.println("video" + video.getReleaseDate());
+        // System.out.println();
 
-            System.out.println("Title: " + video.getTitle());
-            System.out.println("URL: " + video.getUrl());
-            System.out.println("Thumbnail: " + video.getThumbnail());
-            System.out.println("video" + video.getReleaseDate());
-            System.out.println();
-            vList.add(video);
-        }
-
-        return vList;
+        return new ArrayList<>(ss);
     }
 
     public static List<VideoDetails> getRes(YouDownload you) {
@@ -331,10 +324,11 @@ public class YoutubeDownload {
                     String YoutubeChannel = you.getUrl().substring(25);
 
 //                    String dataOrMonth = extractSinhalaSubstring(publishedTimeText);
-                    System.out.println(publishedTimeText);
+                    System.out.println();
+                    System.out.println("Published time text: " + publishedTimeText);
                     String dataOrMonth = publishedTimeText.substring(0, 9);
                     byte[] bytes1 = dataOrMonth.getBytes(StandardCharsets.UTF_8);
-                    System.out.println(dataOrMonth + "data or month");
+                    System.out.println("Data or Month: " + dataOrMonth);
 //                    String dataOrMonth = new String(publishedTimeText.substring(0, 2).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
 //                    System.out.println("Extracted: " + dataOrMonth);
 //                  //test area
@@ -348,20 +342,20 @@ public class YoutubeDownload {
 //                    byte[] bytes = publishedTimeText.getBytes(StandardCharsets.UTF_8);
 //                    byte[] bytes = {-61, -96, -62, -74, -62, -81, -61, -96, -62, -73, -30, -128, -103, -61, -96, -62, -74, -62, -79, 32, 51,};
                     byte[] bytes = {-61, -96, -62, -74, -62, -81, -61, -96, -62, -73, -30, -128, -103, -61, -96, -62, -74, -62, -79,};
-                    System.out.println("Bytes: " + java.util.Arrays.toString(bytes));
+                    // System.out.println("Bytes: " + java.util.Arrays.toString(bytes));
                     String reconstructed = new String(bytes, StandardCharsets.UTF_8);
-                    System.out.println("Reconstructed: " + reconstructed);
+                    // System.out.println("Reconstructed: " + reconstructed);
 
 
                     String datenumber = "";
                     Pattern pattern = Pattern.compile("\\d+");
                     Matcher matcher = pattern.matcher(publishedTimeText);
-                    System.out.println(dataOrMonth + "date or month");
+                    // System.out.println(dataOrMonth + "date or month");
 
                     // Check if a number is found and extract it
                     if (matcher.find()) {
                         datenumber = matcher.group();  // Extract the first number found
-                        System.out.println(datenumber + " - Extracted number");
+                        System.out.println("Extracted number: " + datenumber);
                     } else {
                         System.out.println("No number found in the text.");
                     }
@@ -370,7 +364,7 @@ public class YoutubeDownload {
 
 //                    if (dataOrMonth.equals("දින") || dataOrMonth.equals("පැය")) {
                     if (Arrays.equals(bytes, bytes1)) {
-                        System.out.println("This will return");
+                        // System.out.println("This will return");
 
                         Date uploadDate = calculateUploadDate(publishedTimeText);
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -471,7 +465,7 @@ public class YoutubeDownload {
 
     public static List<YoutubeData> getUrlList() {
         DatabasePostgres db = new DatabasePostgres();
-        List<YoutubeData> list = new ArrayList<>();
+        List<YoutubeData> list;
         list = db.getUrlList();
 
         return list;
@@ -487,7 +481,6 @@ public class YoutubeDownload {
 
             for (VideoDetails vd : vdList) {
                 Map<String, String> map = new HashMap<>();
-                String title = vd.getTitle();
                 map.put("Title", vd.getTitle());
                 map.put("Url", vd.getUrl());
                 map.put("Thumbnail", vd.getThumbnail());
