@@ -458,7 +458,11 @@ public class YoutubeDownload {
             List<List<Map<String, String>>> result1 = getviData1(urlList);
 
             //newly added
-
+            for (List<Map<String, String>> innerList : result1) {
+                for (Map<String, String> map : innerList) {
+                    map.put("channelName", s);
+                }
+            }
             //upto this
 
             result.addAll(result1);
