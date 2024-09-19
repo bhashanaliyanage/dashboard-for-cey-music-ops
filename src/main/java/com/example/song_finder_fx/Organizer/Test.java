@@ -37,6 +37,27 @@ public class Test {
 
         // createImageFromText("මම Siyatha", "C:\\Users\\bhash\\Documents\\Test\\test.png", "Iskoola Pota");
 
+        // testYouTubeMonitoring();
+        ISRCDispatcher dispatcher = new ISRCDispatcher();
+
+        // Dispatch Single ISRC
+        /*String isrc = dispatcher.dispatchSingleISRC("SR");
+        System.out.println("Generated ISRC: " + isrc);
+        if (dispatcher.updateLastISRC(isrc, "SR")) {
+            System.out.println("Updated ISRC: " + isrc);
+        } else {
+            System.out.println("Failed to update ISRC: " + isrc);
+        }*/
+
+        // Dispatch multiple ISRCs
+        List<String> isrcs = dispatcher.dispatchMultipleISRCs(10, "SR");
+        for (String isrc : isrcs) {
+            System.out.println("Generated ISRC: " + isrc);
+        }
+        dispatcher.updateLastISRC(isrcs.getLast(), "SR");
+    }
+
+    private static void testYouTubeMonitoring() {
         List<List<Map<String, String>>> list = YoutubeDownload.getProgramListByChannel();
 
         for (List<Map<String, String>> list1 : list) {
