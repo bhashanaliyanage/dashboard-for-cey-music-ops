@@ -238,7 +238,16 @@ public class YoutubeDownload {
         List<String> urlList;
         for (YoutubeData yd : youList) {
             urlList = Collections.singletonList(yd.getUrl());
+            String s = yd.getName();
             List<List<Map<String, String>>> vdData = getvd(urlList);
+
+
+            for (List<Map<String, String>> innerList : vdData) {
+                for (Map<String, String> map : innerList) {
+                    map.put("channelName", s);
+                }
+            }
+
 
             li.addAll(vdData);
         }
