@@ -397,8 +397,14 @@ public class YoutubeDownload {
         List<String> lst = new ArrayList<>();
         for (YoutubeData yd : list) {
             urlList = Collections.singletonList(yd.getUrl());
+            String s = yd.getName();
+
 //         System.out.println(result);
          List<List<Map<String, String>>> result1 = getviData1(urlList);
+
+            //newly added
+
+            //upto this
 
             result.addAll(result1);
 
