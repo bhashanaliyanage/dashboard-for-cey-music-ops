@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.opencsv.CSVWriter;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
@@ -19,6 +20,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
+import javafx.util.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -44,6 +47,12 @@ public class ControllerMCList {
 
     @FXML
     private Label lblClaimCount;
+
+    @FXML
+    private Label lblArtworkProgress;
+
+    @FXML
+    private HBox hboxLoading;
 
     @FXML
     private VBox vbClaimsList;
@@ -154,10 +163,12 @@ public class ControllerMCList {
     private void runValidationAndArtworkThreads() {
         stopExistingThreads();
 
+        int startIndex = currentPage * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
+        int totalArtworks = endIndex - startIndex;
+
         threadValidation = new Thread(() -> {
             try {
-                int startIndex = currentPage * pageSize;
-                int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
 
                 for (int i = startIndex; i < endIndex; i++) {
                     if (Thread.currentThread().isInterrupted()) {
@@ -182,9 +193,9 @@ public class ControllerMCList {
             }
         });
 
-        threadArtworks = new Thread(() -> {
-            int startIndex = currentPage * pageSize;
-            int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
+        /*threadArtworks = new Thread(() -> {
+            // int startIndex = currentPage * pageSize;
+            // int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
 
             for (int i = startIndex; i < endIndex; i++) {
                 if (Thread.currentThread().isInterrupted()) {
@@ -209,6 +220,61 @@ public class ControllerMCList {
                     Platform.runLater(e::printStackTrace);
                 }
             }
+        });*/
+
+        Task<List<Pair<Integer, Image>>> artworkTask = new Task<>() {
+            @Override
+            protected List<Pair<Integer, Image>> call() throws Exception {
+                List<Pair<Integer, Image>> updatedImages = new ArrayList<>();
+                for (int i = startIndex; i < endIndex; i++) {
+                    if (isCancelled()) {
+                        break;
+                    }
+                    int currentIndex = i - startIndex;
+                    updateProgress(currentIndex, totalArtworks);
+                    updateMessage("Fetching Artwork for: " + allManualClaims.get(i).getTrackName());
+                    MCTrackController controller = new MCTrackController(allManualClaims.get(i));
+                    ManualClaimTrack updatedClaim = controller.fetchArtwork();
+                    allManualClaims.set(i, updatedClaim);
+                    Image image = setImage(updatedClaim, i);
+                    updatedImages.add(new Pair<>(i, image));
+                }
+                return updatedImages;
+            }
+        };
+
+        // Fade in animation
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(500), hboxLoading);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+
+        // Fade out animation
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(500), hboxLoading);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+
+        artworkTask.progressProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> {
+            double progress = newValue.doubleValue();
+            int percentage = (int) (progress * 100);
+            lblArtworkProgress.setText("Loading Artworks (" + percentage + "%)");
+        }));
+
+        artworkTask.setOnSucceeded(event -> {
+            List<Pair<Integer, Image>> updatedImages = artworkTask.getValue();
+            for (Pair<Integer, Image> pair : updatedImages) {
+                ivArtworks.get(pair.getKey()).setImage(pair.getValue());
+            }
+            lblArtworkProgress.setText("Artwork Loading Complete");
+            fadeOut.play();
+        });
+
+        threadArtworks = new Thread(artworkTask);
+
+        // Initialize progress label and start fade in
+        Platform.runLater(() -> {
+            // lblArtworkProgress.setOpacity(0.0);
+            lblArtworkProgress.setText("Loading Artworks (0%)");
+            fadeIn.play();
         });
 
         threadArtworks.start();
@@ -498,7 +564,6 @@ public class ControllerMCList {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-
                 Platform.runLater(() -> {
                     btnArchive.setText("Archiving Claims");
                     btnArchive.setDisable(true);
@@ -525,7 +590,7 @@ public class ControllerMCList {
                         } catch (SQLException e) {
                             Platform.runLater(() -> {
                                 AlertBuilder.sendErrorAlert("Error", "Something went wrong when archiving manual claim", e.toString());
-                                e.printStackTrace();
+                                System.out.println("Cannot archive manual claim: " + e);
                             });
                         }
                     }

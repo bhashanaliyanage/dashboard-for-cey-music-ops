@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCList">
+<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCList">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -88,6 +88,19 @@
          <Button mnemonicParsing="false" onAction="#onBackPage" prefWidth="130.0" styleClass="button_inside" text="Back" />
          <Button mnemonicParsing="false" onAction="#onNextPage" prefWidth="130.0" styleClass="button_inside" text="Next" />
          <Label fx:id="lblPaginationInfo" text="-" />
+         <HBox fx:id="hboxLoading" alignment="CENTER_RIGHT" opacity="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+            <Label fx:id="lblArtworkProgress" text="Loading Artworks (0%)" textFill="#72a276">
+               <HBox.margin>
+                  <Insets right="10.0"/>
+               </HBox.margin>
+            </Label>
+            <ImageView fx:id="imgLoading" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+               <HBox.margin>
+                  <Insets right="10.0"/>
+               </HBox.margin>
+               <Image url="@../../images/loading_02.gif"/>
+            </ImageView>
+         </HBox>
       </HBox>
    </VBox>
    <ScrollPane hbarPolicy="NEVER" minWidth="692.0" VBox.vgrow="ALWAYS">
