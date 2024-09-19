@@ -3,6 +3,7 @@ package com.example.song_finder_fx.Controller;
 import com.example.song_finder_fx.DatabasePostgres;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ISRCDispatcher {
@@ -11,8 +12,15 @@ public class ISRCDispatcher {
         return incrementISRC(lastISRC, assetType);
     }
 
-    public List<String> dispatchMultipleISRCs(int count, String assetType) {
-        return null;
+    public List<String> dispatchMultipleISRCs(int count, String assetType) throws SQLException {
+        List<String> isrcs = new ArrayList<>();
+        String lastISRC = DatabasePostgres.getLastISRC(assetType);
+        for (int i = 0; i < count; i++) {
+            lastISRC = incrementISRC(lastISRC, assetType);
+            isrcs.add(lastISRC);
+        }
+        DatabasePostgres.updateLastISRC(lastISRC, assetType);  // Save the latest ISRC in DB
+        return isrcs;
     }
 
     public boolean updateLastISRC(String isrc, String assetType) throws SQLException {
