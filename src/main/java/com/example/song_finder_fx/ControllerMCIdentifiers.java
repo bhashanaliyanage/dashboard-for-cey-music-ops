@@ -1,6 +1,7 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.AlertBuilder;
+import com.example.song_finder_fx.Controller.ISRCDispatcher;
 import com.example.song_finder_fx.Controller.SceneController;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
@@ -588,39 +589,44 @@ public class ControllerMCIdentifiers {
         );
     }
 
-    private String getISRC(int i, String isrc) {
-        final String[] userISRC = {claimISRCs.get(i).getText()};
-        if (Objects.equals(isrc, "")) {
-            if (userISRC[0].isEmpty()) {
-                // userISRC[0] = requestNewISRC();
-                userISRC[0] = "";
-                System.out.println("isrc[0] = " + userISRC[0]);
-            }
+private String getISRC(int i, String isrc) {
+    final String[] userISRC = {claimISRCs.get(i).getText()};
+    ISRCDispatcher dispatcher = new ISRCDispatcher();
 
-            currentISRC = userISRC[0];
+    if (Objects.equals(isrc, "")) {
+        if (userISRC[0].isEmpty()) {
+            userISRC[0] = "";
+            try {
+                userISRC[0] = dispatcher.dispatchSingleISRC("UGC");
+                dispatcher.updateLastISRC(userISRC[0], "UGC");
+            } catch (SQLException ignored) {
+            }
+            System.out.println("isrc[0] = " + userISRC[0]);
+        }
+
+        currentISRC = userISRC[0];
+        return currentISRC;
+    } else {
+        if (userISRC[0].isEmpty()) {
+            // Extract prefix (first 7 characters)
+            String prefix = currentISRC.substring(0, 7);
+
+            // Extract suffix (remaining characters)
+            String suffixStr = currentISRC.substring(7);
+            int suffix = Integer.parseInt(suffixStr);
+            suffix++;
+
+            // Format the suffix as a 5-digit integer
+            String formattedSuffix = String.format("%05d", suffix);
+
+            currentISRC = prefix + formattedSuffix;
 
             return currentISRC;
         } else {
-            if (userISRC[0].isEmpty()) {
-                // Extract prefix (first 7 characters)
-                String prefix = currentISRC.substring(0, 7);
-
-                // Extract suffix (remaining characters)
-                String suffixStr = currentISRC.substring(7);
-                int suffix = Integer.parseInt(suffixStr);
-                suffix++;
-
-                // Format the suffix as a 5-digit integer
-                String formattedSuffix = String.format("%05d", suffix);
-
-                currentISRC = prefix + formattedSuffix;
-
-                return currentISRC;
-            } else {
-                return userISRC[0];
-            }
+            return userISRC[0];
         }
     }
+}
 
     private String getPrimaryArtists(ManualClaimTrack manualClaimTrack) {
         String lyricist = manualClaimTrack.getLyricist();
