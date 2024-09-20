@@ -238,7 +238,16 @@ public class YoutubeDownload {
         List<String> urlList;
         for (YoutubeData yd : youList) {
             urlList = Collections.singletonList(yd.getUrl());
+            String s = yd.getName();
             List<List<Map<String, String>>> vdData = getvd(urlList);
+
+
+            for (List<Map<String, String>> innerList : vdData) {
+                for (Map<String, String> map : innerList) {
+                    map.put("channelName", s);
+                }
+            }
+
 
             li.addAll(vdData);
         }
@@ -452,8 +461,22 @@ public class YoutubeDownload {
         List<String> lst = new ArrayList<>();
         for (YoutubeData yd : list) {
             urlList = Collections.singletonList(yd.getUrl());
+            String s = yd.getName();
+
 //         System.out.println(result);
             List<List<Map<String, String>>> result1 = getviData1(urlList);
+
+            //newly added
+            for (List<Map<String, String>> innerList : result1) {
+                for (Map<String, String> map : innerList) {
+                    map.put("channelName", s);
+                }
+            }
+            //upto this
+
+            //newly added
+
+            //upto this
 
             result.addAll(result1);
 
