@@ -41,13 +41,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static com.example.song_finder_fx.DatabasePostgres.checkDatabaseConnection;
 
 public class UIController implements com.example.song_finder_fx.Constants.UINode {
 
@@ -307,13 +307,10 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 if (songList.size() > 1) {
                     String text = songList.getFirst().getISRC() + " + " + (songList.size() - 1) + " other songs added";
                     Platform.runLater(() -> UIController.lblSongListSubStatic.setText(text));
-                } else {
-                    Platform.runLater(() -> UIController.lblSongListSubStatic.setText(songList.getFirst().getISRC()));
                 }
             } catch (Exception e) {
                 Platform.runLater(e::printStackTrace);
             }
-
         });
         thread.start();
     }
@@ -903,7 +900,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //<editor-fold desc="Database Things">
     public void onDatabaseConnectionBtnClick() {
         // TODO: Do this on a separate thread
-        boolean status = DatabasePostgres.checkDatabaseConnection();
+        boolean status = checkDatabaseConnection();
 
         if (status) {
             NotificationBuilder.displayTrayInfo("Database Connected", "Database Connection Success");
@@ -912,29 +909,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         }
     }
 
-    void checkDatabaseConnection() throws ClassNotFoundException {
-        lblDatabaseStatus.setText("Connecting");
-
-        Connection con = null;
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            String url = "jdbc:mysql://192.168.1.200/songData";
-            String username = "ceymusic";
-            String password = "ceymusic";
-            con = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            lblDatabaseStatus.setText("Offline");
-            lblDatabaseStatus.setStyle("-fx-text-fill: '#931621'");
-            return;
-        }
-
-        if (con != null) {
-            lblDatabaseStatus.setText("Online");
-            lblDatabaseStatus.setStyle("-fx-text-fill: '#00864E'");
-        }
-
-    }
     //</editor-fold>
 
     //<editor-fold desc="Song List">

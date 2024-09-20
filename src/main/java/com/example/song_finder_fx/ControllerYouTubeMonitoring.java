@@ -60,7 +60,7 @@ public class ControllerYouTubeMonitoring {
                     totalUploads++;
 
                     String title = map.get("Title");
-                    String url = map.get("Url");
+                    // String url = map.get("Url");
                     String thumbnail = map.get("Thumbnail");
                     String releaseDate = map.get("releaseDate");
 
@@ -79,7 +79,7 @@ public class ControllerYouTubeMonitoring {
                     Platform.runLater(() -> {
                         lblVideoTitle.setText(title);
                         // imgTitle.setImage(Test.createImageFromText(title, "Iskoola Potha"));
-                        lblCName.setText("Channel: Siyatha"); // TODO: Add Channel Name
+                        lblCName.setText("Channel/ Program: " + channelName); // TODO: Add Channel Name
                         lblDate.setText(releaseDate);
                         lblViewCount.setText("Views: N/A");
                         imgThumb.setImage(convertedImage);
@@ -99,22 +99,6 @@ public class ControllerYouTubeMonitoring {
         } catch (URISyntaxException e) {
             Platform.runLater(() -> NotificationBuilder.displayTrayError("Error", "Something went wrong when fetching YouTube Thumbnail"));
         }
-    }
-
-    public static String cleanAndFormatTitle(String input) {
-        if (input == null) {
-            return null;
-        }
-        // Keep only English letters, numbers, and specific punctuation
-        String cleanedTitle = input.replaceAll("[^a-zA-Z0-9\\s\\-|:]", "");
-
-        // Trim leading and trailing spaces
-        cleanedTitle = cleanedTitle.trim();
-
-        // Replace multiple spaces with a single space
-        cleanedTitle = cleanedTitle.replaceAll("\\s+", " ");
-
-        return cleanedTitle;
     }
 
 }
