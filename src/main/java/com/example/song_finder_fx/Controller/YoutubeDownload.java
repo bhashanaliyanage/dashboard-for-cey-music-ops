@@ -338,6 +338,7 @@ public class YoutubeDownload {
                     String dataOrMonth = publishedTimeText.substring(0, 9);
                     byte[] bytes1 = dataOrMonth.getBytes(StandardCharsets.UTF_8);
                     System.out.println("Data or Month: " + dataOrMonth);
+
 //                    String dataOrMonth = new String(publishedTimeText.substring(0, 2).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
 //                    System.out.println("Extracted: " + dataOrMonth);
 //                  //test area
