@@ -58,6 +58,8 @@ public class ControllerMCIdentifiers {
 
     private String currentISRC;
 
+    ISRCDispatcher dispatcher = new ISRCDispatcher();
+
     @FXML
     public void initialize() throws IOException {
         vbClaimsList.getChildren().clear();
@@ -368,6 +370,7 @@ public class ControllerMCIdentifiers {
 
                     try {
                         DatabasePostgres.addIngestCSV(byteArray, ingestID);
+                        dispatcher.updateLastISRC(currentISRC, "UGC");
                     } catch (SQLException e) {
                         Platform.runLater(e::printStackTrace);
                     }
@@ -589,44 +592,44 @@ public class ControllerMCIdentifiers {
         );
     }
 
-private String getISRC(int i, String isrc) {
-    final String[] userISRC = {claimISRCs.get(i).getText()};
-    ISRCDispatcher dispatcher = new ISRCDispatcher();
+    private String getISRC(int i, String isrc) {
+        final String[] userISRC = {claimISRCs.get(i).getText()};
+        // ISRCDispatcher dispatcher = new ISRCDispatcher();
 
-    if (Objects.equals(isrc, "")) {
-        if (userISRC[0].isEmpty()) {
-            userISRC[0] = "";
-            try {
-                userISRC[0] = dispatcher.dispatchSingleISRC("UGC");
-                dispatcher.updateLastISRC(userISRC[0], "UGC");
-            } catch (SQLException ignored) {
+        if (Objects.equals(isrc, "")) {
+            if (userISRC[0].isEmpty()) {
+                userISRC[0] = "";
+                try {
+                    userISRC[0] = dispatcher.dispatchSingleISRC("UGC");
+                    dispatcher.updateLastISRC(userISRC[0], "UGC");
+                } catch (SQLException ignored) {
+                }
+                System.out.println("isrc[0] = " + userISRC[0]);
             }
-            System.out.println("isrc[0] = " + userISRC[0]);
-        }
 
-        currentISRC = userISRC[0];
-        return currentISRC;
-    } else {
-        if (userISRC[0].isEmpty()) {
-            // Extract prefix (first 7 characters)
-            String prefix = currentISRC.substring(0, 7);
-
-            // Extract suffix (remaining characters)
-            String suffixStr = currentISRC.substring(7);
-            int suffix = Integer.parseInt(suffixStr);
-            suffix++;
-
-            // Format the suffix as a 5-digit integer
-            String formattedSuffix = String.format("%05d", suffix);
-
-            currentISRC = prefix + formattedSuffix;
-
+            currentISRC = userISRC[0];
             return currentISRC;
         } else {
-            return userISRC[0];
+            if (userISRC[0].isEmpty()) {
+                // Extract prefix (first 7 characters)
+                String prefix = currentISRC.substring(0, 7);
+
+                // Extract suffix (remaining characters)
+                String suffixStr = currentISRC.substring(7);
+                int suffix = Integer.parseInt(suffixStr);
+                suffix++;
+
+                // Format the suffix as a 5-digit integer
+                String formattedSuffix = String.format("%05d", suffix);
+
+                currentISRC = prefix + formattedSuffix;
+
+                return currentISRC;
+            } else {
+                return userISRC[0];
+            }
         }
     }
-}
 
     private String getPrimaryArtists(ManualClaimTrack manualClaimTrack) {
         String lyricist = manualClaimTrack.getLyricist();
