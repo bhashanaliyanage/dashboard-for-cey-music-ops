@@ -23,7 +23,6 @@ import java.util.Map;
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
         // DatabasePostgres.refreshSummaryTable(6, 2024);
-        // DatabasePostgres.refreshSongMetadataTable();
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
@@ -35,9 +34,22 @@ public class Test {
         // UserSession us = new UserSession();
         // DatabasePostgres.changePassword("gimhaar", "admin");
 
-        // createImageFromText("මම Siyatha", "C:\\Users\\bhash\\Documents\\Test\\test.png", "Iskoola Pota");
-
         // testYouTubeMonitoring();
+        // isrcDispatcherTest();
+
+        catalogNumberGenTest();
+    }
+
+    private static void catalogNumberGenTest() throws SQLException {
+        CatalogNumberGenerator generator = new CatalogNumberGenerator();
+        String artist = "Abhisheka Wimalaweera";
+        // String catalogNumber = generator.generateCatalogNumber(artist);
+        // System.out.println("Generated catalog number for: " + artist + " | " + catalogNumber);
+        List<String> catalogNumbers = generator.generateCatalogNumbers(artist, 10);
+        System.out.println("Generated catalog numbers for: " + artist + " | " + catalogNumbers);
+    }
+
+    private static void isrcDispatcherTest() throws SQLException {
         ISRCDispatcher dispatcher = new ISRCDispatcher();
         // String isrc = dispatcher.dispatchSingleISRC("SR");
 
@@ -150,7 +162,7 @@ public class Test {
     }
 
     private static void testBulkReporting() throws SQLException, IOException {
-        int month = 5;
+        int month = 6;
         int year = 2024;
         double eurToAudRate = 0.63333;
         double audToLkrRate = 186.90;

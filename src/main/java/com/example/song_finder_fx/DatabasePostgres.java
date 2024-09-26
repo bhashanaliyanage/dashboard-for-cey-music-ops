@@ -1302,6 +1302,25 @@ public class DatabasePostgres {
         return artists;
     }
 
+    public static List<String> getAllCeyMusicArtists() throws SQLException {
+        String query = "SELECT artist_name FROM public.artists WHERE status = 5 ORDER BY artist_name ASC;";
+        List<String> artists = new ArrayList<>();
+
+        try (Connection con = getConn();
+             Statement statement = con.createStatement()) {
+            try (ResultSet rs = statement.executeQuery(query)) {
+                if (rs.isBeforeFirst()) {
+                    while (rs.next()) {
+                        String artist = rs.getString(1);
+                        artists.add(artist);
+                    }
+                }
+                return artists;
+            }
+        }
+
+    }
+
     public static List<CoWriterSummary> getCoWriterPaymentSummary(String artistName) throws SQLException {
         Connection conn = getConn();
         List<CoWriterSummary> list = new ArrayList<>();
@@ -2789,6 +2808,32 @@ public class DatabasePostgres {
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, isrc);
             ps.setString(2, assetType);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public static String getLastCatalogNumber(String artist) throws SQLException {
+        String sql = "SELECT cat_no FROM public.artists WHERE artist_name = ?;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, artist);
+            ResultSet rs = ps.executeQuery();
+            if (rs.isBeforeFirst()) {
+                if (rs.next()) {
+                    return rs.getString(1);
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean updateLastCatalogNumber(String artist, String lastCatalogNumber) throws SQLException {
+        String sql = "UPDATE public.artists SET cat_no = ? WHERE artist_name = ?;";
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, lastCatalogNumber);
+            ps.setString(2, artist);
             return ps.executeUpdate() > 0;
         }
     }
