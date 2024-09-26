@@ -1,9 +1,6 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.AlertBuilder;
-import com.example.song_finder_fx.Controller.ISRCDispatcher;
-import com.example.song_finder_fx.Controller.SceneController;
-import com.example.song_finder_fx.Controller.YoutubeDownload;
+import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -208,6 +205,14 @@ public class ControllerMCIdentifiers {
 
         // Front End Validation
         System.out.println("Validating UPCs and Catalog Numbers");
+
+        // Fetch the list of registered artists from the database
+        List<String> ceyMusicArtists = DatabasePostgres.getAllCeyMusicArtists();
+
+        // Initialize Catalog Number Generator
+        CatalogNumberGenerator catalogNumberGenerator = new CatalogNumberGenerator();
+
+
         for (int claimID = 0; claimID < totalClaims; claimID++) {
             final String[] upc = {upcs.get(claimID).getText()};
             String catNo = claimCNumbers.get(claimID).getText();
@@ -230,11 +235,33 @@ public class ControllerMCIdentifiers {
             // Validating Catalog Numbers
             if (catNo.isEmpty()) {
                 System.out.println("Catalog Number is null for Claim: " + claimID + 1);
-                // Check catalog numbers from database if no user input available
-                String trackTitle = ControllerMCList.finalManualClaims.get(claimID).getTrackName();
+
+                // Get the composer and lyricist for the current claim
                 String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
                 String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
-                catNo = DatabasePostgres.getCatNo(composer, lyricist);
+                String trackTitle = ControllerMCList.finalManualClaims.get(claimID).getTrackName();
+
+                // Check if composer or lyricist is registered
+                if (ceyMusicArtists.contains(composer)) {
+                    catNo = catalogNumberGenerator.generateCatalogNumber(composer);
+                    catalogNumberGenerator.updateLastCatalogNumber(composer, catNo);
+                } else if (ceyMusicArtists.contains(lyricist)) {
+                    catNo = catalogNumberGenerator.generateCatalogNumber(lyricist);
+                    catalogNumberGenerator.updateLastCatalogNumber(lyricist, catNo);
+                } else {
+                    catNo = "";  // Assign empty string if neither is registered
+                    System.out.println("Neither composer nor lyricist is registered for Claim: " + (claimID + 1));
+                }
+
+                // Set the generated catalog number in the UI
+                claimCNumbers.get(claimID).setText(catNo);
+
+                // If the catalog number is still empty, request from the user
+                if (catNo.isEmpty()) {
+                    requestCatNo(composer, lyricist, claimID, trackTitle);
+                }
+
+                /*catNo = DatabasePostgres.getCatNo(composer, lyricist);
 
                 // Request catalog number from user if there are no catalog numbers available in the database
                 if (catNo == null) {
@@ -246,7 +273,7 @@ public class ControllerMCIdentifiers {
                 String[] parts = catNo.split("-");
                 if (Objects.equals(parts[0], "null")) {
                     requestCatNo(composer, lyricist, claimID, trackTitle);
-                }
+                }*/
             }
         }
 

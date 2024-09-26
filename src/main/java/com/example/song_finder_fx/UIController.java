@@ -788,6 +788,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         rctIngests.setVisible(false);
         rctManualClaims.setVisible(false);
         rctYTM.setVisible(false);
+        rctGenIden.setVisible(false);
 
         if (selector != null) {
             selector.setVisible(true);
