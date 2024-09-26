@@ -212,7 +212,6 @@ public class ControllerMCIdentifiers {
         // Initialize Catalog Number Generator
         CatalogNumberGenerator catalogNumberGenerator = new CatalogNumberGenerator();
 
-
         for (int claimID = 0; claimID < totalClaims; claimID++) {
             final String[] upc = {upcs.get(claimID).getText()};
             String catNo = claimCNumbers.get(claimID).getText();
@@ -414,7 +413,12 @@ public class ControllerMCIdentifiers {
                             );
                         });
                     }
-
+                    /*try {
+                    } catch (SQLException | IOException | InterruptedException e) {
+                        Platform.runLater(() -> {
+                            throw new RuntimeException(e);
+                        });
+                    }*/
                     return null;
                 }
             };
