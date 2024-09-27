@@ -256,7 +256,7 @@ public class ControllerMCIdentifiers {
                 claimCNumbers.get(claimID).setText(catNo);
 
                 // If the catalog number is still empty, request from the user
-                if (catNo.isEmpty()) {
+                if (catNo == null) {
                     requestCatNo(composer, lyricist, claimID, trackTitle);
                 }
 

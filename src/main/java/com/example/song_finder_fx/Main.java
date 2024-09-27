@@ -32,8 +32,7 @@ public class Main extends Application {
     static List<Songs> songListNew = new ArrayList<>();
     static File selectedDirectory = null;
     static Clip clip;
-    // Updated to v23.21.1
-    public static ProductVersion versionInfo = new ProductVersion("v23.21.1");
+    public static ProductVersion versionInfo = new ProductVersion("v23.22.1");
     public static TrayIcon trayIcon;
 
     public static void main(String[] args) {
