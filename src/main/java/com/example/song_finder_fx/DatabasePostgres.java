@@ -403,38 +403,6 @@ public class DatabasePostgres {
         statement.executeUpdate(query);
     }
 
-    public static String getCatNo(String composer, String lyricist) throws SQLException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
-        String query = String.format("SELECT cat_no_handler, last_cat_no FROM public.artists WHERE artist_name = '%s';", composer);
-        ResultSet rs = statement.executeQuery(query);
-
-        String result;
-
-        if (rs.isBeforeFirst()) {
-            rs.next();
-            String prefix = rs.getString(1);
-            int suffix = rs.getInt(2);
-            suffix++;
-            String formattedSuffix = String.format("%03d", suffix);
-            result = prefix + "-CEY-" + formattedSuffix;
-        } else {
-            query = String.format("SELECT cat_no_handler, last_cat_no FROM public.artists WHERE artist_name = '%s'", lyricist);
-            rs = statement.executeQuery(query);
-            if (rs.isBeforeFirst()) {
-                rs.next();
-                String prefix = rs.getString(1);
-                int suffix = rs.getInt(2);
-                suffix++;
-                String formattedSuffix = String.format("%03d", suffix);
-                result = prefix + "-CEY-" + formattedSuffix;
-            } else {
-                result = null;
-            }
-        }
-        return result;
-    }
-
     public static void emptyReportTable() throws SQLException {
         Connection conn = getConn();
         Statement statement = conn.createStatement();
