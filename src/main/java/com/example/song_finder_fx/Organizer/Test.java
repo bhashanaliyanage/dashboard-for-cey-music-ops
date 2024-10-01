@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
-        // DatabasePostgres.refreshSummaryTable(6, 2024);
+        // DatabasePostgres.refreshSummaryTable(8, 2024);
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
@@ -37,7 +37,7 @@ public class Test {
         // testYouTubeMonitoring();
         // isrcDispatcherTest();
 
-        catalogNumberGenTest();
+        // catalogNumberGenTest();
     }
 
     private static void catalogNumberGenTest() throws SQLException {

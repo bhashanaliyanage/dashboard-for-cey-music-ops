@@ -69,6 +69,8 @@ public class ControllerMCIdentifiers {
 
         lblClaimCount.setText("Total: " + claimCount);
 
+        StringBuilder errorLog = new StringBuilder();
+
         for (int i = 0; i < claimCount; i++) {
             ManualClaimTrack claim = claims.get(i);
 
@@ -109,25 +111,22 @@ public class ControllerMCIdentifiers {
             try {
                 imgClaimPreview.setImage(setImage(claim));
             } catch (URISyntaxException e) {
-                e.printStackTrace();
+                System.out.println("Something went wrong when setting the claim image: " + e);
+                errorLog.append("Error setting image for claim ID ")
+                        .append(claimIDString)
+                        .append(": ")
+                        .append(e.getMessage())
+                        .append("\n");
+            }
+
+            if (!errorLog.isEmpty()) {
+                AlertBuilder.sendErrorAlert(
+                        "Image Loading Errors",
+                        "Some images failed to load",
+                        errorLog.toString()
+                );
             }
         }
-
-
-
-        /*TextField firstUPC_Field = upcs.getFirst();
-        firstUPC_Field.setOnKeyReleased(event -> {
-            if (event.isShortcutDown() && event.getCode().equals(KeyCode.V)) {
-                String inputText = firstUPC_Field.getText();
-                String test = "8721093238195\n" +
-                        "8721093238201\n" +
-                        "8721093238218";
-                String[] values = inputText.split("\n");
-                for (String value : values) {
-                    System.out.println("value = " + value);
-                }
-            }
-        });*/
     }
 
     private Image setImage(ManualClaimTrack claim) throws IOException, URISyntaxException {
@@ -260,19 +259,6 @@ public class ControllerMCIdentifiers {
                     requestCatNo(composer, lyricist, claimID, trackTitle);
                 }
 
-                /*catNo = DatabasePostgres.getCatNo(composer, lyricist);
-
-                // Request catalog number from user if there are no catalog numbers available in the database
-                if (catNo == null) {
-                    requestCatNo(composer, lyricist, claimID, trackTitle);
-                }
-
-                // Request catalog number if it is not recognizable
-                assert catNo != null;
-                String[] parts = catNo.split("-");
-                if (Objects.equals(parts[0], "null")) {
-                    requestCatNo(composer, lyricist, claimID, trackTitle);
-                }*/
             }
         }
 
@@ -307,118 +293,154 @@ public class ControllerMCIdentifiers {
             // Executing rest of the tasks as a background task
             Task<Void> task = new Task<>() {
                 @Override
-                protected Void call() throws Exception {
-                    // Looping through claims
-                    final String[] fileLocation = new String[1];
-                    for (int claimID = 0; claimID < totalClaims; claimID++) {
-                        // Getting progress
-                        double progress = (double) (claimID + 1) / totalClaims;
+                protected Void call() {
+                    String albumTitle = "";
+                    int claimID_DB = 0;
+                    try {
+                        // Looping through claims
+                        final String[] fileLocation = new String[1];
+                        for (int claimID = 0; claimID < totalClaims; claimID++) {
+                            // Getting progress
+                            double progress = (double) (claimID + 1) / totalClaims;
 
-                        // Getting ingest details
-                        String albumTitle = ControllerMCList.finalManualClaims.get(claimID).getTrackName();
-                        final String[] upc = {upcs.get(claimID).getText()};
-                        String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
-                        String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
-                        String youtubeID = ControllerMCList.finalManualClaims.get(claimID).getYoutubeID();
-                        String originalFileName = youtubeID + "-" + albumTitle + ".flac";
+                            // Getting ingest details
+                            albumTitle = ControllerMCList.finalManualClaims.get(claimID).getTrackName();
+                            claimID_DB = ControllerMCList.finalManualClaims.get(claimID).getId();
+                            final String[] upc = {upcs.get(claimID).getText()};
+                            String composer = ControllerMCList.finalManualClaims.get(claimID).getComposer();
+                            String lyricist = ControllerMCList.finalManualClaims.get(claimID).getLyricist();
+                            String youtubeID = ControllerMCList.finalManualClaims.get(claimID).getYoutubeID();
+                            String originalFileName = youtubeID + "-" + albumTitle + ".flac";
 
-                        // Writing CSV row
-                        List<String> CSV_Row = getCSV_Row(claimID, albumTitle, upc[0], composer, lyricist, originalFileName);
-                        csvWriter.write(CSV_Row);
+                            // Writing CSV row
+                            List<String> CSV_Row = getCSV_Row(claimID, albumTitle, upc[0], composer, lyricist, originalFileName);
+                            csvWriter.write(CSV_Row);
 
-                        // Creating sub-folders by UPC
-                        File folder = createSubFolder(upc[0], destination);
+                            // Creating sub-folders by UPC
+                            File folder = createSubFolder(upc[0], destination);
 
-                        // Getting the artwork from database, saving it to created subfolder
-                        BufferedImage artwork = ControllerMCList.finalManualClaims.get(claimID).getBufferedImage();
-                        if (artwork != null) {
-                            Platform.runLater(() -> lblProcess.setText("Getting Artwork for: " + albumTitle));
-                            try {
+                            // Getting the artwork from database, saving it to created subfolder
+                            BufferedImage artwork = ControllerMCList.finalManualClaims.get(claimID).getBufferedImage();
+                            if (artwork != null) {
+                                String finalAlbumTitle = albumTitle;
+                                Platform.runLater(() -> lblProcess.setText("Getting Artwork for: " + finalAlbumTitle));
                                 String outputPath = folder.getAbsolutePath() + "\\" + upc[0] + ".jpg";
-                                // Platform.runLater(() -> System.out.println("outputPath = " + outputPath));
                                 ImageIO.write(artwork, "jpg", new File(outputPath));
-                            } catch (IOException e) {
-                                Platform.runLater(() -> progressBar.setStyle("-fx-background-color: red;"));
-                                Platform.runLater(e::printStackTrace);
-                            }
-                        } else {
-                            try {
+                                /*try {
+                                } catch (IOException e) {
+                                    Platform.runLater(() -> progressBar.setStyle("-fx-background-color: red;"));
+                                    Platform.runLater(e::printStackTrace);
+                                }*/
+                            } else {
                                 String path = "src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork.jpg";
                                 BufferedImage tempArtwork = ImageIO.read(new File(path));
-                                Platform.runLater(() -> lblProcess.setText("Error Getting Artwork. Copying Temporary Artwork: " + albumTitle));
+                                String finalAlbumTitle1 = albumTitle;
+                                Platform.runLater(() -> lblProcess.setText("Error Getting Artwork. Copying Temporary Artwork: " + finalAlbumTitle1));
                                 String outputPath = folder.getAbsolutePath() + "\\" + upc[0] + ".jpg";
                                 ImageIO.write(tempArtwork, "jpg", new File(outputPath));
-                            } catch (IOException e) {
-                                System.out.println("Error in Artwork: " + e);
+                                /*try {
+                                } catch (IOException e) {
+                                    Platform.runLater(() -> System.out.println("Error in Artwork: " + e));
+                                }*/
                             }
-                        }
 
-                        // Downloading audio to a temporary directory
-                        Platform.runLater(() -> lblProcess.setText("Processing Audio for: " + albumTitle));
-                        String fileName = CSV_Row.get(55);
+                            // Downloading audio to a temporary directory
+                            String finalAlbumTitle2 = albumTitle;
+                            Platform.runLater(() -> lblProcess.setText("Processing Audio for: " + finalAlbumTitle2));
+                            String fileName = CSV_Row.get(55);
 
-                        // Check if the video is already downloaded and use it
-                        if (downloadedVideos.containsKey(youtubeID)) {
-                            fileName = downloadedFileNames.get(fileLocation[0]);
-                            Platform.runLater(() -> lblProcess.setText("Using existing audio for: " + albumTitle));
-                        } else {
-                            Platform.runLater(() -> lblProcess.setText("Downloading audio for: " + albumTitle));
-                            boolean status = downloadAudio(claimID, fileName, fileLocation);
-                            if (!status) {
-                                String errorMessage = "Failed to download audio for: " + albumTitle + " (YouTube ID: " + youtubeID + ")";
-                                errorLog.add(errorMessage);
+                            // Check if the video is already downloaded and use it
+                            if (downloadedVideos.containsKey(youtubeID)) {
+                                fileName = downloadedFileNames.get(fileLocation[0]);
+                                String finalAlbumTitle3 = albumTitle;
+                                Platform.runLater(() -> lblProcess.setText("Using existing audio for: " + finalAlbumTitle3));
                             } else {
-                                // Store the downloaded file location
-                                downloadedVideos.put(youtubeID, fileLocation[0]);
-                                downloadedFileNames.put(fileLocation[0], fileName);
+                                String finalAlbumTitle4 = albumTitle;
+                                Platform.runLater(() -> lblProcess.setText("Downloading audio for: " + finalAlbumTitle4));
+                                boolean status = downloadAudio(claimID, fileName, fileLocation);
+                                if (!status) {
+                                    String errorMessage = "Failed to download audio for: " + albumTitle + " (YouTube ID: " + youtubeID + ")";
+                                    errorLog.add(errorMessage);
+                                } else {
+                                    // Store the downloaded file location
+                                    downloadedVideos.put(youtubeID, fileLocation[0]);
+                                    downloadedFileNames.put(fileLocation[0], fileName);
+                                }
                             }
+
+                            // Trimming audio if needed and copying it to the sub-folder created
+                            trimAndCopyAudio(claimID, albumTitle, fileLocation, fileName, folder, lblProcess, originalFileName);
+
+                            Platform.runLater(() -> {
+                                // progressBar.setProgress(progress)
+                                double currentProgress = progressBar.getProgress();
+
+                                Timeline timeline = new Timeline(
+                                        new KeyFrame(Duration.ZERO, new KeyValue(progressBar.progressProperty(), currentProgress)),
+                                        new KeyFrame(Duration.millis(250), new KeyValue(progressBar.progressProperty(), progress))
+                                );
+                                timeline.play();
+                            });
+                            String finalAlbumTitle5 = albumTitle;
+                            Platform.runLater(() -> lblProcess.setText("Done downloading audio for: " + finalAlbumTitle5));
                         }
 
-                        // Trimming audio if needed and copying it to the sub-folder created
-                        trimAndCopyAudio(claimID, albumTitle, fileLocation, fileName, folder, lblProcess, originalFileName);
-
-                        Platform.runLater(() -> {
-                            // progressBar.setProgress(progress)
-                            double currentProgress = progressBar.getProgress();
-
-                            Timeline timeline = new Timeline(
-                                    new KeyFrame(Duration.ZERO, new KeyValue(progressBar.progressProperty(), currentProgress)),
-                                    new KeyFrame(Duration.millis(250), new KeyValue(progressBar.progressProperty(), progress))
-                            );
-                            timeline.play();
-                        });
                         Platform.runLater(() -> lblProcess.setText("Done"));
-                    }
 
-                    // Converting CSV to a byte array to store it in the database
-                    String csvContent = csvWriter.toString();
-                    byte[] byteArray = csvContent.getBytes(StandardCharsets.UTF_8);
+                        // Converting CSV to a byte array to store it in the database
+                        String csvContent = csvWriter.toString();
+                        byte[] byteArray = csvContent.getBytes(StandardCharsets.UTF_8);
 
-                    try {
                         DatabasePostgres.addIngestCSV(byteArray, ingestID);
                         dispatcher.updateLastISRC(currentISRC, "UGC");
+
+                        csvWriter.close();
+
+                        if (!errorLog.isEmpty()) {
+                            Platform.runLater(() -> {
+                                String errorSummary = String.join("\n", errorLog);
+                                AlertBuilder.sendErrorAlert(
+                                        "Ingest Process Errors",
+                                        "Some errors occurred during the ingest process",
+                                        "The following errors were encountered:\n\n" + errorSummary
+                                );
+                            });
+                        }
+                        return null;
                     } catch (SQLException e) {
-                        Platform.runLater(e::printStackTrace);
-                    }
-
-                    csvWriter.close();
-
-                    if (!errorLog.isEmpty()) {
+                        String finalAlbumTitle6 = albumTitle;
+                        int finalClaimID_DB = claimID_DB;
                         Platform.runLater(() -> {
-                            String errorSummary = String.join("\n", errorLog);
                             AlertBuilder.sendErrorAlert(
-                                    "Ingest Process Errors",
-                                    "Some errors occurred during the ingest process",
-                                    "The following errors were encountered:\n\n" + errorSummary
+                                    "Ingest Process Interrupted",
+                                    "The ingest process was interrupted",
+                                    "Database Error: " + finalAlbumTitle6 + "\nClaim ID: " + finalClaimID_DB + "\nError: " + e
                             );
+                            e.printStackTrace();
+                        });
+                    } catch (InterruptedException e) {
+                        String finalAlbumTitle7 = albumTitle;
+                        int finalClaimID_DB1 = claimID_DB;
+                        Platform.runLater(() -> {
+                            AlertBuilder.sendErrorAlert(
+                                    "Ingest Process Interrupted",
+                                    "The ingest process was interrupted",
+                                    "Error Trimming Audio for: " + finalAlbumTitle7 + "\nClaim ID: " + finalClaimID_DB1 + "\nError: " + e
+                            );
+                            e.printStackTrace();
+                        });
+                    } catch (IOException e) {
+                        String finalAlbumTitle8 = albumTitle;
+                        int finalClaimID_DB2 = claimID_DB;
+                        Platform.runLater(() -> {
+                            AlertBuilder.sendErrorAlert(
+                                    "Ingest Process Interrupted",
+                                    "The ingest process was interrupted",
+                                    "Error in reading or writing CSV or image files for: " + finalAlbumTitle8 + "\nClaim ID: " + finalClaimID_DB2 + "\nError: " + e
+                            );
+                            e.printStackTrace();
                         });
                     }
-                    /*try {
-                    } catch (SQLException | IOException | InterruptedException e) {
-                        Platform.runLater(() -> {
-                            throw new RuntimeException(e);
-                        });
-                    }*/
                     return null;
                 }
             };
@@ -685,7 +707,7 @@ public class ControllerMCIdentifiers {
         return currentDate.format(formatter);
     }
 
-    private static @NotNull String getCatNo(int i) throws SQLException {
+    private static @NotNull String getCatNo(int i) {
         // Get catalog numbers from user input
         final String[] catNo = {claimCNumbers.get(i).getText()};
 
@@ -693,12 +715,6 @@ public class ControllerMCIdentifiers {
             // Check catalog numbers from database if no user input available
             String composer = ControllerMCList.finalManualClaims.get(i).getComposer();
             String lyricist = ControllerMCList.finalManualClaims.get(i).getLyricist();
-            catNo[0] = DatabasePostgres.getCatNo(composer, lyricist);
-
-            // Request catalog number from user if there are no catalog numbers available in the database
-            if (catNo[0] == null) {
-                requestCatalogNumber(composer, lyricist, catNo);
-            }
 
             // Request catalog number if it is not recognizable
             String[] parts = catNo[0].split("-");

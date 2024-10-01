@@ -29,7 +29,6 @@ import javafx.util.Duration;
 
 import javax.sound.sampled.Clip;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -61,6 +60,7 @@ public class ControllerSearch {
     private VBox vboxSongSearch;
 
     public VBox mainVBox;
+
     @FXML
     private Label lblSearchType;
 
@@ -441,7 +441,7 @@ public class ControllerSearch {
     }
 
     @FXML
-    void onSearchedSongClick() throws IOException, SQLException, ClassNotFoundException {
+    void onSearchedSongClick() throws IOException {
         Duration duration = Duration.seconds(0.100);
 
         // Create a timeline for increasing heights
@@ -633,7 +633,7 @@ public class ControllerSearch {
         }
     }
 
-    public void onSearchOnYoutubeBtnClicked(MouseEvent mouseEvent) {
+    public void onSearchOnYoutubeBtnClicked() {
         String query = searchArea.getText();
         query = query.replace(" ", "+");
         query = "https://www.youtube.com/results?search_query=" + query;

@@ -4,6 +4,8 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -12,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCList">
+<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCList">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -72,9 +74,14 @@
          </VBox.margin>
          <Button mnemonicParsing="false" onAction="#onSelectNone" prefWidth="130.0" styleClass="button_inside" text="Select None" />
          <Button mnemonicParsing="false" onAction="#onSelectAll" prefWidth="130.0" styleClass="button_inside" text="Select All" />
-         <Button layoutX="348.0" layoutY="10.0" mnemonicParsing="false" onAction="#onExportSelected" prefWidth="130.0" styleClass="button_inside_brown" text="Export Selected" />
-         <Button fx:id="btnArchive" mnemonicParsing="false" onAction="#onArchiveSelected" prefWidth="130.0" styleClass="button_inside_brown" text="Archive Selected" />
-         <Button mnemonicParsing="false" onAction="#onCheck" prefWidth="130.0" styleClass="button_inside_brown" text="Create Ingest" />
+         <MenuButton mnemonicParsing="false" prefWidth="130.0" styleClass="button_inside" text="Bulk Actions">
+           <items>
+             <MenuItem mnemonicParsing="false" onAction="#onExportSelected" text="Export Selected" />
+             <MenuItem mnemonicParsing="false" onAction="#onArchiveSelected" text="Archive Selected" />
+               <MenuItem mnemonicParsing="false" onAction="#onBulkEdit" text="Bulk Edit Images" />
+           </items>
+         </MenuButton>
+         <Button mnemonicParsing="false" onAction="#onCheck" prefHeight="27.0" prefWidth="247.0" styleClass="button_inside_brown" text="Create Ingest" />
       </HBox>
    </VBox>
    <VBox layoutX="40.0" layoutY="219.0" maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../../styles.css">
@@ -91,14 +98,14 @@
          <HBox fx:id="hboxLoading" alignment="CENTER_RIGHT" opacity="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
             <Label fx:id="lblArtworkProgress" text="Loading Artworks (0%)" textFill="#72a276">
                <HBox.margin>
-                  <Insets right="10.0"/>
+                  <Insets right="10.0" />
                </HBox.margin>
             </Label>
-            <ImageView fx:id="imgLoading" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
                <HBox.margin>
-                  <Insets right="10.0"/>
+                  <Insets right="10.0" />
                </HBox.margin>
-               <Image url="@../../images/loading_02.gif"/>
+               <Image url="@../../images/loading_02.gif" />
             </ImageView>
          </HBox>
       </HBox>
