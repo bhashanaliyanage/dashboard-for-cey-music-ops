@@ -211,6 +211,8 @@ public class ControllerMCIdentifiers {
         // Initialize Catalog Number Generator
         CatalogNumberGenerator catalogNumberGenerator = new CatalogNumberGenerator();
 
+        StringBuilder catNoErrorLog = new StringBuilder();
+
         for (int claimID = 0; claimID < totalClaims; claimID++) {
             final String[] upc = {upcs.get(claimID).getText()};
             String catNo = claimCNumbers.get(claimID).getText();
@@ -255,7 +257,7 @@ public class ControllerMCIdentifiers {
                 claimCNumbers.get(claimID).setText(catNo);
 
                 // If the catalog number is still empty, request from the user
-                if (catNo == null) {
+                if (catNo == null || catNo.isEmpty()) {
                     requestCatNo(composer, lyricist, claimID, trackTitle);
                 }
 
@@ -272,6 +274,7 @@ public class ControllerMCIdentifiers {
         Label lblIngestID = (Label) scene.lookup("#lblIngestID");
         Label lblProcess = (Label) scene.lookup("#lblProcess");
         Label lblLocation = (Label) scene.lookup("#lblLocation");
+        Label lblPercentage = (Label) scene.lookup("#lblPercentage");
         ProgressBar progressBar = (ProgressBar) scene.lookup("#progressBar");
 
         // Requesting file location from user
@@ -357,7 +360,7 @@ public class ControllerMCIdentifiers {
                             } else {
                                 String finalAlbumTitle4 = albumTitle;
                                 Platform.runLater(() -> lblProcess.setText("Downloading audio for: " + finalAlbumTitle4));
-                                boolean status = downloadAudio(claimID, fileName, fileLocation);
+                                boolean status = downloadAudio(claimID, fileName, fileLocation, lblPercentage);
                                 if (!status) {
                                     String errorMessage = "Failed to download audio for: " + albumTitle + " (YouTube ID: " + youtubeID + ")";
                                     errorLog.add(errorMessage);
@@ -501,9 +504,9 @@ public class ControllerMCIdentifiers {
         }
     }
 
-    private static boolean downloadAudio(int claimID, String fileName, String[] fileLocation) {
-        String url = "";
-        String fileLocation1 = "";
+    private static boolean downloadAudio(int claimID, String fileName, String[] fileLocation, Label lblPercentage) {
+        String url;
+        String fileLocation1;
 
         boolean status;
 
@@ -511,7 +514,7 @@ public class ControllerMCIdentifiers {
             url = ControllerMCList.finalManualClaims.get(claimID).getYouTubeURL();
             Path tempDir = Files.createTempDirectory("ceymusic_dashboard_audio");
             fileLocation1 = tempDir.toString();
-            status = YoutubeDownload.downloadAudio(url, fileLocation1, fileName);
+            status = YoutubeDownload.downloadAudio(url, fileLocation1, fileName, lblPercentage);
             fileLocation[0] = fileLocation1;
         } catch (IOException | InterruptedException e) {
             status = false;

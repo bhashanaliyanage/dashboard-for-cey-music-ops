@@ -19,13 +19,11 @@ import javafx.stage.Window;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.song_finder_fx.Controller.Invoice.loadAutoScaledImage;
 import static com.example.song_finder_fx.Controller.Invoice.loadFont;
-import static com.itextpdf.kernel.pdf.PdfName.Colors;
 
 public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
     private static final Border BLUE_BORDER = new SolidBorder(INVOICE_BLUE, 0.5f);
@@ -293,52 +291,52 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         return pathTo.getAbsolutePath();
     }
 
-    public Document generateReport(String path, ArtistReport report) throws IOException {
-        PDFDocument pdfDocument = new PDFDocument();
-        Document document = pdfDocument.getDocument(path);
+public Document generateReport(String path, ArtistReport report) throws IOException {
+    PDFDocument pdfDocument = new PDFDocument();
+    Document document = pdfDocument.getDocument(path);
 
-        // Images
-        Image reportHeading = loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png");
+    // Images
+    Image reportHeading = loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png");
 
-        // Fonts
-        FONT_RUBIK_SEMIBOLD = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf");
-        FONT_POPPINS = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf");
+    // Fonts
+    FONT_RUBIK_SEMIBOLD = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf");
+    FONT_POPPINS = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf");
 
-        // Table 01
-        Table tableHeader = getHeaderTable(reportHeading);
-        Table tableFooter = getFooterTable();
-        tableFooter.setFixedPosition(20f, document.getBottomMargin(), document.getWidth());
-        Table table02 = getTable02(report);
-        Table table03 = getTable03(report);
-        Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
-        Table tableCoWriterPaymentSummary = getCoWriterSummaryTable(report);
-        Table tableAssetBreakdown = getAssetBreakdownTable(report);
-        Table tableCoWriterPayments = coWriterPaymentsTable(report);
+    // Table 01
+    Table tableHeader = getHeaderTable(reportHeading);
+    Table tableFooter = getFooterTable();
+    tableFooter.setFixedPosition(20f, document.getBottomMargin(), document.getWidth());
+    Table table02 = getTable02(report);
+    Table table03 = getTable03(report);
+    Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
+    Table tableCoWriterPaymentSummary = getCoWriterSummaryTable(report);
+    Table tableAssetBreakdown = getAssetBreakdownTable(report);
+    Table tableCoWriterPayments = coWriterPaymentsTable(report);
 
-        document.add(tableHeader); // Letter Head
-        document.add(table02); // Artist Name and Month
-        document.add(table03);
-        // document.add(table04);
-        document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
-        document.add(tableTopPerformingSongsSummary); // Top Performing Songs Summary
-        document.add(tableFooter);
+    document.add(tableHeader); // Letter Head
+    document.add(table02); // Artist Name and Month
+    document.add(table03);
+    // document.add(table04);
+    document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
+    document.add(tableTopPerformingSongsSummary); // Top Performing Songs Summary
+    document.add(tableFooter);
 
-        document.add(new AreaBreak());
+    document.add(new AreaBreak());
 
-        document.add(tableHeader); // Letter Head
-        document.add(table02); // Artist Name and Month
-        document.add(tableAssetBreakdown);
+    document.add(tableHeader); // Letter Head
+    document.add(table02); // Artist Name and Month
+    document.add(tableAssetBreakdown);
 
-        document.add(new AreaBreak());
+    document.add(new AreaBreak());
 
-        document.add(tableHeader); // Letter Head
-        document.add(table02); // Artist Name and Month
-        document.add(tableCoWriterPayments); // Co-Writer Payments
+    document.add(tableHeader); // Letter Head
+    document.add(table02); // Artist Name and Month
+    document.add(tableCoWriterPayments); // Co-Writer Payments
 
-        document.close();
+    document.close();
 
-        return document;
-    }
+    return document;
+}
 
     private Table coWriterPaymentsTable(ArtistReport report) {
         float[] columnWidth = {500f, 200f};
@@ -435,7 +433,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
             table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare / eurToAudRate * audToLkrRate) + "/-").setFont(FONT_POPPINS))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle).setBorder(BLUE_BORDER));
 
-            Image paidImage = loadImage("src/main/resources/com/example/song_finder_fx/images/reports/report_paid_dark_g.png");
+            Image paidImage = loadPaidImage();
             // paidImage.setWidth(5f);
             paidImage.setHeight(10f);
 
@@ -475,8 +473,8 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         return table;
     }
 
-    private Image loadImage(String location) throws MalformedURLException {
-        Image image = new Image(ImageDataFactory.create(location));
+    private Image loadPaidImage() throws MalformedURLException {
+        Image image = new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/reports/report_paid_dark_g.png"));
         image.setAutoScale(false);
         return image;
     }

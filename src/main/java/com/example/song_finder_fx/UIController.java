@@ -237,8 +237,12 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         btnYouTubeMonitoringStatic = btnYouTubeMonitoring;
         btnGenIdentifiersStatic = btnGenIdentifiers;
 
-        // Loading user
-        loadUser();
+        try {
+            // Loading user
+            loadUser();
+        } catch (Exception e) {
+            System.out.println("Unable to load user: " + e);
+        }
 
         loadUserSongList();
 
@@ -1366,7 +1370,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
                 // Start fade in
                 fadeIn.play();
-            } catch (IOException e) {
+            } catch (IOException | NullPointerException e) {
                 e.printStackTrace();
             }
         });
