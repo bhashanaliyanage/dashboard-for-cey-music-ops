@@ -26,7 +26,7 @@ public class Test {
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
-        // getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 8, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_august_mahesh_vithana.pdf");
+        getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 8, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_august_mahesh_vithana.pdf");
         // testArtistReportsNew();
         // testNewArtistReportPDF();
 
@@ -39,7 +39,7 @@ public class Test {
 
         // catalogNumberGenTest();
 
-        YoutubeDownload.downloadAudio("https://www.youtube.com/watch?v=VPLQqrhKNPk", "D:\\CeyMusic\\Ingests\\2024.10.02", "VPLQqrhKNPk.flac", null);
+        // YoutubeDownload.downloadAudio("https://www.youtube.com/watch?v=VPLQqrhKNPk", "D:\\CeyMusic\\Ingests\\2024.10.02", "VPLQqrhKNPk.flac", null);
     }
 
     private static void catalogNumberGenTest() throws SQLException {

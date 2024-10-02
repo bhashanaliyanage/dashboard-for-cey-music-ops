@@ -291,52 +291,52 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         return pathTo.getAbsolutePath();
     }
 
-public Document generateReport(String path, ArtistReport report) throws IOException {
-    PDFDocument pdfDocument = new PDFDocument();
-    Document document = pdfDocument.getDocument(path);
+    public Document generateReport(String path, ArtistReport report) throws IOException {
+        PDFDocument pdfDocument = new PDFDocument();
+        Document document = pdfDocument.getDocument(path);
 
-    // Images
-    Image reportHeading = loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png");
+        // Images
+        Image reportHeading = loadAutoScaledImage("src/main/resources/com/example/song_finder_fx/images/marketing-head-report-2.png");
 
-    // Fonts
-    FONT_RUBIK_SEMIBOLD = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf");
-    FONT_POPPINS = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf");
+        // Fonts
+        FONT_RUBIK_SEMIBOLD = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Rubik-SemiBold.ttf");
+        FONT_POPPINS = loadFont("src/main/resources/com/example/song_finder_fx/fonts/Poppins-Regular.ttf");
 
-    // Table 01
-    Table tableHeader = getHeaderTable(reportHeading);
-    Table tableFooter = getFooterTable();
-    tableFooter.setFixedPosition(20f, document.getBottomMargin(), document.getWidth());
-    Table table02 = getTable02(report);
-    Table table03 = getTable03(report);
-    Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
-    Table tableCoWriterPaymentSummary = getCoWriterSummaryTable(report);
-    Table tableAssetBreakdown = getAssetBreakdownTable(report);
-    Table tableCoWriterPayments = coWriterPaymentsTable(report);
+        // Table 01
+        Table tableHeader = getHeaderTable(reportHeading);
+        Table tableFooter = getFooterTable();
+        tableFooter.setFixedPosition(20f, document.getBottomMargin(), document.getWidth());
+        Table table02 = getTable02(report);
+        Table table03 = getTable03(report);
+        Table tableTopPerformingSongsSummary = getTopPerformingSongsTable(report);
+        Table tableCoWriterPaymentSummary = getCoWriterSummaryTable(report);
+        Table tableAssetBreakdown = getAssetBreakdownTable(report);
+        Table tableCoWriterPayments = coWriterPaymentsTable(report);
 
-    document.add(tableHeader); // Letter Head
-    document.add(table02); // Artist Name and Month
-    document.add(table03);
-    // document.add(table04);
-    document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
-    document.add(tableTopPerformingSongsSummary); // Top Performing Songs Summary
-    document.add(tableFooter);
+        document.add(tableHeader); // Letter Head
+        document.add(table02); // Artist Name and Month
+        document.add(table03);
+        // document.add(table04);
+        document.add(tableCoWriterPaymentSummary); // Co-Writer Payment Summary
+        document.add(tableTopPerformingSongsSummary); // Top Performing Songs Summary
+        document.add(tableFooter);
 
-    document.add(new AreaBreak());
+        document.add(new AreaBreak());
 
-    document.add(tableHeader); // Letter Head
-    document.add(table02); // Artist Name and Month
-    document.add(tableAssetBreakdown);
+        document.add(tableHeader); // Letter Head
+        document.add(table02); // Artist Name and Month
+        document.add(tableAssetBreakdown);
 
-    document.add(new AreaBreak());
+        document.add(new AreaBreak());
 
-    document.add(tableHeader); // Letter Head
-    document.add(table02); // Artist Name and Month
-    document.add(tableCoWriterPayments); // Co-Writer Payments
+        document.add(tableHeader); // Letter Head
+        document.add(table02); // Artist Name and Month
+        document.add(tableCoWriterPayments); // Co-Writer Payments
 
-    document.close();
+        document.close();
 
-    return document;
-}
+        return document;
+    }
 
     private Table coWriterPaymentsTable(ArtistReport report) {
         float[] columnWidth = {500f, 200f};
@@ -384,19 +384,22 @@ public Document generateReport(String path, ArtistReport report) throws IOExcept
 
     private Table getAssetBreakdownTable(ArtistReport report) throws MalformedURLException {
         // Table
-        float[] columnWidth = {200f, 50f, 50f, 100f, 190f, 10f};
+        float[] columnWidth = {80f, 150f, 50f, 50f, 90f, 170f, 10f};
         Table table = new Table(columnWidth);
         table.setMarginLeft(20f);
         table.setMarginRight(20f);
         float fontSizeSubTitle = 8f;
 
         // Table 02 Row 01
-        table.addCell(new Cell(1, 6).add(new Paragraph("")).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell(1, 6).add(new Paragraph("ASSET BREAKDOWN").setFont(FONT_RUBIK_SEMIBOLD))
+        table.addCell(new Cell(1, 7).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell(1, 7).add(new Paragraph("ASSET BREAKDOWN").setFont(FONT_RUBIK_SEMIBOLD))
                 .setVerticalAlignment(VerticalAlignment.BOTTOM).setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(10f).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell(1, 6).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell(1, 7).add(new Paragraph("")).setBorder(Border.NO_BORDER));
 
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Identifier").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("Title").setFont(FONT_RUBIK_SEMIBOLD))
                 .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
                 setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
@@ -423,7 +426,11 @@ public Document generateReport(String path, ArtistReport report) throws IOExcept
             String percentage = share.getShare();
             double artistShare = share.getRoyalty();
             String coWriter = share.getContributor();
+            String isrc = share.getIsrc();
+            String encryptedISRC = ISRCEncryptor.encryptISRC(isrc);
 
+            table.addCell(new Cell().add(new Paragraph(encryptedISRC).setFont(FONT_POPPINS).setPaddingLeft(5f))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(songName).setFont(FONT_POPPINS).setPaddingLeft(5f))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(songType).setFont(FONT_POPPINS))
