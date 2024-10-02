@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.opencsv.CSVWriter;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
@@ -19,8 +20,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Window;
+import javafx.util.Duration;
+import javafx.util.Pair;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -40,10 +45,13 @@ import java.util.concurrent.TimeUnit;
 public class ControllerMCList {
 
     @FXML
-    public javafx.scene.control.Button btnArchive;
+    private Label lblClaimCount;
 
     @FXML
-    private Label lblClaimCount;
+    private Label lblArtworkProgress;
+
+    @FXML
+    private HBox hboxLoading;
 
     @FXML
     private VBox vbClaimsList;
@@ -154,10 +162,12 @@ public class ControllerMCList {
     private void runValidationAndArtworkThreads() {
         stopExistingThreads();
 
+        int startIndex = currentPage * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
+        int totalArtworks = endIndex - startIndex;
+
         threadValidation = new Thread(() -> {
             try {
-                int startIndex = currentPage * pageSize;
-                int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
 
                 for (int i = startIndex; i < endIndex; i++) {
                     if (Thread.currentThread().isInterrupted()) {
@@ -182,9 +192,9 @@ public class ControllerMCList {
             }
         });
 
-        threadArtworks = new Thread(() -> {
-            int startIndex = currentPage * pageSize;
-            int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
+        /*threadArtworks = new Thread(() -> {
+            // int startIndex = currentPage * pageSize;
+            // int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
 
             for (int i = startIndex; i < endIndex; i++) {
                 if (Thread.currentThread().isInterrupted()) {
@@ -209,6 +219,61 @@ public class ControllerMCList {
                     Platform.runLater(e::printStackTrace);
                 }
             }
+        });*/
+
+        Task<List<Pair<Integer, Image>>> artworkTask = new Task<>() {
+            @Override
+            protected List<Pair<Integer, Image>> call() throws Exception {
+                List<Pair<Integer, Image>> updatedImages = new ArrayList<>();
+                for (int i = startIndex; i < endIndex; i++) {
+                    if (isCancelled()) {
+                        break;
+                    }
+                    int currentIndex = i - startIndex;
+                    updateProgress(currentIndex, totalArtworks);
+                    updateMessage("Fetching Artwork for: " + allManualClaims.get(i).getTrackName());
+                    MCTrackController controller = new MCTrackController(allManualClaims.get(i));
+                    ManualClaimTrack updatedClaim = controller.fetchArtwork();
+                    allManualClaims.set(i, updatedClaim);
+                    Image image = setImage(updatedClaim, i);
+                    updatedImages.add(new Pair<>(i, image));
+                }
+                return updatedImages;
+            }
+        };
+
+        // Fade in animation
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(500), hboxLoading);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+
+        // Fade out animation
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(500), hboxLoading);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+
+        artworkTask.progressProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> {
+            double progress = newValue.doubleValue();
+            int percentage = (int) (progress * 100);
+            lblArtworkProgress.setText("Loading Artworks (" + percentage + "%)");
+        }));
+
+        artworkTask.setOnSucceeded(event -> {
+            List<Pair<Integer, Image>> updatedImages = artworkTask.getValue();
+            for (Pair<Integer, Image> pair : updatedImages) {
+                ivArtworks.get(pair.getKey()).setImage(pair.getValue());
+            }
+            lblArtworkProgress.setText("Artwork Loading Complete");
+            fadeOut.play();
+        });
+
+        threadArtworks = new Thread(artworkTask);
+
+        // Initialize progress label and start fade in
+        Platform.runLater(() -> {
+            // lblArtworkProgress.setOpacity(0.0);
+            lblArtworkProgress.setText("Loading Artworks (0%)");
+            fadeIn.play();
         });
 
         threadArtworks.start();
@@ -431,7 +496,8 @@ public class ControllerMCList {
         if (selectedClaims.isEmpty()) {
             System.out.println("No claims selected. Aborting export.");
         } else {
-            File file = showSaveDialog(actionEvent);
+            Window window = lblClaimCount.getScene().getWindow();
+            File file = showSaveDialog(window);
             if (file == null) {
                 System.out.println("No file selected. Aborting export.");
             } else {
@@ -483,65 +549,53 @@ public class ControllerMCList {
         return rows;
     }
 
-    static File showSaveDialog(ActionEvent actionEvent) {
+    static File showSaveDialog(Window actionEvent) {
         // Getting User Location
-        Node node = (Node) actionEvent.getSource();
-        Scene scene = node.getScene();
+        // Node node = (Node) actionEvent.getSource();
+        // Scene scene = node.getScene();
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"));
         chooser.setTitle("Save As");
-        return chooser.showSaveDialog(scene.getWindow());
+        return chooser.showSaveDialog(actionEvent);
     }
 
     @FXML
     void onArchiveSelected() {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
+        boolean confirmation = AlertBuilder.getSendConfirmationAlert("Warning", null, "Are you sure you want to archive selected claims?");
 
-                Platform.runLater(() -> {
-                    btnArchive.setText("Archiving Claims");
-                    btnArchive.setDisable(true);
-                });
-
-                int count;
-                int archivedCount = 0;
-
-                count = (int) checkBoxes.stream().filter(CheckBox::isSelected).count();
-
-                for (int i = 0; i < checkBoxes.size(); i++) {
-                    if (checkBoxes.get(i).isSelected()) {
-                        String songNo = labelsSongNo.get(i).getText();
-                        try {
-                            DatabasePostgres.archiveSelectedClaim(songNo);
-                            archivedCount++;
-                            int finalI = i;
-                            int finalArchivedCount = archivedCount;
-                            Platform.runLater(() -> {
-                                hBoxes.get(finalI).setDisable(true);
-                                checkBoxes.get(finalI).setSelected(false);
-                                btnArchive.setText("Archiving " + finalArchivedCount + " of " + count);
-                            });
-                        } catch (SQLException e) {
-                            Platform.runLater(() -> {
-                                AlertBuilder.sendErrorAlert("Error", "Something went wrong when archiving manual claim", e.toString());
-                                e.printStackTrace();
-                            });
+        if (confirmation) {
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    for (int i = 0; i < checkBoxes.size(); i++) {
+                        if (checkBoxes.get(i).isSelected()) {
+                            String songNo = labelsSongNo.get(i).getText();
+                            try {
+                                DatabasePostgres.archiveSelectedClaim(songNo);
+                                int finalI = i;
+                                Platform.runLater(() -> {
+                                    hBoxes.get(finalI).setDisable(true);
+                                    checkBoxes.get(finalI).setSelected(false);
+                                    // btnArchive.setText("Archiving " + finalArchivedCount + " of " + count);
+                                });
+                            } catch (SQLException e) {
+                                Platform.runLater(() -> {
+                                    AlertBuilder.sendErrorAlert("Error", "Something went wrong when archiving manual claim", e.toString());
+                                    System.out.println("Cannot archive manual claim: " + e);
+                                });
+                            }
                         }
                     }
+
+                    return null;
                 }
+            };
 
-                Platform.runLater(() -> {
-                    btnArchive.setText("Archive Selected");
-                    btnArchive.setDisable(false);
-                });
+            Thread thread = new Thread(task);
+            thread.start();
 
-                return null;
-            }
-        };
+        }
 
-        Thread thread = new Thread(task);
-        thread.start();
     }
 
     public void onBackPage() {
@@ -550,5 +604,106 @@ public class ControllerMCList {
 
     public void onNextPage() {
         nextPage();
+    }
+
+    public void onBulkEdit() {
+        // Fade in animation
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(500), hboxLoading);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+
+        // Fade out animation
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(500), hboxLoading);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+
+        try {
+            boolean confirmation = AlertBuilder.getSendConfirmationAlert("Warning", null, "Are you sure you want to bulk edit selected claims?");
+            if (!confirmation) return;
+
+            // Check if any checkboxes are selected
+            if (checkBoxes.stream().noneMatch(CheckBox::isSelected)) {
+                AlertBuilder.sendInfoAlert("No Claims Selected", "Please select at least one claim to edit.", null);
+                return;
+            }
+
+            Window window = lblClaimCount.getScene().getWindow();
+            File image = Main.browseForImage(window);
+            if (image == null) return;
+
+            // Start background task
+            Task<Void> bulkEditTask = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        BufferedImage biArtwork = ImageIO.read(image);
+                        int imageWidth = biArtwork.getWidth();
+                        int imageHeight = biArtwork.getHeight();
+
+                        if (imageWidth >= 1400 || imageHeight >= 1400) {
+                            // Resize user input to preview size
+                            BufferedImage previewImage = ImageProcessor.resizeImage(210, 210, biArtwork);
+                            Image fxImage = SwingFXUtils.toFXImage(previewImage, null);
+
+                            List<String> failedUpdates = new ArrayList<>();
+
+                            Platform.runLater(() -> {
+                                lblArtworkProgress.setText("Updating Artworks...");
+                                fadeIn.play();
+                            });
+
+                            for (int i = 0; i < checkBoxes.size(); i++) {
+                                if (checkBoxes.get(i).isSelected()) {
+                                    String songNo = labelsSongNo.get(i).getText();
+
+                                    // Updating Database
+                                    int status = DatabasePostgres.updateClaimArtwork(songNo, biArtwork, previewImage);
+
+                                    if (status > 0) {
+                                        final int index = i;  // Final index for use in lambda expression
+
+                                        // Update UI elements on JavaFX thread
+                                        Platform.runLater(() -> {
+                                            ivArtworks.get(index).setImage(fxImage);
+                                            allManualClaims.get(index).setImage(biArtwork);
+                                            allManualClaims.get(index).setPreviewImage(previewImage);
+                                        });
+                                    } else {
+                                        failedUpdates.add(songNo); // Track failed updates
+                                    }
+                                }
+                            }
+
+                            Platform.runLater(fadeOut::play);
+
+                            // Notify about failed updates on the UI thread
+                            if (!failedUpdates.isEmpty()) {
+                                Platform.runLater(() ->
+                                        NotificationBuilder.displayTrayError("Some updates failed", "Failed for song(s): " + String.join(", ", failedUpdates))
+                                );
+                            }
+                        } else {
+                            Platform.runLater(() ->
+                                    AlertBuilder.sendErrorAlert("Error", "Image must be at least 1400x1400 pixels", null)
+                            );
+                        }
+                    } catch (IOException | SQLException e) {
+                        Platform.runLater(() ->
+                                AlertBuilder.sendErrorAlert("Error", "Something went wrong when editing manual claim", e.toString())
+                        );
+                    }
+                    return null;
+                }
+            };
+
+            // Run the task in a background thread
+            Thread backgroundThread = new Thread(bulkEditTask);
+            backgroundThread.setDaemon(true);  // Allows the thread to exit when the application exits
+            backgroundThread.start();
+
+        } catch (Exception e) {
+            AlertBuilder.sendErrorAlert("Error", "Unable to process bulk edit operation", e.toString());
+        }
+
     }
 }

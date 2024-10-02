@@ -41,13 +41,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static com.example.song_finder_fx.DatabasePostgres.checkDatabaseConnection;
 
 public class UIController implements com.example.song_finder_fx.Constants.UINode {
 
@@ -71,7 +71,12 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Button btnOpenLocation;
     public Button btnCopyTo;
     public Button btnAudioDatabase;
+
+    @FXML
     public HBox btnIngests;
+
+    @FXML
+    private HBox btnGenIdentifiers;
     //</editor-fold>
 
     //<editor-fold desc="ImageView">
@@ -170,14 +175,21 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     @FXML
     public Rectangle rctYTM;
 
+    @FXML
+    private Rectangle rctGenIden;
+
+    @FXML
     public Rectangle rctIngests;
 
+    @FXML
     public Rectangle rctManualClaims;
 
+    @FXML
     public Rectangle rctSearchSongs;
 
     // public Rectangle rctCollectSongs;
 
+    @FXML
     public Rectangle rctRevenue;
 
     // public Rectangle rctArtistReports;
@@ -201,6 +213,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     public static HBox btnSongListStatic;
 
+    public static HBox btnGenIdentifiersStatic;
+
     public void initialize() throws SQLException {
         System.out.println("Initializing UI...");
 
@@ -221,6 +235,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         lblDatabaseStatusStatic = lblDatabaseStatus;
         lblSongListSubStatic = lblSongListSub;
         btnYouTubeMonitoringStatic = btnYouTubeMonitoring;
+        btnGenIdentifiersStatic = btnGenIdentifiers;
 
         // Loading user
         loadUser();
@@ -250,6 +265,28 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 changeSelectorTo(rctYTM);
             } catch (IOException e) {
                 AlertBuilder.sendErrorAlert("Error", "Something went wrong while trying to load the YouTube Monitoring View.", e.toString());
+            }
+
+            FadeTransition fadeIn = getFadeInTransition();
+            fadeIn.play();
+        });
+
+        fadeOut.play();
+    }
+
+    @FXML
+    void onGenerateIdentifiers() {
+        System.out.println("UIController.onGenerateIdentifiers");
+
+        FadeTransition fadeOut = getFadeOutTransition();
+        fadeOut.setOnFinished(event -> {
+            try {
+                Node node = SceneController.loadLayout("layouts/identifiers/identifiers.fxml");
+                mainVBox.getChildren().clear();
+                mainVBox.getChildren().add(node);
+                changeSelectorTo(rctGenIden);
+            } catch (IOException e) {
+                AlertBuilder.sendErrorAlert("Error", "Something went wrong while trying to load the Ingests View.", e.toString());
             }
 
             FadeTransition fadeIn = getFadeInTransition();
@@ -307,13 +344,10 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 if (songList.size() > 1) {
                     String text = songList.getFirst().getISRC() + " + " + (songList.size() - 1) + " other songs added";
                     Platform.runLater(() -> UIController.lblSongListSubStatic.setText(text));
-                } else {
-                    Platform.runLater(() -> UIController.lblSongListSubStatic.setText(songList.getFirst().getISRC()));
                 }
             } catch (Exception e) {
                 Platform.runLater(e::printStackTrace);
             }
-
         });
         thread.start();
     }
@@ -361,6 +395,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 btnManualClaimsStatic.setDisable(false);
                 btnSettingsStatic.setDisable(false);
                 btnSongListStatic.setDisable(false);
+                btnGenIdentifiersStatic.setDisable(false);
 
                 mainVBoxStatic.setDisable(false);
             } else if (privilegeLevel == 1) {
@@ -374,6 +409,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 btnSettingsStatic.setDisable(false);
                 btnSongListStatic.setDisable(false);
                 btnYouTubeMonitoringStatic.setDisable(false);
+                btnGenIdentifiersStatic.setDisable(false);
 
                 mainVBoxStatic.setDisable(false);
             }
@@ -389,6 +425,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 btnSettingsStatic.setDisable(true);
                 btnSongListStatic.setDisable(true);
                 btnYouTubeMonitoringStatic.setDisable(true);
+                btnGenIdentifiersStatic.setDisable(true);
 
                 mainVBoxStatic.setDisable(true);
             } catch (Exception e) {
@@ -751,6 +788,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         rctIngests.setVisible(false);
         rctManualClaims.setVisible(false);
         rctYTM.setVisible(false);
+        rctGenIden.setVisible(false);
 
         if (selector != null) {
             selector.setVisible(true);
@@ -903,7 +941,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //<editor-fold desc="Database Things">
     public void onDatabaseConnectionBtnClick() {
         // TODO: Do this on a separate thread
-        boolean status = DatabasePostgres.checkDatabaseConnection();
+        boolean status = checkDatabaseConnection();
 
         if (status) {
             NotificationBuilder.displayTrayInfo("Database Connected", "Database Connection Success");
@@ -912,29 +950,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         }
     }
 
-    void checkDatabaseConnection() throws ClassNotFoundException {
-        lblDatabaseStatus.setText("Connecting");
-
-        Connection con = null;
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            String url = "jdbc:mysql://192.168.1.200/songData";
-            String username = "ceymusic";
-            String password = "ceymusic";
-            con = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            lblDatabaseStatus.setText("Offline");
-            lblDatabaseStatus.setStyle("-fx-text-fill: '#931621'");
-            return;
-        }
-
-        if (con != null) {
-            lblDatabaseStatus.setText("Online");
-            lblDatabaseStatus.setStyle("-fx-text-fill: '#00864E'");
-        }
-
-    }
     //</editor-fold>
 
     //<editor-fold desc="Song List">

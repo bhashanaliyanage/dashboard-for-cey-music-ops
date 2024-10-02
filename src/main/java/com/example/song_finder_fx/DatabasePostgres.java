@@ -43,7 +43,7 @@ public class DatabasePostgres {
     private static Connection conn;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
-//    DatabasePostgres db =  new DatabasePostgres();
+    //    DatabasePostgres db =  new DatabasePostgres();
     public static Connection getConn() {
         // LocalHost
         String ip = "jdbc:postgresql://192.168.1.200:5432/";
@@ -401,38 +401,6 @@ public class DatabasePostgres {
                 trackName, composer, lyricist, trimStart, trimEnd, songID);
 
         statement.executeUpdate(query);
-    }
-
-    public static String getCatNo(String composer, String lyricist) throws SQLException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
-        String query = String.format("SELECT cat_no_handler, last_cat_no FROM public.artists WHERE artist_name = '%s';", composer);
-        ResultSet rs = statement.executeQuery(query);
-
-        String result;
-
-        if (rs.isBeforeFirst()) {
-            rs.next();
-            String prefix = rs.getString(1);
-            int suffix = rs.getInt(2);
-            suffix++;
-            String formattedSuffix = String.format("%03d", suffix);
-            result = prefix + "-CEY-" + formattedSuffix;
-        } else {
-            query = String.format("SELECT cat_no_handler, last_cat_no FROM public.artists WHERE artist_name = '%s'", lyricist);
-            rs = statement.executeQuery(query);
-            if (rs.isBeforeFirst()) {
-                rs.next();
-                String prefix = rs.getString(1);
-                int suffix = rs.getInt(2);
-                suffix++;
-                String formattedSuffix = String.format("%03d", suffix);
-                result = prefix + "-CEY-" + formattedSuffix;
-            } else {
-                result = null;
-            }
-        }
-        return result;
     }
 
     public static void emptyReportTable() throws SQLException {
@@ -1023,63 +991,63 @@ public class DatabasePostgres {
 
     }
 
-public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQLException {
-    int maxRetries = 3;
-    int retryCount = 0;
-    List<PayeeForReport> pReport = new ArrayList<>();
-    // Connection con = getConn();
-    String sql = """
-            SELECT ip.isrc,\s
-            SUM(CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_payee_share,
-            SUM(rv.after_deduction_royalty / 100 * CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_calculated_royalty
-            FROM isrc_payees ip JOIN public.summary_bd_02 rv ON ip.isrc = rv.asset_isrc
-            WHERE ip.payee = ? OR ip.payee01 = ? OR ip.payee02 = ? GROUP BY ip.isrc
-            """;
+    public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQLException {
+        int maxRetries = 3;
+        int retryCount = 0;
+        List<PayeeForReport> pReport = new ArrayList<>();
+        // Connection con = getConn();
+        String sql = """
+                SELECT ip.isrc,\s
+                SUM(CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_payee_share,
+                SUM(rv.after_deduction_royalty / 100 * CASE WHEN ip.payee = ? THEN ip.share WHEN ip.payee01 = ? THEN ip.payee01share ELSE ip.payee02share END) AS total_calculated_royalty
+                FROM isrc_payees ip JOIN public.summary_bd_02 rv ON ip.isrc = rv.asset_isrc
+                WHERE ip.payee = ? OR ip.payee01 = ? OR ip.payee02 = ? GROUP BY ip.isrc
+                """;
 
-    while (retryCount < maxRetries) {
-        try (Connection con = getConn();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        while (retryCount < maxRetries) {
+            try (Connection con = getConn();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, report.getArtist().getName());
-            ps.setString(2, report.getArtist().getName());
-            ps.setString(3, report.getArtist().getName());
-            ps.setString(4, report.getArtist().getName());
-            ps.setString(5, report.getArtist().getName());
-            ps.setString(6, report.getArtist().getName());
-            ps.setString(7, report.getArtist().getName());
-            //			System.out.println(ps);
-            ResultSet rs = ps.executeQuery();
+                ps.setString(1, report.getArtist().getName());
+                ps.setString(2, report.getArtist().getName());
+                ps.setString(3, report.getArtist().getName());
+                ps.setString(4, report.getArtist().getName());
+                ps.setString(5, report.getArtist().getName());
+                ps.setString(6, report.getArtist().getName());
+                ps.setString(7, report.getArtist().getName());
+                //			System.out.println(ps);
+                ResultSet rs = ps.executeQuery();
 
-            while (rs.next()) {
-                PayeeForReport pr = new PayeeForReport();
-                pr.setIsrc(rs.getString(1));
-                pr.setShare(rs.getInt(2));
-                pr.setValue(rs.getDouble(3));
-                pReport.add(pr);
-            }
-
-            return pReport;
-        } catch (PSQLException e) {
-            if (e.getMessage().contains("An I/O error occurred")) {
-                retryCount++;
-
-                if (retryCount >= maxRetries) {
-                    throw e;
+                while (rs.next()) {
+                    PayeeForReport pr = new PayeeForReport();
+                    pr.setIsrc(rs.getString(1));
+                    pr.setShare(rs.getInt(2));
+                    pr.setValue(rs.getDouble(3));
+                    pReport.add(pr);
                 }
 
-                System.out.println("\nRetrying database operation, attempt " + retryCount);
+                return pReport;
+            } catch (PSQLException e) {
+                if (e.getMessage().contains("An I/O error occurred")) {
+                    retryCount++;
 
-                try {
-                    Thread.sleep(1000L * retryCount); // Exponential backoff
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    if (retryCount >= maxRetries) {
+                        throw e;
+                    }
+
+                    System.out.println("\nRetrying database operation, attempt " + retryCount);
+
+                    try {
+                        Thread.sleep(1000L * retryCount); // Exponential backoff
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         }
-    }
 
-    return null;
-}
+        return null;
+    }
 
     public static ResultSet getCoWriterShares(String artistName) throws SQLException, ClassNotFoundException {
         Connection connection = DatabaseMySQL.getConn();
@@ -1300,6 +1268,25 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         }
 
         return artists;
+    }
+
+    public static List<String> getAllCeyMusicArtists() throws SQLException {
+        String query = "SELECT artist_name FROM public.artists WHERE status = 5 ORDER BY artist_name ASC;";
+        List<String> artists = new ArrayList<>();
+
+        try (Connection con = getConn();
+             Statement statement = con.createStatement()) {
+            try (ResultSet rs = statement.executeQuery(query)) {
+                if (rs.isBeforeFirst()) {
+                    while (rs.next()) {
+                        String artist = rs.getString(1);
+                        artists.add(artist);
+                    }
+                }
+                return artists;
+            }
+        }
+
     }
 
     public static List<CoWriterSummary> getCoWriterPaymentSummary(String artistName) throws SQLException {
@@ -2767,6 +2754,58 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         }
     }
 
+    public static String getLastISRC(String assetType) throws SQLException {
+        String sql = "SELECT last_isrc FROM public.isrc_table WHERE asset_type = ?;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, assetType);
+            ResultSet rs = ps.executeQuery();
+            if (rs.isBeforeFirst()) {
+                if (rs.next()) {
+                    return rs.getString(1);
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean updateLastISRC(String isrc, String assetType) throws SQLException {
+        String sql = "UPDATE public.isrc_table SET last_isrc = ? WHERE asset_type = ?;";
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, isrc);
+            ps.setString(2, assetType);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public static String getLastCatalogNumber(String artist) throws SQLException {
+        String sql = "SELECT cat_no FROM public.artists WHERE artist_name = ?;";
+
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, artist);
+            ResultSet rs = ps.executeQuery();
+            if (rs.isBeforeFirst()) {
+                if (rs.next()) {
+                    return rs.getString(1);
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean updateLastCatalogNumber(String artist, String lastCatalogNumber) throws SQLException {
+        String sql = "UPDATE public.artists SET cat_no = ? WHERE artist_name = ?;";
+        try (Connection con = getConn();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, lastCatalogNumber);
+            ps.setString(2, artist);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     public List<Payee> check(String name) {
         // String name = "Victor Rathnayake";
         Payee py;
@@ -3059,7 +3098,6 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
 
         return songs;
     }
-
 
 
     public static List<Songs> topPerformingSongs() {
@@ -3487,49 +3525,49 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
 
     private static ResultSet getAssetBreakdownResultSet(String artist) throws SQLException {
         String sqlNew2 = """
-                SELECT R.ASSET_ISRC,
-                	R.AFTER_DEDUCTION_ROYALTY,
-                	S.SONG_NAME,
-                	CASE
-                        WHEN ? = IP.PAYEE THEN IP.PAYEE
-                        WHEN ? = IP.PAYEE01 THEN IP.PAYEE01
-                        WHEN ? = IP.PAYEE02 THEN IP.PAYEE02
-                    END AS PAYEE,
-                	IP.SHARE,
-                	CASE
-                        WHEN (CASE
-                                  WHEN ? = IP.PAYEE THEN IP.PAYEE
-                                  WHEN ? = IP.PAYEE01 THEN IP.PAYEE01
-                                  WHEN ? = IP.PAYEE02 THEN IP.PAYEE02
-                              END) = (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER)\s
-                        THEN (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.LYRICIST)
-                        ELSE (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER)
-                    END AS CONTRIBUTOR,
-                               \s
-                	(SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER) AS COMPOSER,
-                               \s
-                	(SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.LYRICIST) AS LYRICIST,
-                \t
-                	 S.TYPE,
-                	R.AFTER_DEDUCTION_ROYALTY * IP.SHARE / 100 AS CALCULATED_ROYALTY,
-                	S.UPC,
-                	P.PRODUCT_TITLE
-                FROM PUBLIC.SUMMARY_BD_02 AS R
-                JOIN
-                	(SELECT ASSET_ISRC,
-                			MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
-                		FROM PUBLIC.SUMMARY_BD_02
-                		WHERE ASSET_ISRC IN
-                				(SELECT ISRC
-                             FROM PUBLIC.ISRC_PAYEES
-                             WHERE ? IN (PAYEE, PAYEE01, PAYEE02))
-                		GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC
-                AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
-                LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
-                LEFT JOIN PUBLIC.ISRC_PAYEES IP ON IP.ISRC = R.ASSET_ISRC
-                LEFT JOIN PUBLIC.PRODUCTS P ON P.UPC = S.UPC
-                ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
-               \s""";
+                 SELECT R.ASSET_ISRC,
+                 	R.AFTER_DEDUCTION_ROYALTY,
+                 	S.SONG_NAME,
+                 	CASE
+                         WHEN ? = IP.PAYEE THEN IP.PAYEE
+                         WHEN ? = IP.PAYEE01 THEN IP.PAYEE01
+                         WHEN ? = IP.PAYEE02 THEN IP.PAYEE02
+                     END AS PAYEE,
+                 	IP.SHARE,
+                 	CASE
+                         WHEN (CASE
+                                   WHEN ? = IP.PAYEE THEN IP.PAYEE
+                                   WHEN ? = IP.PAYEE01 THEN IP.PAYEE01
+                                   WHEN ? = IP.PAYEE02 THEN IP.PAYEE02
+                               END) = (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER)\s
+                         THEN (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.LYRICIST)
+                         ELSE (SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER)
+                     END AS CONTRIBUTOR,
+                                \s
+                 	(SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.COMPOSER) AS COMPOSER,
+                                \s
+                 	(SELECT AR.ARTIST_NAME FROM PUBLIC.ARTISTS AR WHERE AR.ARTIST_ID = S.LYRICIST) AS LYRICIST,
+                 \t
+                 	 S.TYPE,
+                 	R.AFTER_DEDUCTION_ROYALTY * IP.SHARE / 100 AS CALCULATED_ROYALTY,
+                 	S.UPC,
+                 	P.PRODUCT_TITLE
+                 FROM PUBLIC.SUMMARY_BD_02 AS R
+                 JOIN
+                 	(SELECT ASSET_ISRC,
+                 			MAX(AFTER_DEDUCTION_ROYALTY) AS MAX_ROYALTY
+                 		FROM PUBLIC.SUMMARY_BD_02
+                 		WHERE ASSET_ISRC IN
+                 				(SELECT ISRC
+                              FROM PUBLIC.ISRC_PAYEES
+                              WHERE ? IN (PAYEE, PAYEE01, PAYEE02))
+                 		GROUP BY ASSET_ISRC) AS MAX_ROYALTIES ON R.ASSET_ISRC = MAX_ROYALTIES.ASSET_ISRC
+                 AND R.AFTER_DEDUCTION_ROYALTY = MAX_ROYALTIES.MAX_ROYALTY
+                 LEFT JOIN PUBLIC.SONGS S ON R.ASSET_ISRC = S.ISRC
+                 LEFT JOIN PUBLIC.ISRC_PAYEES IP ON IP.ISRC = R.ASSET_ISRC
+                 LEFT JOIN PUBLIC.PRODUCTS P ON P.UPC = S.UPC
+                 ORDER BY R.AFTER_DEDUCTION_ROYALTY DESC;
+                \s""";
         Connection con = getConn();
         PreparedStatement ps = con.prepareStatement(sqlNew2);
         ps.setString(1, artist);
@@ -3542,28 +3580,28 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         return ps.executeQuery();
     }
 
-    public List<Payee> getPayeeList(){
+    public List<Payee> getPayeeList() {
         List<Payee> payeeLists = new ArrayList<>();
         Connection con = getConn();
         String sql = "SELECT isrc,payee,share , payee01, payee01share, payee02, payee02share,payee03,payee03share from isrc_payees ";
         try {
-        PreparedStatement ps =  con.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
-        while(rs.next()){
-            Payee py =  new Payee();
-           py.setIsrc(rs.getString(1));
-           py.setPayee1(rs.getString(2));
-           int pay1 = rs.getInt(3);
-           py.setShare1(Integer.toString(pay1));
-           py.setPayee2(rs.getString(4));
-           int pay2 = rs.getInt(5);
-           py.setShare2(Integer.toBinaryString(pay2));
-           py.setPayee3(rs.getString(6));
-           int pay3 = rs.getInt(7);
-           py.setShare3(Integer.toString(pay3));
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Payee py = new Payee();
+                py.setIsrc(rs.getString(1));
+                py.setPayee1(rs.getString(2));
+                int pay1 = rs.getInt(3);
+                py.setShare1(Integer.toString(pay1));
+                py.setPayee2(rs.getString(4));
+                int pay2 = rs.getInt(5);
+                py.setShare2(Integer.toBinaryString(pay2));
+                py.setPayee3(rs.getString(6));
+                int pay3 = rs.getInt(7);
+                py.setShare3(Integer.toString(pay3));
 
-        }
-        }catch (Exception e){
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return payeeLists;
@@ -3595,15 +3633,14 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
     }
 
 
-
     public static void main(String[] args) {
 //
         String s = DatabasePostgres.testMeth();
     }
 
     public static String testMeth() {
-        String s= "artist/allart";
-        String url = CallWeb.BASE_URL+s;
+        String s = "artist/allart";
+        String url = CallWeb.BASE_URL + s;
 //        System.out.println(url+"  url");
         try {
             s = CallWeb.callWebApp(url);
@@ -3615,41 +3652,20 @@ public static List<PayeeForReport> getPayeeReport(ArtistReport report) throws SQ
         return s;
     }
 
-//Youtube Service
-public List<YoutubeData> getUrlList() {
-    Connection con = getConn();
-    String sql = "SELECT url,name  from youtube where type = '2'";
-//    List<String> stList = new ArrayList<String>();
-        List  <YoutubeData> stList = new ArrayList<YoutubeData>();
-    try {
-        PreparedStatement ps  =  con.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
-        while(rs.next()) {
-            YoutubeData yt =  new YoutubeData();
-//            System.out.println(ps);
-          yt.setUrl(rs.getString(1));
-           yt.setName(  rs.getString(2));
-            stList.add(yt);
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    return stList;
-}
-    public List<YoutubeData> getUrlList1() {
+    //Youtube Service
+    public List<YoutubeData> getUrlList() {
         Connection con = getConn();
-        String sql = "SELECT url,name  from youtube where type = '1'";
+        String sql = "SELECT url,name  from youtube where type = '2'";
 //    List<String> stList = new ArrayList<String>();
-        List  <YoutubeData> stList = new ArrayList<YoutubeData>();
+        List<YoutubeData> stList = new ArrayList<YoutubeData>();
         try {
-            PreparedStatement ps  =  con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            System.out.println(ps);
-            while(rs.next()) {
-                YoutubeData yt =  new YoutubeData();
+            while (rs.next()) {
+                YoutubeData yt = new YoutubeData();
 //            System.out.println(ps);
                 yt.setUrl(rs.getString(1));
-                yt.setName(  rs.getString(2));
+                yt.setName(rs.getString(2));
                 stList.add(yt);
             }
         } catch (Exception e) {
@@ -3658,38 +3674,59 @@ public List<YoutubeData> getUrlList() {
         return stList;
     }
 
-    public boolean insertYoutubechannelType1(YoutubeData you){
-    Connection con = getConn();
-    String sql  = "INSERT INTO public.youtube(type, name, url)VALUES (?, ?, ?) ";
-    boolean bl = false;
-    try {
-    PreparedStatement ps  =  con.prepareStatement(sql);
-    ps.setString(1,you.getUrl());
-    ps.setString(2,you.getName());
-    ps.setInt(3,you.getType());
-   bl  = ps.executeUpdate() > 0 ? true: false;
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-        return bl;
+    public List<YoutubeData> getUrlList1() {
+        Connection con = getConn();
+        String sql = "SELECT url,name  from youtube where type = '1'";
+//    List<String> stList = new ArrayList<String>();
+        List<YoutubeData> stList = new ArrayList<YoutubeData>();
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            System.out.println(ps);
+            while (rs.next()) {
+                YoutubeData yt = new YoutubeData();
+//            System.out.println(ps);
+                yt.setUrl(rs.getString(1));
+                yt.setName(rs.getString(2));
+                stList.add(yt);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stList;
     }
 
-    public boolean updateYoutubeChannel(YoutubeData you) {
+    public boolean insertYoutubechannelType1(YoutubeData you) {
         Connection con = getConn();
-        String sql  = "UPDATE public.youtube SET type = ?, url = ? WHERE name = ? ";
+        String sql = "INSERT INTO public.youtube(type, name, url)VALUES (?, ?, ?) ";
         boolean bl = false;
         try {
-            PreparedStatement ps  =  con.prepareStatement(sql);
-            ps.setInt(1,you.getType());
-            ps.setString(2,you.getUrl());
-            ps.setString(3,you.getName());
-            bl  = ps.executeUpdate() > 0 ? true: false;
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, you.getUrl());
+            ps.setString(2, you.getName());
+            ps.setInt(3, you.getType());
+            bl = ps.executeUpdate() > 0 ? true : false;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return bl;
     }
 
+    public boolean updateYoutubeChannel(YoutubeData you) {
+        Connection con = getConn();
+        String sql = "UPDATE public.youtube SET type = ?, url = ? WHERE name = ? ";
+        boolean bl = false;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, you.getType());
+            ps.setString(2, you.getUrl());
+            ps.setString(3, you.getName());
+            bl = ps.executeUpdate() > 0 ? true : false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bl;
+    }
 
 
 }

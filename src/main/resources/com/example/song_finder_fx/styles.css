@@ -180,6 +180,10 @@
     -fx-border-color: '#17BEBB';
 }
 
+.textarea-bg .scroll-pane:fitToWidth:fitToHeight .viewport .content {
+    -fx-background-color: '#FFFFFF';
+}
+
 .check-box .box {
     -fx-background-color: '#FFFFFF';
     -fx-border-color: '#e9ebee';
@@ -346,17 +350,22 @@
     -fx-background-color: '#FFFFFF';
     -fx-border-color: '#e9ebee';
     -fx-border-width: 1;
-    -fx-background-radius: 3;
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
 }
 
 .spinner .increment-arrow-button {
     -fx-background-color: '#FFFFFF';
     -fx-border-color: '#e9ebee';
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
 }
 
 .spinner .decrement-arrow-button {
     -fx-background-color: '#FFFFFF';
     -fx-border-color: '#e9ebee';
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
 }
 
 .spinner .increment-arrow-button: pressed {
@@ -365,6 +374,11 @@
 
 .spinner .decrement-arrow-button: pressed {
     -fx-background-color: '#e9ebee';
+}
+
+.spinner .text-field:readonly {
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
 }
 
 .progress-bar .track {
@@ -408,19 +422,6 @@
     -fx-border-color: '#FFFFFF';
     -fx-padding: 10px;
 }
-
-
-/*.table-row-cell: odd{
-    -fx-background-color: '#FFFFFF';
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-padding: 0.0em;
-}
-
-.table-row-cell: even{
-    -fx-background-color: '#f9fbff';
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-padding: 0.0em;
-}*/
 
 .table-row-cell: hover {
     -fx-background-color: '#79b7e3';

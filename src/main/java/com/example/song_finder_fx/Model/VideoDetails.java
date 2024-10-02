@@ -1,7 +1,5 @@
 package com.example.song_finder_fx.Model;
 
-import org.checkerframework.checker.index.qual.EnsuresLTLengthOf;
-
 import java.util.List;
 
 public class VideoDetails {
@@ -32,7 +30,17 @@ public class VideoDetails {
     }
 
     public String getThumbnail() {
-        return Thumbnail;
+        if (Thumbnail == null) {
+            try {
+                String videoID = Url.substring(32);
+                Thumbnail = "https://i.ytimg.com/vi/" + videoID + "/maxresdefault.jpg";
+                return Thumbnail;
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            return Thumbnail;
+        }
     }
 
     public void setThumbnail(String thumbnail) {
