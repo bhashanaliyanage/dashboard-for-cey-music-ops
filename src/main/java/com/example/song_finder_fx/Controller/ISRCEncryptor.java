@@ -67,7 +67,7 @@ public class ISRCEncryptor {
     }
 
     // Decryption method to reverse the encryption
-    private static String decryptISRC(String encryptedISRC) {
+    public static String decryptISRC(String encryptedISRC) {
         StringBuilder decryptedISRC = new StringBuilder();
 
         for (char c : encryptedISRC.toCharArray()) {
