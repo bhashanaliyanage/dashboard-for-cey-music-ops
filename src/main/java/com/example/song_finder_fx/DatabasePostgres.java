@@ -3728,5 +3728,61 @@ public class DatabasePostgres {
         return bl;
     }
 
+    public int getUpcCount() {
+        Connection con = getConn();
+        String sql = "SELECT count(*) from upc";
+        int count = 0;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+
+    public boolean addDataToUpc(UpcData data){
+        Connection con= getConn();
+        String sql = "INSERT INTO public.upc(tupc_num, product_name, type, available) VALUES (?, ?, ?, 0);";
+        boolean bl = false;
+        try {
+            PreparedStatement ps=  con.prepareStatement(sql);
+            ps.setString(1, data.getUpcNumber());
+            ps.setString(2,data.getProductName());
+            ps.setString(3,data.getType());
+             bl = ps.executeUpdate() > 0 ? true : false;
+
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return bl;
+    }
+
+
+    public boolean removeUpc(List<String> List){
+    boolean bl = false;
+    Connection con= getConn();
+    String sql = "DELETE FROM public.upc WHERE tupc_num = ? ";
+    try {
+            for(String s : List){
+                PreparedStatement ps=  con.prepareStatement(sql);
+                ps.setString(1, s);
+                bl = ps.executeUpdate() > 0 ? true : false;
+            }
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+
+
+        return bl;
+    }
+
+
 
 }
