@@ -14,10 +14,13 @@ public class IsrcPayeeController {
 
 
     public static void main(String[] args) {
-        Payee p = new Payee();
-        String s = "ATR981202329";
-        p = getPayeeByIsc(s);
-        System.out.println(p.getPayee1() + "  " + p.getPayee2() + "  " + p.getPayee3());
+      Payee py =  new Payee()  ;
+      boolean bl;
+      py.setIsrc("LKA0W2211977");
+      py.setPayee1("Ajantha Ranasinghe");
+      py.setShare1("100");
+        bl =   updateIsrcPayee(py);
+        System.out.println(bl);
     }
 
 
@@ -84,25 +87,30 @@ public class IsrcPayeeController {
         return list;
     }
 
-    public void updateIsrcPayee(Payee py) {
+    public static boolean updateIsrcPayee(Payee py) {
         Connection con = DatabasePostgres.getConn();
         String sql = "UPDATE isrc_payees SET payee = ?,share = ?,payee01 = ?,payee01share = ?,payee02 = ?,payee02share = ? where isrc = ? ";
         boolean bl =false;
         try {
             PreparedStatement ps =  con.prepareStatement(sql);
             ps.setString(1, py.getPayee1() != null ? py.getPayee1() : "");
-            ps.setString(2, py.getShare1() != null ? py.getShare1() : "");
+            ps.setInt(2, py.getShare1() != null ? Integer.parseInt( py.getShare1()) : 0);
+
+
             ps.setString(3, py.getPayee2() != null ? py.getPayee2() : "");
-            ps.setString(4, py.getShare2() != null ? py.getShare2() : "");
+            ps.setInt(4, py.getShare2() != null ? Integer.parseInt(py.getShare2())  : 0);
             ps.setString(5, py.getPayee3() != null ? py.getPayee3() : "");
-            ps.setString(6, py.getShare3() != null ? py.getShare3() : "");
+            ps.setInt(6, py.getShare3() != null ? Integer.parseInt(py.getShare3() ): 0);
+
             ps.setString(7, py.getIsrc() != null ? py.getIsrc() : "");
             bl = ps.executeUpdate()>0 ? true : false;
+
         } catch (Exception e) {
             e.printStackTrace();
 
 
         }
+        return bl;
     }
 
 }
