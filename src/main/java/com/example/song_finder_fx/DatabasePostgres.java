@@ -3747,13 +3747,14 @@ public class DatabasePostgres {
 
     public boolean addDataToUpc(UpcData data){
         Connection con= getConn();
-        String sql = "INSERT INTO public.upc(tupc_num, product_name, type, available) VALUES (?, ?, ?, 0);";
+        String sql = "INSERT INTO public.upc(tupc_num, product_name, type, available,assign user) VALUES (?, ?, ?, 0,?);";
         boolean bl = false;
         try {
             PreparedStatement ps=  con.prepareStatement(sql);
             ps.setString(1, data.getUpcNumber());
             ps.setString(2,data.getProductName());
             ps.setString(3,data.getType());
+            ps.setString(4,data.getUser());
              bl = ps.executeUpdate() > 0 ? true : false;
 
 
@@ -3768,7 +3769,7 @@ public class DatabasePostgres {
     public boolean removeUpc(List<String> List){
     boolean bl = false;
     Connection con= getConn();
-    String sql = "DELETE FROM public.upc WHERE tupc_num = ? ";
+    String sql = "update upc set product_name = '', type = '', available = '1' where upc_num = ?";
     try {
             for(String s : List){
                 PreparedStatement ps=  con.prepareStatement(sql);
