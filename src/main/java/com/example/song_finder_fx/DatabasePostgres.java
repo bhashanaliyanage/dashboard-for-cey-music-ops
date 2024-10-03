@@ -3753,7 +3753,7 @@ public class DatabasePostgres {
 
     public boolean addDataToUpc(UpcData data){
         Connection con= getConn();
-        String sql = "INSERT INTO public.upc(tupc_num, product_name, type, available,assign user) VALUES (?, ?, ?, 0,?);";
+        String sql = "INSERT INTO public.upc(upc_num, product_name, type, available,assign user) VALUES (?, ?, ?, 0,?);";
         boolean bl = false;
         try {
             PreparedStatement ps=  con.prepareStatement(sql);
@@ -3788,6 +3788,29 @@ public class DatabasePostgres {
 
 
         return bl;
+    }
+
+    public List<String> viewUpcList(int count) {
+
+        Connection con = getConn();
+        String sql = "SELECT upc_num from upc where available = '1' Limit ? ";
+        List<String> list;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, count);
+            ResultSet rs = ps.executeQuery();
+            list = new ArrayList<>();
+            while (rs.next()) {
+                list.add(rs.getString(1));
+            }
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection(con);
+        }
+        return list;
     }
 
 

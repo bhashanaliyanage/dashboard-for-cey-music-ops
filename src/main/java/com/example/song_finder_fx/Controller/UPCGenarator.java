@@ -3,6 +3,7 @@ package com.example.song_finder_fx.Controller;
 import com.example.song_finder_fx.DatabasePostgres;
 import com.example.song_finder_fx.Model.UpcData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UPCGenarator {
@@ -36,6 +37,12 @@ public class UPCGenarator {
             s="Failed";
         }
         return s;
+    }
+
+    public List<String> viewUpcList(int count){
+        List<String> list =  new ArrayList<>();
+        list =db.viewUpcList(count);
+        return list;
     }
 
 }
