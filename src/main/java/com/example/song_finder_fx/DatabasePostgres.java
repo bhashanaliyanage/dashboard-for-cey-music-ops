@@ -3784,6 +3784,29 @@ public class DatabasePostgres {
         return bl;
     }
 
+    public List<String> viewUpcList(int count) {
+
+        Connection con = getConn();
+        String sql = "SELECT *  from upc where available = '1' Limit ? ";
+        List<String> list;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, count);
+            ResultSet rs = ps.executeQuery();
+            list = new ArrayList<>();
+            while (rs.next()) {
+                list.add(rs.getString(1));
+            }
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection(con);
+        }
+        return list;
+    }
+
 
 
 }
