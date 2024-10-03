@@ -3747,7 +3747,7 @@ public class DatabasePostgres {
 
     public boolean addDataToUpc(UpcData data){
         Connection con= getConn();
-        String sql = "INSERT INTO public.upc(tupc_num, product_name, type, available,assign user) VALUES (?, ?, ?, 0,?);";
+        String sql = "INSERT INTO public.upc(upc_num, product_name, type, available,assign user) VALUES (?, ?, ?, 0,?);";
         boolean bl = false;
         try {
             PreparedStatement ps=  con.prepareStatement(sql);
