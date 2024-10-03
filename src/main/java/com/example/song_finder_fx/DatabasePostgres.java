@@ -2755,6 +2755,12 @@ public class DatabasePostgres {
     }
 
     public static String getLastISRC(String assetType) throws SQLException {
+        if (Objects.equals(assetType, "SR New Artist")) {
+            assetType = "SR2";
+        } else if (Objects.equals(assetType, "SR Old Artist")) {
+            assetType = "SR";
+        }
+
         String sql = "SELECT last_isrc FROM public.isrc_table WHERE asset_type = ?;";
 
         try (Connection con = getConn();

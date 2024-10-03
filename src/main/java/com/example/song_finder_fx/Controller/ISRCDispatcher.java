@@ -30,7 +30,21 @@ public class ISRCDispatcher {
     private String incrementISRC(String lastISRC, String assetType) {
         try {
             if (lastISRC != null && assetType != null) {
-                String prefix = assetType.equals("UGC") ? "LKA0U" : "LKA0W";
+                String prefix;
+                switch (assetType) {
+                    case "UGC":
+                        prefix = "LKA0U";
+                        break;
+                    case "SR Old Artist":
+                        prefix = "LKA0W";
+                        break;
+                    case "SR New Artist":
+                        prefix = "LKA0V";
+                        break;
+                    default:
+                        System.out.println("Invalid asset type: " + assetType);
+                        return null;
+                }
                 System.out.println("Last ISRC: " + lastISRC);
                 int serialNumber = Integer.parseInt(lastISRC.substring(5));
                 serialNumber++;

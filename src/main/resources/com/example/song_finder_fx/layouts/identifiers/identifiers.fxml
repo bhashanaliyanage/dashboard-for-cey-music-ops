@@ -27,29 +27,29 @@
    </HBox>
    <ScrollPane hbarPolicy="NEVER" prefHeight="759.0" prefWidth="690.0" vbarPolicy="NEVER">
       <VBox.margin>
-         <Insets left="30.0" right="30.0" top="30.0"/>
+         <Insets left="30.0" right="30.0" top="30.0" />
       </VBox.margin>
-      <VBox prefHeight="757.0" prefWidth="690.0" spacing="10.0">
+      <VBox prefHeight="757.0" prefWidth="686.0" spacing="10.0">
          <HBox prefWidth="690.0" spacing="10.0">
             <VBox maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../../styles.css">
                <HBox>
                   <VBox.margin>
-                     <Insets left="20.0" right="20.0" top="20.0"/>
+                     <Insets left="20.0" right="20.0" top="20.0" />
                   </VBox.margin>
                   <VBox HBox.hgrow="ALWAYS">
                      <Label text="Generate ISRCs">
                         <font>
-                           <Font name="Segoe UI Semibold" size="19.0"/>
+                           <Font name="Segoe UI Semibold" size="19.0" />
                         </font>
                         <cursor>
-                           <Cursor fx:constant="DEFAULT"/>
+                           <Cursor fx:constant="DEFAULT" />
                         </cursor>
                      </Label>
                   </VBox>
                </HBox>
                <HBox spacing="10.0">
                   <VBox.margin>
-                     <Insets bottom="20.0" left="20.0" right="20.0" top="30.0"/>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
                   </VBox.margin>
                   <HBox spacing="10.0">
                      <children>
@@ -57,22 +57,19 @@
                            <HBox>
                               <VBox spacing="10.0">
                                  <VBox spacing="10.0">
-                                    <Label text="Type" textFill="#656565"/>
+                                    <Label text="Type" textFill="#656565" />
                                     <HBox spacing="10.0">
-                                       <ToggleButton fx:id="btnSearchName" mnemonicParsing="false"
-                                                     prefWidth="160.0" selected="true" styleClass="button_inside"
-                                                     text="SR">
+                                       <ToggleButton fx:id="btnSearchName" mnemonicParsing="false" prefWidth="160.0" selected="true" styleClass="button_inside" text="SR Old Artist">
                                           <toggleGroup>
-                                             <ToggleGroup fx:id="type"/>
+                                             <ToggleGroup fx:id="type" />
                                           </toggleGroup>
                                        </ToggleButton>
-                                       <ToggleButton fx:id="btnSearchName1" layoutX="10.0" layoutY="10.0"
-                                                     mnemonicParsing="false" prefWidth="160.0"
-                                                     styleClass="button_inside" text="UGC" toggleGroup="$type"/>
+                                       <ToggleButton fx:id="btnSearchName11" layoutX="163.0" layoutY="10.0" mnemonicParsing="false" prefWidth="160.0" styleClass="button_inside" text="SR New Artist" toggleGroup="$type" />
+                                       <ToggleButton fx:id="btnSearchName1" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefWidth="160.0" styleClass="button_inside" text="UGC" toggleGroup="$type" />
                                     </HBox>
                                  </VBox>
                               </VBox>
-                              <VBox layoutX="10.0" layoutY="10.0" spacing="10.0"/>
+                              <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" />
                            </HBox>
                            <VBox alignment="TOP_RIGHT">
                               <children>
@@ -80,42 +77,38 @@
                                     <children>
                                        <VBox maxWidth="-Infinity" spacing="10.0">
                                           <children>
-                                             <Label text="Count" textFill="#656565"/>
-                                             <Spinner fx:id="isrcCount" editable="true"/>
+                                             <Label text="Count" textFill="#656565" />
+                                             <Spinner fx:id="isrcCount" editable="true" />
                                           </children>
                                        </VBox>
                                        <HBox alignment="BOTTOM_LEFT">
                                           <children>
-                                             <Button mnemonicParsing="false" onAction="#onGenerateISRC"
-                                                     prefWidth="150.0" styleClass="button_inside"
-                                                     text="Generate"/>
+                                             <Button mnemonicParsing="false" onAction="#onGenerateISRC" prefWidth="150.0" styleClass="button_inside" text="Generate" />
                                           </children>
                                        </HBox>
                                     </children>
                                  </HBox>
                               </children>
                               <VBox.margin>
-                                 <Insets top="10.0"/>
+                                 <Insets top="10.0" />
                               </VBox.margin>
                            </VBox>
                            <VBox layoutX="10.0" layoutY="74.0" prefWidth="419.0" spacing="10.0">
                               <children>
-                                 <Label text="ISRCs" textFill="#656565"/>
-                                 <TextArea fx:id="isrcTextArea" prefHeight="150.0" promptText="ISRCs"
-                                           styleClass="textarea-bg"/>
+                                 <Label text="ISRCs" textFill="#656565" />
+                                 <TextArea fx:id="isrcTextArea" prefHeight="150.0" promptText="ISRCs" styleClass="textarea-bg" />
                               </children>
                               <VBox.margin>
-                                 <Insets/>
+                                 <Insets />
                               </VBox.margin>
                            </VBox>
-                           <VBox alignment="TOP_RIGHT" layoutX="10.0" layoutY="84.0"/>
+                           <VBox alignment="TOP_RIGHT" layoutX="10.0" layoutY="84.0" />
                         </VBox>
                      </children>
                   </HBox>
                </HBox>
             </VBox>
-            <VBox layoutX="10.0" layoutY="10.0" maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg"
-                  stylesheets="@../../styles.css">
+            <VBox layoutX="10.0" layoutY="10.0" maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../../styles.css">
                <children>
                   <HBox>
                      <children>
@@ -123,17 +116,17 @@
                            <children>
                               <Label text="Generate Catalog Numbers">
                                  <font>
-                                    <Font name="Segoe UI Semibold" size="19.0"/>
+                                    <Font name="Segoe UI Semibold" size="19.0" />
                                  </font>
                                  <cursor>
-                                    <Cursor fx:constant="DEFAULT"/>
+                                    <Cursor fx:constant="DEFAULT" />
                                  </cursor>
                               </Label>
                            </children>
                         </VBox>
                      </children>
                      <VBox.margin>
-                        <Insets left="20.0" right="20.0" top="20.0"/>
+                        <Insets left="20.0" right="20.0" top="20.0" />
                      </VBox.margin>
                   </HBox>
                   <HBox spacing="10.0">
@@ -148,14 +141,13 @@
                                              <children>
                                                 <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                                                    <children>
-                                                      <Label text="Artist" textFill="#656565"/>
-                                                      <ComboBox fx:id="comboArtist" prefWidth="300.0"
-                                                                promptText="Artist" VBox.vgrow="ALWAYS"/>
+                                                      <Label text="Artist" textFill="#656565" />
+                                                      <ComboBox fx:id="comboArtist" prefWidth="300.0" promptText="Artist" VBox.vgrow="ALWAYS" />
                                                    </children>
                                                 </VBox>
                                              </children>
                                           </VBox>
-                                          <VBox layoutX="10.0" layoutY="10.0" spacing="10.0"/>
+                                          <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" />
                                        </children>
                                     </HBox>
                                     <VBox alignment="TOP_RIGHT">
@@ -164,32 +156,29 @@
                                              <children>
                                                 <VBox maxWidth="-Infinity" spacing="10.0">
                                                    <children>
-                                                      <Label text="Count" textFill="#656565"/>
-                                                      <Spinner fx:id="catNoCount" editable="true"/>
+                                                      <Label text="Count" textFill="#656565" />
+                                                      <Spinner fx:id="catNoCount" editable="true" />
                                                    </children>
                                                 </VBox>
                                                 <HBox alignment="BOTTOM_LEFT">
                                                    <children>
-                                                      <Button mnemonicParsing="false" onAction="#onGenerateCatNos"
-                                                              prefWidth="150.0" styleClass="button_inside"
-                                                              text="Generate"/>
+                                                      <Button mnemonicParsing="false" onAction="#onGenerateCatNos" prefWidth="150.0" styleClass="button_inside" text="Generate" />
                                                    </children>
                                                 </HBox>
                                              </children>
                                           </HBox>
                                        </children>
                                        <VBox.margin>
-                                          <Insets top="10.0"/>
+                                          <Insets top="10.0" />
                                        </VBox.margin>
                                     </VBox>
                                     <VBox layoutX="10.0" layoutY="74.0" prefWidth="419.0" spacing="10.0">
                                        <children>
-                                          <Label text="Catalog Numbers" textFill="#656565"/>
-                                          <TextArea fx:id="catNoTextArea" prefHeight="150.0"
-                                                    promptText="Catalog Numbers" styleClass="textarea-bg"/>
+                                          <Label text="Catalog Numbers" textFill="#656565" />
+                                          <TextArea fx:id="catNoTextArea" prefHeight="150.0" promptText="Catalog Numbers" styleClass="textarea-bg" />
                                        </children>
                                        <VBox.margin>
-                                          <Insets/>
+                                          <Insets />
                                        </VBox.margin>
                                     </VBox>
                                  </children>
@@ -198,7 +187,7 @@
                         </HBox>
                      </children>
                      <VBox.margin>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="30.0"/>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
                      </VBox.margin>
                   </HBox>
                </children>
@@ -207,36 +196,32 @@
          <VBox maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../../styles.css">
             <HBox spacing="10.0">
                <VBox.margin>
-                  <Insets left="20.0" right="20.0" top="20.0"/>
+                  <Insets left="20.0" right="20.0" top="20.0" />
                </VBox.margin>
                <VBox HBox.hgrow="ALWAYS">
                   <Label text="Encrypt or Decrypt ISRCs">
                      <font>
-                        <Font name="Segoe UI Semibold" size="19.0"/>
+                        <Font name="Segoe UI Semibold" size="19.0" />
                      </font>
                      <cursor>
-                        <Cursor fx:constant="DEFAULT"/>
+                        <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </Label>
                </VBox>
-               <Button mnemonicParsing="false" onAction="#onEncryptISRCs" prefWidth="100.0"
-                       styleClass="button_inside" text="Encrypt"/>
-               <Button layoutX="506.0" layoutY="10.0" mnemonicParsing="false" onAction="#onDecryptISRCs"
-                       prefWidth="100.0" styleClass="button_inside" text="Decrypt"/>
+               <Button mnemonicParsing="false" onAction="#onEncryptISRCs" prefWidth="100.0" styleClass="button_inside" text="Encrypt" />
+               <Button layoutX="506.0" layoutY="10.0" mnemonicParsing="false" onAction="#onDecryptISRCs" prefWidth="100.0" styleClass="button_inside" text="Decrypt" />
             </HBox>
             <HBox spacing="10.0">
                <VBox.margin>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="30.0"/>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
                </VBox.margin>
                <VBox maxWidth="-Infinity" spacing="10.0">
-                  <Label text="ISRCs" textFill="#656565"/>
-                  <TextArea fx:id="taISRCs" prefHeight="150.0" promptText="Paste your ISRCs"
-                            styleClass="textarea-bg"/>
+                  <Label text="ISRCs" textFill="#656565" />
+                  <TextArea fx:id="taISRCs" prefHeight="150.0" promptText="Paste your ISRCs" styleClass="textarea-bg" />
                </VBox>
                <VBox maxWidth="-Infinity" spacing="10.0">
-                  <Label text="Encrypted/Decrypted Output" textFill="#656565"/>
-                  <TextArea fx:id="taEcOrDcISRCs" prefHeight="150.0"
-                            promptText="Click encrypt or decrypt to generate" styleClass="textarea-bg"/>
+                  <Label text="Encrypted/Decrypted Output" textFill="#656565" />
+                  <TextArea fx:id="taEcOrDcISRCs" prefHeight="150.0" promptText="Click encrypt or decrypt to generate" styleClass="textarea-bg" />
                </VBox>
             </HBox>
          </VBox>
