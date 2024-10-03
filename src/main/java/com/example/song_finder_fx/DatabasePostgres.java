@@ -3787,7 +3787,7 @@ public class DatabasePostgres {
     public List<String> viewUpcList(int count) {
 
         Connection con = getConn();
-        String sql = "SELECT *  from upc where available = '1' Limit ? ";
+        String sql = "SELECT upc_num from upc where available = '1' Limit ? ";
         List<String> list;
         try {
             PreparedStatement ps = con.prepareStatement(sql);
