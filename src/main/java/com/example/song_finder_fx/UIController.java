@@ -4,6 +4,7 @@ import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.Model.Search;
 import com.example.song_finder_fx.Model.Songs;
 import com.example.song_finder_fx.Session.UserSession;
+import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -29,6 +30,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.util.Duration;
+import org.jetbrains.annotations.NotNull;
 
 import javax.sound.sampled.Clip;
 import java.awt.*;
@@ -39,27 +41,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.example.song_finder_fx.DatabasePostgres.checkDatabaseConnection;
+
 public class UIController implements com.example.song_finder_fx.Constants.UINode {
-
-    @FXML
-    public VBox sideVBox;
-
-    public static VBox sideVBoxStatic;
 
     private final Search search = new Search();
 
+    static File directory;
 
-    //<editor-fold desc="Variables">
+    public BorderPane borderpane;
+
+    File destination;
+
     //<editor-fold desc="TextArea">
     public TextArea textArea;
+
     //</editor-fold>
 
     //<editor-fold desc="Button">
@@ -69,9 +71,12 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Button btnOpenLocation;
     public Button btnCopyTo;
     public Button btnAudioDatabase;
-    public HBox btnIngests;
+
     @FXML
-    private HBox btnArtistReports;
+    public HBox btnIngests;
+
+    @FXML
+    private HBox btnGenIdentifiers;
     //</editor-fold>
 
     //<editor-fold desc="ImageView">
@@ -80,9 +85,13 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public ImageView imgMediaPico;
     //</editor-fold>
 
-    public HBox btnSeachSongs;
+    //<editor-fold desc="HBoxes">
+    public static HBox btnYouTubeMonitoringStatic;
 
-    public HBox btnCollectSongs;
+    @FXML
+    public HBox btnYouTubeMonitoring;
+
+    public HBox btnSeachSongs;
 
     public HBox btnRevenueAnalysis;
 
@@ -99,6 +108,11 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     //<editor-fold desc="VBox">
+    public static VBox sideVBoxStatic;
+
+    @FXML
+    public VBox sideVBox;
+
     public VBox textAreaVbox;
 
     @FXML
@@ -136,7 +150,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     public Label songUPCCopied;
     public Label songAlbumNameCopied;
     public Label songName;
-    public Label lblSearchType;
     public Label searchResultISRC;
     public Label songFeaturing;
     public Label songFeaturingCopied;
@@ -159,27 +172,40 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     //<editor-fold desc="Rectangle">
-    static File directory;
-    public BorderPane borderpane;
+    @FXML
+    public Rectangle rctYTM;
+
+    @FXML
+    private Rectangle rctGenIden;
+
+    @FXML
     public Rectangle rctIngests;
-    File destination;
+
+    @FXML
     public Rectangle rctManualClaims;
+
+    @FXML
     public Rectangle rctSearchSongs;
-    public Rectangle rctCollectSongs;
+
+    // public Rectangle rctCollectSongs;
+
+    @FXML
     public Rectangle rctRevenue;
-    public Rectangle rctArtistReports;
+
+    // public Rectangle rctArtistReports;
+    //</editor-fold>
 
     public static Label lblUserEmailAndUpdateStatic;
 
     public static HBox btnRevenueAnalysisStatic;
 
-    public static HBox btnArtistReportsStatic;
+    // public static HBox btnArtistReportsStatic;
 
     public static HBox btnIngestsStatic;
 
     public static HBox btnSeachSongsStatic;
 
-    public static HBox btnCollectSongsStatic;
+    // public static HBox btnCollectSongsStatic;
 
     public static HBox btnManualClaimsStatic;
 
@@ -187,19 +213,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     public static HBox btnSongListStatic;
 
-    public static void blankSidePanel() {
-        try {
-            Node node2 = SceneController.loadLayout("layouts/sidepanel-blank.fxml");
-            sideVBoxStatic.getChildren().setAll(node2);
-        } catch (IOException e) {
-            System.out.println("Unable to load side panel");
-        }
-    }
+    public static HBox btnGenIdentifiersStatic;
 
-    //</editor-fold>
-    //</editor-fold>
-
-    @FXML
     public void initialize() throws SQLException {
         System.out.println("Initializing UI...");
 
@@ -210,23 +225,91 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         lblUserStatic = lblUser;
         lblUserEmailAndUpdateStatic = lblUserEmailAndUpdate;
         btnRevenueAnalysisStatic = btnRevenueAnalysis;
-        btnArtistReportsStatic = btnArtistReports;
+        // btnArtistReportsStatic = btnArtistReports;
         btnIngestsStatic = btnIngests;
         btnSeachSongsStatic = btnSeachSongs;
-        btnCollectSongsStatic = btnCollectSongs;
+        // btnCollectSongsStatic = btnCollectSongs;
         btnManualClaimsStatic = btnManualClaims;
         btnSettingsStatic = btnSettings;
         btnSongListStatic = btnSongList;
         lblDatabaseStatusStatic = lblDatabaseStatus;
         lblSongListSubStatic = lblSongListSub;
+        btnYouTubeMonitoringStatic = btnYouTubeMonitoring;
+        btnGenIdentifiersStatic = btnGenIdentifiers;
 
-        // Loading user
-        loadUser();
+        try {
+            // Loading user
+            loadUser();
+        } catch (Exception e) {
+            System.out.println("Unable to load user: " + e);
+        }
 
         loadUserSongList();
 
         updateApplication();
     }
+
+    @FXML
+    public void onYTMBtnClick() {
+        System.out.println("UIController.onYTMBtnClick");
+
+        FadeTransition fadeOut = getFadeOutTransition();
+        fadeOut.setOnFinished(event -> {
+            try {
+                Node node = SceneController.loadLayout("layouts/youtube_monitoring/youtube_monitoring.fxml");
+
+                // Load YouTube Monitoring View
+                mainVBox.getChildren().clear();
+                mainVBox.getChildren().add(node);
+
+                // Set SidePanel
+                blankSidePanel();
+
+                // Change Selector
+                changeSelectorTo(rctYTM);
+            } catch (IOException e) {
+                AlertBuilder.sendErrorAlert("Error", "Something went wrong while trying to load the YouTube Monitoring View.", e.toString());
+            }
+
+            FadeTransition fadeIn = getFadeInTransition();
+            fadeIn.play();
+        });
+
+        fadeOut.play();
+    }
+
+    @FXML
+    void onGenerateIdentifiers() {
+        System.out.println("UIController.onGenerateIdentifiers");
+
+        FadeTransition fadeOut = getFadeOutTransition();
+        fadeOut.setOnFinished(event -> {
+            try {
+                Node node = SceneController.loadLayout("layouts/identifiers/identifiers.fxml");
+                mainVBox.getChildren().clear();
+                mainVBox.getChildren().add(node);
+                changeSelectorTo(rctGenIden);
+            } catch (IOException e) {
+                AlertBuilder.sendErrorAlert("Error", "Something went wrong while trying to load the Ingests View.", e.toString());
+            }
+
+            FadeTransition fadeIn = getFadeInTransition();
+            fadeIn.play();
+        });
+
+        fadeOut.play();
+    }
+
+    public static void blankSidePanel() {
+        try {
+            Node node2 = SceneController.loadLayout("layouts/sidepanel-blank.fxml");
+            sideVBoxStatic.getChildren().setAll(node2);
+        } catch (IOException e) {
+            System.out.println("Unable to load side panel");
+        }
+    }
+
+    @FXML
 
     private void updateApplication() {
         Thread thread = new Thread(() -> {
@@ -241,7 +324,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                                 try {
                                     Desktop.getDesktop().open(updateFile);
                                 } catch (IOException e) {
-                                    e.printStackTrace();
+                                    Platform.runLater(() -> System.out.println("Unable to open update file: " + e.getMessage()));
                                 }
                                 Platform.exit();
                                 System.exit(0);
@@ -249,8 +332,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                         });
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException e) {
+                Platform.runLater(e::printStackTrace);
             }
         });
         thread.start();
@@ -265,13 +348,10 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 if (songList.size() > 1) {
                     String text = songList.getFirst().getISRC() + " + " + (songList.size() - 1) + " other songs added";
                     Platform.runLater(() -> UIController.lblSongListSubStatic.setText(text));
-                } else {
-                    Platform.runLater(() -> UIController.lblSongListSubStatic.setText(songList.getFirst().getISRC()));
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> e.printStackTrace());
+                Platform.runLater(e::printStackTrace);
             }
-
         });
         thread.start();
     }
@@ -296,7 +376,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             if (privilegeLevel == 3) {
                 try {
                     btnRevenueAnalysisStatic.setDisable(true);
-                    btnArtistReportsStatic.setDisable(true);
+                    // btnArtistReportsStatic.setDisable(true);
                     btnIngestsStatic.setDisable(true);
 
                     btnSeachSongsStatic.setDisable(false);
@@ -319,25 +399,28 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 btnManualClaimsStatic.setDisable(false);
                 btnSettingsStatic.setDisable(false);
                 btnSongListStatic.setDisable(false);
+                btnGenIdentifiersStatic.setDisable(false);
 
                 mainVBoxStatic.setDisable(false);
             } else if (privilegeLevel == 1) {
                 btnRevenueAnalysisStatic.setDisable(false);
-                btnArtistReportsStatic.setDisable(false);
+                // btnArtistReportsStatic.setDisable(false);
                 btnIngestsStatic.setDisable(false);
 
                 btnSeachSongsStatic.setDisable(false);
-                btnCollectSongsStatic.setDisable(false);
+                // btnCollectSongsStatic.setDisable(false);
                 btnManualClaimsStatic.setDisable(false);
                 btnSettingsStatic.setDisable(false);
                 btnSongListStatic.setDisable(false);
+                btnYouTubeMonitoringStatic.setDisable(false);
+                btnGenIdentifiersStatic.setDisable(false);
 
                 mainVBoxStatic.setDisable(false);
             }
         } else {
             try {
                 btnRevenueAnalysisStatic.setDisable(true);
-                btnArtistReportsStatic.setDisable(true);
+                // btnArtistReportsStatic.setDisable(true);
                 btnIngestsStatic.setDisable(true);
 
                 btnSeachSongsStatic.setDisable(true);
@@ -345,6 +428,8 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                 btnManualClaimsStatic.setDisable(true);
                 btnSettingsStatic.setDisable(true);
                 btnSongListStatic.setDisable(true);
+                btnYouTubeMonitoringStatic.setDisable(true);
+                btnGenIdentifiersStatic.setDisable(true);
 
                 mainVBoxStatic.setDisable(true);
             } catch (Exception e) {
@@ -653,91 +738,65 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     }
 
     @FXML
-    protected void onSearchDetailsButtonClick() throws IOException {
-        // Load Search View
-        mainVBox.getChildren().clear();
-        mainVBox.getChildren().add(mainNodes[2]);
+    protected void onSearchDetailsButtonClick() {
+        System.out.println("UIController.onSearchDetailsButtonClick");
 
-        // Set SidePanel
-        FXMLLoader sidePanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
-        Parent sidePanelNewContent = sidePanelLoader.load();
-        sideVBox.getChildren().clear();
-        sideVBox.getChildren().add(sidePanelNewContent);
+        FadeTransition fadeOut = getFadeOutTransition();
 
-        // Change Selector
-        changeSelectorTo(rctSearchSongs);
+        fadeOut.setOnFinished(event -> {
+            // Load Search View
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(mainNodes[2]);
 
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                Platform.runLater(() -> lblDatabaseStatus.setText("Refreshing Song Table"));
-                DatabasePostgres.refreshSongMetadataTable();
-                Platform.runLater(() -> lblDatabaseStatus.setText("Online"));
-                return null;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+            blankSidePanel();
+
+            // Change Selector
+            changeSelectorTo(rctSearchSongs);
+
+            FadeTransition fadeIn = getFadeInTransition();
+
+            fadeIn.setOnFinished(event2 -> {
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        Platform.runLater(() -> lblDatabaseStatus.setText("Refreshing Song Table"));
+                        DatabasePostgres.refreshSongMetadataTable();
+                        Platform.runLater(() -> lblDatabaseStatus.setText("Online"));
+                        return null;
+                    }
+                };
+                Thread thread = new Thread(task);
+                thread.start();
+            });
+
+            fadeIn.play();
+        });
+
+        fadeOut.play();
+    }
+
+    @NotNull
+    private FadeTransition getFadeOutTransition() {
+        // Create fade out transition
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(300), mainVBox);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+        return fadeOut;
     }
 
     private void changeSelectorTo(Rectangle selector) {
         rctSearchSongs.setVisible(false);
-        rctCollectSongs.setVisible(false);
+        // rctCollectSongs.setVisible(false);
         rctRevenue.setVisible(false);
-        rctArtistReports.setVisible(false);
+        // rctArtistReports.setVisible(false);
         rctIngests.setVisible(false);
         rctManualClaims.setVisible(false);
+        rctYTM.setVisible(false);
+        rctGenIden.setVisible(false);
 
-        selector.setVisible(true);
-    }
-
-    public void onSearchedSongClick(MouseEvent mouseEvent) throws SQLException, ClassNotFoundException, IOException {
-        String isrc = searchResultISRC.getText();
-
-        Songs songDetails = DatabasePostgres.searchSongDetails(isrc);
-
-        String percentage;
-        if (songDetails.composerAndLyricistCeyMusic()) {
-            percentage = "100%";
-        } else if (songDetails.composerOrLyricistCeyMusic()) {
-            percentage = "50%";
-        } else {
-            percentage = "0%";
+        if (selector != null) {
+            selector.setVisible(true);
         }
-
-        // Getting the current parent layout
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("layouts/song-view.fxml"));
-        Parent newContent = loader.load();
-        Node node = (Node) mouseEvent.getSource();
-        Scene scene = node.getScene();
-        VBox mainVBox = (VBox) scene.lookup("#mainVBox");
-        mainVBox.getChildren().clear();
-
-
-        // Setting the new layout
-        mainVBox.getChildren().add(newContent);
-
-        // Setting values for labels
-        Label songNameViewTitle = (Label) scene.lookup("#songNameViewTitle");
-        Label songName = (Label) scene.lookup("#songName");
-        Label songISRC = (Label) scene.lookup("#songISRC");
-        Label songSinger = (Label) scene.lookup("#songSinger");
-        Label songFeaturing = (Label) scene.lookup("#songFeaturing");
-        Label songComposer = (Label) scene.lookup("#songComposer");
-        Label songLyricist = (Label) scene.lookup("#songLyricist");
-        Label songUPC = (Label) scene.lookup("#songUPC");
-        Label songProductName = (Label) scene.lookup("#songProductName");
-        Label songShare = (Label) scene.lookup("#songShare");
-        songISRC.setText(songDetails.getISRC());
-        songProductName.setText(songDetails.getProductName());
-        songUPC.setText(songDetails.getUPC());
-        songName.setText(songDetails.getTrackTitle());
-        songNameViewTitle.setText(songDetails.getTrackTitle());
-        songSinger.setText(songDetails.getSinger());
-        songFeaturing.setText(songDetails.getFeaturing());
-        songComposer.setText(songDetails.getComposer());
-        songLyricist.setText(songDetails.getLyricist());
-        songShare.setText(percentage);
     }
 
     public void getText() throws IOException {
@@ -763,6 +822,9 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             Node[] nodes;
             nodes = new Node[songList.size()];
             vboxSong.getChildren().clear();
+
+            StringBuilder errorBuffer = new StringBuilder();
+
             for (int i = 0; i < nodes.length; i++) {
                 try {
                     nodes[i] = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/search-song.fxml")));
@@ -773,17 +835,21 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
                     Label lblLyricist = (Label) nodes[i].lookup("#searchResultLyricist");
 
                     lblSongName.setText(songList.get(i).getTrackTitle());
-//                    lblSongName.setText("test art");
+                    // lblSongName.setText("test art");
                     lblISRC.setText(songList.get(i).getISRC().trim());
 
                     lblArtist.setText(songList.get(i).getSinger().trim());
-//                        lblArtist.setText("test name");
+                    // lblArtist.setText("test name");
                     lblComposer.setText(songList.get(i).getComposer().trim());
                     lblLyricist.setText(songList.get(i).getLyricist().trim());
                     vboxSong.getChildren().add(nodes[i]);
                 } catch (NullPointerException | IOException ex) {
-                    ex.printStackTrace();
+                    errorBuffer.append("Error processing song ").append(i + 1).append(": ").append(ex.getMessage()).append("\n");
                 }
+            }
+
+            if (!errorBuffer.isEmpty()) {
+                AlertBuilder.sendErrorAlert("Error Loading Songs", "Some songs could not be loaded", errorBuffer.toString());
             }
         });
 
@@ -879,7 +945,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //<editor-fold desc="Database Things">
     public void onDatabaseConnectionBtnClick() {
         // TODO: Do this on a separate thread
-        boolean status = DatabasePostgres.checkDatabaseConnection();
+        boolean status = checkDatabaseConnection();
 
         if (status) {
             NotificationBuilder.displayTrayInfo("Database Connected", "Database Connection Success");
@@ -888,45 +954,29 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
         }
     }
 
-    void checkDatabaseConnection() throws ClassNotFoundException {
-        lblDatabaseStatus.setText("Connecting");
-
-        Connection con = null;
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            String url = "jdbc:mysql://192.168.1.200/songData";
-            String username = "ceymusic";
-            String password = "ceymusic";
-            con = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            lblDatabaseStatus.setText("Offline");
-            lblDatabaseStatus.setStyle("-fx-text-fill: '#931621'");
-            return;
-        }
-
-        if (con != null) {
-            lblDatabaseStatus.setText("Online");
-            lblDatabaseStatus.setStyle("-fx-text-fill: '#00864E'");
-        }
-
-    }
     //</editor-fold>
 
     //<editor-fold desc="Song List">
     public void onSongListButtonClicked() {
-        try {
-            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/song-list.fxml")));
-            mainVBox.getChildren().clear();
-            mainVBox.getChildren().add(node);
+        System.out.println("UIController.onSongListButtonClicked");
 
-            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
-            Parent sidepanelNewContent = sidepanelLoader.load();
-            sideVBox.getChildren().clear();
-            sideVBox.getChildren().add(sidepanelNewContent);
-        } catch (IOException e) {
-            AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
-        }
+        FadeTransition fadeOut = getFadeOutTransition();
+        fadeOut.setOnFinished(event -> {
+            try {
+                Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/song-list.fxml")));
+                mainVBox.getChildren().clear();
+                mainVBox.getChildren().add(node);
+
+                blankSidePanel();
+            } catch (IOException e) {
+                AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
+            }
+
+            FadeTransition fadeIn = getFadeInTransition();
+            fadeIn.play();
+        });
+
+        fadeOut.play();
     }
 
     /*public void onDeleteSongClicked(MouseEvent event) {
@@ -1059,17 +1109,25 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
 
     //<editor-fold desc="Settings">
     public void onSettingsButtonClicked() {
-        try {
-            ControllerSettings cs = new ControllerSettings(this);
-            cs.loadThings();
+        System.out.println("UIController.onSettingsButtonClicked");
 
-            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
-            Parent sidepanelNewContent = sidepanelLoader.load();
-            sideVBox.getChildren().clear();
-            sideVBox.getChildren().add(sidepanelNewContent);
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
-        }
+        FadeTransition fadeOut = getFadeOutTransition();
+
+        fadeOut.setOnFinished(event -> {
+            try {
+                ControllerSettings cs = new ControllerSettings(this);
+                cs.loadThings();
+
+                blankSidePanel();
+            } catch (IOException | SQLException | ClassNotFoundException e) {
+                AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
+            }
+
+            FadeTransition fadeIn = getFadeInTransition();
+            fadeIn.play();
+        });
+
+        fadeOut.play();
     }
     //</editor-fold>
 
@@ -1094,7 +1152,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
 
-            changeSelectorTo(rctCollectSongs);
+            // changeSelectorTo(rctCollectSongs);
 
             String directoryString = Main.getAudioDatabaseLocation();
             Node node = (Node) event.getSource();
@@ -1276,44 +1334,91 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     }
     //</editor-fold>
 
-    public void onAboutButtonClicked() throws IOException {
+    public void onAboutButtonClicked() {
+        System.out.println("UIController.onAboutButtonClicked");
         mainVBox.setDisable(false);
 
-        if (Main.userSession.isLoggedIn()) {
-            Node node = SceneController.loadLayout("layouts/user/profile.fxml");
-            mainVBox.getChildren().setAll(node);
-        } else {
-            // System.out.println("Load Log In | Sign Up View...");
-            // SceneController.loadLayout("layouts/user/login_signup.fxml");
-            Node node = SceneController.loadLayout("layouts/user/login_signup.fxml");
-            mainVBox.getChildren().setAll(node);
+        // Create fade out transition
+        FadeTransition fadeOut = getFadeOutTransition();
 
-        }
+        fadeOut.setOnFinished(event -> {
+            try {
+                // Load the appropriate layout
+                Node node;
+                if (Main.userSession.isLoggedIn()) {
+                    node = SceneController.loadLayout("layouts/user/profile.fxml");
+                } else {
+                    node = SceneController.loadLayout("layouts/user/login_signup.fxml");
+                }
 
-        System.out.println("UIController.onAboutButtonClicked");
+                // Set the new content
+                mainVBox.getChildren().setAll(node);
 
-        if (Main.versionInfo.updateAvailable()) {
-            System.out.println("Update Available");
-            loadUpdate();
-        }
+                // Create fade in transition
+                FadeTransition fadeIn = getFadeInTransition();
+
+                fadeIn.setOnFinished(e -> {
+
+                    // Check for updates after fade-in is complete
+                    if (Main.versionInfo.updateAvailable()) {
+                        System.out.println("Update Available");
+                        loadUpdate();
+                    }
+
+                    changeSelectorTo(null);
+                });
+
+                // Start fade in
+                fadeIn.play();
+            } catch (IOException | NullPointerException e) {
+                e.printStackTrace();
+            }
+        });
+
+        // Start fade out
+        // mainVBox.setDisable(true);
+        fadeOut.play();
     }
 
-    private void loadUpdate() throws IOException {
-        FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-update.fxml"));
-        // loader.setController(this);
-        Parent sidepanelContent = loader.load();
+    @NotNull
+    private FadeTransition getFadeInTransition() {
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(300), mainVBox);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
 
-        sideVBox.getChildren().clear();
-        sideVBox.getChildren().add(sidepanelContent);
+        return fadeIn;
+    }
 
-        // lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
+    private void loadUpdate() {
+        try {
+            FXMLLoader loader = new FXMLLoader(ControllerSettings.class.getResource("layouts/sidepanel-update.fxml"));
+            Parent sidepanelContent = loader.load();
+
+            sideVBox.getChildren().clear();
+            sideVBox.getChildren().add(sidepanelContent);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Something went wrong when loading UI", e.toString());
+        }
     }
 
     public void onRevenueAnalysisBtnClick() throws IOException {
-        ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
-        revenueGenerator.loadRevenueGenerator();
+        System.out.println("UIController.onRevenueAnalysisBtnClick");
 
-        changeSelectorTo(rctRevenue);
+        FadeTransition fadeOut = getFadeOutTransition();
+        fadeOut.setOnFinished(event -> {
+            try {
+                Node node = SceneController.loadLayout("layouts/reports/revenue-reports.fxml");
+                mainVBox.getChildren().setAll(node);
+            } catch (IOException e) {
+                AlertBuilder.sendErrorAlert("Error", "Something went wrong when setting up revenue reports", e.toString());
+            }
+            changeSelectorTo(rctRevenue);
+
+            FadeTransition fadeIn = getFadeInTransition();
+            fadeIn.play();
+        });
+
+        fadeOut.play();
     }
 
     //<editor-fold desc="Invoice">
@@ -1344,7 +1449,6 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     //</editor-fold>
 
     public void onArtistReportsBtnClick() {
-
         try {
             ControllerRevenueGenerator revenueGenerator = new ControllerRevenueGenerator(this);
             revenueGenerator.loadArtistReports();
@@ -1354,7 +1458,7 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
             sideVBox.getChildren().clear();
             sideVBox.getChildren().add(sidepanelNewContent);
 
-            changeSelectorTo(rctArtistReports);
+            // changeSelectorTo(rctArtistReports);
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
         }
@@ -1365,35 +1469,48 @@ public class UIController implements com.example.song_finder_fx.Constants.UINode
     }
 
     public void onIngestsBtnClick() {
-        try {
-            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests-chooser.fxml")));
-            mainVBox.getChildren().setAll(node);
+        System.out.println("UIController.onIngestsBtnClick");
 
-            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
-            Parent sidepanelNewContent = sidepanelLoader.load();
-            sideVBox.getChildren().clear();
-            sideVBox.getChildren().add(sidepanelNewContent);
+        FadeTransition fadeOut = getFadeOutTransition();
+        fadeOut.setOnFinished(event -> {
+            try {
+                Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/ingests-chooser.fxml")));
+                mainVBox.getChildren().setAll(node);
 
-            changeSelectorTo(rctIngests);
-        } catch (IOException e) {
-            AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
-        }
+                blankSidePanel();
+
+                changeSelectorTo(rctIngests);
+            } catch (IOException e) {
+                AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
+            }
+
+            FadeTransition fadeIn = getFadeInTransition();
+            fadeIn.play();
+        });
+
+        fadeOut.play();
     }
 
     public void onManualClaimsBtnClick() {
-        try {
-            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-main.fxml")));
-            mainVBox.getChildren().setAll(node);
+        FadeTransition fadeOut = getFadeOutTransition();
 
-            FXMLLoader sidepanelLoader = new FXMLLoader(getClass().getResource("layouts/sidepanel-blank.fxml"));
-            Parent sidepanelNewContent = sidepanelLoader.load();
-            sideVBox.getChildren().clear();
-            sideVBox.getChildren().add(sidepanelNewContent);
+        fadeOut.setOnFinished(event -> {
+            try {
+                Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-main.fxml")));
+                mainVBox.getChildren().setAll(node);
 
-            changeSelectorTo(rctManualClaims);
-        } catch (IOException e) {
-            AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
-        }
+                blankSidePanel();
+
+                changeSelectorTo(rctManualClaims);
+            } catch (IOException e) {
+                AlertBuilder.sendErrorAlert("Error!", "Error Initializing UI", e.toString());
+            }
+
+            FadeTransition fadeIn = getFadeInTransition();
+            fadeIn.play();
+        });
+
+        fadeOut.play();
     }
 
     @FXML

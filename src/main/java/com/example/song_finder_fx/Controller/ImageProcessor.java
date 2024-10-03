@@ -14,12 +14,12 @@ import java.net.URL;
 public class ImageProcessor {
 
     public static BufferedImage getDownloadedImage(String imageUrl) throws URISyntaxException, IOException {
-        URL url = new URI(imageUrl).toURL();
         File uploadArtwork = new File("src/main/resources/com/example/song_finder_fx/images/manual_claims/upload_artwork.jpg");
 
         try {
+            URL url = new URI(imageUrl).toURL();
             return ImageIO.read(url);
-        } catch (IOException e) {
+        } catch (Exception e) {
             // Returns a default image if the thumbnail is not downloadable
             return ImageIO.read(uploadArtwork);
         }
@@ -38,14 +38,14 @@ public class ImageProcessor {
         return resizedImage;
     }
 
-    public static BufferedImage cropImage(BufferedImage image) {
-        // Calculate the square dimensions (1:1 ratio)
-        int size = Math.min(image.getWidth(), image.getHeight());
+public static BufferedImage cropImage(BufferedImage image) {
+    // Calculate the square dimensions (1:1 ratio)
+    int size = Math.min(image.getWidth(), image.getHeight());
 
-        // Crop the center square
-        int x = (image.getWidth() - size) / 2;
-        int y = (image.getHeight() - size) / 2;
-        return image.getSubimage(x, y, size, size);
-    }
+    // Crop the center square
+    int x = (image.getWidth() - size) / 2;
+    int y = (image.getHeight() - size) / 2;
+    return image.getSubimage(x, y, size, size);
+}
 
 }

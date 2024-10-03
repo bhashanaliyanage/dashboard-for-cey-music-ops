@@ -31,7 +31,7 @@
                     </HBox.margin>
                     <Image url="@../images/logo_small_70x_2.png" />
                 </ImageView>
-                <VBox fx:id="vboxAbout" alignment="CENTER_LEFT" stylesheets="@../styles.css">
+                <VBox alignment="CENTER_LEFT" stylesheets="@../styles.css">
                     <padding>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                     </padding>
@@ -58,7 +58,7 @@
                     </HBox.margin>
                     <Image url="@../images/icon%20_search%20normal%201_.png" />
                 </ImageView>
-                <VBox stylesheets="@../styles.css">
+                <VBox stylesheets="@../styles.css" HBox.hgrow="ALWAYS">
                     <padding>
                         <Insets left="10.0" right="10.0" />
                     </padding>
@@ -68,31 +68,6 @@
                         </font>
                         <VBox.margin>
                             <Insets left="3.0" />
-                        </VBox.margin>
-                    </Label>
-                </VBox>
-            </HBox>
-            <HBox fx:id="btnCollectSongs" disable="true" layoutX="35.0" layoutY="170.0" maxWidth="278.0" onMouseClicked="#onCollectSongsButtonClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
-                <VBox.margin>
-                    <Insets left="25.0" />
-                </VBox.margin>
-                <Rectangle fx:id="rctCollectSongs" arcHeight="5.0" arcWidth="5.0" fill="#79b7e3" height="19.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" visible="false" width="5.0" />
-                <ImageView fitHeight="19.0" fitWidth="19.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-                    <HBox.margin>
-                        <Insets left="10.0" />
-                    </HBox.margin>
-                    <Image url="@../images/icon%20_document%20download_.png" />
-                </ImageView>
-                <VBox stylesheets="@../styles.css">
-                    <padding>
-                        <Insets left="10.0" right="10.0" />
-                    </padding>
-                    <Label fx:id="lblSearchNCollect" prefHeight="40.0" text="Search and Collect Songs">
-                        <font>
-                            <Font name="Segoe UI Light" size="14.0" />
-                        </font>
-                        <VBox.margin>
-                            <Insets left="4.0" />
                         </VBox.margin>
                     </Label>
                 </VBox>
@@ -112,7 +87,7 @@
                     <padding>
                         <Insets left="10.0" right="10.0" />
                     </padding>
-                    <Label fx:id="lblArtistReports2" prefHeight="40.0" text="Manual Claims">
+                    <Label fx:id="lblMC" prefHeight="40.0" text="Manual Claims">
                         <font>
                             <Font name="Segoe UI Light" size="14.0" />
                         </font>
@@ -147,31 +122,6 @@
                     </Label>
                 </VBox>
             </HBox>
-            <HBox fx:id="btnArtistReports" disable="true" layoutX="35.0" layoutY="215.0" maxWidth="278.0" onMouseClicked="#onArtistReportsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
-                <VBox.margin>
-                    <Insets left="25.0" />
-                </VBox.margin>
-                <Rectangle fx:id="rctArtistReports" arcHeight="5.0" arcWidth="5.0" fill="#79b7e3" height="19.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" visible="false" width="5.0" />
-                <ImageView fitHeight="19.0" fitWidth="19.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
-                    <HBox.margin>
-                        <Insets left="10.0" />
-                    </HBox.margin>
-                    <Image url="@../images/icon_report_.png" />
-                </ImageView>
-                <VBox stylesheets="@../styles.css">
-                    <padding>
-                        <Insets left="10.0" right="10.0" />
-                    </padding>
-                    <Label fx:id="lblArtistReports" prefHeight="40.0" text="Artist Reports">
-                        <font>
-                            <Font name="Segoe UI Light" size="14.0" />
-                        </font>
-                        <VBox.margin>
-                            <Insets left="5.0" />
-                        </VBox.margin>
-                    </Label>
-                </VBox>
-            </HBox>
             <HBox fx:id="btnIngests" disable="true" layoutX="35.0" layoutY="257.0" maxWidth="278.0" onMouseClicked="#onIngestsBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
                 <VBox.margin>
                     <Insets left="25.0" />
@@ -187,7 +137,7 @@
                     <padding>
                         <Insets left="10.0" right="10.0" />
                     </padding>
-                    <Label fx:id="lblArtistReports1" prefHeight="40.0" text="Ingests">
+                    <Label fx:id="lblIngest" prefHeight="40.0" text="Ingests">
                         <font>
                             <Font name="Segoe UI Light" size="14.0" />
                         </font>
@@ -197,27 +147,57 @@
                     </Label>
                 </VBox>
             </HBox>
-            <HBox fx:id="btnArtistReports1" layoutX="35.0" layoutY="260.0" maxWidth="278.0" onMouseClicked="#hideLeft" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css" visible="false">
+            <HBox fx:id="btnYouTubeMonitoring" disable="true" layoutX="35.0" layoutY="260.0" maxWidth="278.0"
+                  onMouseClicked="#onYTMBtnClick" prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox"
+                  stylesheets="@../styles.css">
                 <VBox.margin>
-                    <Insets left="25.0" />
+                    <Insets left="25.0"/>
                 </VBox.margin>
-                <Rectangle fx:id="rctArtistReports1" arcHeight="5.0" arcWidth="5.0" fill="#79b7e3" height="19.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" visible="false" width="5.0" />
+                <Rectangle fx:id="rctYTM" arcHeight="5.0" arcWidth="5.0" fill="#79b7e3" height="19.0"
+                           stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" visible="false" width="5.0"/>
                 <ImageView fitHeight="19.0" fitWidth="19.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
                     <HBox.margin>
-                        <Insets left="10.0" />
+                        <Insets left="11.0"/>
                     </HBox.margin>
-                    <Image url="@../images/icon_setting.png" />
+                    <Image url="@../images/icon_youtube_.png"/>
                 </ImageView>
                 <VBox stylesheets="@../styles.css">
                     <padding>
-                        <Insets left="10.0" right="10.0" />
+                        <Insets left="10.0" right="10.0"/>
                     </padding>
-                    <Label prefHeight="40.0" text="Hide">
+                    <Label fx:id="lblYT" prefHeight="40.0" text="YouTube Monitoring">
                         <font>
-                            <Font name="Segoe UI Light" size="14.0" />
+                            <Font name="Segoe UI Light" size="14.0"/>
                         </font>
                         <VBox.margin>
-                            <Insets left="5.0" />
+                            <Insets left="4.0"/>
+                        </VBox.margin>
+                    </Label>
+                </VBox>
+            </HBox>
+            <HBox fx:id="btnGenIdentifiers" disable="true" maxWidth="278.0" onMouseClicked="#onGenerateIdentifiers"
+                  prefHeight="40.0" prefWidth="278.0" styleClass="button-vbox" stylesheets="@../styles.css">
+                <VBox.margin>
+                    <Insets left="25.0"/>
+                </VBox.margin>
+                <Rectangle fx:id="rctGenIden" arcHeight="5.0" arcWidth="5.0" fill="#79b7e3" height="19.0"
+                           stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" visible="false" width="5.0"/>
+                <ImageView fitHeight="19.0" fitWidth="19.0" opacity="0.8" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets left="11.0"/>
+                    </HBox.margin>
+                    <Image url="@../images/icon_identifiers.png"/>
+                </ImageView>
+                <VBox stylesheets="@../styles.css">
+                    <padding>
+                        <Insets left="10.0" right="10.0"/>
+                    </padding>
+                    <Label fx:id="lblGenIden" prefHeight="40.0" text="Generate Identifiers">
+                        <font>
+                            <Font name="Segoe UI Light" size="14.0"/>
+                        </font>
+                        <VBox.margin>
+                            <Insets left="4.0"/>
                         </VBox.margin>
                     </Label>
                 </VBox>

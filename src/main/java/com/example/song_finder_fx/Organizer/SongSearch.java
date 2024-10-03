@@ -44,11 +44,7 @@ public class SongSearch {
         return searchResults;
     }
 
-    public void addSongToDatabase(Songs song) {
-
-    }
-
-    public void bulkAddSongsFromCSV(File csv) {
-
+    public List<Songs> searchSongAcrossAllFields(String text, boolean excludeUGC) {
+        return databaseHandler.searchSongsAcrossAllFields(text, excludeUGC);
     }
 }

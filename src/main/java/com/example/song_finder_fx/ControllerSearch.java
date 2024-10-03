@@ -29,7 +29,6 @@ import javafx.util.Duration;
 
 import javax.sound.sampled.Clip;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -61,6 +60,7 @@ public class ControllerSearch {
     private VBox vboxSongSearch;
 
     public VBox mainVBox;
+
     @FXML
     private Label lblSearchType;
 
@@ -86,7 +86,7 @@ public class ControllerSearch {
 
     private SongSearch search;
 
-    private String searchType = SearchType.SONG_NAME;
+    private String searchType = SearchType.ALL;
 
     private final PauseTransition pause = new PauseTransition(Duration.millis(300));
 
@@ -110,6 +110,37 @@ public class ControllerSearch {
     void getTextCB() {
         String query = searchArea.getText();
         getText2(query);
+    }
+
+    @FXML
+    void btnSetSearchTypeAll() {
+        searchOld.setType("song_name");
+        searchType = SearchType.ALL;
+
+        Timeline timeline = new Timeline();
+
+        // Fade out
+        KeyFrame fadeOut = new KeyFrame(Duration.millis(300),
+                new KeyValue(searchArea.opacityProperty(), 0),
+                new KeyValue(lblSearchType.opacityProperty(), 0)
+        );
+
+        // Change text
+        KeyFrame changeText = new KeyFrame(Duration.millis(301),
+                e -> {
+                    searchArea.setPromptText("Enter Text to Search");
+                    lblSearchType.setText("All Types (Unified)");
+                }
+        );
+
+        // Fade in
+        KeyFrame fadeIn = new KeyFrame(Duration.millis(600),
+                new KeyValue(searchArea.opacityProperty(), 1),
+                new KeyValue(lblSearchType.opacityProperty(), 1)
+        );
+
+        timeline.getKeyFrames().addAll(fadeOut, changeText, fadeIn);
+        timeline.play();
     }
 
     @FXML
@@ -290,7 +321,13 @@ public class ControllerSearch {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                List<Songs> songList = search.searchSong(text, searchType, excludeUGC);
+                List<Songs> songList;
+
+                if (Objects.equals(searchType, SearchType.ALL)) {
+                    songList = search.searchSongAcrossAllFields(text, excludeUGC);
+                } else {
+                    songList = search.searchSong(text, searchType, excludeUGC);
+                }
                 // return searchOld.search(text);
 
                 try {
@@ -441,7 +478,7 @@ public class ControllerSearch {
     }
 
     @FXML
-    void onSearchedSongClick() throws IOException, SQLException, ClassNotFoundException {
+    void onSearchedSongClick() throws IOException {
         Duration duration = Duration.seconds(0.100);
 
         // Create a timeline for increasing heights
@@ -633,7 +670,7 @@ public class ControllerSearch {
         }
     }
 
-    public void onSearchOnYoutubeBtnClicked(MouseEvent mouseEvent) {
+    public void onSearchOnYoutubeBtnClicked() {
         String query = searchArea.getText();
         query = query.replace(" ", "+");
         query = "https://www.youtube.com/results?search_query=" + query;

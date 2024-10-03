@@ -1,5 +1,8 @@
 package com.example.song_finder_fx.Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Payee {
 
     private String payee1;
@@ -73,5 +76,8 @@ public class Payee {
 
     public void setPayee2Amount(double payee2Amount) {
     }
+
+
+
 
 }

@@ -19,13 +19,11 @@ import javafx.stage.Window;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.song_finder_fx.Controller.Invoice.loadAutoScaledImage;
 import static com.example.song_finder_fx.Controller.Invoice.loadFont;
-import static com.itextpdf.kernel.pdf.PdfName.Colors;
 
 public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
     private static final Border BLUE_BORDER = new SolidBorder(INVOICE_BLUE, 0.5f);
@@ -386,19 +384,22 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
 
     private Table getAssetBreakdownTable(ArtistReport report) throws MalformedURLException {
         // Table
-        float[] columnWidth = {200f, 50f, 50f, 100f, 190f, 10f};
+        float[] columnWidth = {80f, 150f, 50f, 50f, 90f, 170f, 10f};
         Table table = new Table(columnWidth);
         table.setMarginLeft(20f);
         table.setMarginRight(20f);
         float fontSizeSubTitle = 8f;
 
         // Table 02 Row 01
-        table.addCell(new Cell(1, 6).add(new Paragraph("")).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell(1, 6).add(new Paragraph("ASSET BREAKDOWN").setFont(FONT_RUBIK_SEMIBOLD))
+        table.addCell(new Cell(1, 7).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell(1, 7).add(new Paragraph("ASSET BREAKDOWN").setFont(FONT_RUBIK_SEMIBOLD))
                 .setVerticalAlignment(VerticalAlignment.BOTTOM).setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(10f).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell(1, 6).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell(1, 7).add(new Paragraph("")).setBorder(Border.NO_BORDER));
 
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("Identifier").setFont(FONT_RUBIK_SEMIBOLD))
+                .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
+                setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("Title").setFont(FONT_RUBIK_SEMIBOLD))
                 .setFontColor(INVOICE_WHITE).setFontSize(10f).setTextAlignment(TextAlignment.CENTER).
                 setVerticalAlignment(VerticalAlignment.MIDDLE).setBackgroundColor(INVOICE_BLUE).setBorder(BLUE_BORDER));
@@ -425,7 +426,11 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
             String percentage = share.getShare();
             double artistShare = share.getRoyalty();
             String coWriter = share.getContributor();
+            String isrc = share.getIsrc();
+            String encryptedISRC = ISRCEncryptor.encryptISRC(isrc);
 
+            table.addCell(new Cell().add(new Paragraph(encryptedISRC).setFont(FONT_POPPINS).setPaddingLeft(5f))
+                    .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(songName).setFont(FONT_POPPINS).setPaddingLeft(5f))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.LEFT).setFontSize(fontSizeSubTitle).setBorder(BLUE_BORDER));
             table.addCell(new Cell().add(new Paragraph(songType).setFont(FONT_POPPINS))
@@ -435,7 +440,7 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
             table.addCell(new Cell().add(new Paragraph("LKR " + String.format("%,9.2f", artistShare / eurToAudRate * audToLkrRate) + "/-").setFont(FONT_POPPINS))
                     .setPaddingLeft(5f).setVerticalAlignment(VerticalAlignment.MIDDLE).setTextAlignment(TextAlignment.CENTER).setFontSize(fontSizeSubTitle).setBorder(BLUE_BORDER));
 
-            Image paidImage = loadImage("src/main/resources/com/example/song_finder_fx/images/reports/report_paid_dark_g.png");
+            Image paidImage = loadPaidImage();
             // paidImage.setWidth(5f);
             paidImage.setHeight(10f);
 
@@ -475,8 +480,8 @@ public class ReportPDF implements com.example.song_finder_fx.Constants.Colors {
         return table;
     }
 
-    private Image loadImage(String location) throws MalformedURLException {
-        Image image = new Image(ImageDataFactory.create(location));
+    private Image loadPaidImage() throws MalformedURLException {
+        Image image = new Image(ImageDataFactory.create("src/main/resources/com/example/song_finder_fx/images/reports/report_paid_dark_g.png"));
         image.setAutoScale(false);
         return image;
     }

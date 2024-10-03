@@ -31,6 +31,20 @@ application {
     mainClass = 'com.example.song_finder_fx.Main'
 }
 
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+
+test {
+    systemProperty 'file.encoding', 'UTF-8'
+}
+
+
+
 shadowJar {
     manifest {
         attributes 'Main-Class': 'com.example.Main'
@@ -102,6 +116,12 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.json/json
     implementation 'org.json:json:20231013'
+
+
+    // newly added for provide service to youtube Notification service
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.0'
 }
 
 test {

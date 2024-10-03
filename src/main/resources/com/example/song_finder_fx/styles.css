@@ -1,3 +1,15 @@
+.expanded {
+    -fx-pref-width: 293;
+    -fx-min-width: 293;
+    -fx-transition: all 0.3s ease-out;
+}
+
+.collapsed {
+    -fx-pref-width: 100;
+    -fx-min-width: 100;
+    -fx-transition: all 0.3s ease-in;
+}
+
 .white-background{
     -fx-background-color: '#f3f3f3';
 }
@@ -114,13 +126,14 @@
 }
 
 .button_inside_green:hover {
-    -fx-background-color: '#4d8d69';
+    -fx-background-color: '#71D09A';
     -fx-background-radius: 7;
     -fx-border-radius: 7;
 }
 
 .button_inside_green:pressed {
-    -fx-background-color: '#7de6ab';
+    -fx-background-color: '#69C08F';
+    -fx-text-fill: '#FFFFFF';
     -fx-background-radius: 7;
     -fx-border-radius: 7;
 }
@@ -165,6 +178,10 @@
 
 .textarea-bg:focused {
     -fx-border-color: '#17BEBB';
+}
+
+.textarea-bg .scroll-pane:fitToWidth:fitToHeight .viewport .content {
+    -fx-background-color: '#FFFFFF';
 }
 
 .check-box .box {
@@ -333,17 +350,22 @@
     -fx-background-color: '#FFFFFF';
     -fx-border-color: '#e9ebee';
     -fx-border-width: 1;
-    -fx-background-radius: 3;
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
 }
 
 .spinner .increment-arrow-button {
     -fx-background-color: '#FFFFFF';
     -fx-border-color: '#e9ebee';
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
 }
 
 .spinner .decrement-arrow-button {
     -fx-background-color: '#FFFFFF';
     -fx-border-color: '#e9ebee';
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
 }
 
 .spinner .increment-arrow-button: pressed {
@@ -352,6 +374,11 @@
 
 .spinner .decrement-arrow-button: pressed {
     -fx-background-color: '#e9ebee';
+}
+
+.spinner .text-field:readonly {
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
 }
 
 .progress-bar .track {
@@ -395,19 +422,6 @@
     -fx-border-color: '#FFFFFF';
     -fx-padding: 10px;
 }
-
-
-/*.table-row-cell: odd{
-    -fx-background-color: '#FFFFFF';
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-padding: 0.0em;
-}
-
-.table-row-cell: even{
-    -fx-background-color: '#f9fbff';
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-padding: 0.0em;
-}*/
 
 .table-row-cell: hover {
     -fx-background-color: '#79b7e3';

@@ -9,8 +9,6 @@ public class ArtistReport {
     private int monthInt = 0;
     private Artist artist = null;
     private double eurToAudRate = 0;
-    private final ArrayList<String> coWriters = new ArrayList<>();
-    private final ArrayList<String> coWriterShare = new ArrayList<>();
     private Double grossRevenue;
     private Double partnerShare;
     private ArrayList<Songs> topPerformingSongs;
@@ -185,5 +183,29 @@ public class ArtistReport {
 
     public List<TerritoryBreakdown> getTerritoryBreakdown() {
         return this.territoryBreakdown;
+    }
+
+    public List<CoWriterShare> getSRAssetBreakdown() {
+        List<CoWriterShare> srCoWriterShare = new ArrayList<>();
+
+        for (CoWriterShare coWriterShare : coWritterList) {
+           if (coWriterShare.getSongType().equals("SR")) {
+               srCoWriterShare.add(coWriterShare);
+           }
+        }
+
+        return srCoWriterShare;
+    }
+
+    public List<CoWriterShare> getPUBAssetBreakdown() {
+        List<CoWriterShare> pubCoWriterShare = new ArrayList<>();
+
+        for (CoWriterShare coWriterShare : coWritterList) {
+            if (!coWriterShare.getSongType().equals("SR") || coWriterShare.getSongType().isEmpty()) {
+                pubCoWriterShare.add(coWriterShare);
+            }
+        }
+
+        return pubCoWriterShare;
     }
 }

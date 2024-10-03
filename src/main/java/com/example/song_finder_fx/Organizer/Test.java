@@ -8,87 +8,163 @@ import com.example.song_finder_fx.Session.UserSession;
 import com.example.song_finder_fx.Session.UserSummary;
 import com.itextpdf.layout.Document;
 import com.opencsv.exceptions.CsvValidationException;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Test {
-    public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException {
-        DatabasePostgres.refreshSummaryTable(7, 2024);
-        // DatabasePostgres.refreshSongMetadataTable();
+    public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException, InterruptedException {
+        // DatabasePostgres.refreshSummaryTable(8, 2024);
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
-        // getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 4, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_april_mahesh_vithana_edit.pdf");
+        getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 8, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_august_mahesh_vithana.pdf");
         // testArtistReportsNew();
         // testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
         // DatabasePostgres.changePassword("gimhaar", "admin");
+
+        // testYouTubeMonitoring();
+        // isrcDispatcherTest();
+
+        // catalogNumberGenTest();
+
+        // YoutubeDownload.downloadAudio("https://www.youtube.com/watch?v=VPLQqrhKNPk", "D:\\CeyMusic\\Ingests\\2024.10.02", "VPLQqrhKNPk.flac", null);
+    }
+
+    private static void catalogNumberGenTest() throws SQLException {
+        CatalogNumberGenerator generator = new CatalogNumberGenerator();
+        String artist = "Abhisheka Wimalaweera";
+        // String catalogNumber = generator.generateCatalogNumber(artist);
+        // System.out.println("Generated catalog number for: " + artist + " | " + catalogNumber);
+        List<String> catalogNumbers = generator.generateCatalogNumbers(artist, 10);
+        System.out.println("Generated catalog numbers for: " + artist + " | " + catalogNumbers);
+    }
+
+    private static void isrcDispatcherTest() throws SQLException {
+        ISRCDispatcher dispatcher = new ISRCDispatcher();
+        // String isrc = dispatcher.dispatchSingleISRC("SR");
+
+        // Dispatch Single ISRC
+        /*String isrc = dispatcher.dispatchSingleISRC("SR");
+        System.out.println("Generated ISRC: " + isrc);
+        if (dispatcher.updateLastISRC(isrc, "SR")) {
+            System.out.println("Updated ISRC: " + isrc);
+        } else {
+            System.out.println("Failed to update ISRC: " + isrc);
+        }*/
+
+        // Dispatch multiple ISRCs
+        List<String> isrcs = dispatcher.dispatchMultipleISRCs(10, "SR");
+        for (String isrc : isrcs) {
+            System.out.println("Generated ISRC: " + isrc);
+        }
+        dispatcher.updateLastISRC(isrcs.getLast(), "SR");
+    }
+
+    private static void testYouTubeMonitoring() {
+        List<List<Map<String, String>>> list = YoutubeDownload.getProgramListByChannel();
+
+        for (List<Map<String, String>> list1 : list) {
+            for (Map<String, String> map : list1) {
+                // Fetching Details
+                String channelName = map.get("channelName");
+                String title = map.get("Title");
+                String url = map.get("Url");
+                String thumbnail = map.get("Thumbnail");
+                String releaseDate = map.get("releaseDate");
+
+                System.out.println("Channel Name: " + channelName);
+                System.out.println("Title: " + title);
+                System.out.println("URL: " + url);
+                // System.out.println("Thumbnail: " + thumbnail);
+                System.out.println("Release Date: " + releaseDate);
+                System.out.println();
+            }
+        }
+    }
+
+    public static Image createImageFromText(String text, String preferredFontName) {
+        int width = 350;
+        int height = 20;
+
+        // Create a buffered image
+        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        // Create a graphics object
+        Graphics2D g2d = bufferedImage.createGraphics();
+
+        // Set the background color
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, width, height);
+
+        // Find a suitable font
+        Font font = findSuitableFont(preferredFontName, text);
+        g2d.setFont(font.deriveFont(14f));  // Set font size to 24
+
+        // Set the text color
+        g2d.setColor(Color.BLACK);
+
+        // Enable anti-aliasing for smoother text
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // Draw the text
+        FontMetrics metrics = g2d.getFontMetrics();
+        int textWidth = metrics.stringWidth(text);
+        int textHeight = metrics.getHeight();
+        g2d.drawString(text, 0, height / 2 + textHeight / 4);
+
+        // Dispose the graphics object
+        g2d.dispose();
+
+        return SwingFXUtils.toFXImage(bufferedImage, null);
+    }
+
+    private static Font findSuitableFont(String preferredFontName, String text) {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        Font[] fonts = ge.getAllFonts();
+
+        // First, try the preferred font
+        for (Font font : fonts) {
+            if (font.getName().equals(preferredFontName) && font.canDisplayUpTo(text) == -1) {
+                System.out.println("Using preferred font: " + font.getName());
+                return font;
+            }
+        }
+
+        // If preferred font doesn't work, find any font that can display the text
+        for (Font font : fonts) {
+            if (font.canDisplayUpTo(text) == -1) {
+                System.out.println("Using font: " + font.getName());
+                return font;
+            }
+        }
+
+        // If no suitable font found, return a default font
+        System.out.println("No suitable font found. Using default.");
+        return new Font(Font.SANS_SERIF, Font.PLAIN, 12);
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
-        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Ridma Weerawardena", 2024, 5, true);
+        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Methun SK", 2024, 7, true);
 
         ReportPDFNew pdf = new ReportPDFNew();
-        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_may_ridma.pdf", report);
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_july_methun.pdf", report);
         System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
     }
 
-    private static void testAssignPayee() throws SQLException {
-        Ingest ingest = DatabasePostgres.getIngest(12);
-        assert ingest != null;
-        List<IngestCSVData> data = ingest.getIngestCSVDataList();
-        IngestCSVDataController controller = new IngestCSVDataController(data.getFirst());
-
-        System.out.println("Assigning Payees...");
-
-        IngestCSVData data2 = controller.assignPayees();
-
-        System.out.println("\nEdit Data on: " + data2.getTrackTitle());
-        System.out.println("Composer: " + data2.getComposer());
-        System.out.println("Lyricist: " + data2.getLyricist());
-        System.out.println("Payee 01: " + data2.getPayee().getPayee1());
-        System.out.println("Share: " + data2.getPayee().getShare1());
-        System.out.println("Payee 02: " + data2.getPayee().getPayee2());
-        System.out.println("Share: " + data2.getPayee().getShare2());
-        System.out.println("Payee 03: " + data2.getPayee().getPayee3());
-    }
-
-    public static String testApiCall() {
-        String s = "";
-        String url = "http://192.168.1.32:8080/artist";
-        String urlpart = "/allart";
-        url = url + urlpart;
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest req = HttpRequest.newBuilder().uri(URI.create(url)).build();
-
-        try {
-            HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response);
-            System.out.println("here");
-            s = response.body();
-
-            System.out.println("here1");
-            // return response.body();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return s;
-    }
-
     private static void testBulkReporting() throws SQLException, IOException {
-        int month = 5;
+        int month = 6;
         int year = 2024;
         double eurToAudRate = 0.63333;
         double audToLkrRate = 186.90;
@@ -189,26 +265,6 @@ public class Test {
         }
     }
 
-    private static void testRemoveAllReports() throws SQLException {
-        List<ReportMetadata> reports = DatabasePostgres.getAllReports();
-
-        for (ReportMetadata report : reports) {
-            boolean status = report.remove();
-            if (status) {
-                System.out.println("Report of the month of " + report.getReportMonth() + " is deleted.");
-            }
-        }
-    }
-
-    private static void testAddNewFugaReport() {
-        ReportMetadata report = new ReportMetadata("Test March", 1, 2024, new File("D:\\CeyMusic\\CeyMusic Software Dev\\Tools\\Report Generator\\March2024StatementRun_IslandDreamRecords-standard\\March2024StatementRun_IslandDreamRecords-royalty_product_and_asset.csv"));
-        try {
-            DatabasePostgres.importReport(report);
-        } catch (SQLException | IOException | CsvValidationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static void testArtistReportsNew() throws SQLException {
         // String.format("%,9.2f", report.getGrossRevenueInAUD())
         int artistID = 47;
@@ -283,29 +339,6 @@ public class Test {
         report = revenueReportController.calculateRevenue(includeTerritoryAndDSPBreakdown);
 
         return report;
-    }
-
-    private static void testStoreIngests() throws SQLException {
-        File file = new File("C:\\Users\\bhash\\Downloads\\Catalog Ingestion CSV Downloads\\PRK-CEY-001-004.csv");
-        IngestController ingestController = new IngestController();
-        String status = ingestController.insertIngest("test", LocalDate.now(), file);
-        System.out.println("\nImport Status: " + status);
-    }
-
-    private static void testArchivedManualClaims() throws SQLException {
-        List<ManualClaimTrack> archivedManualClaims;
-
-        LocalDate startDate = LocalDate.of(2024, 5, 1);
-        LocalDate endDate = LocalDate.of(2024, 5, 30);
-
-        archivedManualClaims = DatabasePostgres.getArchivedManualClaims(startDate, endDate);
-
-        System.out.println("\nTotal: " + archivedManualClaims.size());
-        System.out.println("\n");
-
-        for (ManualClaimTrack track : archivedManualClaims) {
-            System.out.println("Name: " + track.getTrackName());
-        }
     }
 
     private static void testDashboard() throws SQLException {
