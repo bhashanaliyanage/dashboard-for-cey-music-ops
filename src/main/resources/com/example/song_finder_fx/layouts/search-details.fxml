@@ -39,7 +39,7 @@
                         <Font name="Segoe UI Semibold" size="19.0" />
                      </font>
                   </Label>
-                  <Label fx:id="lblSearchType" text="Song Name" />
+                  <Label fx:id="lblSearchType" text="All Types (Unified)" />
                </children>
             </VBox>
             <VBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
@@ -49,15 +49,16 @@
             </VBox>
          </children>
       </HBox>
-      <HBox minHeight="30.0" spacing="32.0">
+      <HBox minHeight="30.0" spacing="20.0">
          <VBox.margin>
             <Insets left="30.0" right="30.0" top="20.0" />
          </VBox.margin>
-         <ToggleButton fx:id="btnSearchName" mnemonicParsing="false" onAction="#btnSetSearchTypeName" prefHeight="30.0" prefWidth="100.0" selected="true" styleClass="button_inside" text="Song Name">
+         <ToggleButton fx:id="btnSearchName1" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeAll" prefHeight="30.0" prefWidth="100.0" selected="true" styleClass="button_inside" text="All">
             <toggleGroup>
                <ToggleGroup fx:id="searchType" />
             </toggleGroup>
          </ToggleButton>
+         <ToggleButton fx:id="btnSearchName" mnemonicParsing="false" onAction="#btnSetSearchTypeName" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Song Name" toggleGroup="$searchType" />
          <ToggleButton fx:id="btnSearchISRC" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeISRC" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="ISRC" toggleGroup="$searchType" />
          <ToggleButton fx:id="btnSearchSinger" layoutX="101.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeSinger" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Singer" toggleGroup="$searchType" />
          <ToggleButton fx:id="btnSearchComposer" layoutX="192.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnSetSearchTypeComposer" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Composer" toggleGroup="$searchType" />
@@ -70,7 +71,7 @@
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
-         <TextField fx:id="searchArea" prefHeight="30.0" prefWidth="550.0" promptText="Enter song name">
+         <TextField fx:id="searchArea" prefHeight="30.0" prefWidth="550.0" promptText="Enter Text to Search">
             <font>
                <Font size="14.0" />
             </font>

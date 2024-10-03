@@ -86,7 +86,7 @@ public class ControllerSearch {
 
     private SongSearch search;
 
-    private String searchType = SearchType.SONG_NAME;
+    private String searchType = SearchType.ALL;
 
     private final PauseTransition pause = new PauseTransition(Duration.millis(300));
 
@@ -110,6 +110,37 @@ public class ControllerSearch {
     void getTextCB() {
         String query = searchArea.getText();
         getText2(query);
+    }
+
+    @FXML
+    void btnSetSearchTypeAll() {
+        searchOld.setType("song_name");
+        searchType = SearchType.ALL;
+
+        Timeline timeline = new Timeline();
+
+        // Fade out
+        KeyFrame fadeOut = new KeyFrame(Duration.millis(300),
+                new KeyValue(searchArea.opacityProperty(), 0),
+                new KeyValue(lblSearchType.opacityProperty(), 0)
+        );
+
+        // Change text
+        KeyFrame changeText = new KeyFrame(Duration.millis(301),
+                e -> {
+                    searchArea.setPromptText("Enter Text to Search");
+                    lblSearchType.setText("All Types (Unified)");
+                }
+        );
+
+        // Fade in
+        KeyFrame fadeIn = new KeyFrame(Duration.millis(600),
+                new KeyValue(searchArea.opacityProperty(), 1),
+                new KeyValue(lblSearchType.opacityProperty(), 1)
+        );
+
+        timeline.getKeyFrames().addAll(fadeOut, changeText, fadeIn);
+        timeline.play();
     }
 
     @FXML
@@ -290,7 +321,13 @@ public class ControllerSearch {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                List<Songs> songList = search.searchSong(text, searchType, excludeUGC);
+                List<Songs> songList;
+
+                if (Objects.equals(searchType, SearchType.ALL)) {
+                    songList = search.searchSongAcrossAllFields(text, excludeUGC);
+                } else {
+                    songList = search.searchSong(text, searchType, excludeUGC);
+                }
                 // return searchOld.search(text);
 
                 try {

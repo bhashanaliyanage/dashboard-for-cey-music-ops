@@ -12,4 +12,6 @@ public interface SearchType {
     String LYRICIST = "lyricist";
 
     String PRODUCT_NAME = "product_name";
+
+    String ALL = "all";
 }
