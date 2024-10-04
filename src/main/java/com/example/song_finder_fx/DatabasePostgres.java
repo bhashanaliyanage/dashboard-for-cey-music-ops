@@ -3796,6 +3796,7 @@ public class DatabasePostgres {
             list = new ArrayList<>();
             while (rs.next()) {
                 list.add(rs.getString(1));
+                updateVacant(list);
             }
 
 
@@ -3805,6 +3806,27 @@ public class DatabasePostgres {
             closeConnection(con);
         }
         return list;
+    }
+
+    private void updateVacant(List<String> list){
+        Connection con= getConn();
+        String sql = "update upc set vacant ='0' where upc_num = ?";
+
+        try {
+            for (String s:list){
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, s);
+                ps.executeUpdate();
+            }
+
+
+        } catch (Exception e) {
+           e.printStackTrace();
+        }finally {
+            closeConnection(con);
+        }
+
+
     }
 
 
