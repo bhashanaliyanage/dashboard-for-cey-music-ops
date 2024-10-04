@@ -47,6 +47,8 @@ public class ControllerManualClaims {
     @FXML
     private Button btnAddClaim;
 
+    public static WebView ytPlayerStatic;
+
     @FXML
     public void initialize() {
         // comboClaimType.getItems().addAll("Unspecified", "TV Programs", "Manual Claim", "Single SR");
@@ -80,14 +82,19 @@ public class ControllerManualClaims {
         txtURL_Static = txtURL;
         comboClaimTypeStatic = comboClaimType;
         vboxTracksStatic = vboxTracks;
+        ytPlayerStatic = ytPlayer;
     }
 
     @FXML
-    void onCheckBtnClicked() throws IOException, SQLException {
-        loadURL();
+    void onCheckBtnClicked() {
+        try {
+            loadURL();
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Loading URL", e.toString());
+        }
     }
 
-    private void loadURL() throws SQLException, IOException {
+    private void loadURL() throws IOException {
         String URL = txtURL.getText();
 
         if (!Objects.equals(URL, "")) {
@@ -263,7 +270,11 @@ public class ControllerManualClaims {
         mainVBox.getChildren().setAll(node);
     }
 
-    public void urlOnAction() throws SQLException, IOException {
-        loadURL();
+    public void urlOnAction() {
+        try {
+            loadURL();
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Error Loading URL", e.toString());
+        }
     }
 }

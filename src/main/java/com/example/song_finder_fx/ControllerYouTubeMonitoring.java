@@ -37,11 +37,6 @@ public class ControllerYouTubeMonitoring {
 
     }
 
-    // For Testing Purposes
-    /*public static void main(String[] args) {
-        listChannels();
-    }*/
-
     private void listChannels() {
         try {
             List<List<Map<String, String>>> list = YoutubeDownload.getTypeTvProgramLlist();
@@ -63,6 +58,7 @@ public class ControllerYouTubeMonitoring {
                     // String url = map.get("Url");
                     String thumbnail = map.get("Thumbnail");
                     String releaseDate = map.get("releaseDate");
+                    String ytLink = map.get("Url");
 
                     System.out.println("title = " + title);
                     BufferedImage thumbnailImage = ImageProcessor.getDownloadedImage(thumbnail);
@@ -75,6 +71,7 @@ public class ControllerYouTubeMonitoring {
                     Label lblCName = (Label) node.lookup("#lblCName");
                     Label lblDate = (Label) node.lookup("#lblDate");
                     Label lblViewCount = (Label) node.lookup("#lblViewCount");
+                    Label lblYTLink = (Label) node.lookup("#lblYTLink");
 
                     Platform.runLater(() -> {
                         lblVideoTitle.setText(title);
@@ -82,6 +79,7 @@ public class ControllerYouTubeMonitoring {
                         lblCName.setText("Channel/ Program: " + channelName); // TODO: Add Channel Name
                         lblDate.setText(releaseDate);
                         lblViewCount.setText("Views: N/A");
+                        lblYTLink.setText(ytLink);
                         imgThumb.setImage(convertedImage);
                         vbReportsList.getChildren().add(node);
                     });
