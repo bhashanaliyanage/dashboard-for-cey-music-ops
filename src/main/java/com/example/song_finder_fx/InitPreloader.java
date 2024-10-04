@@ -210,7 +210,10 @@ public class InitPreloader implements Initializable {
                 // Platform.runLater(() -> setupSystemTray(mainWindowStage));
 
             } catch (IOException e) {
-                Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Cannot load application", e.toString()));
+                Platform.runLater(() -> {
+                    AlertBuilder.sendErrorAlert("Error", "Cannot load application", e.toString());
+                    e.printStackTrace();
+                });
             }
         }));
 

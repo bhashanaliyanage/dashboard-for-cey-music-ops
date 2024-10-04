@@ -25,81 +25,65 @@ import java.net.URL;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import javafx.scene.control.Label;
 
 
 public class YoutubeDownload {
 
-    public static boolean downloadAudio(String url, String fileLocation, String fileName) throws IOException, InterruptedException {
-        String file = fileLocation + "\\" + fileName;
-        String nodeScriptPath = "libs/jdown.js";
+public static boolean downloadAudio(String url, String fileLocation, String fileName, Label lblPercentage) throws IOException, InterruptedException {
+    String file = fileLocation + "\\" + fileName;
+    String nodeScriptPath = "libs/jdown.js";
 
-        System.out.println("Downloading audio from: " + url);
-        System.out.println("Saving downloaded audio as: " + file);
+    System.out.println("Downloading audio from: " + url);
+    System.out.println("Saving downloaded audio as: " + file);
 
-        ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
-        Process process = processBuilder.start();
+    ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
+    Process process = processBuilder.start();
 
-        // Read and print output
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            String finalLine = line;
-            Platform.runLater(() -> System.out.println(finalLine));
+    // Patterns for progress and speed
+    Pattern progressPattern = Pattern.compile("\\[download]\\s+(\\d+\\.\\d+)%");
+    // Pattern speedPattern = Pattern.compile("at\\s+([\\d.]+(?:K|M|G)?iB/s)");
+
+    // Read and print output
+    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    String line;
+    while ((line = reader.readLine()) != null) {
+        // Extract progress
+        Matcher progressMatcher = progressPattern.matcher(line);
+        if (progressMatcher.find()) {
+            String progress = progressMatcher.group(1);
+            if (lblPercentage != null) {
+                String finalLine = line;
+                Platform.runLater(() -> {
+                    lblPercentage.setText(progress + "%");
+                    System.out.println(finalLine);
+                });
+            }
+            // System.out.println("Progress: " + progress + "%");
         }
 
-        int exitCode = process.waitFor();
-
-        boolean status;
-
-        if (exitCode == 0) {
-            System.out.println("Audio download script executed successfully.");
-            status = true;
-        } else {
-            System.out.println("Audio download script execution failed.");
-            status = false;
-        }
-
-        return status;
+        /*// Extract speed
+        Matcher speedMatcher = speedPattern.matcher(line);
+        if (speedMatcher.find()) {
+            String speed = speedMatcher.group(1);
+            System.out.println("Speed: " + speed);
+        }*/
     }
 
-    // Made this inline cuz no need of two methods. Might delete later.
-    public static boolean downloadAudioOnly(String url, String file) throws IOException, InterruptedException {
-        String nodeScriptPath = "libs/jdown.js";
+    int exitCode = process.waitFor();
 
-        System.out.println("Downloading audio from: " + url);
-        System.out.println("Saving downloaded audio as: " + file);
+    boolean status;
 
-        ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
-        Process process = processBuilder.start();
-
-        // Read and print output
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            String finalLine = line;
-            Platform.runLater(() -> System.out.println(finalLine));
-        }
-
-        int exitCode = process.waitFor();
-
-        boolean status;
-
-        if (exitCode == 0) {
-            System.out.println("Audio download script executed successfully.");
-            status = true;
-        } else {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("An error occurred");
-                alert.setContentText("Error Downloading Audio");
-                Platform.runLater(alert::showAndWait);
-            });
-            status = false;
-        }
-
-        return status;
+    if (exitCode == 0) {
+        System.out.println("Audio download script executed successfully.");
+        status = true;
+    } else {
+        System.out.println("Audio download script execution failed.");
+        status = false;
     }
+
+    return status;
+}
 
     public static void trimAudio(String filePath, String outputPath, String startTime, String EndTime) throws IOException, InterruptedException {
         String nodeScriptPPath = "libs/cutAud.js";
@@ -216,7 +200,6 @@ public class YoutubeDownload {
 
                 String title = map.get("Title");
                 String url = map.get("Url");
-                String thumbnail = map.get("Thumbnail");
                 String releaseDate = map.get("releaseDate");
 
                 System.out.println("Title: " + title);

@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.CatalogNumberGenerator;
 import com.example.song_finder_fx.Controller.ISRCDispatcher;
+import com.example.song_finder_fx.Controller.ISRCEncryptor;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -12,6 +13,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class ControllerIdentifiers {
+
+    @FXML
+    public TextArea taISRCs;
+
+    @FXML
+    public TextArea taEcOrDcISRCs;
 
     @FXML
     private ToggleGroup type;
@@ -135,4 +142,41 @@ public class ControllerIdentifiers {
         thread.start();
     }
 
+    @FXML
+    public void onEncryptISRCs() {
+        // Get the input ISRCs from the TextArea
+        String inputISRCs = taISRCs.getText().trim();
+
+        // Split the ISRCs by new lines if there are multiple ISRCs
+        String[] isrcList = inputISRCs.split("\n");
+
+        StringBuilder encryptedISRCs = new StringBuilder();
+
+        // Encrypt each ISRC
+        for (String isrc : isrcList) {
+            encryptedISRCs.append(ISRCEncryptor.encryptISRC(isrc)).append("\n");
+        }
+
+        // Set the encrypted ISRCs in the TextArea for output
+        taEcOrDcISRCs.setText(encryptedISRCs.toString().trim());
+    }
+
+    @FXML
+    public void onDecryptISRCs() {
+        // Get the encrypted ISRCs from the TextArea
+        String encryptedISRCs = taISRCs.getText().trim();
+
+        // Split the ISRCs by new lines if there are multiple ISRCs
+        String[] encryptedISRCList = encryptedISRCs.split("\n");
+
+        StringBuilder decryptedISRCs = new StringBuilder();
+
+        // Decrypt each ISRC
+        for (String encryptedISRC : encryptedISRCList) {
+            decryptedISRCs.append(ISRCEncryptor.decryptISRC(encryptedISRC)).append("\n");
+        }
+
+        // Set the decrypted ISRCs in the TextArea for output
+        taEcOrDcISRCs.setText(decryptedISRCs.toString().trim());
+    }
 }
