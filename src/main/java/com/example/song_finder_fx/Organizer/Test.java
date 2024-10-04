@@ -1,8 +1,10 @@
 package com.example.song_finder_fx.Organizer;
 
+import com.example.song_finder_fx.Constants.ProductType;
 import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.DatabasePostgres;
+import com.example.song_finder_fx.Main;
 import com.example.song_finder_fx.Model.*;
 import com.example.song_finder_fx.Session.UserSession;
 import com.example.song_finder_fx.Session.UserSummary;
@@ -26,7 +28,7 @@ public class Test {
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
-        getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 8, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_august_mahesh_vithana.pdf");
+        // getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 8, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_august_mahesh_vithana.pdf");
         // testArtistReportsNew();
         // testNewArtistReportPDF();
 
@@ -40,6 +42,25 @@ public class Test {
         // catalogNumberGenTest();
 
         // YoutubeDownload.downloadAudio("https://www.youtube.com/watch?v=VPLQqrhKNPk", "D:\\CeyMusic\\Ingests\\2024.10.02", "VPLQqrhKNPk.flac", null);
+
+        UPCGenarator upcGenarator = new UPCGenarator();
+
+        List<String> upcList = upcGenarator.viewUpcList(10);
+        for (String upc : upcList) {
+            System.out.println(upc);
+        }
+
+        UpcData upcData = new UpcData();
+        String upc = "4796033752004";
+        String productName = "Test Product";
+        String type = ProductType.UGC;
+        String username = Main.userSession.getUserName();
+        upcData.setUpcNumber(upc);
+        upcData.setProductName(productName);
+        upcData.setType(type);
+        upcData.setUser(username);
+
+        
     }
 
     private static void catalogNumberGenTest() throws SQLException {

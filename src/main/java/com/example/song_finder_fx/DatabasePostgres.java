@@ -2272,7 +2272,7 @@ public class DatabasePostgres {
                                 track.setPreviewImage(previewImage);
                                 track.setImage(artwork);
                             } else {
-                                System.out.println("No Artwork Found");
+                                System.out.println("No Artwork Found for Manual Claim: " + track.getId());
                             }
                         } catch (IOException e) {
                             System.out.println("Unable to download artwork");
@@ -2280,7 +2280,7 @@ public class DatabasePostgres {
                     }
                 }
 
-                System.out.println("DatabasePostgres.getClaimArtwork");
+                // System.out.println("DatabasePostgres.getClaimArtwork");
                 return track;
             } catch (PSQLException e) {
                 if (e.getMessage().contains("An I/O error occurred") || e.getMessage().contains("This connection has been closed")) {
