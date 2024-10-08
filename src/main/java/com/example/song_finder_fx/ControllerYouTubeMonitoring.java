@@ -13,10 +13,7 @@ import javafx.scene.image.ImageView;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ControllerYouTubeMonitoring {
 
@@ -25,6 +22,12 @@ public class ControllerYouTubeMonitoring {
 
     @FXML
     private VBox vbReportsList;
+
+    private final List<Node> allEntries = new ArrayList<>();
+
+    private final int pageSize = 50;
+
+    private int currentPage = 0;
 
     @FXML
     void initialize() {
@@ -39,6 +42,7 @@ public class ControllerYouTubeMonitoring {
 
     private void listChannels() {
         try {
+            // Fetching Details
             List<List<Map<String, String>>> list = YoutubeDownload.getTypeTvProgramLlist();
             list.addAll(YoutubeDownload.getProgramListByChannel());
 
@@ -47,6 +51,7 @@ public class ControllerYouTubeMonitoring {
 
             Platform.runLater(() -> vbReportsList.getChildren().clear());
 
+            // Implementing Pagination
             for (List<Map<String, String>> list1 : list) {
                 for (Map<String, String> map : list1) {
                     // Fetching Details
@@ -55,12 +60,10 @@ public class ControllerYouTubeMonitoring {
                     totalUploads++;
 
                     String title = map.get("Title");
-                    // String url = map.get("Url");
                     String thumbnail = map.get("Thumbnail");
                     String releaseDate = map.get("releaseDate");
                     String ytLink = map.get("Url");
 
-                    System.out.println("title = " + title);
                     BufferedImage thumbnailImage = ImageProcessor.getDownloadedImage(thumbnail);
                     Image convertedImage = SwingFXUtils.toFXImage(thumbnailImage, null);
 
@@ -81,10 +84,13 @@ public class ControllerYouTubeMonitoring {
                         lblViewCount.setText("Views: N/A");
                         lblYTLink.setText(ytLink);
                         imgThumb.setImage(convertedImage);
-                        vbReportsList.getChildren().add(node);
+                        allEntries.add(node);
+                        // vbReportsList.getChildren().add(node);
                     });
                 }
             }
+
+            displayCurrentPage();
 
             int finalTotalUploads = totalUploads;
             String outText = finalTotalUploads + " Uploads from " + uniqueChannels.size() + " YouTube Channels are Available";
@@ -97,6 +103,32 @@ public class ControllerYouTubeMonitoring {
         } catch (URISyntaxException e) {
             Platform.runLater(() -> NotificationBuilder.displayTrayError("Error", "Something went wrong when fetching YouTube Thumbnail"));
         }
+    }
+
+    private void displayCurrentPage() {
+        int startIndex = currentPage * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allEntries.size());
+
+        Platform.runLater(() -> vbReportsList.getChildren().clear());
+        for (int i = startIndex; i < endIndex; i++) {
+            int finalI = i;
+            Platform.runLater(() -> vbReportsList.getChildren().add(allEntries.get(finalI)));
+            // vbReportsList.getChildren().add(allEntries.get(i));
+        }
+
+        int displayStart = startIndex + 1;
+        int totalUploads = allEntries.size();
+
+        int currentPageNumber = currentPage + 1;
+        int totalPages = (int) Math.ceil(totalUploads / (double) pageSize);
+        String paginationInfo = String.format("Page %d of %d (%d-%d of %d claims)",
+                currentPageNumber, totalPages,
+                displayStart, endIndex, totalUploads);
+
+        // TODO: Add Pagination Info Label
+        Platform.runLater(() -> System.out.println(paginationInfo));
+
+
     }
 
 }

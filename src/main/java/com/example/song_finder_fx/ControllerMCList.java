@@ -120,9 +120,8 @@ public class ControllerMCList {
         return new Task<>() {
             @Override
             protected Void call() throws SQLException {
-                // Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText("Loading Manual Claims"));
+                // Fetching manual claims
                 allManualClaims = DatabasePostgres.getManualClaims();
-                // manualClaims = DatabasePostgres.getManualClaims();
 
                 // Pagination Modification
                 for (ManualClaimTrack claim : allManualClaims) {
@@ -317,7 +316,7 @@ public class ControllerMCList {
         String paginationInfo = String.format("Page %d of %d (%d-%d of %d claims)",
                 currentPageNumber, totalPages,
                 displayStart, endIndex, totalClaims);
-        System.out.println(paginationInfo);
+        // System.out.println(paginationInfo);
 
         // Assuming you have a Label called lblPaginationInfo in your FXML
         lblPaginationInfo.setText(paginationInfo);
@@ -514,7 +513,7 @@ public class ControllerMCList {
         System.out.println(count + " items selected");
     }
 
-    public void onExportSelected(ActionEvent actionEvent) {
+    public void onExportSelected() {
         List<ManualClaimTrack> selectedClaims = new ArrayList<>();
 
         for (int i = 0; i < checkBoxes.size(); i++) {
@@ -664,7 +663,7 @@ public class ControllerMCList {
             // Start background task
             Task<Void> bulkEditTask = new Task<>() {
                 @Override
-                protected Void call() throws Exception {
+                protected Void call() {
                     try {
                         BufferedImage biArtwork = ImageIO.read(image);
                         int imageWidth = biArtwork.getWidth();
