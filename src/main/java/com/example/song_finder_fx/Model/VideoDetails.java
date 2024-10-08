@@ -12,6 +12,7 @@ public class VideoDetails {
     private String channalName;
     private List<String> stList;
 
+    private String videoID;
     private String lable;
 
     public String getLable() {
@@ -50,6 +51,15 @@ public class VideoDetails {
         } else {
             return Thumbnail;
         }
+    }
+
+
+    public String getVideoID() {
+        return videoID;
+    }
+
+    public void setVideoID(String videoID) {
+        this.videoID = videoID;
     }
 
     public void setThumbnail(String thumbnail) {

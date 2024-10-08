@@ -202,12 +202,14 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 String url = map.get("Url");
                 String releaseDate = map.get("releaseDate");
                 String label = map.get("Label");
+                String vId = map.get("VideoId");
 
                 System.out.println("Title: " + title);
                 System.out.println("URL: " + url);
                 // System.out.println("Thumbnail: " + thumbnail);
                 System.out.println("Release Date: " + releaseDate);
                 System.out.println("label:" + label);
+                System.out.println("videoId: "+vId);
 
                 System.out.println();
             }
@@ -497,6 +499,8 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 map.put("releaseDate", vd.getReleaseDate());
                 map.put("channelName", vd.getChannalName());
                 map.put("Label", vd.getLable());
+                map.put("VideoId", vd.getVideoID());
+                System.out.println(vd.getVideoID()+" VID ON GETVIDATA METHOD 503 LINE");
 
 
                 maplist.add(map);
@@ -525,10 +529,14 @@ public static boolean downloadAudio(String url, String fileLocation, String file
             System.out.println("Thumbnail: " + video.getThumbnail());
             System.out.println("video" + video.getReleaseDate());
             System.out.println(name);*/
+            System.out.println("VIDEO ID: " + video.getVideoID());
             String title = video.getTitle();
             String label =video.getLable();
+            String vId = video.getVideoID();
             video.setChannalName(name);
             video.setLable(label);
+            video.setVideoID(vId);
+//            video.setVideoID(video.getVideoID());
 //            System.out.println();
             vList.add(video);
         }
@@ -582,6 +590,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                     // new
                     video.setReleaseDate(s);
                     video.setLable(label);
+                    video.setVideoID(videoId);
 //					video.setChannalName(playlistUrl);
 
                     videoList.add(video);
