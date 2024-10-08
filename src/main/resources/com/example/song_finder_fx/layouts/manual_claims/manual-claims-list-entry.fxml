@@ -24,7 +24,7 @@
             </HBox.margin>
             <Image url="@../../images/Green%20Gradient.jpg" />
          </ImageView>
-         <VBox fx:id="vboxSongDetails" HBox.hgrow="ALWAYS">
+         <VBox fx:id="vboxSongDetails" spacing="2.0" HBox.hgrow="ALWAYS">
             <HBox.margin>
                <Insets left="10.0" top="10.0" />
             </HBox.margin>
@@ -98,6 +98,21 @@
                      </image>
                   </ImageView>
                   <Label fx:id="lblLyricist" layoutX="10.0" layoutY="10.0" text="Lyricist" textFill="#656565" />
+                  <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label fx:id="lblDuration" style="-fx-background-color: #e3f6e9;" styleClass="textarea-bg" text="Full Video" textFill="#006218">
+                           <font>
+                              <Font name="Segoe UI" size="12.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="1.0" left="5.0" right="5.0" top="1.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </HBox>
                </children>
                <VBox.margin>
                   <Insets top="5.0" />

@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException, InterruptedException {
-        // DatabasePostgres.refreshSummaryTable(8, 2024);
+        // DatabasePostgres.refreshSummaryTable(6, 2024);
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
@@ -34,7 +34,7 @@ public class Test {
 
         // testDashboard();
         // UserSession us = new UserSession();
-        // DatabasePostgres.changePassword("gimhaar", "admin");
+        // DatabasePostgres.changePassword("sandumini", "admin");
 
         // testYouTubeMonitoring();
         // isrcDispatcherTest();
@@ -43,6 +43,10 @@ public class Test {
 
         // YoutubeDownload.downloadAudio("https://www.youtube.com/watch?v=VPLQqrhKNPk", "D:\\CeyMusic\\Ingests\\2024.10.02", "VPLQqrhKNPk.flac", null);
 
+        // testUPCGenerator();
+    }
+
+    private static void testUPCGenerator() {
         UPCGenarator upcGenarator = new UPCGenarator();
 
         List<String> upcList = upcGenarator.viewUpcList(10);
@@ -59,8 +63,6 @@ public class Test {
         upcData.setProductName(productName);
         upcData.setType(type);
         upcData.setUser(username);
-
-        
     }
 
     private static void catalogNumberGenTest() throws SQLException {
@@ -187,8 +189,8 @@ public class Test {
     private static void testBulkReporting() throws SQLException, IOException {
         int month = 6;
         int year = 2024;
-        double eurToAudRate = 0.63333;
-        double audToLkrRate = 186.90;
+        double eurToAudRate = 0.63475;
+        double audToLkrRate = 191.86;
 
         ArrayList<String> names = new ArrayList<>(Arrays.asList(
                 "Ajantha Ranasinghe",

@@ -1,12 +1,16 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.UserSettingsManager;
+import javafx.concurrent.Worker;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
@@ -104,6 +108,73 @@ public class ControllerSettings {
         mainUIController.sideVBox.getChildren().add(sidepanelContent);
 
         // lblVersion.setText(Main.versionInfo.getUpdateVersionInfo());
+    }
+
+    @FXML
+    void onTestWebAP(ActionEvent event) {
+        WebView webView = new WebView();
+
+        webView.getEngine().setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+        webView.getEngine().setJavaScriptEnabled(true);
+        webView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == Worker.State.SUCCEEDED) {
+                webView.getEngine().executeScript(
+                        "var meta = document.createElement('meta'); " +
+                                "meta.httpEquiv = 'Content-Security-Policy'; " +
+                                "meta.content = \"default-src * 'unsafe-inline' 'unsafe-eval'\"; " +
+                                "document.getElementsByTagName('head')[0].appendChild(meta);"
+                );
+            }
+        });
+
+        String html = """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>YouTube Audio Player</title>
+                </head>
+                <body>
+                    <div id="player"></div>
+                    <button onclick="toggleAudio()">Play/Pause Audio</button>
+
+                    <script src="https://www.youtube.com/iframe_api"></script>
+                    <script>
+                        var player;
+                        function onYouTubeIframeAPIReady() {
+                            player = new YT.Player('player', {
+                                height: '0',
+                                width: '0',
+                                videoId: 'MjDaa-L8_5o',
+                                playerVars: {
+                                    'autoplay': 0,
+                                    'controls': 0,
+                                },
+                                events: {
+                                    'onReady': onPlayerReady
+                                }
+                            });
+                        }
+
+                        function onPlayerReady(event) {
+                            event.target.setPlaybackQuality('small');
+                        }
+
+                        function toggleAudio() {
+                            if (player.getPlayerState() == 1) {
+                                player.pauseVideo();
+                            } else {
+                                player.playVideo();
+                            }
+                        }
+                    </script>
+                </body>
+                </html>
+                """;
+
+        webView.getEngine().loadContent(html);
+
+        UIController.mainVBoxStatic.getChildren().clear();
+        UIController.mainVBoxStatic.getChildren().add(webView);
     }
 
 }
