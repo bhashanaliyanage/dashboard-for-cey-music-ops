@@ -12,6 +12,15 @@ public class VideoDetails {
     private String channalName;
     private List<String> stList;
 
+    private String lable;
+
+    public String getLable() {
+        return lable;
+    }
+
+    public void setLable(String lable) {
+        this.lable = lable;
+    }
 
     public String getTitle() {
         return Title;
