@@ -25,9 +25,12 @@ public class ControllerYouTubeMonitoring {
 
     private final List<Node> allEntries = new ArrayList<>();
 
-    private final int pageSize = 50;
+    private final int pageSize = 30;
 
     private int currentPage = 0;
+
+    @FXML
+    private Label lblPaginationInfo;
 
     @FXML
     void initialize() {
@@ -126,9 +129,36 @@ public class ControllerYouTubeMonitoring {
                 displayStart, endIndex, totalUploads);
 
         // TODO: Add Pagination Info Label
-        Platform.runLater(() -> System.out.println(paginationInfo));
+        Platform.runLater(() -> {
+            System.out.println(paginationInfo);
+            lblPaginationInfo.setText(paginationInfo);
+        });
 
 
+    }
+
+    @FXML
+    void onBackPage() {
+        previousPage();
+    }
+
+    private void previousPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            displayCurrentPage();
+        }
+    }
+
+    @FXML
+    void onNextPage() {
+        nextPage();
+    }
+
+    private void nextPage() {
+        if ((currentPage + 1) * pageSize < allEntries.size()) {
+            currentPage++;
+            displayCurrentPage();
+        }
     }
 
 }
