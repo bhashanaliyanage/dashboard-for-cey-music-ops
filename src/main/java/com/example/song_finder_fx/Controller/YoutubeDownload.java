@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import java.text.SimpleDateFormat;
 
 import java.net.URL;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -168,23 +169,15 @@ public static boolean downloadAudio(String url, String fileLocation, String file
     //Get urlList from database  Type 2 Urls
     //GET TV CHANNEL PROGRAM LIST
 
+public static  void main(String[] args) {
+    List<YoutubeData> list =  youList();
+    List<String> li = list.stream().map(YoutubeData::getUrl).collect(Collectors.toList());
+    getvd(li);
+    System.out.println();
+}
 
+    /**
     public static void main(String[] args) {
-        //     List<List<Map<String, String>>> result = new ArrayList<>();
-        //     List<YoutubeData> list = new ArrayList<>();
-        //     List<String> urlList = new ArrayList<>();
-        //        list = getUrlList();
-        //     List<String> lst = new ArrayList<>();
-        //     for (YoutubeData yd : list) {
-        //         urlList = Collections.singletonList(yd.getUrl());
-        ////         System.out.println(result);
-        //         getviData1(urlList);
-        //
-        //        li.addAll(vdData);
-
-        //        li = getvd(urlList);
-        //        System.out.println(li);
-
 
         List<List<Map<String, String>>> result = getTypeTvProgramLlist();
         result.addAll(getProgramListByChannel());
@@ -206,20 +199,13 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 String vId = map.get("VideoId");
                 String count =map.get("ViewCount");
 
-//                System.out.println("Title: " + title);
-//                System.out.println("URL: " + url);
-                // System.out.println("Thumbnail: " + thumbnail);
-//                System.out.println("Release Date: " + releaseDate);
-//                System.out.println("view count: " + count);
-//                System.out.println("label:" + label);
-//                System.out.println("videoId: "+vId);
-
-                System.out.println();
+//
             }
         }
 
         System.out.println(totalUploads + " Uploads from " + uniqueChannels.size() + " YouTube Channels are Available");
     }
+     */
 
     public static List<List<Map<String, String>>> getProgramListByChannel() {
         // Type 01: Single Channel
@@ -270,6 +256,8 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 map.put("Url", v.getUrl());
                 map.put("Thumbnail", v.getThumbnail());
                 map.put("releaseDate", v.getReleaseDate());
+                map.put("ViewCount", stringSpliter(v.getLable()));
+                System.out.println(stringSpliter(v.getLable())+" THIS IS VIEW COUNT");
                 maplist.add(map);
             }
             li.add(maplist);
@@ -322,6 +310,8 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                             .path("webCommandMetadata").path("url").asText("URL not found");
 
                     String YoutubeChannel = you.getUrl().substring(25);
+                    String label = videoRenderer.path("title").path("accessibility").path("accessibilityData")
+                            .path("label").asText("Label not found");
 
 //                    String dataOrMonth = extractSinhalaSubstring(publishedTimeText);
                     System.out.println();
@@ -381,6 +371,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
 //						vd1.setReleaseDate(formattedUploadDate);
                         vd1.setTitle(YoutubeChannel);
                         vd1.setReleaseDate(dateCalulator(datenumber));
+                        vd1.setLable(label);
 //						vd1.set
 //						result1.add(result.toString());
                         vd.add(vd1);
