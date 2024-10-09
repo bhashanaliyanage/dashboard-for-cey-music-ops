@@ -559,9 +559,9 @@ public static boolean downloadAudio(String url, String fileLocation, String file
             if (-264710101 == ii) {
 
                 count =  st[i+1]+","+ st[i+2];
-                System.out.println("THIS IS VIEW COUNT "+count);
+//                System.out.println("THIS IS VIEW COUNT "+count);
             } else {
-                System.out.println("Strings are not equal.");
+//                System.out.println("Strings are not equal.");
             }
 //
         }
