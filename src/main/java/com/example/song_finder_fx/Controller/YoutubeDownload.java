@@ -257,6 +257,7 @@ public static  void main(String[] args) {
                 map.put("Thumbnail", v.getThumbnail());
                 map.put("releaseDate", v.getReleaseDate());
                 map.put("ViewCount", stringSpliter(v.getLable()));
+                map.put("Label", v.getLable());
                 System.out.println(stringSpliter(v.getLable())+" THIS IS VIEW COUNT");
                 maplist.add(map);
             }
