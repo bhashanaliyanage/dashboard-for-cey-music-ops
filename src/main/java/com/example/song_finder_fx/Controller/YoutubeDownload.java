@@ -206,11 +206,11 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 String vId = map.get("VideoId");
                 String count =map.get("ViewCount");
 
-                System.out.println("Title: " + title);
-                System.out.println("URL: " + url);
+//                System.out.println("Title: " + title);
+//                System.out.println("URL: " + url);
                 // System.out.println("Thumbnail: " + thumbnail);
-                System.out.println("Release Date: " + releaseDate);
-                System.out.println("view count: " + count);
+//                System.out.println("Release Date: " + releaseDate);
+//                System.out.println("view count: " + count);
 //                System.out.println("label:" + label);
 //                System.out.println("videoId: "+vId);
 
@@ -464,11 +464,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                     map.put("channelName", s);
                 }
             }
-            //upto this
 
-            //newly added
-
-            //upto this
 
             result.addAll(result1);
 
@@ -504,7 +500,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 map.put("Label", vd.getLable());
                 map.put("VideoId", vd.getVideoID());
                 map.put("ViewCount",vd.getViewCount());
-                System.out.println(vd.getVideoID()+" VID ON GETVIDATA METHOD 503 LINE");
+
 
 
                 maplist.add(map);
@@ -517,8 +513,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
     }
 
     public static List<VideoDetails> getYou(String name) {
-        //	String playlistUrl = "https://www.youtube.com/playlist?list=PLxlWBAWnGBcdKoHbqfALcO0mHvfMpzNF4";
-        //	String playlistUrl = "https://www.youtube.com/@LakaiSikai/videos";
+
 
         List<VideoDetails> vList = new ArrayList<VideoDetails>();
 
@@ -528,11 +523,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
             int count = 0;
             VideoDetails vd = new VideoDetails();
 
-            /*System.out.println("Title: " + video.getTitle());
-            System.out.println("URL: " + video.getUrl());
-            System.out.println("Thumbnail: " + video.getThumbnail());
-            System.out.println("video" + video.getReleaseDate());
-            System.out.println(name);*/
+
             System.out.println("VIDEO ID: " + video.getVideoID());
             String title = video.getTitle();
             String label =video.getLable();
@@ -541,11 +532,10 @@ public static boolean downloadAudio(String url, String fileLocation, String file
             video.setLable(label);
             video.setVideoID(vId);
             String ss =	stringSpliter(video.getLable());
-            System.out.println("LINE 543 VIEW COUNT"+ss);
+//            System.out.println("LINE 543 VIEW COUNT"+ss);
             video.setViewCount(ss);
 
-//            video.setVideoID(video.getVideoID());
-//            System.out.println();
+
             vList.add(video);
         }
         return vList;
@@ -620,7 +610,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                             .asText("Title not found").getBytes(), StandardCharsets.UTF_8);
 
                     String label = videoRenderer.path("title").path("accessibility").path("accessibilityData").path("label").asText("Label not found");
-                    System.out.println("THIS IS LABEL "+label);
+//                    System.out.println("THIS IS LABEL "+label);
                     String videoId = videoRenderer.path("videoId").asText("Video ID not found");
                     String thumbnailUrl = videoRenderer.path("thumbnail").path("thumbnails").get(0).path("url")
                             .asText("Thumbnail not found");
