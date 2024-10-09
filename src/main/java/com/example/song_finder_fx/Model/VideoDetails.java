@@ -15,6 +15,16 @@ public class VideoDetails {
     private String videoID;
     private String lable;
 
+    private String viewCount;
+
+    public String getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(String viewCount) {
+        this.viewCount = viewCount;
+    }
+
     public String getLable() {
         return lable;
     }

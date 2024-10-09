@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -203,13 +204,15 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 String releaseDate = map.get("releaseDate");
                 String label = map.get("Label");
                 String vId = map.get("VideoId");
+                String count =map.get("ViewCount");
 
                 System.out.println("Title: " + title);
                 System.out.println("URL: " + url);
                 // System.out.println("Thumbnail: " + thumbnail);
                 System.out.println("Release Date: " + releaseDate);
-                System.out.println("label:" + label);
-                System.out.println("videoId: "+vId);
+                System.out.println("view count: " + count);
+//                System.out.println("label:" + label);
+//                System.out.println("videoId: "+vId);
 
                 System.out.println();
             }
@@ -500,6 +503,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 map.put("channelName", vd.getChannalName());
                 map.put("Label", vd.getLable());
                 map.put("VideoId", vd.getVideoID());
+                map.put("ViewCount",vd.getViewCount());
                 System.out.println(vd.getVideoID()+" VID ON GETVIDATA METHOD 503 LINE");
 
 
@@ -536,12 +540,58 @@ public static boolean downloadAudio(String url, String fileLocation, String file
             video.setChannalName(name);
             video.setLable(label);
             video.setVideoID(vId);
+            String ss =	stringSpliter(video.getLable());
+            System.out.println("LINE 543 VIEW COUNT"+ss);
+            video.setViewCount(ss);
+
 //            video.setVideoID(video.getVideoID());
 //            System.out.println();
             vList.add(video);
         }
         return vList;
     }
+
+    public static String stringSpliter(String s) {
+        String count = "";
+        String dataSet = s;
+        String regex = "[,\\.\\s]";
+        String st[] =dataSet.split(regex);
+        String revList1[] = null;
+        int n = st.length;
+        for(int i = 0;i<n-1;i++) {
+            String sss = st[i];
+
+                String num = sss.hashCode() + "THIS IS HASH CODE";
+                num = String.valueOf(num.hashCode());
+
+            int ii =Integer.parseInt(num);
+
+            if (-264710101 == ii) {
+
+                count =  st[i+1]+","+ st[i+2];
+                System.out.println("THIS IS VIEW COUNT "+count);
+            } else {
+                System.out.println("Strings are not equal.");
+            }
+//
+        }
+
+
+
+        return count;
+
+    }
+
+    public static String[] reverse(String[] array) {
+        String[] reversedArray = new String[array.length];
+
+        for (int i = 0; i < array.length; i++) {
+            reversedArray[i] = array[array.length - 1 - i];
+        }
+
+        return reversedArray;
+    }
+
 
     public static List<VideoDetails> getPlaylistVideos(String playlistUrl) {
         List<VideoDetails> videoList = new ArrayList<>();
