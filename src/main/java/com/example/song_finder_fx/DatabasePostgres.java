@@ -190,13 +190,16 @@ public class DatabasePostgres {
     }
 
     public static String getManualClaimCount() throws SQLException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
         String query = "SELECT COUNT(youtube_id) FROM public.manual_claims WHERE ingest_status = false AND archive = false;";
-        ResultSet rs = statement.executeQuery(query);
-        rs.next();
-        int count = rs.getInt(1);
-        return String.valueOf(count);
+
+        try (Connection con = getConn()) {
+            Statement statement = con.createStatement();
+            try (ResultSet rs = statement.executeQuery(query)) {
+                rs.next();
+                int count = rs.getInt(1);
+                return String.valueOf(count);
+            }
+        }
     }
 
     public static ResultSet getTop5Territories() throws SQLException {
@@ -3751,40 +3754,39 @@ public class DatabasePostgres {
     }
 
 
-    public boolean addDataToUpc(UpcData data){
-        Connection con= getConn();
+    public boolean addDataToUpc(UpcData data) {
+        Connection con = getConn();
         String sql = "INSERT INTO public.upc(upc_num, product_name, type, available,assign user) VALUES (?, ?, ?, 0,?);";
         boolean bl = false;
         try {
-            PreparedStatement ps=  con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, data.getUpcNumber());
-            ps.setString(2,data.getProductName());
-            ps.setString(3,data.getType());
-            ps.setString(4,data.getUser());
-             bl = ps.executeUpdate() > 0 ? true : false;
+            ps.setString(2, data.getProductName());
+            ps.setString(3, data.getType());
+            ps.setString(4, data.getUser());
+            bl = ps.executeUpdate() > 0 ? true : false;
 
 
-
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return bl;
     }
 
 
-    public boolean removeUpc(List<String> List){
-    boolean bl = false;
-    Connection con= getConn();
-    String sql = "update upc set product_name = '', type = '',vacant='1', available = '1' where upc_num = ?";
-    try {
-            for(String s : List){
-                PreparedStatement ps=  con.prepareStatement(sql);
+    public boolean removeUpc(List<String> List) {
+        boolean bl = false;
+        Connection con = getConn();
+        String sql = "update upc set product_name = '', type = '',vacant='1', available = '1' where upc_num = ?";
+        try {
+            for (String s : List) {
+                PreparedStatement ps = con.prepareStatement(sql);
                 ps.setString(1, s);
                 bl = ps.executeUpdate() > 0 ? true : false;
             }
-    } catch (Exception e) {
-        throw new RuntimeException(e);
-    }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
 
         return bl;
@@ -3814,12 +3816,12 @@ public class DatabasePostgres {
         return list;
     }
 
-    private void updateVacant(List<String> list){
-        Connection con= getConn();
+    private void updateVacant(List<String> list) {
+        Connection con = getConn();
         String sql = "update upc set vacant ='0' where upc_num = ?";
 
         try {
-            for (String s:list){
+            for (String s : list) {
                 PreparedStatement ps = con.prepareStatement(sql);
                 ps.setString(1, s);
                 ps.executeUpdate();
@@ -3827,14 +3829,13 @@ public class DatabasePostgres {
 
 
         } catch (Exception e) {
-           e.printStackTrace();
-        }finally {
+            e.printStackTrace();
+        } finally {
             closeConnection(con);
         }
 
 
     }
-
 
 
 }

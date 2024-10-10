@@ -42,6 +42,13 @@ public class Test {
         // catalogNumberGenTest();
 
         // YoutubeDownload.downloadAudio("https://www.youtube.com/watch?v=VPLQqrhKNPk", "D:\\CeyMusic\\Ingests\\2024.10.02", "VPLQqrhKNPk.flac", null);
+        YoutubeData channel = new YoutubeData();
+        channel.setName("Test Name");
+        channel.setType(1);
+        channel.setUrl("https://www.youtube.com/channel/UC4WjwE9qz3wQyqFZKg9uN5g");
+
+        YoutubeDownload youtubeDownload = new YoutubeDownload();
+        youtubeDownload.addChannelToDatabase(channel);
 
         // testUPCGenerator();
     }
@@ -179,11 +186,25 @@ public class Test {
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
-        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Methun SK", 2024, 7, true);
+        int month = 6;
+        int year = 2024;
+        double eurToAudRate = 0.63475;
+        double audToLkrRate = 191.86;
+
+        ArrayList<String> names = new ArrayList<>(Arrays.asList("Methun SK", "Ridma Weerawardena", "Senanga Dissanayake", "WAYO", "Aruna Lian", "Abhisheka Wimalaweera"));
+
+        for (String name : names) {
+            ArtistReport report = getArtistReportNew(0, eurToAudRate, audToLkrRate, name, year, month, true);
+            ReportPDFNew pdf = new ReportPDFNew();
+            pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\" + month + "_" + year + "_" + name + ".pdf", report);
+            System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
+        }
+
+        /*ArtistReport report = getArtistReportNew(0, 0.63475, 191.86, "Abhisheka Wimalaweera", 2024, 6, true);
 
         ReportPDFNew pdf = new ReportPDFNew();
-        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_july_methun.pdf", report);
-        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\6_2024_Abhisheka_Wimalaweera.pdf", report);
+        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());*/
     }
 
     private static void testBulkReporting() throws SQLException, IOException {

@@ -14,6 +14,7 @@ import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.border.Border;
+import com.itextpdf.layout.border.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
@@ -71,7 +72,7 @@ public class ReportPDFNew implements Colors {
         // Tables
         Table tableHeader = getHeaderTable(reportHeading);
         Table reportSummary = getReportSummaryTable(report);
-        reportSummary.setFixedPosition(35, 570, 540);
+        reportSummary.setFixedPosition(25, 570, 540);
         Table srBreakdown = getSRBreakdownTable(report);
         srBreakdown.setWidth(540f);
 
@@ -762,50 +763,71 @@ public class ReportPDFNew implements Colors {
         table.setMarginRight(20f);
         table.setMarginTop(10f);
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
-        float fontSizeSubTitle = 15f;
+        float fontSizeSubTitle = 20f;
+        float cellHeight = 42f;
         PdfFont subtitleFont = FONT_POPPINS_MEDIUM;
 
-        Image image = loadGrowIcon();
-        image.setWidth(10);
+        Border border = new SolidBorder(INVOICE_BLUE, 1);
+
+        Border.Side bottom = Border.Side.BOTTOM;
+
+        // Image image = loadGrowIcon();
+        // image.setWidth(10);
 
         // Row 01
-        table.addCell(new Cell().setHeight(20f).add(image).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("Gross Revenue Produced").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_DARK_BLUE).setFontSize(10f).setVerticalAlignment(VerticalAlignment.MIDDLE).setBorder(Border.NO_BORDER));
+                .setFontColor(INVOICE_DARK_BLUE).setFontSize(10f)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setBorder(Border.NO_BORDER));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().setHeight(20f).add(image).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("Partner Share of Gross").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_DARK_BLUE).setFontSize(10f).setBorder(Border.NO_BORDER));
+                .setFontColor(INVOICE_DARK_BLUE)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(10f)
+                .setBorder(Border.NO_BORDER));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().setHeight(20f).add(image).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
+        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
         table.addCell(new Cell().setHeight(20f).add(new Paragraph("Amount Payable").setFont(FONT_RUBIK_SEMIBOLD))
-                .setFontColor(INVOICE_DARK_BLUE).setFontSize(10f).setBorder(Border.NO_BORDER));
+                .setFontColor(INVOICE_DARK_BLUE)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(10f)
+                .setBorder(Border.NO_BORDER));
 
         // Row 02
-        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(cellHeight).add(new Paragraph("")).setBorder(Border.NO_BORDER));
         table.addCell(new Cell()
-                .add(new Paragraph("AUD " + String.format("%,9.2f", report.getGrossRevenueInAUD())).setFont(subtitleFont))
-                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setTextAlignment(TextAlignment.LEFT)
+                        .setHeight(cellHeight)
+                .add(new Paragraph("AUD " + String.format("%,.2f", report.getGrossRevenueInAUD())).setFont(subtitleFont))
+                .setVerticalAlignment(VerticalAlignment.TOP)
+                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(fontSizeSubTitle)
                 .setFontColor(INVOICE_DARK_BLUE)
-                .setBorder(Border.NO_BORDER));
+                .setBorder(border));
         table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(cellHeight).add(new Paragraph("")).setBorder(Border.NO_BORDER));
         table.addCell(new Cell()
-                .add(new Paragraph("AUD " + String.format("%,9.2f", report.getPartnerShareInAUD())).setFont(subtitleFont))
+                        .setHeight(cellHeight)
+                .add(new Paragraph("AUD " + String.format("%,.2f", report.getPartnerShareInAUD())).setFont(subtitleFont))
                 .setFontColor(INVOICE_DARK_BLUE)
                 .setFontSize(fontSizeSubTitle)
-                .setTextAlignment(TextAlignment.LEFT)
-                .setBorder(Border.NO_BORDER));
+                .setVerticalAlignment(VerticalAlignment.TOP)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setBorder(border));
         table.addCell(new Cell().add(new Paragraph("")).setBorder(Border.NO_BORDER));
-        table.addCell(new Cell().setHeight(20f).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table.addCell(new Cell().setHeight(cellHeight).add(new Paragraph("")).setBorder(Border.NO_BORDER));
         table.addCell(new Cell()
-                .add(new Paragraph("LKR " + String.format("%,9.2f", report.getPartnerShareInLKR())).setFont(subtitleFont))
+                        .setHeight(cellHeight)
+                .add(new Paragraph("LKR " + String.format("%,.2f", report.getPartnerShareInLKR())).setFont(subtitleFont))
                 .setFontColor(INVOICE_DARK_BLUE)
                 .setFontSize(fontSizeSubTitle)
-                .setTextAlignment(TextAlignment.LEFT)
-                .setBorder(Border.NO_BORDER));
+                .setVerticalAlignment(VerticalAlignment.TOP)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setBorder(border));
 
         return table;
     }

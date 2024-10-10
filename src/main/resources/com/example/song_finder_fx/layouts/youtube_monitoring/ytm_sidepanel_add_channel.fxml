@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefWidth="250.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerYTMAddChannel">
+   <Label text="Add New Channel">
+      <font>
+         <Font name="Segoe UI Semibold" size="19.0" />
+      </font>
+      <VBox.margin>
+         <Insets left="20.0" top="20.0" />
+      </VBox.margin>
+   </Label>
+   <HBox>
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" />
+      </VBox.margin>
+   </HBox>
+   <VBox>
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="30.0" />
+      </VBox.margin>
+      <Label text="Name">
+         <VBox.margin>
+            <Insets left="5.0" />
+         </VBox.margin></Label>
+      <TextField fx:id="txtChannelName" promptText="Set Channel Name" styleClass="textarea-bg">
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
+      </TextField>
+   </VBox>
+   <VBox layoutX="30.0" layoutY="105.0">
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="10.0" />
+      </VBox.margin>
+      <Label text="Type">
+         <VBox.margin>
+            <Insets left="5.0" />
+         </VBox.margin></Label>
+      <HBox spacing="10.0">
+         <children>
+            <ToggleButton mnemonicParsing="false" prefWidth="100.0" selected="true" styleClass="button_inside" text="Channel" HBox.hgrow="ALWAYS">
+               <toggleGroup>
+                  <ToggleGroup fx:id="type" />
+               </toggleGroup>
+            </ToggleButton>
+            <ToggleButton mnemonicParsing="false" prefWidth="100.0" styleClass="button_inside" text="Playlist" toggleGroup="$type" HBox.hgrow="ALWAYS" />
+         </children>
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
+      </HBox>
+   </VBox>
+   <VBox layoutX="10.0" layoutY="149.0">
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" top="10.0" />
+      </VBox.margin>
+      <Label text="URL">
+         <VBox.margin>
+            <Insets left="5.0" />
+         </VBox.margin></Label>
+      <TextField fx:id="txtURL" promptText="Channel or Playlist URL" styleClass="textarea-bg">
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
+      </TextField>
+   </VBox>
+   <Button mnemonicParsing="false" onAction="#onSave" prefHeight="27.0" prefWidth="210.0" styleClass="button-big" text="Save Changes">
+      <VBox.margin>
+         <Insets bottom="10.0" left="20.0" top="15.0" />
+      </VBox.margin>
+   </Button>
+</VBox>

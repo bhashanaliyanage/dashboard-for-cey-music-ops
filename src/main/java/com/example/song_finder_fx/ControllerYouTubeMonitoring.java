@@ -40,7 +40,14 @@ public class ControllerYouTubeMonitoring {
 
     @FXML
     void onAddNewReport() {
-
+        try {
+            Node node = SceneController.loadLayout("layouts/youtube_monitoring/ytm_sidepanel_add_channel.fxml");
+            UIController.sideVBoxStatic.getChildren().clear();
+            UIController.sideVBoxStatic.getChildren().add(node);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Something went wrong when loading UI", e.toString());
+            e.printStackTrace();
+        }
     }
 
     private void listChannels() {

@@ -10,6 +10,13 @@ public class YoutubeData {
         return type;
     }
 
+    /**
+     * Sets the type of the YouTube entity.
+     *
+     * @param type An integer representing the type of YouTube entity:
+     *             1 for YouTube channels
+     *             2 for YouTube playlists
+     */
     public void setType(int type) {
         this.type = type;
     }
