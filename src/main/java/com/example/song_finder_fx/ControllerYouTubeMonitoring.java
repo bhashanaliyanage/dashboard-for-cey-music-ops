@@ -46,7 +46,7 @@ public class ControllerYouTubeMonitoring {
             UIController.sideVBoxStatic.getChildren().add(node);
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error", "Something went wrong when loading UI", e.toString());
-            e.printStackTrace();
+            System.out.println("Error Loading UI: " + e);
         }
     }
 
@@ -73,6 +73,8 @@ public class ControllerYouTubeMonitoring {
                     String thumbnail = map.get("Thumbnail");
                     String releaseDate = map.get("releaseDate");
                     String ytLink = map.get("Url");
+                    String viewCount = map.get("ViewCount");
+                    String label = map.get("Label");
 
                     BufferedImage thumbnailImage = ImageProcessor.getDownloadedImage(thumbnail);
                     Image convertedImage = SwingFXUtils.toFXImage(thumbnailImage, null);
@@ -89,12 +91,13 @@ public class ControllerYouTubeMonitoring {
                     Platform.runLater(() -> {
                         lblVideoTitle.setText(title);
                         // imgTitle.setImage(Test.createImageFromText(title, "Iskoola Potha"));
-                        lblCName.setText("Channel/ Program: " + channelName); // TODO: Add Channel Name
+                        lblCName.setText("Channel/ Program: " + channelName);
                         lblDate.setText(releaseDate);
-                        lblViewCount.setText("Views: N/A");
+                        lblViewCount.setText("Views: " + viewCount);
                         lblYTLink.setText(ytLink);
                         imgThumb.setImage(convertedImage);
                         allEntries.add(node);
+                        System.out.println(label);
                         // vbReportsList.getChildren().add(node);
                     });
                 }
