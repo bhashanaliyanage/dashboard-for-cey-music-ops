@@ -7,6 +7,7 @@ import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -14,10 +15,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -94,32 +98,29 @@ public class ControllerManualClaims {
         }
     }
 
-    private void loadURL() throws IOException {
-        String URL = txtURL.getText();
+private void loadURL() throws IOException {
+    String URL = txtURL.getText();
 
-        if (!Objects.equals(URL, "")) {
-            String ID2 = TextFormatter.extractYoutubeID(URL);
+    if (!Objects.equals(URL, "")) {
+        String ID2 = TextFormatter.extractYoutubeID(URL);
 
-            Thread threadLoadVideo = getThreadLoadVideo(ID2);
-            threadLoadVideo.start();
+        Thread threadLoadVideo = getThreadLoadVideo(ID2);
+        threadLoadVideo.start();
 
-            // If this ID is in the manual claims database, show an alert.
-            // int previousClaims = DatabasePostgres.checkPreviousClaims(ID2);
+        Thread showPreviousClaims = getThreadPreviousClaims(ID2);
+        showPreviousClaims.start();
 
-            Thread showPreviousClaims = getThreadPreviousClaims(ID2);
-            showPreviousClaims.start();
+        comboClaimType.requestFocus();
 
-            comboClaimType.requestFocus();
+        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
+        vboxTracks.getChildren().clear();
+        vboxTracks.getChildren().add(node);
 
-            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
-            vboxTracks.getChildren().clear();
-            vboxTracks.getChildren().add(node);
-
-            manualClaims.clear();
-        } else {
-            System.out.println("URL Empty");
-        }
+        manualClaims.clear();
+    } else {
+        System.out.println("URL Empty");
     }
+}
 
     private Thread getThreadPreviousClaims(String id2) {
         Task<Void> task = new Task<>() {
@@ -183,28 +184,62 @@ public class ControllerManualClaims {
         return new Thread(task);
     }
 
-    private @NotNull Thread getThreadLoadVideo(String ID2) {
-        Task<List<Songs>> taskLoadVideo = new Task<>() {
-            @Override
-            protected List<Songs> call() {
-                try {
-                    String embedID = "https://www.youtube.com/embed/" + ID2;
-                    Platform.runLater(() -> ytPlayer.getEngine().load(embedID));
-                    // ytPlayer.getEngine().load(embedID);
-                } catch (Exception e) {
-                    Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Error!");
-                        alert.setHeaderText("Error Loading URL");
-                        alert.setContentText(e.toString());
-                        alert.showAndWait();
-                    });
-                }
-                return null;
-            }
-        };
+private @NotNull Thread getThreadLoadVideo(String ID2) {
+    Task<List<Songs>> taskLoadVideo = new Task<>() {
+        @Override
+        protected List<Songs> call() {
+            try {
+                Platform.runLater(() -> {
+                    ytPlayer.getEngine().setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+                    ytPlayer.getEngine().setJavaScriptEnabled(true);
 
-        return new Thread(taskLoadVideo);
+                    String htmlContent = loadHtmlFromFile("layouts/manual_claims/youtube_player.html");
+                    ytPlayer.getEngine().loadContent(htmlContent);
+
+                    ytPlayer.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+                        if (newValue == Worker.State.SUCCEEDED) {
+                            ytPlayer.getEngine().executeScript(
+                                    "var meta = document.createElement('meta'); " +
+                                            "meta.httpEquiv = 'Content-Security-Policy'; " +
+                                            "meta.content = \"default-src * 'unsafe-inline' 'unsafe-eval'\"; " +
+                                            "document.getElementsByTagName('head')[0].appendChild(meta);"
+                            );
+
+                            // Load the video after the page has loaded
+                           ytPlayer.getEngine().executeScript("loadVideo('" + ID2 + "')");
+                        }
+                    });
+                });
+                // ytPlayer.getEngine().load(embedID);
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error!");
+                    alert.setHeaderText("Error Loading URL");
+                    alert.setContentText(e.toString());
+                    alert.showAndWait();
+                });
+            }
+            return null;
+        }
+    };
+
+    return new Thread(taskLoadVideo);
+}
+
+    // Method to load HTML from file
+    private String loadHtmlFromFile(String fileName) {
+        try (InputStream is = getClass().getResourceAsStream(fileName)) {
+            if (is != null) {
+                return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            } else {
+                System.err.println("Could not find file: " + fileName);
+                return "";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public void onAddManualClaim() {
@@ -276,5 +311,12 @@ public class ControllerManualClaims {
         } catch (IOException e) {
             AlertBuilder.sendErrorAlert("Error", "Error Loading URL", e.toString());
         }
+    }
+
+    @FXML
+    private void onButtonClick() {
+        WebEngine engine = ytPlayer.getEngine();
+        String currentTime = (String) engine.executeScript("document.getElementById('current-time').innerHTML");
+        System.out.println("Current time: " + currentTime);
     }
 }

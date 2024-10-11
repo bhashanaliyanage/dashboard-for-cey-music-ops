@@ -6,6 +6,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -38,9 +40,35 @@
                <VBox.margin>
                   <Insets top="5.0" />
                </VBox.margin>
-               <TextField fx:id="spinnerStart" onAction="#formatStartTime" promptText="00:00:00" styleClass="textarea-bg" />
+               <HBox spacing="5.0">
+                  <children>
+                     <TextField fx:id="spinnerStart" onAction="#formatStartTime" prefWidth="110.0" promptText="00:00:00" styleClass="textarea-bg" />
+                     <Button mnemonicParsing="false" onAction="#onGetStartTime" styleClass="button_inside">
+                        <graphic>
+                           <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                              <image>
+                                 <Image url="@../../images/star.png" />
+                              </image>
+                           </ImageView>
+                        </graphic>
+                     </Button>
+                  </children>
+               </HBox>
                <Label text="-" textFill="#656565" />
-               <TextField fx:id="spinnerEnd" onAction="#formatEndTime" promptText="00:00:00" styleClass="textarea-bg" />
+               <HBox spacing="5.0">
+                  <children>
+                     <TextField fx:id="spinnerEnd" onAction="#formatEndTime" prefWidth="110.0" promptText="00:00:00" styleClass="textarea-bg" />
+                     <Button mnemonicParsing="false" onAction="#onGetEndTime" styleClass="button_inside">
+                        <graphic>
+                           <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                              <image>
+                                 <Image url="@../../images/star.png" />
+                              </image>
+                           </ImageView>
+                        </graphic>
+                     </Button>
+                  </children>
+               </HBox>
             </HBox>
          </VBox>
       </HBox>
@@ -60,7 +88,7 @@
                </VBox.margin>
             </TextField>
          </VBox>
-         <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+         <VBox layoutX="10.0" layoutY="10.0" prefWidth="148.0" HBox.hgrow="ALWAYS">
             <Label text="Composer" textFill="#656565">
                <cursor>
                   <Cursor fx:constant="DEFAULT" />

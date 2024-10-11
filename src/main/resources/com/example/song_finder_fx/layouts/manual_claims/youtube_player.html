@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>YouTube Audio Player</title>
+    <style>
+        #seek-bar {
+            width: 100%;
+        }
+        #current-time, #duration {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="player-container">
+    <div id="player"></div>
+    <div id="timeline">
+        <span id="current-time">0:00</span>
+        <label for="seek-bar"></label><input type="range" id="seek-bar" value="0">
+        <span id="duration">0:00</span>
+    </div>
+</div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="youtube_player.js"></script>
+<script>
+    var player;
+    var seekBar = document.getElementById("seek-bar");
+    var currentTimeDisplay = document.getElementById("current-time");
+    var durationDisplay = document.getElementById("duration");
+    var videoIdToLoad;
+
+    function onYouTubeIframeAPIReady() {
+        if (videoIdToLoad) {
+            loadVideo(videoIdToLoad);
+        }
+    }
+
+    function loadVideo(videoId) {
+        if (player) {
+            player.destroy();  // Destroy the existing player if it exists
+        }
+
+        player = new YT.Player('player', {
+            width: '620',
+            height: '320',
+            videoId: videoId,
+            playerVars: {
+                'autoplay': 0,
+                'controls': 0,
+            },
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+    }
+
+    function onPlayerReady(event) {
+        event.target.setPlaybackQuality('small');
+        updateTimerDisplay();
+        updateProgressBar();
+        player.playVideo();
+    }
+
+    function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING) {
+            setTimeout(updateTimerDisplay, 1000);
+            setTimeout(updateProgressBar, 1000);
+        }
+    }
+
+    function formatTime(time) {
+        time = Math.round(time);
+        var minutes = Math.floor(time / 60);
+        var seconds = time - minutes * 60;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        return minutes + ":" + seconds;
+    }
+
+    function updateTimerDisplay() {
+        currentTimeDisplay.innerHTML = formatTime(player.getCurrentTime());
+        durationDisplay.innerHTML = formatTime(player.getDuration());
+
+        if (player.getPlayerState() == 1) {
+            setTimeout(updateTimerDisplay, 1000);
+        }
+    }
+
+    function updateProgressBar() {
+        seekBar.value = (player.getCurrentTime() / player.getDuration()) * 100;
+
+        if (player.getPlayerState() == 1) {
+            setTimeout(updateProgressBar, 1000);
+        }
+    }
+
+    seekBar.addEventListener("change", function () {
+        // Check if the video is not playing and play it
+        if (player.getPlayerState() !== YT.PlayerState.PLAYING) {
+            player.playVideo();
+        }
+
+        var time = player.getDuration() * (seekBar.value / 100);
+        player.seekTo(time);
+    });
+</script>
+
+<style>
+    #player-container {
+        width: 620px;
+    }
+
+    #timeline {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    #seek-bar {
+        flex-grow: 1;
+        margin: 0 10px;
+        appearance: none;
+        -webkit-appearance: none;
+        background: transparent;
+    }
+
+    #seek-bar::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 8px;
+        background: #ddd;
+        border: none;
+        border-radius: 3px;
+    }
+
+    #seek-bar::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        border: none;
+        height: 16px;
+        width: 16px;
+        border-radius: 50%;
+        background: #79b7e3;
+        margin-top: -5px;
+    }
+
+    #seek-bar::-moz-range-track {
+        width: 100%;
+        height: 5px;
+        background: #ddd;
+        border: none;
+        border-radius: 3px;
+    }
+
+    #seek-bar::-moz-range-thumb {
+        border: none;
+        height: 16px;
+        width: 16px;
+        border-radius: 50%;
+        background: #79b7e3;
+    }
+
+    #seek-bar::-ms-track {
+        width: 100%;
+        height: 5px;
+        background: transparent;
+        border-color: transparent;
+        color: transparent;
+    }
+
+    #seek-bar::-ms-fill-lower {
+        background: #79b7e3;
+        border-radius: 3px;
+    }
+
+    #seek-bar::-ms-fill-upper {
+        background: #ddd;
+        border-radius: 3px;
+    }
+
+    #seek-bar::-ms-thumb {
+        border: none;
+        height: 16px;
+        width: 16px;
+        border-radius: 50%;
+        background: #79b7e3;
+    }
+
+    #seek-bar:focus {
+        outline: none;
+    }
+
+    #controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+</body>
+
+</html>

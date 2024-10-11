@@ -2,6 +2,7 @@ package com.example.song_finder_fx.Controller;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -71,7 +72,17 @@ public class TextFormatter {
     }
 
     public static boolean validateTrimTimes(String trimStart, String trimEnd) {
-        return validateTime(trimStart) && validateTime(trimEnd);
+        // return validateTime(trimStart) && validateTime(trimEnd);
+
+        if (!validateTime(trimStart) || !validateTime(trimEnd)) {
+            return false;
+        }
+
+        LocalTime start = LocalTime.parse(trimStart);
+        LocalTime end = LocalTime.parse(trimEnd);
+
+        Duration duration = Duration.between(start, end);
+        return duration.getSeconds() >= 50;
     }
 
 

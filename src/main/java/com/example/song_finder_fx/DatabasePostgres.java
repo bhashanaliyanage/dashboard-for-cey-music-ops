@@ -126,25 +126,23 @@ public class DatabasePostgres {
         return songs;
     }
 
-    public static Songs searchContributors(String songName) throws SQLException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
-        Songs song = new Songs();
+    public static Songs searchContributorsSR(String songName) throws SQLException {
+        // Connection conn = getConn();
+        // ResultSet rs = statement.executeQuery(query);
+        String query = String.format("SELECT song_name, composer, lyricist FROM public.song_metadata_new WHERE song_name = '%s' AND type = 'O' ORDER BY song_name ASC;", songName);
 
-        String query = String.format("SELECT song_name, composer, lyricist FROM public.song_metadata_new WHERE song_name = '%s' ORDER BY song_name ASC;", songName);
-        ResultSet rs = statement.executeQuery(query);
-        if (rs.isBeforeFirst()) {
-            rs.next();
-            song.setComposer(rs.getString(2));
-            song.setLyricist(rs.getString(3));
-            // song.getContributorsFromRS(rs);
-
-            System.out.println("song.getLyricist() = " + song.getLyricist());
-            System.out.println("song.getComposer() = " + song.getComposer());
-
+        try (Connection con = getConn();
+             Statement statement = con.createStatement()) {
+            Songs song = new Songs();
+            ResultSet rs = statement.executeQuery(query);
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                song.setComposer(rs.getString(2));
+                song.setLyricist(rs.getString(3));
+                return song;
+            }
             return song;
         }
-        return song;
     }
 
     public static int checkPreviousClaims(String id) throws SQLException {
@@ -3711,9 +3709,9 @@ public class DatabasePostgres {
         boolean bl = false;
         try {
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, you.getUrl());
+            ps.setString(3, you.getUrl());
             ps.setString(2, you.getName());
-            ps.setInt(3, you.getType());
+            ps.setInt(1, you.getType());
             bl = ps.executeUpdate() > 0 ? true : false;
         } catch (Exception e) {
             e.printStackTrace();
