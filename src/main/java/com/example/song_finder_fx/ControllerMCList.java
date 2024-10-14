@@ -37,10 +37,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class ControllerMCList {
 
@@ -61,7 +58,11 @@ public class ControllerMCList {
 
     public static List<CheckBox> checkBoxes = new ArrayList<>();
 
+    private final Map<Integer, CheckBox> checkBoxMap = new HashMap<>();
+
     public static List<HBox> hBoxes = new ArrayList<>();
+
+    private final Map<Integer, HBox> hBoxMap = new HashMap<>();
 
     public static List<Label> labelsSongNo = new ArrayList<>();
 
@@ -77,13 +78,13 @@ public class ControllerMCList {
 
     public static Map<Integer, ManualClaimTrack> claimMap = new HashMap<>();
 
+    public static Map<Integer, Node> claimNodeMap = new HashMap<>();
+
     private final int pageSize = 50;
 
     private int currentPage = 0;
 
     public static List<ManualClaimTrack> allManualClaims;
-
-    private final List<Node> allClaimEntries = new ArrayList<>();
 
     private volatile Thread threadValidation;
 
@@ -104,6 +105,12 @@ public class ControllerMCList {
         labelsComposer.clear();
         labelsLyricist.clear();
         ivArtworks.clear();
+
+        // Clear maps
+        claimMap.clear();
+        claimNodeMap.clear();
+        checkBoxMap.clear();
+        hBoxMap.clear();
 
         lblClaimCount.setText("Loading...");
 
@@ -131,9 +138,10 @@ public class ControllerMCList {
                     Node node;
                     try {
                         node = createClaimEntryNode(claim);
-                        allClaimEntries.add(node);
+                        // allClaimEntries.add(node);
+                        claimNodeMap.put(claim.getId(), node);
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        Platform.runLater(e::printStackTrace);
                     }
                 }
 
@@ -142,7 +150,7 @@ public class ControllerMCList {
                         lblClaimCount.setText(DatabasePostgres.getManualClaimCount());
                         displayCurrentPage();
                     } catch (SQLException e) {
-                        throw new RuntimeException(e);
+                        Platform.runLater(e::printStackTrace);
                     }
                 });
                 return null;
@@ -167,75 +175,76 @@ public class ControllerMCList {
 
         threadValidation = new Thread(() -> {
             try {
+                List<Integer> claimIds = new ArrayList<>(claimMap.keySet());
+                List<Pair<Integer, String>> composerUpdates = new ArrayList<>();
+                List<Pair<Integer, String>> lyricistUpdates = new ArrayList<>();
 
                 for (int i = startIndex; i < endIndex; i++) {
                     if (Thread.currentThread().isInterrupted()) {
                         return; // Exit the method if the thread has been interrupted
                     }
 
-                    final int index = i;
-                    String composer = labelsComposer.get(i).getText();
-                    boolean status = DatabasePostgres.checkIfArtistValidated(composer);
-                    if (!status) {
-                        Platform.runLater(() -> labelsComposer.get(index).setStyle("-fx-text-fill: red"));
+                    int id = claimIds.get(i);
+                    ManualClaimTrack claim = claimMap.get(id);
+                    int index = allManualClaims.indexOf(claim);
+
+                    String composer = labelsComposer.get(index).getText();
+                    boolean composerStatus = DatabasePostgres.checkIfArtistValidated(composer);
+                    if (!composerStatus) {
+                        composerUpdates.add(new Pair<>(index, "-fx-text-fill: red"));
                     }
 
-                    String lyricist = labelsLyricist.get(i).getText();
-                    status = DatabasePostgres.checkIfArtistValidated(lyricist);
-                    if (!status) {
-                        Platform.runLater(() -> labelsLyricist.get(index).setStyle("-fx-text-fill: red"));
+                    String lyricist = labelsLyricist.get(index).getText();
+                    boolean lyricistStatus = DatabasePostgres.checkIfArtistValidated(lyricist);
+                    if (!lyricistStatus) {
+                        lyricistUpdates.add(new Pair<>(index, "-fx-text-fill: red"));
                     }
                 }
+
+                Platform.runLater(() -> {
+                    for (Pair<Integer, String> update : composerUpdates) {
+                        labelsComposer.get(update.getKey()).setStyle(update.getValue());
+                    }
+                    for (Pair<Integer, String> update : lyricistUpdates) {
+                        labelsLyricist.get(update.getKey()).setStyle(update.getValue());
+                    }
+                });
             } catch (SQLException e) {
                 Platform.runLater(e::printStackTrace);
             }
         });
 
-        /*threadArtworks = new Thread(() -> {
-            // int startIndex = currentPage * pageSize;
-            // int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
-
-            for (int i = startIndex; i < endIndex; i++) {
-                if (Thread.currentThread().isInterrupted()) {
-                    return; // Exit the method if the thread has been interrupted
-                }
-
-                final int index = i;
-                ImageView imageView = ivArtworks.get(i);
-                MCTrackController controller = new MCTrackController(allManualClaims.get(i));
-                try {
-                    Platform.runLater(() -> System.out.println("Fetching Artworks for: " + allManualClaims.get(index).getTrackName()));
-                    ManualClaimTrack updatedClaim = controller.fetchArtwork();
-                    allManualClaims.set(index, updatedClaim);
-                    Platform.runLater(() -> {
-                        try {
-                            imageView.setImage(setImage(updatedClaim, index));
-                        } catch (IOException | URISyntaxException e) {
-                            Platform.runLater(e::printStackTrace);
-                        }
-                    });
-                } catch (SQLException e) {
-                    Platform.runLater(e::printStackTrace);
-                }
-            }
-        });*/
-
         Task<List<Pair<Integer, Image>>> artworkTask = new Task<>() {
             @Override
-            protected List<Pair<Integer, Image>> call() throws Exception {
+            protected List<Pair<Integer, Image>> call() {
+                List<Integer> claimIds = new ArrayList<>(claimMap.keySet());
                 List<Pair<Integer, Image>> updatedImages = new ArrayList<>();
-                for (int i = startIndex; i < endIndex; i++) {
-                    if (isCancelled()) {
-                        break;
+                try {
+                    for (int i = startIndex; i < endIndex; i++) {
+                        if (isCancelled()) {
+                            break;
+                        }
+                        int currentIndex = i - startIndex;
+                        updateProgress(currentIndex, totalArtworks);
+
+                        int claimId = claimIds.get(i);
+                        ManualClaimTrack claim = claimMap.get(claimId);
+                        updateMessage("Fetching Artwork for: " + claim.getTrackName());
+
+                        MCTrackController controller = new MCTrackController(claim);
+                        ManualClaimTrack updatedClaim = controller.fetchArtwork();
+
+                        claimMap.put(claimId, updatedClaim);
+                        int allManualClaimsIndex = allManualClaims.indexOf(claim);
+                        if (allManualClaimsIndex != -1) {
+                            allManualClaims.set(allManualClaimsIndex, updatedClaim);
+                        }
+
+                        Image image = setImage(updatedClaim, allManualClaims.indexOf(claim));
+                        updatedImages.add(new Pair<>(allManualClaims.indexOf(claim), image));
                     }
-                    int currentIndex = i - startIndex;
-                    updateProgress(currentIndex, totalArtworks);
-                    updateMessage("Fetching Artwork for: " + allManualClaims.get(i).getTrackName());
-                    MCTrackController controller = new MCTrackController(allManualClaims.get(i));
-                    ManualClaimTrack updatedClaim = controller.fetchArtwork();
-                    allManualClaims.set(i, updatedClaim);
-                    Image image = setImage(updatedClaim, i);
-                    updatedImages.add(new Pair<>(i, image));
+                } catch (Exception e) {
+                    Platform.runLater(e::printStackTrace);
                 }
                 return updatedImages;
             }
@@ -300,12 +309,17 @@ public class ControllerMCList {
     }
 
     private void displayCurrentPage() {
+        List<Integer> claimIds = new ArrayList<>(claimMap.keySet());
         int startIndex = currentPage * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, allClaimEntries.size());
+        int endIndex = Math.min(startIndex + pageSize, claimIds.size());
 
         vbClaimsList.getChildren().clear();
         for (int i = startIndex; i < endIndex; i++) {
-            vbClaimsList.getChildren().add(allClaimEntries.get(i));
+            int claimId = claimIds.get(i);
+            Node claimNode = claimNodeMap.get(claimId);
+            if (claimNode != null) {
+                vbClaimsList.getChildren().add(claimNode);
+            }
         }
 
         int displayStart = startIndex + 1;
@@ -335,7 +349,7 @@ public class ControllerMCList {
     }
 
     public void nextPage() {
-        if ((currentPage + 1) * pageSize < allClaimEntries.size()) {
+        if ((currentPage + 1) * pageSize < claimNodeMap.size()) {
             currentPage++;
             displayCurrentPage();
         }
@@ -375,8 +389,10 @@ public class ControllerMCList {
         Label lblClaimType = (Label) node.lookup("#lblClaimType");
         CheckBox checkBox = (CheckBox) node.lookup("#checkBox");
         checkBoxes.add(checkBox);
+        checkBoxMap.put(claim.getId(), checkBox);
         HBox hboxEntry = (HBox) node.lookup("#hboxEntry");
         hBoxes.add(hboxEntry);
+        hBoxMap.put(claim.getId(), hboxEntry);
         ImageView image = (ImageView) node.lookup("#image");
         ivArtworks.add(image);
         try {
@@ -420,8 +436,8 @@ public class ControllerMCList {
 
             // Setting Thumbnail and Preview Images to the model
             // Resize the image for preview (adjust dimensions as needed)
-            int previewWidth = 200; // Adjust this value to your desired preview width
-            int previewHeight = 200; // Adjust this value to your desired preview height
+            int previewWidth = 90; // Adjust this value to your desired preview width
+            int previewHeight = 90; // Adjust this value to your desired preview height
             BufferedImage previewImage = ImageProcessor.resizeImage(previewWidth, previewHeight, image);
             claim.setPreviewImage(previewImage);
             image = ImageProcessor.resizeImage(1400, 1400, image);
@@ -465,13 +481,17 @@ public class ControllerMCList {
     @FXML
     void onCheck(ActionEvent event) throws IOException {
         finalManualClaims.clear();
+        List<Integer> claimIds = new ArrayList<>(claimMap.keySet());
+
         for (int i = 0; i < checkBoxes.size(); i++) {
-            if (checkBoxes.get(i).isSelected()) {
+            int claimId = claimIds.get(i);
+            CheckBox checkBox = checkBoxMap.get(claimId);
+            if (checkBox.isSelected()) {
                 // ID, Name, Composer, Lyricist
-                int id = allManualClaims.get(i).getId();
-                ManualClaimTrack claim = claimMap.get(id);
-                System.out.println("claim.getBufferedImage() = " + allManualClaims.get(i).getBufferedImage());
+                // int id = allManualClaims.get(i).getId();
+                ManualClaimTrack claim = claimMap.get(claimId);
                 finalManualClaims.add(claim);
+                // System.out.println("claim.getBufferedImage() = " + allManualClaims.get(i).getBufferedImage());
                 // finalSongNames.add(labelsSongName.get(i).getText());
             }
         }
@@ -485,14 +505,19 @@ public class ControllerMCList {
 
     @FXML
     void onSelectNone() {
-        int count = 0;
-
+        List<Integer> claimIds = new ArrayList<>(claimMap.keySet());
         int startIndex = currentPage * pageSize;
         int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
 
+        int count = 0;
+
         for (int i = startIndex; i < endIndex; i++) {
-            checkBoxes.get(i).setSelected(false);
-            count++;
+            int claimId = claimIds.get(i);
+            CheckBox checkBox = checkBoxMap.get(claimId);
+            if (checkBox != null) {
+                checkBox.setSelected(false);
+                count++;
+            }
         }
 
         System.out.println(count + " items deselected");
@@ -500,25 +525,33 @@ public class ControllerMCList {
 
     @FXML
     void onSelectAll() {
+        List<Integer> claimIds = new ArrayList<>(claimMap.keySet());
+        int startIndex = currentPage * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, claimIds.size());
+
         int count = 0;
 
-        int startIndex = currentPage * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, allManualClaims.size());
-
         for (int i = startIndex; i < endIndex; i++) {
-            checkBoxes.get(i).setSelected(true);
-            count++;
+            int claimId = claimIds.get(i);
+            CheckBox checkBox = checkBoxMap.get(claimId);
+            if (checkBox != null) {
+                checkBox.setSelected(true);
+                count++;
+            }
         }
 
         System.out.println(count + " items selected");
     }
 
     public void onExportSelected() {
+        List<Integer> claimIds = new ArrayList<>(claimMap.keySet());
         List<ManualClaimTrack> selectedClaims = new ArrayList<>();
 
         for (int i = 0; i < checkBoxes.size(); i++) {
-            if (checkBoxes.get(i).isSelected()) {
-                selectedClaims.add(allManualClaims.get(i));
+            int claimId = claimIds.get(i);
+            CheckBox checkBox = checkBoxMap.get(claimId);
+            if (checkBox.isSelected()) {
+                selectedClaims.add(claimMap.get(claimId));
             }
         }
 
@@ -596,16 +629,17 @@ public class ControllerMCList {
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
+                    List<Integer> claimIds = new ArrayList<>(claimMap.keySet());
                     for (int i = 0; i < checkBoxes.size(); i++) {
-                        if (checkBoxes.get(i).isSelected()) {
-                            String songNo = labelsSongNo.get(i).getText();
+                        int claimId = claimIds.get(i);
+                        CheckBox checkBox = checkBoxMap.get(claimId);
+                        if (checkBox.isSelected()) {
+                            // String songNo = labelsSongNo.get(i).getText();
                             try {
-                                DatabasePostgres.archiveSelectedClaim(songNo);
-                                int finalI = i;
+                                DatabasePostgres.archiveSelectedClaim(String.valueOf(claimId));
                                 Platform.runLater(() -> {
-                                    hBoxes.get(finalI).setDisable(true);
-                                    checkBoxes.get(finalI).setSelected(false);
-                                    // btnArchive.setText("Archiving " + finalArchivedCount + " of " + count);
+                                    hBoxMap.get(claimId).setDisable(true);
+                                    checkBoxMap.get(claimId).setSelected(false);
                                 });
                             } catch (SQLException e) {
                                 Platform.runLater(() -> {
@@ -681,16 +715,21 @@ public class ControllerMCList {
                                 fadeIn.play();
                             });
 
+                            List<Integer> claimIds = new ArrayList<>(claimMap.keySet());
+
                             for (int i = 0; i < checkBoxes.size(); i++) {
-                                if (checkBoxes.get(i).isSelected()) {
-                                    String songNo = labelsSongNo.get(i).getText();
+                                int claimId = claimIds.get(i);
+                                CheckBox checkBox = checkBoxMap.get(claimId);
+                                ManualClaimTrack claim = claimMap.get(claimId);
+                                int index = allManualClaims.indexOf(claim);
+
+                                if (checkBox.isSelected()) {
+                                    String songNo = String.valueOf(claimId);
 
                                     // Updating Database
                                     int status = DatabasePostgres.updateClaimArtwork(songNo, biArtwork, previewImage);
 
                                     if (status > 0) {
-                                        final int index = i;  // Final index for use in lambda expression
-
                                         // Update UI elements on JavaFX thread
                                         Platform.runLater(() -> {
                                             ivArtworks.get(index).setImage(fxImage);

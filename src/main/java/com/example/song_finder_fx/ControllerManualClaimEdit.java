@@ -5,6 +5,7 @@ import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -24,6 +25,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Objects;
+
+import static com.example.song_finder_fx.ControllerMCList.*;
 
 public class ControllerManualClaimEdit {
 
@@ -73,6 +76,7 @@ public class ControllerManualClaimEdit {
     @FXML
     void onSave() throws SQLException {
         String songID = lblClaimID.getText();
+        int songIDInt = Integer.parseInt(songID);
         String trackName = txtSongName.getText();
         String composer = txtComposer.getText();
         String lyricist = txtLyricist.getText();
@@ -81,39 +85,57 @@ public class ControllerManualClaimEdit {
 
         boolean claimValidation = true;
 
-        for (int i = 0; i < ControllerMCList.labelsSongNo.size(); i++) {
-            if (Objects.equals(ControllerMCList.labelsSongNo.get(i).getText(), songID)) {
+        ManualClaimTrack claim = claimMap.get(songIDInt);
 
-                ControllerMCList.labelsSongName.get(i).setText(trackName);
-                ControllerMCList.labelsComposer.get(i).setText(composer);
-                ControllerMCList.labelsLyricist.get(i).setText(lyricist);
+        if (claim != null) {
+            claim.setTrackName(trackName);
+            claim.setComposer(composer);
+            claim.setLyricist(lyricist);
 
-                ControllerMCList.allManualClaims.get(i).setTrackName(trackName);
-                ControllerMCList.allManualClaims.get(i).setComposer(composer);
-                ControllerMCList.allManualClaims.get(i).setLyricist(lyricist);
-
-                // Checking trim times
-                if (trimStart != null && trimEnd != null && !trimStart.isEmpty() && !trimEnd.isEmpty()) {
-                    // Validating trim times
-                    boolean status = TextFormatter.validateTrimTimes(trimStart, trimEnd);
-                    if (status) {
-                        // Adding trim times to model
-                        ControllerMCList.allManualClaims.get(i).setTrimStart(trimStart);
-                        ControllerMCList.allManualClaims.get(i).setTrimEnd(trimEnd);
-                        DatabasePostgres.editManualClaim(songID, trackName, composer, lyricist, trimStart, trimEnd);
-                    } else {
-                        claimValidation = false;
-                        AlertBuilder.sendErrorAlert("Error", null, "Error Parsing Trim Time");
-                    }
-                } else {
-                    DatabasePostgres.editManualClaim(songID, trackName, composer, lyricist, trimStart, trimEnd);
-                }
+            // Update the UI elements if they exist
+            Node claimNode = claimNodeMap.get(songIDInt);
+            if (claimNode != null) {
+                updateClaimNodeUI(claimNode, claim);
             }
+
+            // Checking trim times
+            if (trimStart != null && trimEnd != null && !trimStart.isEmpty() && !trimEnd.isEmpty()) {
+                // Validating trim times
+                boolean status = TextFormatter.validateTrimTimes(trimStart, trimEnd);
+                if (status) {
+                    // Adding trim times to model
+                    claim.setTrimStart(trimStart);
+                    claim.setTrimEnd(trimEnd);
+                    DatabasePostgres.editManualClaim(songID, trackName, composer, lyricist, trimStart, trimEnd);
+                } else {
+                    claimValidation = false;
+                    AlertBuilder.sendErrorAlert("Error", null, "Error Parsing Trim Time");
+                }
+            } else {
+                DatabasePostgres.editManualClaim(songID, trackName, composer, lyricist, trimStart, trimEnd);
+            }
+
+            // Update allManualClaims if needed
+            int index = allManualClaims.indexOf(claim);
+            if (index != -1) {
+                allManualClaims.set(index, claim);
+            }
+        } else {
+            AlertBuilder.sendErrorAlert("Error", null, "Claim not found");
+            claimValidation = false;
         }
 
         if (claimValidation) {
             UIController.blankSidePanel();
         }
+    }
+
+    private void updateClaimNodeUI(Node claimNode, ManualClaimTrack claim) {
+        // Assuming the claim node contains labels for song name, composer, and lyricist
+        // You'll need to adjust this based on your actual UI structure
+        ((Label) claimNode.lookup("#lblSongName")).setText(claim.getTrackName());
+        ((Label) claimNode.lookup("#lblComposer")).setText(claim.getComposer());
+        ((Label) claimNode.lookup("#lblLyricist")).setText(claim.getLyricist());
     }
 
     @FXML
