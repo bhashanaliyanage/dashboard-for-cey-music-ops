@@ -1,7 +1,6 @@
 package com.example.song_finder_fx;
 
 import com.example.song_finder_fx.Controller.*;
-import com.example.song_finder_fx.Controller.TextFormatter;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
 import javafx.application.Platform;
@@ -9,13 +8,12 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.web.WebEngine;
 import org.controlsfx.control.textfield.TextFields;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -77,8 +75,8 @@ public class ControllerMCTrack {
         });
     }
 
-    public void onAddTrack() throws IOException {
-        Task<Void> task = new Task<Void>() {
+    public void onAddTrack() {
+        Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
                 try {
@@ -95,10 +93,7 @@ public class ControllerMCTrack {
                     String selectedItem = ControllerManualClaims.comboClaimTypeStatic.getSelectionModel().getSelectedItem();
                     int claimType = getClaimType(selectedItem);
 
-                    // Front-End validation
-                    boolean ifAnyNull = checkData();
-
-                    if (!ifAnyNull) {
+                    if (checkData()) {
                         // Fetching YouTube ID
                         String youtubeID = TextFormatter.extractYoutubeID(url);
 
@@ -131,24 +126,23 @@ public class ControllerMCTrack {
                                     AlertBuilder.sendErrorAlert("Error Adding Track", "Invalid Trim Time", "Trim time cannot be less than 50 seconds or not in 00:00:00 format");
                                     btnAddTrack.setText("Add Track");
                                 });
-                                // AlertBuilder.sendErrorAlert("Error Adding Track", "Invalid Trim Time", "Trim time cannot be less than 50 seconds or not in 00:00:00 format");
                             }
                         }
 
                         if (claimValidation) {
-                            trackID = ManualClaims.manualClaims.size();
+                            trackID = ManualClaims.manualClaims.size() + 1;
 
                             ManualClaims.manualClaims.add(track);
 
                             Platform.runLater(() -> {
-                                titledPane.setText(trackName);
+                                titledPane.setText(String.format("%02d | %s", trackID, trackName));
                                 titledPane.setExpanded(false);
                                 btnAddTrack.setDisable(true);
                                 btnAddTrack.setText("Claim Added");
-                                // btnEditTrack.setDisable(false);
+                                disableFields(true);
+                                btnEditTrack.setDisable(false);
                                 ControllerManualClaims.vboxTracksStatic.getChildren().add(nodeTrack);
                             });
-
                         }
                     }
                 } catch (Exception e) {
@@ -158,83 +152,64 @@ public class ControllerMCTrack {
             }
         };
 
-        new Thread(task).start();
+        if (titledPane.getText().equals("Song Name")) {
+            new Thread(task).start();
+        } else {
+            saveEdits();
+        }
+    }
+
+    private void disableFields(boolean type) {
+        txtTrackTitle.setDisable(type);
+        spinnerStart.setDisable(type);
+        spinnerEnd.setDisable(type);
+        txtComposer.setDisable(type);
+        txtLyricist.setDisable(type);
     }
 
     @FXML
     void onEditTrack() {
-        /*Node node = (Node) event.getSource();
-        Scene scene = node.getScene();
-        TextField txtURL = (TextField) scene.lookup("#txtURL");
-        ComboBox<String> comboClaimType = (ComboBox<String>) scene.lookup("#comboClaimType");*/
+        if (btnEditTrack.getText().equals("Edit Track")) {
+            disableFields(false);
+            btnEditTrack.setText("Save");
+        } else {
+            saveEdits();
+        }
+    }
 
-        /*// Fetching user values
+    private void saveEdits() {
+        // Fetching user values
+        String titledPaneText = titledPane.getText();
         String trackName = txtTrackTitle.getText();
         String lyricist = txtLyricist.getText();
         String composer = txtComposer.getText();
         String trimStart = spinnerStart.getText();
         String trimEnd = spinnerEnd.getText();
-        String url = ControllerManualClaims.txtURL_Static.getText();
-        String selectedItem = ControllerManualClaims.comboClaimTypeStatic.getSelectionModel().getSelectedItem();
-        int claimType = getClaimType(selectedItem);
 
-        // Front-End validation
-        boolean ifAnyNull = checkData();
+        if (checkData()) {
+            int trackNumber = Integer.parseInt(titledPaneText.split("\\|")[0].trim()) - 1;
 
-        if (!ifAnyNull) {
-            // Fetching YouTube ID
-            String youtubeID = TextFormatter.extractYoutubeID(url);
+            // Update the track in the manualClaims list
+            if (trackNumber >= 0 && trackNumber < ManualClaims.manualClaims.size()) {
+                ManualClaimTrack track = ManualClaims.manualClaims.get(trackNumber);
+                track.setTrackName(trackName);
+                track.setLyricist(lyricist);
+                track.setComposer(composer);
+                track.setTrimStart(trimStart);
+                track.setTrimEnd(trimEnd);
 
-            // Getting Date
-            LocalDate date = LocalDate.now();
+                // Update the titledPane text
+                titledPane.setText(String.format("%02d | %s", trackNumber + 1, trackName));
 
-            // Creating track model
-            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID, date, claimType);
-            MCTrackController mcTrackController = new MCTrackController(track);
-
-            try {
-                mcTrackController.checkNew();
-            } catch (SQLException e) {
-                ErrorDialog.showErrorDialog("Error!", "Error Adding Track Data", e.toString());
+                // On Completion
+                disableFields(true);
+                btnEditTrack.setText("Edit Track");
+            } else {
+                NotificationBuilder.displayTrayError("Error", "Unable to edit the track");
             }
-
-            boolean claimValidation = true;
-
-            // Checking trim times
-            if (!trimStart.isEmpty() && !trimEnd.isEmpty()) {
-                // Validating trim times
-                boolean status = TextFormatter.validateTrimTimes(trimStart, trimEnd);
-                if (status) {
-                    // Adding trim times to model
-                    track.addTrimTime(trimStart, trimEnd);
-                } else {
-                    claimValidation = false;
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setContentText("Error Parsing Time");
-                    alert.showAndWait();
-                }
-            }
-
-            if (claimValidation) {
-                // ManualClaims.manualClaims.add(track);
-
-                titledPane.setText(trackName);
-                titledPane.setExpanded(false);
-                btnAddTrack.setDisable(true);
-                btnEditTrack.setDisable(false);
-
-                ManualClaimTrack trackOld = ManualClaims.manualClaims.set(trackID, track);
-
-                try {
-                    NotificationBuilder.displayTrayInfo("Manual Claim Edited", "Details of " + trackOld.getTrackName() + " are modified");
-                } catch (AWTException e) {
-                    e.printStackTrace();
-                }
-
-                // vboxTracks.getChildren().add(nodeTrack);
-            }
-        }*/
+        } else {
+            NotificationBuilder.displayTrayError("Error", "Invalid Details");
+        }
     }
 
     private int getClaimType(String selectedItem) {
@@ -270,124 +245,68 @@ public class ControllerMCTrack {
         };
     }
 
-    private boolean checkData() {
-        /*boolean status = false;
-        String trackName = txtTrackTitle.getText();
-        String lyricist = txtLyricist.getText();
-        String composer = txtComposer.getText();
-        String trimStart = spinnerStart.getText();
-        String trimEnd = spinnerEnd.getText();
+private boolean checkData() {
+    boolean status = false;
+    String trackName = txtTrackTitle.getText();
+    String lyricist = txtLyricist.getText();
+    String composer = txtComposer.getText();
+    String trimStart = spinnerStart.getText();
+    String trimEnd = spinnerEnd.getText();
 
-        if (trackName.isEmpty()) {
+    if (trackName.isEmpty()) {
+        status = true;
+        Platform.runLater(() -> txtTrackTitle.setStyle("-fx-border-color: red;"));
+    } else {
+        Platform.runLater(() -> txtTrackTitle.setStyle("-fx-border-color: '#e9ebee';"));
+    }
+
+    if (lyricist.isEmpty()) {
+        status = true;
+        Platform.runLater(() -> txtLyricist.setStyle("-fx-border-color: red;"));
+    } else {
+        Platform.runLater(() -> txtLyricist.setStyle("-fx-border-color: '#e9ebee';"));
+    }
+
+    if (composer.isEmpty()) {
+        status = true;
+        Platform.runLater(() -> txtComposer.setStyle("-fx-border-color: red;"));
+    } else {
+        Platform.runLater(() -> txtComposer.setStyle("-fx-border-color: '#e9ebee';"));
+    }
+
+    if (!trimStart.isEmpty()) {
+        if (isNotValidTimeFormat(trimStart)) {
             status = true;
-            txtTrackTitle.setStyle("-fx-border-color: red;");
+            Platform.runLater(() -> spinnerStart.setStyle("-fx-border-color: red;"));
         } else {
-            txtTrackTitle.setStyle("-fx-border-color: '#e9ebee';");
-        }
+            if (!trimEnd.isEmpty()) {
+                if (isNotValidTimeFormat(trimStart)) {
+                    status = true;
+                    Platform.runLater(() -> spinnerEnd.setStyle("-fx-border-color: red;"));
+                } else {
+                    LocalTime startTime = LocalTime.parse(trimStart);
+                    LocalTime endTime = LocalTime.parse(trimEnd);
 
-        if (lyricist.isEmpty()) {
-            status = true;
-            txtLyricist.setStyle("-fx-border-color: red;");
-        } else {
-            txtLyricist.setStyle("-fx-border-color: '#e9ebee';");
-        }
-
-        if (composer.isEmpty()) {
-            status = true;
-            txtComposer.setStyle("-fx-border-color: red;");
-        } else {
-            txtComposer.setStyle("-fx-border-color: '#e9ebee';");
-        }
-
-        if (!trimStart.isEmpty()) {
-            if (isNotValidTimeFormat(trimStart)) {
-                status = true;
-                spinnerStart.setStyle("-fx-border-color: red;");
-            } else {
-                if (!trimEnd.isEmpty()) {
-                    if (isNotValidTimeFormat(trimStart)) {
+                    if (endTime.isBefore(startTime)) {
                         status = true;
-                        spinnerEnd.setStyle("-fx-border-color: red;");
-                    } else {
-                        LocalTime startTime = LocalTime.parse(trimStart);
-                        LocalTime endTime = LocalTime.parse(trimEnd);
-
-                        if (endTime.isBefore(startTime)) {
-                            status = true;
+                        Platform.runLater(() -> {
                             spinnerEnd.setStyle("-fx-border-color: red;");
                             spinnerStart.setStyle("-fx-border-color: red;");
                             NotificationBuilder.displayTrayError("Time Validation Error", "Please check trim start and end times");
-                        } else {
+                        });
+                    } else {
+                        Platform.runLater(() -> {
                             spinnerEnd.setStyle("-fx-border-color: '#e9ebee';");
                             spinnerStart.setStyle("-fx-border-color: '#e9ebee';");
-                        }
+                        });
                     }
                 }
             }
         }
-
-        return status;*/
-        boolean status = false;
-        String trackName = txtTrackTitle.getText();
-        String lyricist = txtLyricist.getText();
-        String composer = txtComposer.getText();
-        String trimStart = spinnerStart.getText();
-        String trimEnd = spinnerEnd.getText();
-
-        if (trackName.isEmpty()) {
-            status = true;
-            Platform.runLater(() -> txtTrackTitle.setStyle("-fx-border-color: red;"));
-        } else {
-            Platform.runLater(() -> txtTrackTitle.setStyle("-fx-border-color: '#e9ebee';"));
-        }
-
-        if (lyricist.isEmpty()) {
-            status = true;
-            Platform.runLater(() -> txtLyricist.setStyle("-fx-border-color: red;"));
-        } else {
-            Platform.runLater(() -> txtLyricist.setStyle("-fx-border-color: '#e9ebee';"));
-        }
-
-        if (composer.isEmpty()) {
-            status = true;
-            Platform.runLater(() -> txtComposer.setStyle("-fx-border-color: red;"));
-        } else {
-            Platform.runLater(() -> txtComposer.setStyle("-fx-border-color: '#e9ebee';"));
-        }
-
-        if (!trimStart.isEmpty()) {
-            if (isNotValidTimeFormat(trimStart)) {
-                status = true;
-                Platform.runLater(() -> spinnerStart.setStyle("-fx-border-color: red;"));
-            } else {
-                if (!trimEnd.isEmpty()) {
-                    if (isNotValidTimeFormat(trimStart)) {
-                        status = true;
-                        Platform.runLater(() -> spinnerEnd.setStyle("-fx-border-color: red;"));
-                    } else {
-                        LocalTime startTime = LocalTime.parse(trimStart);
-                        LocalTime endTime = LocalTime.parse(trimEnd);
-
-                        if (endTime.isBefore(startTime)) {
-                            status = true;
-                            Platform.runLater(() -> {
-                                spinnerEnd.setStyle("-fx-border-color: red;");
-                                spinnerStart.setStyle("-fx-border-color: red;");
-                                NotificationBuilder.displayTrayError("Time Validation Error", "Please check trim start and end times");
-                            });
-                        } else {
-                            Platform.runLater(() -> {
-                                spinnerEnd.setStyle("-fx-border-color: '#e9ebee';");
-                                spinnerStart.setStyle("-fx-border-color: '#e9ebee';");
-                            });
-                        }
-                    }
-                }
-            }
-        }
-
-        return status;
     }
+
+    return !status;
+}
 
     private boolean isNotValidTimeFormat(String timeText) {
         String[] parts = timeText.split(":");

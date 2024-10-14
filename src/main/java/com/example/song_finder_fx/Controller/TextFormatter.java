@@ -31,18 +31,30 @@ public class TextFormatter {
     public static String formatTime(String input) {
         if (!validateTime(input)) {
             try {
-                String[] parts = input.split("\\.");
+                String[] parts;
+
+                if (input.contains(".")) {
+                    // Split by dot
+                    parts = input.split("\\.");
+                } else if (input.contains(":")) {
+                    // Split by colon
+                    parts = input.split(":");
+                } else {
+                    return ""; // Invalid format
+                }
+
+                int hours = 0, minutes, seconds;
+
                 if (parts.length == 3) {
-                    int hours = Integer.parseInt(parts[0]);
-                    int minutes = Integer.parseInt(parts[1]);
-                    int seconds = Integer.parseInt(parts[2]);
+                    hours = Integer.parseInt(parts[0]);
+                    minutes = Integer.parseInt(parts[1]);
+                    seconds = Integer.parseInt(parts[2]);
 
                     LocalTime time = LocalTime.of(hours, minutes, seconds);
                     return time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
                 } else if (parts.length == 2) {
-                    int hours = 0; // Default to 0 hours
-                    int minutes = Integer.parseInt(parts[0]);
-                    int seconds = Integer.parseInt(parts[1]);
+                    minutes = Integer.parseInt(parts[0]);
+                    seconds = Integer.parseInt(parts[1]);
 
                     LocalTime time = LocalTime.of(hours, minutes, seconds);
                     return time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));

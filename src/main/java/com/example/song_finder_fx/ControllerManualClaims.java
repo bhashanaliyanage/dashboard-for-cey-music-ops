@@ -98,29 +98,29 @@ public class ControllerManualClaims {
         }
     }
 
-private void loadURL() throws IOException {
-    String URL = txtURL.getText();
+    private void loadURL() throws IOException {
+        String URL = txtURL.getText();
 
-    if (!Objects.equals(URL, "")) {
-        String ID2 = TextFormatter.extractYoutubeID(URL);
+        if (!Objects.equals(URL, "")) {
+            String ID2 = TextFormatter.extractYoutubeID(URL);
 
-        Thread threadLoadVideo = getThreadLoadVideo(ID2);
-        threadLoadVideo.start();
+            Thread threadLoadVideo = getThreadLoadVideo(ID2);
+            threadLoadVideo.start();
 
-        Thread showPreviousClaims = getThreadPreviousClaims(ID2);
-        showPreviousClaims.start();
+            Thread showPreviousClaims = getThreadPreviousClaims(ID2);
+            showPreviousClaims.start();
 
-        comboClaimType.requestFocus();
+            comboClaimType.requestFocus();
 
-        Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
-        vboxTracks.getChildren().clear();
-        vboxTracks.getChildren().add(node);
+            Node node = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
+            vboxTracks.getChildren().clear();
+            vboxTracks.getChildren().add(node);
 
-        manualClaims.clear();
-    } else {
-        System.out.println("URL Empty");
+            manualClaims.clear();
+        } else {
+            System.out.println("URL Empty");
+        }
     }
-}
 
     private Thread getThreadPreviousClaims(String id2) {
         Task<Void> task = new Task<>() {
@@ -190,6 +190,9 @@ private @NotNull Thread getThreadLoadVideo(String ID2) {
         protected List<Songs> call() {
             try {
                 Platform.runLater(() -> {
+                    // Clear the WebView content
+                    ytPlayer.getEngine().loadContent("");
+
                     ytPlayer.getEngine().setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
                     ytPlayer.getEngine().setJavaScriptEnabled(true);
 
@@ -206,7 +209,7 @@ private @NotNull Thread getThreadLoadVideo(String ID2) {
                             );
 
                             // Load the video after the page has loaded
-                           ytPlayer.getEngine().executeScript("loadVideo('" + ID2 + "')");
+                            ytPlayer.getEngine().executeScript("loadVideo('" + ID2 + "')");
                         }
                     });
                 });

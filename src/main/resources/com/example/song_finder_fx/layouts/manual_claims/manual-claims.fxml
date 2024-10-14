@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerManualClaims">
+<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerManualClaims">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -49,7 +49,6 @@
                      <Cursor fx:constant="DEFAULT" />
                   </cursor>
                </Label>
-               <Button mnemonicParsing="false" onAction="#onButtonClick" text="test" />
                <Label text="(Video previews are disabled for copyrighted content)" textFill="#656565">
                   <cursor>
                      <Cursor fx:constant="DEFAULT" />

@@ -37,10 +37,16 @@ public class Test {
         // DatabasePostgres.changePassword("sandumini", "admin");
 
         // testYouTubeMonitoring();
+        // testYTMAddChannel();
+
         // isrcDispatcherTest();
-
         // catalogNumberGenTest();
+        // testUPCGenerator();
 
+        System.out.println(TextFormatter.formatTime("0.17"));
+    }
+
+    private static void testYTMAddChannel() {
         // YoutubeDownload.downloadAudio("https://www.youtube.com/watch?v=VPLQqrhKNPk", "D:\\CeyMusic\\Ingests\\2024.10.02", "VPLQqrhKNPk.flac", null);
         YoutubeData channel = new YoutubeData();
         channel.setName("Test Name");
@@ -49,8 +55,6 @@ public class Test {
 
         YoutubeDownload youtubeDownload = new YoutubeDownload();
         youtubeDownload.addChannelToDatabase(channel);
-
-        // testUPCGenerator();
     }
 
     private static void testUPCGenerator() {
