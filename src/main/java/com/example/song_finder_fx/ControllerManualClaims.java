@@ -53,6 +53,8 @@ public class ControllerManualClaims {
 
     public static WebView ytPlayerStatic;
 
+    public static List<String> ceyMusicArtists;
+
     @FXML
     public void initialize() {
         // comboClaimType.getItems().addAll("Unspecified", "TV Programs", "Manual Claim", "Single SR");
@@ -87,6 +89,20 @@ public class ControllerManualClaims {
         comboClaimTypeStatic = comboClaimType;
         vboxTracksStatic = vboxTracks;
         ytPlayerStatic = ytPlayer;
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                try {
+                    ceyMusicArtists = DatabasePostgres.getAllCeyMusicArtists();
+                } catch (Exception ignore) {
+
+                }
+                return null;
+            }
+        };
+
+        new Thread(task).start();
     }
 
     @FXML
@@ -184,71 +200,68 @@ public class ControllerManualClaims {
         return new Thread(task);
     }
 
-private @NotNull Thread getThreadLoadVideo(String ID2) {
-    Task<List<Songs>> taskLoadVideo = new Task<>() {
-        @Override
-        protected List<Songs> call() {
-            try {
+    private @NotNull Thread getThreadLoadVideo(String ID2) {
+        Task<List<Songs>> taskLoadVideo = new Task<>() {
+            @Override
+            protected List<Songs> call() {
                 Platform.runLater(() -> {
-                    // Clear the WebView content
-                    ytPlayer.getEngine().loadContent("");
+                    try {
+                        // Clear the WebView content
+                        ytPlayer.getEngine().loadContent("");
 
-                    ytPlayer.getEngine().setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
-                    ytPlayer.getEngine().setJavaScriptEnabled(true);
+                        ytPlayer.getEngine().setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+                        ytPlayer.getEngine().setJavaScriptEnabled(true);
 
-                    String htmlContent = loadHtmlFromFile("layouts/manual_claims/youtube_player.html");
-                    ytPlayer.getEngine().loadContent(htmlContent);
+                        String htmlContent = loadHtmlFromFile();
+                        ytPlayer.getEngine().loadContent(htmlContent);
 
-                    ytPlayer.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-                        if (newValue == Worker.State.SUCCEEDED) {
-                            ytPlayer.getEngine().executeScript(
-                                    "var meta = document.createElement('meta'); " +
-                                            "meta.httpEquiv = 'Content-Security-Policy'; " +
-                                            "meta.content = \"default-src * 'unsafe-inline' 'unsafe-eval'\"; " +
-                                            "document.getElementsByTagName('head')[0].appendChild(meta);"
-                            );
+                        ytPlayer.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+                            if (newValue == Worker.State.SUCCEEDED) {
+                                ytPlayer.getEngine().executeScript(
+                                        "var meta = document.createElement('meta'); " +
+                                                "meta.httpEquiv = 'Content-Security-Policy'; " +
+                                                "meta.content = \"default-src * 'unsafe-inline' 'unsafe-eval'\"; " +
+                                                "document.getElementsByTagName('head')[0].appendChild(meta);"
+                                );
 
-                            // Load the video after the page has loaded
-                            ytPlayer.getEngine().executeScript("loadVideo('" + ID2 + "')");
-                        }
-                    });
+                                // Load the video after the page has loaded
+                                ytPlayer.getEngine().executeScript("loadVideo('" + ID2 + "')");
+                            }
+                        });
+                    } catch (Exception e) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error!");
+                        alert.setHeaderText("Error Loading URL");
+                        alert.setContentText(e.toString());
+                        alert.showAndWait();
+                    }
                 });
-                // ytPlayer.getEngine().load(embedID);
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error!");
-                    alert.setHeaderText("Error Loading URL");
-                    alert.setContentText(e.toString());
-                    alert.showAndWait();
-                });
+                return null;
             }
-            return null;
-        }
-    };
+        };
 
-    return new Thread(taskLoadVideo);
-}
+        return new Thread(taskLoadVideo);
+    }
 
     // Method to load HTML from file
-    private String loadHtmlFromFile(String fileName) {
-        try (InputStream is = getClass().getResourceAsStream(fileName)) {
+    private String loadHtmlFromFile() throws IOException {
+        try (InputStream is = getClass().getResourceAsStream("layouts/manual_claims/youtube_player.html")) {
             if (is != null) {
                 return new String(is.readAllBytes(), StandardCharsets.UTF_8);
             } else {
-                System.err.println("Could not find file: " + fileName);
+                System.err.println("Could not find file: " + "layouts/manual_claims/youtube_player.html");
                 return "";
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
         }
     }
 
     public void onAddManualClaim() {
+        ytPlayer.getEngine().executeScript("loadVideo()");
         Task<List<Songs>> taskAddClaim = new Task<>() {
             @Override
             protected java.util.List<Songs> call() {
+                StringBuilder errorBuffer = new StringBuilder();
+
                 for (ManualClaimTrack claim : manualClaims) {
                     try {
                         String songName = claim.getTrackName();
@@ -256,30 +269,17 @@ private @NotNull Thread getThreadLoadVideo(String ID2) {
                         int status = DatabasePostgres.addManualClaim(claim);
 
                         Platform.runLater(() -> {
-                            try {
-                                if (status < 1) {
-                                    NotificationBuilder.displayTrayError("Error!", "Error Adding Manual Claim");
-                                } else {
-                                    NotificationBuilder.displayTrayInfo("Manual Claim Added", "Your Claim for " + songName + " is successfully added");
-                                    Node node = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/manual_claims/manual-claims.fxml")));
-                                    UIController.mainNodes[6] = node;
-                                    UIController.mainVBoxStatic.getChildren().setAll(node);
-                                }
-                            } catch (IOException e) {
-                                Platform.runLater(() -> {
-                                    throw new RuntimeException(e);
-                                });
+                            if (status < 1) {
+                                errorBuffer.append("Error adding manual claim for ").append(songName).append("\n");
+                            } else {
+                                NotificationBuilder.displayTrayInfo("Manual Claim Added", "Your Claim for " + songName + " is successfully added");
+                                /*Node node = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/manual_claims/manual-claims.fxml")));
+                                UIController.mainNodes[6] = node;
+                                UIController.mainVBoxStatic.getChildren().setAll(node);*/
                             }
                         });
                     } catch (IOException | SQLException e) {
-                        e.printStackTrace();
-                        Platform.runLater(() -> {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Error");
-                            alert.setHeaderText("Error Occurred When Adding Claim");
-                            alert.setContentText(e.toString());
-                            alert.showAndWait();
-                        });
+                        errorBuffer.append("Error adding claim for ").append(claim.getTrackName()).append(": ").append(e.getMessage()).append("\n");
                     }
                 }
 
@@ -288,6 +288,22 @@ private @NotNull Thread getThreadLoadVideo(String ID2) {
                 Platform.runLater(() -> {
                     btnAddClaim.setText("Add Manual Claim");
                     UIController.blankSidePanel();
+
+                    if (!errorBuffer.isEmpty()) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Errors Occurred");
+                        alert.setHeaderText("Some errors occurred while adding claims");
+                        alert.setContentText(errorBuffer.toString());
+                        alert.showAndWait();
+                    } else {
+                        try {
+                            Node node = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/manual_claims/manual-claims.fxml")));
+                            UIController.mainNodes[6] = node;
+                            UIController.mainVBoxStatic.getChildren().setAll(node);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
                 });
 
 

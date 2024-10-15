@@ -98,6 +98,13 @@
         }
     }
 
+    // Add the pause function
+    function pauseVideo() {
+        if (player && player.pauseVideo) {
+            player.pauseVideo();
+        }
+    }
+
     seekBar.addEventListener("change", function () {
         // Check if the video is not playing and play it
         if (player.getPlayerState() !== YT.PlayerState.PLAYING) {

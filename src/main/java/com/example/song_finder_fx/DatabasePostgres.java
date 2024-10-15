@@ -2241,7 +2241,7 @@ public class DatabasePostgres {
         }
     }
 
-    public static ManualClaimTrack getClaimArtwork(ManualClaimTrack track) throws SQLException {
+    public static void getClaimArtwork(ManualClaimTrack track) throws SQLException {
         int maxRetries = 3;
         int retryCount = 0;
 
@@ -2282,7 +2282,7 @@ public class DatabasePostgres {
                 }
 
                 // System.out.println("DatabasePostgres.getClaimArtwork");
-                return track;
+                return;
             } catch (PSQLException e) {
                 if (e.getMessage().contains("An I/O error occurred") || e.getMessage().contains("This connection has been closed")) {
                     retryCount++;
@@ -2302,7 +2302,6 @@ public class DatabasePostgres {
             }
         }
 
-        return track;
     }
 
     public static int getAMClaimCountFor(LocalDate startDate, LocalDate endDate) throws SQLException {

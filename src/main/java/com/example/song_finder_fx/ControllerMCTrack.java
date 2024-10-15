@@ -61,62 +61,71 @@ public class ControllerMCTrack {
         txtTrackTitle.setOnAction(event -> {
             Songs songs;
             String songName = txtTrackTitle.getText();
-            // System.out.println("songName = " + songName);
+
             try {
                 songs = DatabasePostgres.searchContributorsSR(songName);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+                txtComposer.setText(songs.getComposer());
+                txtLyricist.setText(songs.getLyricist());
+            } catch (SQLException ignore) {
             }
 
-            txtComposer.setText(songs.getComposer());
-            txtLyricist.setText(songs.getLyricist());
 
             spinnerStart.requestFocus();
         });
     }
 
     public void onAddTrack() {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                try {
-                    Platform.runLater(() -> btnAddTrack.setText("Validating Claim..."));
-                    Node nodeTrack = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
+        if (titledPane.getText().equals("Song Name")) {
+            // Perform initial validations
+            if (!checkData()) {
+                return;
+            }
 
-                    // Fetching user values
-                    String trackName = txtTrackTitle.getText();
-                    String lyricist = txtLyricist.getText();
-                    String composer = txtComposer.getText();
-                    String trimStart = spinnerStart.getText();
-                    String trimEnd = spinnerEnd.getText();
-                    String url = ControllerManualClaims.txtURL_Static.getText();
-                    String selectedItem = ControllerManualClaims.comboClaimTypeStatic.getSelectionModel().getSelectedItem();
-                    int claimType = getClaimType(selectedItem);
+            // Create track model
+            String trackName = txtTrackTitle.getText();
+            String lyricist = txtLyricist.getText();
+            String composer = txtComposer.getText();
+            String url = ControllerManualClaims.txtURL_Static.getText();
+            String selectedItem = ControllerManualClaims.comboClaimTypeStatic.getSelectionModel().getSelectedItem();
+            int claimType = getClaimType(selectedItem);
+            String youtubeID = TextFormatter.extractYoutubeID(url);
+            LocalDate date = LocalDate.now();
 
-                    if (checkData()) {
-                        // Fetching YouTube ID
-                        String youtubeID = TextFormatter.extractYoutubeID(url);
+            ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID, date, claimType);
+            MCTrackController mcTrackController = new MCTrackController(track);
 
-                        // Getting Date
-                        LocalDate date = LocalDate.now();
+            // Validate artists
+            boolean artistsValidated = mcTrackController.validateArtists();
 
-                        // Creating track model
-                        ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID, date, claimType);
-                        MCTrackController mcTrackController = new MCTrackController(track);
+            // If artists are not validated, ask for confirmation
+            if (!artistsValidated) {
+                boolean shouldProceed = AlertBuilder.getSendConfirmationAlert(
+                        "Artist Validation",
+                        "Artists Not Validated",
+                        "Both artists are not registered in CeyMusic. Do you want to add the track anyway?"
+                );
+                if (!shouldProceed) {
+                    return;
+                }
+            }
 
-                        try {
-                            mcTrackController.checkNew();
-                        } catch (SQLException e) {
-                            Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Something went wrong", e.toString()));
-                            // ErrorDialog.showErrorDialog("Error!", "Error Adding Track Data", e.toString());
-                        }
+            // If we're here, either artists are validated or user confirmed to proceed
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    try {
+                        Platform.runLater(() -> btnAddTrack.setText("Validating Claim..."));
+                        Node nodeTrack = FXMLLoader.load(Objects.requireNonNull(ControllerSettings.class.getResource("layouts/manual_claims/manual-claims-track.fxml")));
+
+                        String trimStart = spinnerStart.getText();
+                        String trimEnd = spinnerEnd.getText();
 
                         boolean claimValidation = true;
 
                         // Checking trim times
                         if (!trimStart.isEmpty() && !trimEnd.isEmpty()) {
                             // Validating trim times
-                            boolean status = TextFormatter.validateTrimTimes(trimStart, trimEnd); // This will return false either if trim time is less than 50 seconds or if trim time is not in 00:00:00 format
+                            boolean status = TextFormatter.validateTrimTimes(trimStart, trimEnd);
                             if (status) {
                                 // Adding trim times to model
                                 track.addTrimTime(trimStart, trimEnd);
@@ -144,15 +153,13 @@ public class ControllerMCTrack {
                                 ControllerManualClaims.vboxTracksStatic.getChildren().add(nodeTrack);
                             });
                         }
+                    } catch (Exception e) {
+                        Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Something went wrong", e.toString()));
                     }
-                } catch (Exception e) {
-                    Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Something went wrong", e.toString()));
+                    return null;
                 }
-                return null;
-            }
-        };
+            };
 
-        if (titledPane.getText().equals("Song Name")) {
             new Thread(task).start();
         } else {
             saveEdits();
@@ -245,68 +252,68 @@ public class ControllerMCTrack {
         };
     }
 
-private boolean checkData() {
-    boolean status = false;
-    String trackName = txtTrackTitle.getText();
-    String lyricist = txtLyricist.getText();
-    String composer = txtComposer.getText();
-    String trimStart = spinnerStart.getText();
-    String trimEnd = spinnerEnd.getText();
+    private boolean checkData() {
+        boolean status = false;
+        String trackName = txtTrackTitle.getText();
+        String lyricist = txtLyricist.getText();
+        String composer = txtComposer.getText();
+        String trimStart = spinnerStart.getText();
+        String trimEnd = spinnerEnd.getText();
 
-    if (trackName.isEmpty()) {
-        status = true;
-        Platform.runLater(() -> txtTrackTitle.setStyle("-fx-border-color: red;"));
-    } else {
-        Platform.runLater(() -> txtTrackTitle.setStyle("-fx-border-color: '#e9ebee';"));
-    }
-
-    if (lyricist.isEmpty()) {
-        status = true;
-        Platform.runLater(() -> txtLyricist.setStyle("-fx-border-color: red;"));
-    } else {
-        Platform.runLater(() -> txtLyricist.setStyle("-fx-border-color: '#e9ebee';"));
-    }
-
-    if (composer.isEmpty()) {
-        status = true;
-        Platform.runLater(() -> txtComposer.setStyle("-fx-border-color: red;"));
-    } else {
-        Platform.runLater(() -> txtComposer.setStyle("-fx-border-color: '#e9ebee';"));
-    }
-
-    if (!trimStart.isEmpty()) {
-        if (isNotValidTimeFormat(trimStart)) {
+        if (trackName.isEmpty()) {
             status = true;
-            Platform.runLater(() -> spinnerStart.setStyle("-fx-border-color: red;"));
+            Platform.runLater(() -> txtTrackTitle.setStyle("-fx-border-color: red;"));
         } else {
-            if (!trimEnd.isEmpty()) {
-                if (isNotValidTimeFormat(trimStart)) {
-                    status = true;
-                    Platform.runLater(() -> spinnerEnd.setStyle("-fx-border-color: red;"));
-                } else {
-                    LocalTime startTime = LocalTime.parse(trimStart);
-                    LocalTime endTime = LocalTime.parse(trimEnd);
+            Platform.runLater(() -> txtTrackTitle.setStyle("-fx-border-color: '#e9ebee';"));
+        }
 
-                    if (endTime.isBefore(startTime)) {
+        if (lyricist.isEmpty()) {
+            status = true;
+            Platform.runLater(() -> txtLyricist.setStyle("-fx-border-color: red;"));
+        } else {
+            Platform.runLater(() -> txtLyricist.setStyle("-fx-border-color: '#e9ebee';"));
+        }
+
+        if (composer.isEmpty()) {
+            status = true;
+            Platform.runLater(() -> txtComposer.setStyle("-fx-border-color: red;"));
+        } else {
+            Platform.runLater(() -> txtComposer.setStyle("-fx-border-color: '#e9ebee';"));
+        }
+
+        if (!trimStart.isEmpty()) {
+            if (isNotValidTimeFormat(trimStart)) {
+                status = true;
+                Platform.runLater(() -> spinnerStart.setStyle("-fx-border-color: red;"));
+            } else {
+                if (!trimEnd.isEmpty()) {
+                    if (isNotValidTimeFormat(trimStart)) {
                         status = true;
-                        Platform.runLater(() -> {
-                            spinnerEnd.setStyle("-fx-border-color: red;");
-                            spinnerStart.setStyle("-fx-border-color: red;");
-                            NotificationBuilder.displayTrayError("Time Validation Error", "Please check trim start and end times");
-                        });
+                        Platform.runLater(() -> spinnerEnd.setStyle("-fx-border-color: red;"));
                     } else {
-                        Platform.runLater(() -> {
-                            spinnerEnd.setStyle("-fx-border-color: '#e9ebee';");
-                            spinnerStart.setStyle("-fx-border-color: '#e9ebee';");
-                        });
+                        LocalTime startTime = LocalTime.parse(trimStart);
+                        LocalTime endTime = LocalTime.parse(trimEnd);
+
+                        if (endTime.isBefore(startTime)) {
+                            status = true;
+                            Platform.runLater(() -> {
+                                spinnerEnd.setStyle("-fx-border-color: red;");
+                                spinnerStart.setStyle("-fx-border-color: red;");
+                                NotificationBuilder.displayTrayError("Time Validation Error", "Please check trim start and end times");
+                            });
+                        } else {
+                            Platform.runLater(() -> {
+                                spinnerEnd.setStyle("-fx-border-color: '#e9ebee';");
+                                spinnerStart.setStyle("-fx-border-color: '#e9ebee';");
+                            });
+                        }
                     }
                 }
             }
         }
-    }
 
-    return !status;
-}
+        return !status;
+    }
 
     private boolean isNotValidTimeFormat(String timeText) {
         String[] parts = timeText.split(":");
