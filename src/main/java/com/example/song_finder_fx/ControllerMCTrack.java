@@ -48,6 +48,8 @@ public class ControllerMCTrack {
 
     private int trackID;
 
+    private Songs song;
+
     @FXML
     public void initialize() throws SQLException {
         // List<String> songTitles = DatabaseMySQL.getAllSongs();
@@ -59,13 +61,12 @@ public class ControllerMCTrack {
         TextFields.bindAutoCompletion(txtLyricist, artistValidation);
 
         txtTrackTitle.setOnAction(event -> {
-            Songs songs;
             String songName = txtTrackTitle.getText();
 
             try {
-                songs = DatabasePostgres.searchContributorsSR(songName);
-                txtComposer.setText(songs.getComposer());
-                txtLyricist.setText(songs.getLyricist());
+                song = DatabasePostgres.searchContributorsSR(songName);
+                txtComposer.setText(song.getComposer());
+                txtLyricist.setText(song.getLyricist());
             } catch (SQLException ignore) {
             }
 
@@ -92,6 +93,7 @@ public class ControllerMCTrack {
             LocalDate date = LocalDate.now();
 
             ManualClaimTrack track = new ManualClaimTrack(0, trackName, lyricist, composer, youtubeID, date, claimType);
+            track.setOriginalISRC(song.getISRC());
             MCTrackController mcTrackController = new MCTrackController(track);
 
             // Validate artists

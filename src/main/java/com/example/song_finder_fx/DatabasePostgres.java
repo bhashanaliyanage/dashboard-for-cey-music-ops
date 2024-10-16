@@ -129,7 +129,7 @@ public class DatabasePostgres {
     public static Songs searchContributorsSR(String songName) throws SQLException {
         // Connection conn = getConn();
         // ResultSet rs = statement.executeQuery(query);
-        String query = String.format("SELECT song_name, composer, lyricist FROM public.song_metadata_new WHERE song_name = '%s' AND type = 'O' ORDER BY song_name ASC;", songName);
+        String query = String.format("SELECT isrc, composer, lyricist FROM public.song_metadata_new WHERE song_name = '%s' AND type = 'O' ORDER BY song_name ASC;", songName);
 
         try (Connection con = getConn();
              Statement statement = con.createStatement()) {
@@ -137,6 +137,7 @@ public class DatabasePostgres {
             ResultSet rs = statement.executeQuery(query);
             if (rs.isBeforeFirst()) {
                 rs.next();
+                song.setISRC(rs.getString(1));
                 song.setComposer(rs.getString(2));
                 song.setLyricist(rs.getString(3));
                 return song;
@@ -504,7 +505,7 @@ public class DatabasePostgres {
         Connection conn = getConn();
         PreparedStatement preparedStatement = conn.prepareStatement(
                 "INSERT INTO public.manual_claims " +
-                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, date, claim_type) " +
+                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, date, claim_type, original_song_isrc) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -528,6 +529,7 @@ public class DatabasePostgres {
         // preparedStatement.setBytes(8, previewImage); // Remove
         preparedStatement.setDate(7, Date.valueOf(claim.getDate()));
         preparedStatement.setInt(8, claim.getClaimType());
+        preparedStatement.setString(9, claim.getOriginalISRC());
 
         // Execute the prepared statement
         return preparedStatement.executeUpdate();

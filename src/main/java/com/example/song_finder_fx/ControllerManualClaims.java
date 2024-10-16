@@ -261,6 +261,7 @@ public class ControllerManualClaims {
             @Override
             protected java.util.List<Songs> call() {
                 StringBuilder errorBuffer = new StringBuilder();
+                StringBuilder successBuffer = new StringBuilder();
 
                 for (ManualClaimTrack claim : manualClaims) {
                     try {
@@ -272,10 +273,8 @@ public class ControllerManualClaims {
                             if (status < 1) {
                                 errorBuffer.append("Error adding manual claim for ").append(songName).append("\n");
                             } else {
-                                NotificationBuilder.displayTrayInfo("Manual Claim Added", "Your Claim for " + songName + " is successfully added");
-                                /*Node node = FXMLLoader.load(Objects.requireNonNull(UIController.class.getResource("layouts/manual_claims/manual-claims.fxml")));
-                                UIController.mainNodes[6] = node;
-                                UIController.mainVBoxStatic.getChildren().setAll(node);*/
+                                successBuffer.append(songName).append("\n");
+                                // NotificationBuilder.displayTrayInfo("Manual Claim Added", "Your Claim for " + songName + " is successfully added");
                             }
                         });
                     } catch (IOException | SQLException e) {
@@ -288,6 +287,13 @@ public class ControllerManualClaims {
                 Platform.runLater(() -> {
                     btnAddClaim.setText("Add Manual Claim");
                     UIController.blankSidePanel();
+
+                    if (!successBuffer.isEmpty()) {
+                        NotificationBuilder.displayTrayInfo(
+                                "Manual Claims Added",
+                                "Successfully added claims for:\n" + successBuffer.toString()
+                        );
+                    }
 
                     if (!errorBuffer.isEmpty()) {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
