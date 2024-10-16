@@ -1,5 +1,6 @@
 package com.example.song_finder_fx.Organizer;
 
+import com.example.song_finder_fx.Constants.Months;
 import com.example.song_finder_fx.Constants.ProductType;
 import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.*;
@@ -24,7 +25,7 @@ import java.util.Map;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException, InterruptedException {
-        // DatabasePostgres.refreshSummaryTable(6, 2024);
+        DatabasePostgres.refreshSummaryTable(Months.JULY, 2024);
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
@@ -43,7 +44,7 @@ public class Test {
         // catalogNumberGenTest();
         // testUPCGenerator();
 
-        System.out.println(TextFormatter.formatTime("0.17"));
+        // System.out.println(TextFormatter.formatTime("0.17"));
     }
 
     private static void testYTMAddChannel() {

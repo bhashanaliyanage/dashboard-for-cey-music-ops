@@ -506,7 +506,7 @@ public class DatabasePostgres {
         PreparedStatement preparedStatement = conn.prepareStatement(
                 "INSERT INTO public.manual_claims " +
                         "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, date, claim_type, original_song_isrc) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         // Get artwork
