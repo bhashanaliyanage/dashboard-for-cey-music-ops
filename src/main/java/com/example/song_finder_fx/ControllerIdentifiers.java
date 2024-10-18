@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 public class ControllerIdentifiers {
 
@@ -63,6 +64,8 @@ public class ControllerIdentifiers {
 
     @FXML
     void onGenerateISRC() {
+        boolean confirmation = AlertBuilder.getSendConfirmationAlert("Confirm", "Are you sure you want to generate ISRCs?", null);
+
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
@@ -82,7 +85,15 @@ public class ControllerIdentifiers {
                             // Generate ISRC
                             String isrc = dispatcher.dispatchSingleISRC(type);
                             Platform.runLater(() -> isrcTextArea.setText(isrc));
-                            dispatcher.updateLastISRC(isrc, type);
+
+                            String finalType = type;
+                            if (Objects.equals(type, "SR New Artist")) {
+                                finalType = "SR2";
+                            } else if (Objects.equals(type, "SR Old Artist")) {
+                                finalType = "SR";
+                            }
+
+                            dispatcher.updateLastISRC(isrc, finalType);
                         } else {
                             // Generate ISRCs
                             List<String> ISRCs = dispatcher.dispatchMultipleISRCs(count, type);
@@ -102,9 +113,11 @@ public class ControllerIdentifiers {
             }
         };
 
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
+        if (confirmation) {
+            Thread thread = new Thread(task);
+            thread.setDaemon(true);
+            thread.start();
+        }
     }
 
     @FXML

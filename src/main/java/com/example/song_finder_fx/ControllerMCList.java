@@ -120,9 +120,8 @@ public class ControllerMCList {
         return new Task<>() {
             @Override
             protected Void call() throws SQLException {
-                // Platform.runLater(() -> UIController.lblDatabaseStatusStatic.setText("Loading Manual Claims"));
+                // Fetching manual claims
                 allManualClaims = DatabasePostgres.getManualClaims();
-                // manualClaims = DatabasePostgres.getManualClaims();
 
                 // Pagination Modification
                 for (ManualClaimTrack claim : allManualClaims) {
@@ -317,7 +316,7 @@ public class ControllerMCList {
         String paginationInfo = String.format("Page %d of %d (%d-%d of %d claims)",
                 currentPageNumber, totalPages,
                 displayStart, endIndex, totalClaims);
-        System.out.println(paginationInfo);
+        // System.out.println(paginationInfo);
 
         // Assuming you have a Label called lblPaginationInfo in your FXML
         lblPaginationInfo.setText(paginationInfo);
@@ -352,6 +351,18 @@ public class ControllerMCList {
     private Node createClaimEntryNode(ManualClaimTrack claim) throws IOException {
         Node node = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("layouts/manual_claims/manual-claims-list-entry.fxml")));
 
+        String trimStart = claim.getTrimStart();
+        String trimEnd = claim.getTrimEnd();
+        int duration = 0;
+
+        try {
+            if (trimStart != null && trimEnd != null) {
+                // Trim start and trim end are in hh:mm:ss format
+                duration = calculateDuration(trimStart, trimEnd);
+            }
+        } catch (Exception ignore) {
+        }
+
         Label lblSongNo = (Label) node.lookup("#lblSongNo");
         labelsSongNo.add(lblSongNo);
         Label lblSongName = (Label) node.lookup("#lblSongName");
@@ -368,6 +379,11 @@ public class ControllerMCList {
         hBoxes.add(hboxEntry);
         ImageView image = (ImageView) node.lookup("#image");
         ivArtworks.add(image);
+        try {
+            Label lblDuration = (Label) node.lookup("#lblDuration");
+            lblDuration.setText(duration == 0 ? "Full Video" : duration + " sec");
+        } catch (Exception ignore) {
+        }
 
         lblSongNo.setText(String.valueOf(claim.getId()));
         lblSongName.setText(claim.getTrackName());
@@ -378,6 +394,19 @@ public class ControllerMCList {
         lblClaimType.setText(claim.getClaimTypeString());
 
         return node;
+    }
+
+    private int calculateDuration(String trimStart, String trimEnd) {
+        // Trim start and trim end are in hh:mm:ss format
+        String[] startParts = trimStart.split(":");
+        String[] endParts = trimEnd.split(":");
+        int startHours = Integer.parseInt(startParts[0]);
+        int startMinutes = Integer.parseInt(startParts[1]);
+        int startSeconds = Integer.parseInt(startParts[2]);
+        int endHours = Integer.parseInt(endParts[0]);
+        int endMinutes = Integer.parseInt(endParts[1]);
+        int endSeconds = Integer.parseInt(endParts[2]);
+        return (endHours - startHours) * 3600 + (endMinutes - startMinutes) * 60 + (endSeconds - startSeconds);
     }
 
     private Image setImage(ManualClaimTrack claim, int listIndex) throws IOException, URISyntaxException {
@@ -484,7 +513,7 @@ public class ControllerMCList {
         System.out.println(count + " items selected");
     }
 
-    public void onExportSelected(ActionEvent actionEvent) {
+    public void onExportSelected() {
         List<ManualClaimTrack> selectedClaims = new ArrayList<>();
 
         for (int i = 0; i < checkBoxes.size(); i++) {
@@ -634,7 +663,7 @@ public class ControllerMCList {
             // Start background task
             Task<Void> bulkEditTask = new Task<>() {
                 @Override
-                protected Void call() throws Exception {
+                protected Void call() {
                     try {
                         BufferedImage biArtwork = ImageIO.read(image);
                         int imageWidth = biArtwork.getWidth();

@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 import java.text.SimpleDateFormat;
 
 import java.net.URL;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -167,23 +169,15 @@ public static boolean downloadAudio(String url, String fileLocation, String file
     //Get urlList from database  Type 2 Urls
     //GET TV CHANNEL PROGRAM LIST
 
+public static  void main(String[] args) {
+    List<YoutubeData> list =  youList();
+    List<String> li = list.stream().map(YoutubeData::getUrl).collect(Collectors.toList());
+    getvd(li);
+    System.out.println();
+}
 
+    /**
     public static void main(String[] args) {
-        //     List<List<Map<String, String>>> result = new ArrayList<>();
-        //     List<YoutubeData> list = new ArrayList<>();
-        //     List<String> urlList = new ArrayList<>();
-        //        list = getUrlList();
-        //     List<String> lst = new ArrayList<>();
-        //     for (YoutubeData yd : list) {
-        //         urlList = Collections.singletonList(yd.getUrl());
-        ////         System.out.println(result);
-        //         getviData1(urlList);
-        //
-        //        li.addAll(vdData);
-
-        //        li = getvd(urlList);
-        //        System.out.println(li);
-
 
         List<List<Map<String, String>>> result = getTypeTvProgramLlist();
         result.addAll(getProgramListByChannel());
@@ -201,17 +195,17 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 String title = map.get("Title");
                 String url = map.get("Url");
                 String releaseDate = map.get("releaseDate");
+                String label = map.get("Label");
+                String vId = map.get("VideoId");
+                String count =map.get("ViewCount");
 
-                System.out.println("Title: " + title);
-                System.out.println("URL: " + url);
-                // System.out.println("Thumbnail: " + thumbnail);
-                System.out.println("Release Date: " + releaseDate);
-                System.out.println();
+//
             }
         }
 
         System.out.println(totalUploads + " Uploads from " + uniqueChannels.size() + " YouTube Channels are Available");
     }
+     */
 
     public static List<List<Map<String, String>>> getProgramListByChannel() {
         // Type 01: Single Channel
@@ -262,6 +256,9 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 map.put("Url", v.getUrl());
                 map.put("Thumbnail", v.getThumbnail());
                 map.put("releaseDate", v.getReleaseDate());
+                map.put("ViewCount", stringSpliter(v.getLable()));
+                map.put("Label", v.getLable());
+                System.out.println(stringSpliter(v.getLable())+" THIS IS VIEW COUNT");
                 maplist.add(map);
             }
             li.add(maplist);
@@ -314,6 +311,8 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                             .path("webCommandMetadata").path("url").asText("URL not found");
 
                     String YoutubeChannel = you.getUrl().substring(25);
+                    String label = videoRenderer.path("title").path("accessibility").path("accessibilityData")
+                            .path("label").asText("Label not found");
 
 //                    String dataOrMonth = extractSinhalaSubstring(publishedTimeText);
                     System.out.println();
@@ -321,6 +320,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                     String dataOrMonth = publishedTimeText.substring(0, 9);
                     byte[] bytes1 = dataOrMonth.getBytes(StandardCharsets.UTF_8);
                     System.out.println("Data or Month: " + dataOrMonth);
+
 //                    String dataOrMonth = new String(publishedTimeText.substring(0, 2).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
 //                    System.out.println("Extracted: " + dataOrMonth);
 //                  //test area
@@ -372,6 +372,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
 //						vd1.setReleaseDate(formattedUploadDate);
                         vd1.setTitle(YoutubeChannel);
                         vd1.setReleaseDate(dateCalulator(datenumber));
+                        vd1.setLable(label);
 //						vd1.set
 //						result1.add(result.toString());
                         vd.add(vd1);
@@ -455,11 +456,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                     map.put("channelName", s);
                 }
             }
-            //upto this
 
-            //newly added
-
-            //upto this
 
             result.addAll(result1);
 
@@ -492,6 +489,11 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                 map.put("Thumbnail", vd.getThumbnail());
                 map.put("releaseDate", vd.getReleaseDate());
                 map.put("channelName", vd.getChannalName());
+                map.put("Label", vd.getLable());
+                map.put("VideoId", vd.getVideoID());
+                map.put("ViewCount",vd.getViewCount());
+
+
 
                 maplist.add(map);
             }
@@ -503,8 +505,7 @@ public static boolean downloadAudio(String url, String fileLocation, String file
     }
 
     public static List<VideoDetails> getYou(String name) {
-        //	String playlistUrl = "https://www.youtube.com/playlist?list=PLxlWBAWnGBcdKoHbqfALcO0mHvfMpzNF4";
-        //	String playlistUrl = "https://www.youtube.com/@LakaiSikai/videos";
+
 
         List<VideoDetails> vList = new ArrayList<VideoDetails>();
 
@@ -514,18 +515,65 @@ public static boolean downloadAudio(String url, String fileLocation, String file
             int count = 0;
             VideoDetails vd = new VideoDetails();
 
-            /*System.out.println("Title: " + video.getTitle());
-            System.out.println("URL: " + video.getUrl());
-            System.out.println("Thumbnail: " + video.getThumbnail());
-            System.out.println("video" + video.getReleaseDate());
-            System.out.println(name);*/
+
+            System.out.println("VIDEO ID: " + video.getVideoID());
             String title = video.getTitle();
+            String label =video.getLable();
+            String vId = video.getVideoID();
             video.setChannalName(name);
-//            System.out.println();
+            video.setLable(label);
+            video.setVideoID(vId);
+            String ss =	stringSpliter(video.getLable());
+//            System.out.println("LINE 543 VIEW COUNT"+ss);
+            video.setViewCount(ss);
+
+
             vList.add(video);
         }
         return vList;
     }
+
+    public static String stringSpliter(String s) {
+        String count = "";
+        String dataSet = s;
+        String regex = "[,\\.\\s]";
+        String st[] =dataSet.split(regex);
+        String revList1[] = null;
+        int n = st.length;
+        for(int i = 0;i<n-1;i++) {
+            String sss = st[i];
+
+                String num = sss.hashCode() + "THIS IS HASH CODE";
+                num = String.valueOf(num.hashCode());
+
+            int ii =Integer.parseInt(num);
+
+            if (-264710101 == ii) {
+
+                count =  st[i+1]+","+ st[i+2];
+//                System.out.println("THIS IS VIEW COUNT "+count);
+            } else {
+//                System.out.println("Strings are not equal.");
+            }
+//
+        }
+
+
+
+        return count;
+
+    }
+
+    public static String[] reverse(String[] array) {
+        String[] reversedArray = new String[array.length];
+
+        for (int i = 0; i < array.length; i++) {
+            reversedArray[i] = array[array.length - 1 - i];
+        }
+
+        return reversedArray;
+    }
+
 
     public static List<VideoDetails> getPlaylistVideos(String playlistUrl) {
         List<VideoDetails> videoList = new ArrayList<>();
@@ -552,6 +600,9 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                             .asText("Title not found");
                     title = new String(videoRenderer.path("title").path("runs").get(0).path("text")
                             .asText("Title not found").getBytes(), StandardCharsets.UTF_8);
+
+                    String label = videoRenderer.path("title").path("accessibility").path("accessibilityData").path("label").asText("Label not found");
+//                    System.out.println("THIS IS LABEL "+label);
                     String videoId = videoRenderer.path("videoId").asText("Video ID not found");
                     String thumbnailUrl = videoRenderer.path("thumbnail").path("thumbnails").get(0).path("url")
                             .asText("Thumbnail not found");
@@ -570,6 +621,8 @@ public static boolean downloadAudio(String url, String fileLocation, String file
                     video.setThumbnail(thumbnailUrl);
                     // new
                     video.setReleaseDate(s);
+                    video.setLable(label);
+                    video.setVideoID(videoId);
 //					video.setChannalName(playlistUrl);
 
                     videoList.add(video);

@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerManualClaims">
+<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerManualClaims">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -80,7 +80,7 @@
                   </children>
                </HBox>
             </HBox>
-            <WebView fx:id="ytPlayer" prefHeight="370.0" prefWidth="200.0">
+            <WebView fx:id="ytPlayer" minHeight="-1.0" minWidth="-1.0" prefHeight="370.0" prefWidth="-1.0">
                <VBox.margin>
                   <Insets bottom="10.0" left="20.0" right="20.0" />
                </VBox.margin>

@@ -126,25 +126,24 @@ public class DatabasePostgres {
         return songs;
     }
 
-    public static Songs searchContributors(String songName) throws SQLException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
-        Songs song = new Songs();
+    public static Songs searchContributorsSR(String songName) throws SQLException {
+        // Connection conn = getConn();
+        // ResultSet rs = statement.executeQuery(query);
+        String query = String.format("SELECT isrc, composer, lyricist FROM public.song_metadata_new WHERE song_name = '%s' AND type = 'O' ORDER BY song_name ASC;", songName);
 
-        String query = String.format("SELECT song_name, composer, lyricist FROM public.song_metadata_new WHERE song_name = '%s' ORDER BY song_name ASC;", songName);
-        ResultSet rs = statement.executeQuery(query);
-        if (rs.isBeforeFirst()) {
-            rs.next();
-            song.setComposer(rs.getString(2));
-            song.setLyricist(rs.getString(3));
-            // song.getContributorsFromRS(rs);
-
-            System.out.println("song.getLyricist() = " + song.getLyricist());
-            System.out.println("song.getComposer() = " + song.getComposer());
-
+        try (Connection con = getConn();
+             Statement statement = con.createStatement()) {
+            Songs song = new Songs();
+            ResultSet rs = statement.executeQuery(query);
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                song.setISRC(rs.getString(1));
+                song.setComposer(rs.getString(2));
+                song.setLyricist(rs.getString(3));
+                return song;
+            }
             return song;
         }
-        return song;
     }
 
     public static int checkPreviousClaims(String id) throws SQLException {
@@ -190,13 +189,16 @@ public class DatabasePostgres {
     }
 
     public static String getManualClaimCount() throws SQLException {
-        Connection conn = getConn();
-        Statement statement = conn.createStatement();
         String query = "SELECT COUNT(youtube_id) FROM public.manual_claims WHERE ingest_status = false AND archive = false;";
-        ResultSet rs = statement.executeQuery(query);
-        rs.next();
-        int count = rs.getInt(1);
-        return String.valueOf(count);
+
+        try (Connection con = getConn()) {
+            Statement statement = con.createStatement();
+            try (ResultSet rs = statement.executeQuery(query)) {
+                rs.next();
+                int count = rs.getInt(1);
+                return String.valueOf(count);
+            }
+        }
     }
 
     public static ResultSet getTop5Territories() throws SQLException {
@@ -503,8 +505,8 @@ public class DatabasePostgres {
         Connection conn = getConn();
         PreparedStatement preparedStatement = conn.prepareStatement(
                 "INSERT INTO public.manual_claims " +
-                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, date, claim_type) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                        "(song_name, composer, lyricist, youtube_id, trim_start, trim_end, date, claim_type, original_song_isrc) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         // Get artwork
@@ -527,6 +529,7 @@ public class DatabasePostgres {
         // preparedStatement.setBytes(8, previewImage); // Remove
         preparedStatement.setDate(7, Date.valueOf(claim.getDate()));
         preparedStatement.setInt(8, claim.getClaimType());
+        preparedStatement.setString(9, claim.getOriginalISRC());
 
         // Execute the prepared statement
         return preparedStatement.executeUpdate();
@@ -2240,7 +2243,7 @@ public class DatabasePostgres {
         }
     }
 
-    public static ManualClaimTrack getClaimArtwork(ManualClaimTrack track) throws SQLException {
+    public static void getClaimArtwork(ManualClaimTrack track) throws SQLException {
         int maxRetries = 3;
         int retryCount = 0;
 
@@ -2272,7 +2275,7 @@ public class DatabasePostgres {
                                 track.setPreviewImage(previewImage);
                                 track.setImage(artwork);
                             } else {
-                                System.out.println("No Artwork Found");
+                                System.out.println("No Artwork Found for Manual Claim: " + track.getId());
                             }
                         } catch (IOException e) {
                             System.out.println("Unable to download artwork");
@@ -2280,8 +2283,8 @@ public class DatabasePostgres {
                     }
                 }
 
-                System.out.println("DatabasePostgres.getClaimArtwork");
-                return track;
+                // System.out.println("DatabasePostgres.getClaimArtwork");
+                return;
             } catch (PSQLException e) {
                 if (e.getMessage().contains("An I/O error occurred") || e.getMessage().contains("This connection has been closed")) {
                     retryCount++;
@@ -2301,7 +2304,6 @@ public class DatabasePostgres {
             }
         }
 
-        return track;
     }
 
     public static int getAMClaimCountFor(LocalDate startDate, LocalDate endDate) throws SQLException {
@@ -2755,6 +2757,12 @@ public class DatabasePostgres {
     }
 
     public static String getLastISRC(String assetType) throws SQLException {
+        if (Objects.equals(assetType, "SR New Artist")) {
+            assetType = "SR2";
+        } else if (Objects.equals(assetType, "SR Old Artist")) {
+            assetType = "SR";
+        }
+
         String sql = "SELECT last_isrc FROM public.isrc_table WHERE asset_type = ?;";
 
         try (Connection con = getConn();
@@ -3702,9 +3710,9 @@ public class DatabasePostgres {
         boolean bl = false;
         try {
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, you.getUrl());
+            ps.setString(3, you.getUrl());
             ps.setString(2, you.getName());
-            ps.setInt(3, you.getType());
+            ps.setInt(1, you.getType());
             bl = ps.executeUpdate() > 0 ? true : false;
         } catch (Exception e) {
             e.printStackTrace();
@@ -3726,6 +3734,106 @@ public class DatabasePostgres {
             e.printStackTrace();
         }
         return bl;
+    }
+
+    public int getUpcCount() {
+        Connection con = getConn();
+        String sql = "SELECT count(*) from upc";
+        int count = 0;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+
+    public boolean addDataToUpc(UpcData data) {
+        Connection con = getConn();
+        String sql = "INSERT INTO public.upc(upc_num, product_name, type, available,assign user) VALUES (?, ?, ?, 0,?);";
+        boolean bl = false;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, data.getUpcNumber());
+            ps.setString(2, data.getProductName());
+            ps.setString(3, data.getType());
+            ps.setString(4, data.getUser());
+            bl = ps.executeUpdate() > 0 ? true : false;
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bl;
+    }
+
+
+    public boolean removeUpc(List<String> List) {
+        boolean bl = false;
+        Connection con = getConn();
+        String sql = "update upc set product_name = '', type = '',vacant='1', available = '1' where upc_num = ?";
+        try {
+            for (String s : List) {
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, s);
+                bl = ps.executeUpdate() > 0 ? true : false;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        return bl;
+    }
+
+    public List<String> viewUpcList(int count) {
+
+        Connection con = getConn();
+        String sql = "SELECT upc_num from upc where available = '1' Limit ? ";
+        List<String> list;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, count);
+            ResultSet rs = ps.executeQuery();
+            list = new ArrayList<>();
+            while (rs.next()) {
+                list.add(rs.getString(1));
+                updateVacant(list);
+            }
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection(con);
+        }
+        return list;
+    }
+
+    private void updateVacant(List<String> list) {
+        Connection con = getConn();
+        String sql = "update upc set vacant ='0' where upc_num = ?";
+
+        try {
+            for (String s : list) {
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, s);
+                ps.executeUpdate();
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection(con);
+        }
+
+
     }
 
 

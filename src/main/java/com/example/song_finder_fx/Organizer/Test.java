@@ -1,8 +1,11 @@
 package com.example.song_finder_fx.Organizer;
 
+import com.example.song_finder_fx.Constants.Months;
+import com.example.song_finder_fx.Constants.ProductType;
 import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.DatabasePostgres;
+import com.example.song_finder_fx.Main;
 import com.example.song_finder_fx.Model.*;
 import com.example.song_finder_fx.Session.UserSession;
 import com.example.song_finder_fx.Session.UserSummary;
@@ -22,24 +25,56 @@ import java.util.Map;
 
 public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, CsvValidationException, InterruptedException {
-        // DatabasePostgres.refreshSummaryTable(8, 2024);
+        DatabasePostgres.refreshSummaryTable(Months.JULY, 2024);
         // testBulkReporting();
         // April 0.6305, 184.65
         // March 0.6285, 186.78
-        getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 8, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_august_mahesh_vithana.pdf");
+        // getArtistReport(0.6285, 186.78, "Mahesh Vithana", 2024, 8, "C:\\Users\\bhash\\Documents\\Test\\ReportsBulk\\2024_august_mahesh_vithana.pdf");
         // testArtistReportsNew();
         // testNewArtistReportPDF();
 
         // testDashboard();
         // UserSession us = new UserSession();
-        // DatabasePostgres.changePassword("gimhaar", "admin");
+        // DatabasePostgres.changePassword("sandumini", "admin");
 
         // testYouTubeMonitoring();
+        // testYTMAddChannel();
+
         // isrcDispatcherTest();
-
         // catalogNumberGenTest();
+        // testUPCGenerator();
 
+        // System.out.println(TextFormatter.formatTime("0.17"));
+    }
+
+    private static void testYTMAddChannel() {
         // YoutubeDownload.downloadAudio("https://www.youtube.com/watch?v=VPLQqrhKNPk", "D:\\CeyMusic\\Ingests\\2024.10.02", "VPLQqrhKNPk.flac", null);
+        YoutubeData channel = new YoutubeData();
+        channel.setName("Test Name");
+        channel.setType(1);
+        channel.setUrl("https://www.youtube.com/channel/UC4WjwE9qz3wQyqFZKg9uN5g");
+
+        YoutubeDownload youtubeDownload = new YoutubeDownload();
+        youtubeDownload.addChannelToDatabase(channel);
+    }
+
+    private static void testUPCGenerator() {
+        UPCGenarator upcGenarator = new UPCGenarator();
+
+        List<String> upcList = upcGenarator.viewUpcList(10);
+        for (String upc : upcList) {
+            System.out.println(upc);
+        }
+
+        UpcData upcData = new UpcData();
+        String upc = "4796033752004";
+        String productName = "Test Product";
+        String type = ProductType.UGC;
+        String username = Main.userSession.getUserName();
+        upcData.setUpcNumber(upc);
+        upcData.setProductName(productName);
+        upcData.setType(type);
+        upcData.setUser(username);
     }
 
     private static void catalogNumberGenTest() throws SQLException {
@@ -156,18 +191,32 @@ public class Test {
     }
 
     private static void testNewArtistReportPDF() throws SQLException, IOException, ClassNotFoundException {
-        ArtistReport report = getArtistReportNew(0, 0.6305, 184.65, "Methun SK", 2024, 7, true);
+        int month = 6;
+        int year = 2024;
+        double eurToAudRate = 0.63475;
+        double audToLkrRate = 191.86;
+
+        ArrayList<String> names = new ArrayList<>(Arrays.asList("Methun SK", "Ridma Weerawardena", "Senanga Dissanayake", "WAYO", "Aruna Lian", "Abhisheka Wimalaweera"));
+
+        for (String name : names) {
+            ArtistReport report = getArtistReportNew(0, eurToAudRate, audToLkrRate, name, year, month, true);
+            ReportPDFNew pdf = new ReportPDFNew();
+            pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\" + month + "_" + year + "_" + name + ".pdf", report);
+            System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
+        }
+
+        /*ArtistReport report = getArtistReportNew(0, 0.63475, 191.86, "Abhisheka Wimalaweera", 2024, 6, true);
 
         ReportPDFNew pdf = new ReportPDFNew();
-        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\2024_july_methun.pdf", report);
-        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());
+        pdf.generateReport("C:\\Users\\bhash\\Documents\\Test\\ReportsNewArtists\\6_2024_Abhisheka_Wimalaweera.pdf", report);
+        System.out.println("\n========\n\nReport for " + report.getArtist().getName() + " is generated and saved in: " + pdf.getReportPath());*/
     }
 
     private static void testBulkReporting() throws SQLException, IOException {
         int month = 6;
         int year = 2024;
-        double eurToAudRate = 0.63333;
-        double audToLkrRate = 186.90;
+        double eurToAudRate = 0.63475;
+        double audToLkrRate = 191.86;
 
         ArrayList<String> names = new ArrayList<>(Arrays.asList(
                 "Ajantha Ranasinghe",

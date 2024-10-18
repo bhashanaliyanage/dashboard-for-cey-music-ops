@@ -22,6 +22,16 @@ public class ManualClaimTrack {
     private BufferedImage previewImage;
     private final int claimType;
 
+    public String getOriginalISRC() {
+        return originalISRC;
+    }
+
+    public void setOriginalISRC(String originalISRC) {
+        this.originalISRC = originalISRC;
+    }
+
+    private String originalISRC;
+
     public ManualClaimTrack(int id, String trackName, String lyricist, String composer, String youTubeID, LocalDate date, int claimType) {
         this.id = id;
         this.trackName = trackName;

@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox prefHeight="70.0" spacing="10.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<HBox prefHeight="70.0" spacing="10.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerYTMEntry">
    <HBox fx:id="hboxEntry" alignment="CENTER_LEFT" prefWidth="512.0" styleClass="clickable-pane-bg" HBox.hgrow="ALWAYS">
       <ImageView fx:id="imgThumb" fitHeight="68.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="true">
          <HBox.margin>
@@ -43,44 +43,41 @@
          </HBox>
          <HBox layoutX="10.0" layoutY="49.0">
             <VBox.margin>
-               <Insets top="5.0" />
+               <Insets top="5.0"/>
             </VBox.margin>
-            <children>
-               <Label fx:id="lblCName" maxWidth="350.0" text="Channel Name" textFill="#656565" />
-               <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
-                  <children>
-                     <Label fx:id="lblViewCount" text="View Count" textFill="#2e6070">
-                        <font>
-                           <Font name="Segoe UI" size="12.0" />
-                        </font>
-                     </Label>
-                  </children>
-                  <HBox.margin>
-                     <Insets right="10.0" />
-                  </HBox.margin>
-               </HBox>
-            </children>
+            <Label fx:id="lblCName" maxWidth="350.0" text="Channel Name" textFill="#656565"/>
+            <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets right="10.0"/>
+               </HBox.margin>
+               <Label fx:id="lblYTLink" layoutX="218.0" layoutY="10.0" maxWidth="1.0"
+                      textFill="#2e6070" visible="false">
+                  <font>
+                     <Font name="Segoe UI" size="12.0"/>
+                  </font>
+               </Label>
+               <Label fx:id="lblViewCount" text="View Count" textFill="#2e6070">
+                  <font>
+                     <Font name="Segoe UI" size="12.0"/>
+                  </font>
+               </Label>
+            </HBox>
          </HBox>
       </VBox>
    </HBox>
    <VBox>
-      <children>
-         <HBox alignment="CENTER_RIGHT" VBox.vgrow="ALWAYS">
-            <children>
-               <Button mnemonicParsing="false" prefHeight="70.0" prefWidth="50.0" styleClass="button_inside">
-                  <graphic>
-                     <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
-                        <image>
-                           <Image url="@../../images/icon_plus.png" />
-                        </image>
-                     </ImageView>
-                  </graphic>
-                  <HBox.margin>
-                     <Insets />
-                  </HBox.margin>
-               </Button>
-            </children>
-         </HBox>
-      </children>
+      <HBox alignment="CENTER_RIGHT" VBox.vgrow="ALWAYS">
+         <Button mnemonicParsing="false" onAction="#onAddManualClaim" prefHeight="70.0" prefWidth="50.0"
+                 styleClass="button_inside">
+            <graphic>
+               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
+                  <Image url="@../../images/icon_plus.png"/>
+               </ImageView>
+            </graphic>
+            <HBox.margin>
+               <Insets/>
+            </HBox.margin>
+         </Button>
+      </HBox>
    </VBox>
 </HBox>
