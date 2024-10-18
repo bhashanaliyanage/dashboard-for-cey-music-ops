@@ -3,7 +3,6 @@ package com.example.song_finder_fx.Controller;
 import com.example.song_finder_fx.Main;
 import javafx.application.Platform;
 
-import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 
 public class NotificationBuilder {

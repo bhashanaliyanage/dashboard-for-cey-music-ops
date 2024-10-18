@@ -4,7 +4,6 @@ import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.YoutubeData;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -22,7 +21,7 @@ public class ControllerYTMAddChannel {
     private ToggleGroup type;
 
     @FXML
-    void onSave(ActionEvent event) {
+    void onSave() {
         boolean isValid = true;
         String channelName = txtChannelName.getText().trim();
         String url = txtURL.getText().trim();
@@ -75,10 +74,12 @@ public class ControllerYTMAddChannel {
 
             if (youtubeDownload.addChannelToDatabase(channel)) {
                 // AlertBuilder.sendInfoAlert("Success", null, "Channel added to database.");
-                NotificationBuilder.displayTrayInfo("Channel added to database.", "Channel added to database.");
+                NotificationBuilder.displayTrayInfo("Channel added to database.", channelName + " added to database.");
+                UIController.blankSidePanel();
+                new Thread(() -> ControllerYouTubeMonitoring.listChannels("Refreshing...")).start();
             } else {
                 // AlertBuilder.sendErrorAlert("Error", null, "Failed to add channel to database.");
-                NotificationBuilder.displayTrayError("Failed to add channel to database.", "Failed to add channel to database.");
+                NotificationBuilder.displayTrayError("Something went wrong.", "Error: Failed to add channel to database.");
             }
         }
     }
