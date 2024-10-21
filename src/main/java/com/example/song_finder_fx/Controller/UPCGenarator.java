@@ -10,6 +10,8 @@ public class UPCGenarator {
 
     DatabasePostgres db = new DatabasePostgres();
 
+
+    //Get Available UPC Count
     public int getUpcAvailableCount() {
 
         int i = db.getUpcCount();
@@ -17,6 +19,8 @@ public class UPCGenarator {
         return i;
     }
 
+
+    //UPC DATA INSERT
     public String getUpc(UpcData upcData) {
         String s = "";
         boolean bl = db.addDataToUpc(upcData);
@@ -39,10 +43,29 @@ public class UPCGenarator {
         return s;
     }
 
-    public List<String> viewUpcList(int count){
+
+
+    //GET UPC NUMBER LIST FROM UPC
+    public List<String> viewUpcList(int count,int uid){
         List<String> list =  new ArrayList<>();
-        list =db.viewUpcList(count);
+        list =db.viewUpcList(count,uid);
         return list;
     }
+    private boolean allocateUser(int uid, List<String> list) {
+        boolean bl = false;
+        bl = db.allocateUser(uid, list);
+        return  bl;
+    }
+
+
+
+    public  List<String> upcListByAllocateUser(int uid){
+            List<String> list =  new ArrayList<>();
+        list = db.upcListByAllocateUser(uid);
+
+
+     return  list;
+    }
+
 
 }
