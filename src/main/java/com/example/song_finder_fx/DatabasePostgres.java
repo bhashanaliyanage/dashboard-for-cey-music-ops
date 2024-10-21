@@ -3866,9 +3866,9 @@ public class DatabasePostgres {
         Connection con = getConn()  ;
         String sql  = "Update upc set assign_user = '',vacant = '0' where upc_number  IN ("; StringBuilder placeholders = new StringBuilder();
       for (int i = 0; i < list.size(); i++) {
-          placeholders.append("?"); // Placeholder for each item
+          placeholders.append("?");
           if (i < list.size() - 1) {
-              placeholders.append(", "); // Add comma if not the last item
+              placeholders.append(", ");
           }
       }
       sql += placeholders.toString() + ")";
