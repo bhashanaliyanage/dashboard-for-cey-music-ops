@@ -13,7 +13,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -32,60 +31,60 @@ import javafx.scene.control.Label;
 
 public class YoutubeDownload {
 
-public static boolean downloadAudio(String url, String fileLocation, String fileName, Label lblPercentage) throws IOException, InterruptedException {
-    String file = fileLocation + "\\" + fileName;
-    String nodeScriptPath = "libs/jdown.js";
+    public static boolean downloadAudio(String url, String fileLocation, String fileName, Label lblPercentage) throws IOException, InterruptedException {
+        String file = fileLocation + "\\" + fileName;
+        String nodeScriptPath = "libs/jdown.js";
 
-    System.out.println("Downloading audio from: " + url);
-    System.out.println("Saving downloaded audio as: " + file);
+        System.out.println("Downloading audio from: " + url);
+        System.out.println("Saving downloaded audio as: " + file);
 
-    ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
-    Process process = processBuilder.start();
+        ProcessBuilder processBuilder = new ProcessBuilder("node", nodeScriptPath, url, file);
+        Process process = processBuilder.start();
 
-    // Patterns for progress and speed
-    Pattern progressPattern = Pattern.compile("\\[download]\\s+(\\d+\\.\\d+)%");
-    // Pattern speedPattern = Pattern.compile("at\\s+([\\d.]+(?:K|M|G)?iB/s)");
+        // Patterns for progress and speed
+        Pattern progressPattern = Pattern.compile("\\[download]\\s+(\\d+\\.\\d+)%");
+        // Pattern speedPattern = Pattern.compile("at\\s+([\\d.]+(?:K|M|G)?iB/s)");
 
-    // Read and print output
-    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    String line;
-    while ((line = reader.readLine()) != null) {
-        // Extract progress
-        Matcher progressMatcher = progressPattern.matcher(line);
-        if (progressMatcher.find()) {
-            String progress = progressMatcher.group(1);
-            if (lblPercentage != null) {
-                String finalLine = line;
-                Platform.runLater(() -> {
-                    lblPercentage.setText(progress + "%");
-                    System.out.println(finalLine);
-                });
+        // Read and print output
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            // Extract progress
+            Matcher progressMatcher = progressPattern.matcher(line);
+            if (progressMatcher.find()) {
+                String progress = progressMatcher.group(1);
+                if (lblPercentage != null) {
+                    String finalLine = line;
+                    Platform.runLater(() -> {
+                        lblPercentage.setText(progress + "%");
+                        System.out.println(finalLine);
+                    });
+                }
+                // System.out.println("Progress: " + progress + "%");
             }
-            // System.out.println("Progress: " + progress + "%");
+
+            /*// Extract speed
+            Matcher speedMatcher = speedPattern.matcher(line);
+            if (speedMatcher.find()) {
+                String speed = speedMatcher.group(1);
+                System.out.println("Speed: " + speed);
+            }*/
         }
 
-        /*// Extract speed
-        Matcher speedMatcher = speedPattern.matcher(line);
-        if (speedMatcher.find()) {
-            String speed = speedMatcher.group(1);
-            System.out.println("Speed: " + speed);
-        }*/
+        int exitCode = process.waitFor();
+
+        boolean status;
+
+        if (exitCode == 0) {
+            System.out.println("Audio download script executed successfully.");
+            status = true;
+        } else {
+            System.out.println("Audio download script execution failed.");
+            status = false;
+        }
+
+        return status;
     }
-
-    int exitCode = process.waitFor();
-
-    boolean status;
-
-    if (exitCode == 0) {
-        System.out.println("Audio download script executed successfully.");
-        status = true;
-    } else {
-        System.out.println("Audio download script execution failed.");
-        status = false;
-    }
-
-    return status;
-}
 
     public static void trimAudio(String filePath, String outputPath, String startTime, String EndTime) throws IOException, InterruptedException {
         String nodeScriptPPath = "libs/cutAud.js";
@@ -169,42 +168,42 @@ public static boolean downloadAudio(String url, String fileLocation, String file
     //Get urlList from database  Type 2 Urls
     //GET TV CHANNEL PROGRAM LIST
 
-public static  void main(String[] args) {
-    List<YoutubeData> list =  youList();
-    List<String> li = list.stream().map(YoutubeData::getUrl).collect(Collectors.toList());
-    getvd(li);
-    System.out.println();
-}
+    public static void main(String[] args) {
+        List<YoutubeData> list = youList();
+        List<String> li = list.stream().map(YoutubeData::getUrl).collect(Collectors.toList());
+        getvd(li);
+        System.out.println();
+    }
 
     /**
-    public static void main(String[] args) {
-
-        List<List<Map<String, String>>> result = getTypeTvProgramLlist();
-        result.addAll(getProgramListByChannel());
-        // List<List<Map<String, String>>> result = getProgramListByChannel();
-        int totalUploads = 0;
-        Set<String> uniqueChannels = new HashSet<>();
-
-        for (List<Map<String, String>> list1 : result) {
-            for (Map<String, String> map : list1) {
-                // Fetching Details
-                String channelName = map.get("channelName");
-                uniqueChannels.add(channelName);
-                totalUploads++;
-
-                String title = map.get("Title");
-                String url = map.get("Url");
-                String releaseDate = map.get("releaseDate");
-                String label = map.get("Label");
-                String vId = map.get("VideoId");
-                String count =map.get("ViewCount");
-
-//
-            }
-        }
-
-        System.out.println(totalUploads + " Uploads from " + uniqueChannels.size() + " YouTube Channels are Available");
-    }
+     * public static void main(String[] args) {
+     * <p>
+     * List<List<Map<String, String>>> result = getTypeTvProgramLlist();
+     * result.addAll(getProgramListByChannel());
+     * // List<List<Map<String, String>>> result = getProgramListByChannel();
+     * int totalUploads = 0;
+     * Set<String> uniqueChannels = new HashSet<>();
+     * <p>
+     * for (List<Map<String, String>> list1 : result) {
+     * for (Map<String, String> map : list1) {
+     * // Fetching Details
+     * String channelName = map.get("channelName");
+     * uniqueChannels.add(channelName);
+     * totalUploads++;
+     * <p>
+     * String title = map.get("Title");
+     * String url = map.get("Url");
+     * String releaseDate = map.get("releaseDate");
+     * String label = map.get("Label");
+     * String vId = map.get("VideoId");
+     * String count =map.get("ViewCount");
+     * <p>
+     * //
+     * }
+     * }
+     * <p>
+     * System.out.println(totalUploads + " Uploads from " + uniqueChannels.size() + " YouTube Channels are Available");
+     * }
      */
 
     public static List<List<Map<String, String>>> getProgramListByChannel() {
@@ -245,7 +244,7 @@ public static  void main(String[] args) {
         List<List<Map<String, String>>> li = new ArrayList<>();
 
         for (String s : list) {
-            List<VideoDetails> vd = new ArrayList<>();
+            List<VideoDetails> vd;
             System.out.println("Link: " + s);
             vd = dataList(s);
             List<Map<String, String>> maplist = new ArrayList<>();
@@ -258,7 +257,7 @@ public static  void main(String[] args) {
                 map.put("releaseDate", v.getReleaseDate());
                 map.put("ViewCount", stringSpliter(v.getLable()));
                 map.put("Label", v.getLable());
-                System.out.println(stringSpliter(v.getLable())+" THIS IS VIEW COUNT");
+                System.out.println(stringSpliter(v.getLable()) + " THIS IS VIEW COUNT");
                 maplist.add(map);
             }
             li.add(maplist);
@@ -287,8 +286,7 @@ public static  void main(String[] args) {
 
     public static List<VideoDetails> getRes(YouDownload you) {
         StringBuilder result = new StringBuilder();
-        List<String> result1 = new ArrayList<>();
-        List<VideoDetails> vd = new ArrayList<VideoDetails>();
+        List<VideoDetails> vd = new ArrayList<>();
         try {
             String urlString = you.getUrl();
             String jsonResponse = getResponseFromUrl(urlString);
@@ -491,8 +489,7 @@ public static  void main(String[] args) {
                 map.put("channelName", vd.getChannalName());
                 map.put("Label", vd.getLable());
                 map.put("VideoId", vd.getVideoID());
-                map.put("ViewCount",vd.getViewCount());
-
+                map.put("ViewCount", vd.getViewCount());
 
 
                 maplist.add(map);
@@ -518,12 +515,12 @@ public static  void main(String[] args) {
 
             System.out.println("VIDEO ID: " + video.getVideoID());
             String title = video.getTitle();
-            String label =video.getLable();
+            String label = video.getLable();
             String vId = video.getVideoID();
             video.setChannalName(name);
             video.setLable(label);
             video.setVideoID(vId);
-            String ss =	stringSpliter(video.getLable());
+            String ss = stringSpliter(video.getLable());
 //            System.out.println("LINE 543 VIEW COUNT"+ss);
             video.setViewCount(ss);
 
@@ -537,27 +534,26 @@ public static  void main(String[] args) {
         String count = "";
         String dataSet = s;
         String regex = "[,\\.\\s]";
-        String st[] =dataSet.split(regex);
+        String st[] = dataSet.split(regex);
         String revList1[] = null;
         int n = st.length;
-        for(int i = 0;i<n-1;i++) {
+        for (int i = 0; i < n - 1; i++) {
             String sss = st[i];
 
-                String num = sss.hashCode() + "THIS IS HASH CODE";
-                num = String.valueOf(num.hashCode());
+            String num = sss.hashCode() + "THIS IS HASH CODE";
+            num = String.valueOf(num.hashCode());
 
-            int ii =Integer.parseInt(num);
+            int ii = Integer.parseInt(num);
 
             if (-264710101 == ii) {
 
-                count =  st[i+1]+","+ st[i+2];
+                count = st[i + 1] + "," + st[i + 2];
 //                System.out.println("THIS IS VIEW COUNT "+count);
             } else {
 //                System.out.println("Strings are not equal.");
             }
 //
         }
-
 
 
         return count;

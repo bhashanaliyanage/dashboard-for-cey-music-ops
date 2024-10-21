@@ -3,6 +3,7 @@ package com.example.song_finder_fx;
 import com.example.song_finder_fx.Controller.AlertBuilder;
 import com.example.song_finder_fx.Controller.NotificationBuilder;
 import com.example.song_finder_fx.Controller.TextFormatter;
+import com.example.song_finder_fx.Controller.YoutubeDownload;
 import com.example.song_finder_fx.Model.ManualClaimTrack;
 import com.example.song_finder_fx.Model.Songs;
 import javafx.application.Platform;
@@ -13,12 +14,19 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Window;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +37,9 @@ import java.util.Objects;
 import static com.example.song_finder_fx.Controller.ManualClaims.manualClaims;
 
 public class ControllerManualClaims {
+
+    @FXML
+    private Button btnDownload;
 
     @FXML
     public WebView ytPlayer;
@@ -136,6 +147,50 @@ public class ControllerManualClaims {
         } else {
             System.out.println("URL Empty");
         }
+    }
+
+    @FXML
+    void onDownload() {
+        String URL = txtURL.getText();
+
+        if (!Objects.equals(URL, "")) {
+            Window window = btnAddClaim.getScene().getWindow();
+            File file = Main.browseLocationNew(window);
+
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    Platform.runLater(() -> {
+                        btnDownload.setText("Downloading...");
+                        btnDownload.setDisable(true);
+                    });
+
+                    try {
+                        String ID = TextFormatter.extractYoutubeID(URL);
+                        YoutubeDownload.downloadAudio(URL, file.getAbsolutePath(), ID + ".flac", null);
+                    } catch (IOException | InterruptedException e) {
+                        AlertBuilder.sendErrorAlert("Error Downloading", "Error Downloading", "Something went wrong when downloading the video. Please try again\n\n" + e);
+                    }
+
+                    return null;
+                }
+            };
+
+            task.setOnSucceeded(event -> Platform.runLater(() -> {
+                btnDownload.setText("Download");
+                btnDownload.setDisable(false);
+                NotificationBuilder.displayTrayInfo("Download Complete", "File saved in " + file.getAbsolutePath());
+
+                try {
+                    // Open the downloaded folder
+                    Desktop.getDesktop().open(file);
+                } catch (IOException ignore) {
+                }
+            }));
+
+            new Thread(task).start();
+        }
+
     }
 
     private Thread getThreadPreviousClaims(String id2) {

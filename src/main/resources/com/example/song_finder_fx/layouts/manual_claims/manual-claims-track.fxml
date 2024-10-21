@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<TitledPane fx:id="titledPane" prefWidth="600.0" stylesheets="@../../styles.css" text="Song Name" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCTrack">
+<TitledPane fx:id="titledPane" prefWidth="600.0" stylesheets="@../../styles.css" text="Song Name" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerMCTrack">
    <font>
       <Font size="14.0" />
    </font>
@@ -41,33 +41,30 @@
                   <Insets top="5.0" />
                </VBox.margin>
                <HBox spacing="5.0">
-                  <children>
-                     <TextField fx:id="spinnerStart" onAction="#formatStartTime" prefWidth="110.0" promptText="00:00:00" styleClass="textarea-bg" />
-                     <Button mnemonicParsing="false" onAction="#onGetStartTime" styleClass="button_inside">
-                        <graphic>
-                           <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                              <image>
-                                 <Image url="@../../images/star.png" />
-                              </image>
-                           </ImageView>
-                        </graphic>
-                     </Button>
-                  </children>
+                  <TextField fx:id="spinnerStart" onAction="#formatStartTime" prefHeight="30.0" prefWidth="110.0"
+                             promptText="00:00:00" styleClass="textarea-bg"/>
+                  <Button mnemonicParsing="false" onAction="#onGetStartTime" prefHeight="30.0"
+                          styleClass="button_inside">
+                     <graphic>
+                        <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                           <Image url="@../../images/star.png"/>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                </HBox>
                <Label text="-" textFill="#656565" />
                <HBox spacing="5.0">
-                  <children>
-                     <TextField fx:id="spinnerEnd" onAction="#formatEndTime" prefWidth="110.0" promptText="00:00:00" styleClass="textarea-bg" />
-                     <Button mnemonicParsing="false" onAction="#onGetEndTime" styleClass="button_inside">
-                        <graphic>
-                           <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                              <image>
-                                 <Image url="@../../images/star.png" />
-                              </image>
-                           </ImageView>
-                        </graphic>
-                     </Button>
-                  </children>
+                  <TextField fx:id="spinnerEnd" onAction="#formatEndTime" prefHeight="30.0" prefWidth="110.0"
+                             promptText="00:00:00" styleClass="textarea-bg"/>
+                  <Button mnemonicParsing="false" onAction="#onGetEndTime" prefHeight="30.0" styleClass="button_inside">
+                     <graphic>
+                        <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../images/star.png"/>
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                </HBox>
             </HBox>
          </VBox>
@@ -106,8 +103,9 @@
          <VBox.margin>
             <Insets top="10.0" />
          </VBox.margin>
-         <Button fx:id="btnAddTrack" mnemonicParsing="false" onAction="#onAddTrack" prefHeight="30.0" prefWidth="1054.0" styleClass="button_inside_brown" text="Add Track" />
-         <Button fx:id="btnEditTrack" disable="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onEditTrack" prefHeight="30.0" prefWidth="687.0" styleClass="button_inside_brown" text="Edit Track" />
+         <Button fx:id="btnAddTrack" mnemonicParsing="false" onAction="#onAddTrack" prefHeight="30.0" prefWidth="356.0" styleClass="button_inside_brown" text="Add Track" />
+         <Button fx:id="btnEditTrack" disable="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onEditTrack" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Edit Track" />
+         <Button fx:id="btnEditTrack1" disable="true" layoutX="487.0" layoutY="10.0" mnemonicParsing="false" onAction="#onEditTrack" prefHeight="30.0" prefWidth="100.0" styleClass="button_inside" text="Delete Track" />
       </HBox>
    </VBox>
 </TitledPane>

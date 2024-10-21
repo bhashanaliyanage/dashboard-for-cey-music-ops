@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -15,7 +16,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerManualClaims">
+<VBox prefWidth="750.0" stylesheets="@../../styles.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.song_finder_fx.ControllerManualClaims">
     <HBox>
         <VBox.margin>
             <Insets left="30.0" top="30.0" />
@@ -60,25 +61,51 @@
             </VBox>
             <HBox prefWidth="200.0" spacing="10.0">
                <VBox.margin>
-                  <Insets bottom="10.0" left="20.0" right="20.0" top="30.0" />
+                  <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
                </VBox.margin>
-               <HBox HBox.hgrow="ALWAYS">
+               <VBox HBox.hgrow="ALWAYS">
+                  <VBox spacing="5.0">
+                     <Label text="Link:" textFill="#656565"/>
+                     <HBox alignment="CENTER_LEFT" spacing="5.0">
+                        <TextField fx:id="txtURL" onAction="#urlOnAction" prefHeight="30.0"
+                                   promptText="https://www.youtube.com/watch?v=&lt;id&gt;"
+                                   styleClass="textarea-bg" HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnAddToList" graphicTextGap="5.0" minHeight="30.0" mnemonicParsing="false"
+                                onAction="#onCheckBtnClicked" prefHeight="30.0" styleClass="button_inside"
+                                stylesheets="@../../styles.css" text="Search">
+                           <graphic>
+                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true"
+                                         preserveRatio="true">
+                                 <Image url="@../../images/icon%20_search%20normal%201_.png"/>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="btnDownload" graphicTextGap="5.0" layoutX="418.0" layoutY="10.0"
+                                minHeight="30.0" mnemonicParsing="false" onAction="#onDownload" prefHeight="30.0"
+                                styleClass="button_inside" stylesheets="@../../styles.css" text="Download">
+                           <graphic>
+                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true"
+                                         preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../images/icon%20_document%20download_.png"/>
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </HBox>
+                  </VBox>
+               </VBox>
+               <Separator orientation="VERTICAL" prefHeight="50.0" />
+               <VBox spacing="5.0">
                   <children>
-                     <TextField fx:id="txtURL" onAction="#urlOnAction" prefHeight="30.0" promptText="https://www.youtube.com/watch?v=&lt;id&gt;" styleClass="textarea-bg" HBox.hgrow="ALWAYS" />
-                     <Button fx:id="btnAddToList" minHeight="30.0" mnemonicParsing="false" onAction="#onCheckBtnClicked" prefHeight="30.0" styleClass="button_inside" stylesheets="@../../styles.css">
-                        <graphic>
-                           <ImageView fitHeight="10.0" fitWidth="10.0" pickOnBounds="true" preserveRatio="true">
-                              <Image url="@../../images/icon%20_search%20normal%201_.png" />
-                           </ImageView>
-                        </graphic>
-                     </Button>
+                     <Label text="Claim Type:" textFill="#656565" />
+                     <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0">
+                        <children>
+                           <ComboBox fx:id="comboClaimType" prefHeight="30.0" prefWidth="200.0" promptText="Claim Type" HBox.hgrow="ALWAYS" />
+                        </children>
+                     </HBox>
                   </children>
-               </HBox>
-               <HBox prefWidth="200.0">
-                  <children>
-                     <ComboBox fx:id="comboClaimType" prefHeight="30.0" prefWidth="650.0" promptText="Claim Type" HBox.hgrow="ALWAYS" />
-                  </children>
-               </HBox>
+               </VBox>
             </HBox>
             <WebView fx:id="ytPlayer" minHeight="-1.0" minWidth="-1.0" prefHeight="370.0" prefWidth="-1.0">
                <VBox.margin>
