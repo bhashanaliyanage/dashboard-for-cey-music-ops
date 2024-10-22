@@ -28,7 +28,7 @@ public class UserSession {
     }
 
     // Method to restore session if user was previously logged in
-    private void restoreSession() throws SQLException {
+    private void restoreSession() {
         username = preferences.get("username", null);
         isLoggedIn = preferences.getBoolean("isLoggedIn", false);
         if (isLoggedIn) {
@@ -87,34 +87,6 @@ public class UserSession {
     // Method to simulate user signup
     public void signup(String username, String password, String email, String displayName) throws SQLException {
         boolean userCreated = DatabasePostgres.createUser(username, password, email, displayName);
-        if (userCreated) {
-            // Simulate user signup logic
-            // For demonstration purposes, let's assume signup always succeeds
-            isLoggedIn = true;
-            setPrivilegesAndEmail(username);
-            saveSession(username);
-            System.out.println("Signup successful. Welcome, " + username + "!");
-        } else {
-            System.out.println("Error!. Unable to create user for username: " + username);
-        }
-    }
-
-    // Method to simulate user signup
-    public void googleSignup(String id, String displayName) throws SQLException {
-        /*
-        * JSONObject userData = authGoogle.getJsonData();
-
-        Object id = userData.get("id");
-        Object name = userData.get("name");
-        Object given_name = userData.get("given_name");
-        Object family_name = userData.get("family_name");
-        Object picture = userData.get("picture");
-        * */
-
-        // boolean userCreated = DatabasePostgres.createUser(username, password, email, displayName);
-        String username = displayName.toLowerCase().replace(" ", "_");
-        boolean userCreated = DatabasePostgres.createUserGoogle(id, displayName, username);
-
         if (userCreated) {
             // Simulate user signup logic
             // For demonstration purposes, let's assume signup always succeeds
@@ -201,5 +173,9 @@ public class UserSession {
     public void loginGoogle() {
         OAuthAuthenticator authGoogle = new OAuthGoogleAuthenticator("452215453695-7u0h5pfs9n3352ppc47ivg84nk82vs6t.apps.googleusercontent.com", "http://localhost/dashboard/", "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", "https://www.googleapis.com/auth/userinfo.profile");
         authGoogle.startLogin();
+    }
+
+    public int getUserID() {
+        return user.getUserID();
     }
 }

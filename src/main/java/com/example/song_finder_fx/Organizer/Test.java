@@ -1,7 +1,6 @@
 package com.example.song_finder_fx.Organizer;
 
 import com.example.song_finder_fx.Constants.Months;
-import com.example.song_finder_fx.Constants.ProductType;
 import com.example.song_finder_fx.Constants.SearchType;
 import com.example.song_finder_fx.Controller.*;
 import com.example.song_finder_fx.DatabasePostgres;
@@ -61,20 +60,20 @@ public class Test {
     private static void testUPCGenerator() {
         UPCGenarator upcGenarator = new UPCGenarator();
 
-        List<String> upcList = upcGenarator.viewUpcList(10);
+        int userID = Main.userSession.getUserID();
+
+        List<String> upcList = upcGenarator.viewUpcList(10, userID);
         for (String upc : upcList) {
             System.out.println(upc);
         }
 
-        UpcData upcData = new UpcData();
+        /*UpcData upcData = new UpcData();
         String upc = "4796033752004";
         String productName = "Test Product";
         String type = ProductType.UGC;
-        String username = Main.userSession.getUserName();
         upcData.setUpcNumber(upc);
         upcData.setProductName(productName);
-        upcData.setType(type);
-        upcData.setUser(username);
+        upcData.setType(type);*/
     }
 
     private static void catalogNumberGenTest() throws SQLException {

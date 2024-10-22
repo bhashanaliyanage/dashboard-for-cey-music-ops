@@ -52,59 +52,58 @@
                      <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
                   </VBox.margin>
                   <HBox spacing="10.0">
-                     <children>
-                        <VBox prefWidth="320.0" spacing="10.0">
-                           <HBox>
+                     <VBox prefWidth="320.0" spacing="10.0">
+                        <HBox>
+                           <VBox spacing="10.0">
                               <VBox spacing="10.0">
-                                 <VBox spacing="10.0">
-                                    <Label text="Type" textFill="#656565" />
-                                    <HBox spacing="10.0">
-                                       <ToggleButton fx:id="btnSearchName" mnemonicParsing="false" prefWidth="160.0" selected="true" styleClass="button_inside" text="SR Old Artist">
-                                          <toggleGroup>
-                                             <ToggleGroup fx:id="type" />
-                                          </toggleGroup>
-                                       </ToggleButton>
-                                       <ToggleButton fx:id="btnSearchName11" layoutX="163.0" layoutY="10.0" mnemonicParsing="false" prefWidth="160.0" styleClass="button_inside" text="SR New Artist" toggleGroup="$type" />
-                                       <ToggleButton fx:id="btnSearchName1" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefWidth="160.0" styleClass="button_inside" text="UGC" toggleGroup="$type" />
-                                    </HBox>
-                                 </VBox>
-                              </VBox>
-                              <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" />
-                           </HBox>
-                           <VBox alignment="TOP_RIGHT">
-                              <children>
+                                 <Label text="Type" textFill="#656565"/>
                                  <HBox spacing="10.0">
-                                    <children>
-                                       <VBox maxWidth="-Infinity" spacing="10.0">
-                                          <children>
-                                             <Label text="Count" textFill="#656565" />
-                                             <Spinner fx:id="isrcCount" editable="true" />
-                                          </children>
-                                       </VBox>
-                                       <HBox alignment="BOTTOM_LEFT">
-                                          <children>
-                                             <Button mnemonicParsing="false" onAction="#onGenerateISRC" prefWidth="150.0" styleClass="button_inside" text="Generate" />
-                                          </children>
-                                       </HBox>
-                                    </children>
+                                    <ToggleButton fx:id="btnSearchName" mnemonicParsing="false" prefWidth="160.0"
+                                                  selected="true" styleClass="button_inside" text="SR Old Artist">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="type"/>
+                                       </toggleGroup>
+                                    </ToggleButton>
+                                    <ToggleButton fx:id="btnSearchName11" layoutX="163.0" layoutY="10.0"
+                                                  mnemonicParsing="false" prefWidth="160.0" styleClass="button_inside"
+                                                  text="SR New Artist" toggleGroup="$type"/>
+                                    <ToggleButton fx:id="btnSearchName1" layoutX="10.0" layoutY="10.0"
+                                                  mnemonicParsing="false" prefWidth="160.0" styleClass="button_inside"
+                                                  text="UGC" toggleGroup="$type"/>
                                  </HBox>
-                              </children>
-                              <VBox.margin>
-                                 <Insets top="10.0" />
-                              </VBox.margin>
+                              </VBox>
                            </VBox>
-                           <VBox layoutX="10.0" layoutY="74.0" prefWidth="419.0" spacing="10.0">
-                              <children>
-                                 <Label text="ISRCs" textFill="#656565" />
-                                 <TextArea fx:id="isrcTextArea" prefHeight="150.0" promptText="ISRCs" styleClass="textarea-bg" />
-                              </children>
-                              <VBox.margin>
-                                 <Insets />
-                              </VBox.margin>
-                           </VBox>
-                           <VBox alignment="TOP_RIGHT" layoutX="10.0" layoutY="84.0" />
+                           <VBox layoutX="10.0" layoutY="10.0" spacing="10.0"/>
+                        </HBox>
+                        <VBox alignment="TOP_RIGHT">
+                           <VBox.margin>
+                              <Insets top="10.0"/>
+                           </VBox.margin>
+                           <HBox spacing="10.0">
+                              <VBox maxWidth="-Infinity" spacing="10.0">
+                                 <Label text="Count" textFill="#656565"/>
+                                 <Spinner fx:id="isrcCount" editable="true"/>
+                              </VBox>
+                              <HBox alignment="BOTTOM_LEFT">
+                                 <children>
+                                    <Button mnemonicParsing="false" onAction="#onGenerateISRC" prefWidth="150.0"
+                                            styleClass="button_inside" text="Generate"/>
+                                 </children>
+                              </HBox>
+                           </HBox>
                         </VBox>
-                     </children>
+                        <VBox layoutX="10.0" layoutY="74.0" prefWidth="419.0" spacing="10.0">
+                           <children>
+                              <Label text="ISRCs" textFill="#656565"/>
+                              <TextArea fx:id="isrcTextArea" prefHeight="150.0" promptText="ISRCs"
+                                        styleClass="textarea-bg"/>
+                           </children>
+                           <VBox.margin>
+                              <Insets/>
+                           </VBox.margin>
+                        </VBox>
+                        <VBox alignment="TOP_RIGHT" layoutX="10.0" layoutY="84.0"/>
+                     </VBox>
                   </HBox>
                </HBox>
             </VBox>
@@ -193,6 +192,7 @@
                </children>
             </VBox>
          </HBox>
+         <Button mnemonicParsing="false" onAction="#onGenerateUPC" prefHeight="27.0" prefWidth="687.0" styleClass="button_inside" text="Generate UPCs" />
          <VBox maxWidth="688.0" prefWidth="688.0" styleClass="textarea-bg" stylesheets="@../../styles.css">
             <HBox spacing="10.0">
                <VBox.margin>

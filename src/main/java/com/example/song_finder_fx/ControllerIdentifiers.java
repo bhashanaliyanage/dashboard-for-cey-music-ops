@@ -1,14 +1,14 @@
 package com.example.song_finder_fx;
 
-import com.example.song_finder_fx.Controller.AlertBuilder;
-import com.example.song_finder_fx.Controller.CatalogNumberGenerator;
-import com.example.song_finder_fx.Controller.ISRCDispatcher;
-import com.example.song_finder_fx.Controller.ISRCEncryptor;
+import com.example.song_finder_fx.Controller.*;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -191,5 +191,17 @@ public class ControllerIdentifiers {
 
         // Set the decrypted ISRCs in the TextArea for output
         taEcOrDcISRCs.setText(decryptedISRCs.toString().trim());
+    }
+
+    @FXML
+    void onGenerateUPC(ActionEvent event) {
+        try {
+            Node node = SceneController.loadLayout("layouts/identifiers/upc-generator.fxml");
+            UIController.mainVBoxStatic.getChildren().clear();
+            UIController.mainVBoxStatic.getChildren().add(node);
+        } catch (IOException e) {
+            AlertBuilder.sendErrorAlert("Error", "Failed to load layout", e.toString());
+            e.printStackTrace();
+        }
     }
 }
