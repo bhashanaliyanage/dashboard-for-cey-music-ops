@@ -3736,9 +3736,12 @@ public class DatabasePostgres {
         return bl;
     }
 
+
+
+    //UPC SERVICE
     public int getUpcCount() {
         Connection con = getConn();
-        String sql = "SELECT count(*) from upc";
+        String sql = "SELECT count(*) from upc where vacant = '1' and available = '1'";
         int count = 0;
         try {
             PreparedStatement ps = con.prepareStatement(sql);
@@ -3776,7 +3779,7 @@ public class DatabasePostgres {
     public boolean removeUpc(List<String> List) {
         boolean bl = false;
         Connection con = getConn();
-        String sql = "update upc set product_name = '', type = '',vacant='1', available = '1' where upc_num = ?";
+        String sql = "update upc set product_name = '', type = '',vacant='1', available = '1', assign_user = '' where upc_num = ?";
         try {
             for (String s : List) {
                 PreparedStatement ps = con.prepareStatement(sql);
@@ -3791,10 +3794,10 @@ public class DatabasePostgres {
         return bl;
     }
 
-    public List<String> viewUpcList(int count) {
+    public List<String> viewUpcList(int count,int uid) {
 
         Connection con = getConn();
-        String sql = "SELECT upc_num from upc where available = '1' Limit ? ";
+        String sql = "SELECT upc_num from upc where available = '1' AND vacant ='1' Limit ? ";
         List<String> list;
         try {
             PreparedStatement ps = con.prepareStatement(sql);
@@ -3803,7 +3806,7 @@ public class DatabasePostgres {
             list = new ArrayList<>();
             while (rs.next()) {
                 list.add(rs.getString(1));
-                updateVacant(list);
+                updateVacant(list,uid);
             }
 
 
@@ -3815,14 +3818,15 @@ public class DatabasePostgres {
         return list;
     }
 
-    private void updateVacant(List<String> list) {
+    private void updateVacant(List<String> list,int uid) {
         Connection con = getConn();
-        String sql = "update upc set vacant ='0' where upc_num = ?";
+        String sql = "update upc set vacant ='0', assign_user = ?  where upc_num = ?";
 
         try {
             for (String s : list) {
                 PreparedStatement ps = con.prepareStatement(sql);
-                ps.setString(1, s);
+                ps.setInt(1,uid);
+                ps.setString(2, s);
                 ps.executeUpdate();
             }
 
@@ -3835,6 +3839,50 @@ public class DatabasePostgres {
 
 
     }
+
+   public List<String> upcListByAllocateUser(int uid){
+
+            Connection con = getConn()  ;
+            String sql = "SELECT  upc_num from upc where available = '0' and assign_user = ? ";
+            List<String>    list =  new ArrayList<>();
+            try {
+            PreparedStatement ps= con.prepareStatement(sql);
+            ps.setInt(1,uid);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()){
+                list.add(rs.getString(1));
+
+            }
+
+            }catch (Exception e) {
+                e.printStackTrace();
+            }finally {
+                closeConnection(con);
+            }
+        return list;
+   }
+
+  public boolean allocateUser(int uid, List<String> list) {
+        Connection con = getConn()  ;
+        String sql  = "Update upc set assign_user = '',vacant = '0' where upc_number  IN ("; StringBuilder placeholders = new StringBuilder();
+      for (int i = 0; i < list.size(); i++) {
+          placeholders.append("?");
+          if (i < list.size() - 1) {
+              placeholders.append(", ");
+          }
+      }
+      sql += placeholders.toString() + ")";
+        try {
+        PreparedStatement ps =  con.prepareStatement(sql);
+        ps.setInt(1,uid);
+
+        }catch (Exception   e) {
+
+        }
+      return false;
+  }
+
 
 
 }

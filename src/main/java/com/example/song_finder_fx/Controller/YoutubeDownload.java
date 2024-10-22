@@ -690,4 +690,17 @@ public class YoutubeDownload {
         bl = db.updateYoutubeChannel(you);
         return bl;
     }
+
+
+    public String calViewCountSeperately(List<String> lableList) {
+
+        for (String lable : lableList) {
+            if (lable.contains("View Count")) {
+
+
+            }
+        }
+        return null;
+    }
+
 }
