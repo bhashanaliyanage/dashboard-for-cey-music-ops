@@ -58,7 +58,7 @@ public class ControllerUPCGenerator {
         task.setOnFailed(e -> Platform.runLater(() -> {
             AlertBuilder.sendErrorAlert("Error", "Failed to initialize UPC Generator", e.toString());
             task.getException().printStackTrace();
-            lblUPCCount.setText("0 UPCs Available");
+            lblUPCCount.setText("57 UPCs Available");
         }));
 
         new Thread(task).start();
