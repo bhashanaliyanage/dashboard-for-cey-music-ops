@@ -29,7 +29,7 @@ public class ControllerUPCGenerator {
 
     private UPCGenarator upcGenarator;
 
-    private int availableUPC_Count;
+    private int availableUPC_Count = 0;
 
     private int userID;
 
@@ -40,27 +40,26 @@ public class ControllerUPCGenerator {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                try {
-                    upcGenarator = new UPCGenarator();
-                    userID = Main.userSession.getUserID();
+                upcGenarator = new UPCGenarator();
+                userID = Main.userSession.getUserID();
 
-                    availableUPC_Count = upcGenarator.getUpcAvailableCount();
-                    SpinnerValueFactory<Integer> upcValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, availableUPC_Count, 1);
+                availableUPC_Count = upcGenarator.getUpcAvailableCount();
+                SpinnerValueFactory<Integer> upcValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, availableUPC_Count, 1);
 
-                    Platform.runLater(() -> {
-                        lblUPCCount.setText(availableUPC_Count + " UPCs Available");
-                        upcSpinner.setValueFactory(upcValueFactory);
-                    });
-                } catch (Exception e) {
-                    Platform.runLater(() -> {
-                        AlertBuilder.sendErrorAlert("Error", "Unable to initialize UPC Generator", e.toString());
-                        System.out.println("Error Initializing UPC Generator: " + e);
-                    });
-                }
+                Platform.runLater(() -> {
+                    lblUPCCount.setText(availableUPC_Count + " UPCs Available");
+                    upcSpinner.setValueFactory(upcValueFactory);
+                });
 
                 return null;
             }
         };
+
+        task.setOnFailed(e -> Platform.runLater(() -> {
+            AlertBuilder.sendErrorAlert("Error", "Failed to initialize UPC Generator", e.toString());
+            task.getException().printStackTrace();
+            lblUPCCount.setText("0 UPCs Available");
+        }));
 
         new Thread(task).start();
     }
@@ -117,17 +116,17 @@ public class ControllerUPCGenerator {
                     btnUndo.setDisable(false);
                 } catch (Exception e) {
                     Platform.runLater(() -> AlertBuilder.sendErrorAlert("Error", "Unable to undo last action", e.toString()));
-                    System.out.println("Error Undoing last action: " + e);
+                    e.printStackTrace();
                 }
                 return null;
             }
         };
 
-        new Thread(task).start();
 
         boolean confirmation = AlertBuilder.getSendConfirmationAlert("Warning", null, "Are you sure you want to undo last action?");
-        if (confirmation) {
 
+        if (confirmation) {
+            new Thread(task).start();
         }
     }
 }

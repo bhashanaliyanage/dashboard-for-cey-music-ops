@@ -3779,7 +3779,7 @@ public class DatabasePostgres {
     public boolean removeUpc(List<String> List) {
         boolean bl = false;
         Connection con = getConn();
-        String sql = "update upc set product_name = '', type = '',vacant='1', available = '1', assign_user = '' where upc_num = ?";
+        String sql = "update upc set product_name = '', type = '',vacant='1', available = '1', assign_user = null where upc_num = ?";
         try {
             for (String s : List) {
                 PreparedStatement ps = con.prepareStatement(sql);
