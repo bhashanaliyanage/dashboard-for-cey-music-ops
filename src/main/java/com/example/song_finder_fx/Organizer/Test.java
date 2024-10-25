@@ -53,24 +53,7 @@ public class Test {
         // testUPCGenerator();
     }
 
-    private static void testUPCGenerator() {
-        UPCGenarator upcGenarator = new UPCGenarator();
 
-        List<String> upcList = upcGenarator.viewUpcList(10);
-        for (String upc : upcList) {
-            System.out.println(upc);
-        }
-
-        UpcData upcData = new UpcData();
-        String upc = "4796033752004";
-        String productName = "Test Product";
-        String type = ProductType.UGC;
-        String username = Main.userSession.getUserName();
-        upcData.setUpcNumber(upc);
-        upcData.setProductName(productName);
-        upcData.setType(type);
-        upcData.setUser(username);
-    }
 
     private static void catalogNumberGenTest() throws SQLException {
         CatalogNumberGenerator generator = new CatalogNumberGenerator();
